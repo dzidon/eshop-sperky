@@ -1,0 +1,62 @@
+body {
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
+}
+
+main {
+    flex: 1 0 auto;
+}
+
+.icon-block {
+    padding: 0 15px;
+}
+
+.icon-block .material-icons {
+    font-size: inherit;
+}
+
+.bold {
+    font-weight: bold;
+}
+
+.parallax-container {
+    min-height: 380px;
+    line-height: 0;
+    height: auto;
+}
+
+.img-parralax {
+    filter: brightness(60%);
+    transform: translate3d(-50%, 244.229px, 0px);
+    opacity: 1;
+}
+
+.cart-badge {
+    padding-left: 7px;
+    padding-right: 7px;
+    border-radius: 50px;
+}
+
+.row-products {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.col-products {
+    margin: 0 !important;
+}
+
+.space-between {
+    justify-content: space-between;
+}
+
+.row .input-field input:focus {
+    border-bottom: 1px solid #03a9f4 !important;
+    box-shadow: 0 1px 0 0 #03a9f4 !important;
+}
+
+.checkbox-light-blue[type="checkbox"].filled-in:checked+span:not(.lever):after {
+    border: 2px solid #03a9f4 !important;
+    background-color: #03a9f4 !important;
+}
