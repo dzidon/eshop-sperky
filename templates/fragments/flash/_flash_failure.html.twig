@@ -1,0 +1,3 @@
+{% for flashFailure in app.flashes('failure') %}
+    <div class="card-panel red lighten-4 bold red-text text-darken-3">{{ flashFailure }}</div>
+{% endfor %}

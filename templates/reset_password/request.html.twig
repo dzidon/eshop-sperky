@@ -8,9 +8,8 @@
         <div class="container">
             <h1>Obnova hesla</h1>
 
-            {% for flashFailure in app.flashes('failure') %}
-                <div class="card-panel red lighten-4 bold red-text text-darken-3">{{ flashFailure }}</div>
-            {% endfor %}
+            {# Flash failure zprávy #}
+            {{ include('fragments/flash/_flash_failure.html.twig') }}
 
             <br>
             {{ form_start(requestForm) }}
