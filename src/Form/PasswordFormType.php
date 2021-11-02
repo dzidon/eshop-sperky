@@ -18,7 +18,7 @@ class PasswordFormType extends AbstractType
             ->add('repeated', RepeatedType::class, [
                 'type' => PasswordType::class,
                 'first_options' => [
-                    'attr' => ['autocomplete' => 'new-password'],
+                    'attr' => $options['first_options_attr'],
                     'constraints' => [
                         new NotBlank([
                             'message' => 'Zadejte heslo.',
@@ -42,6 +42,10 @@ class PasswordFormType extends AbstractType
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefaults([]);
+        $resolver->setDefaults([
+            'first_options_attr' => array(),
+        ]);
+
+        $resolver->setAllowedTypes('first_options_attr', 'array');
     }
 }

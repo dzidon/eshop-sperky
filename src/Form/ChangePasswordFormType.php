@@ -11,7 +11,10 @@ class ChangePasswordFormType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('plainPassword', PasswordFormType::class);
+            ->add('plainPassword', PasswordFormType::class, [
+                'first_options_attr' => ['autocomplete' => 'new-password',
+                                         'autofocus' => 'autofocus'],
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

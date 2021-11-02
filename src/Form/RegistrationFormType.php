@@ -28,6 +28,7 @@ class RegistrationFormType extends AbstractType
             ])
             ->add('plainPassword', PasswordFormType::class, [
                 'mapped' => false,
+                'first_options_attr' => ['autocomplete' => 'new-password'],
             ])
         ;
     }
