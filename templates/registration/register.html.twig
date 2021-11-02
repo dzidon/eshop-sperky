@@ -19,18 +19,18 @@
 
                 <div class="row">
                     <div class="input-field">
-                        {{ form_label(registrationForm.plainPassword.first, 'Heslo') }}
-                        {{ form_widget(registrationForm.plainPassword.first) }}
+                        {{ form_label(registrationForm.plainPassword.repeated.first, 'Heslo') }}
+                        {{ form_widget(registrationForm.plainPassword.repeated.first) }}
                     </div>
-                    <span class="helper-text red-text">{{ form_errors(registrationForm.plainPassword.first) }}</span>
+                    <span class="helper-text red-text">{{ form_errors(registrationForm.plainPassword.repeated.first) }}</span>
                 </div>
 
                 <div class="row">
                     <div class="input-field">
-                        {{ form_label(registrationForm.plainPassword.second, 'Heslo znovu') }}
-                        {{ form_widget(registrationForm.plainPassword.second) }}
+                        {{ form_label(registrationForm.plainPassword.repeated.second, 'Heslo znovu') }}
+                        {{ form_widget(registrationForm.plainPassword.repeated.second) }}
                     </div>
-                    <span class="helper-text red-text">{{ form_errors(registrationForm.plainPassword.second) }}</span>
+                    <span class="helper-text red-text">{{ form_errors(registrationForm.plainPassword.repeated.second) }}</span>
                 </div>
 
                 <div class="row">

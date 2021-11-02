@@ -11,18 +11,18 @@
             {{ form_start(resetForm) }}
                 <div class="row">
                     <div class="input-field">
-                        {{ form_label(resetForm.plainPassword.first, 'Heslo') }}
-                        {{ form_widget(resetForm.plainPassword.first) }}
+                        {{ form_label(resetForm.plainPassword.repeated.first, 'Heslo') }}
+                        {{ form_widget(resetForm.plainPassword.repeated.first) }}
                     </div>
-                    <span class="helper-text red-text">{{ form_errors(resetForm.plainPassword.first) }}</span>
+                    <span class="helper-text red-text">{{ form_errors(resetForm.plainPassword.repeated.first) }}</span>
                 </div>
 
                 <div class="row">
                     <div class="input-field">
-                        {{ form_label(resetForm.plainPassword.second, 'Heslo znovu') }}
-                        {{ form_widget(resetForm.plainPassword.second) }}
+                        {{ form_label(resetForm.plainPassword.repeated.second, 'Heslo znovu') }}
+                        {{ form_widget(resetForm.plainPassword.repeated.second) }}
                     </div>
-                    <span class="helper-text red-text">{{ form_errors(resetForm.plainPassword.second) }}</span>
+                    <span class="helper-text red-text">{{ form_errors(resetForm.plainPassword.repeated.second) }}</span>
                 </div>
 
                 <div class="center-align">
