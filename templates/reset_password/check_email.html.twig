@@ -1,0 +1,18 @@
+{% extends 'base.html.twig' %}
+
+{% block title %} Obnova hesla - {{ site_name }} {% endblock %}
+
+{% block body %}
+    <div class="container">
+        <h1>Obnova hesla</h1>
+        <div class="section">
+            <p>
+                Pokud vámi zadaný email existuje, poslali jsme na něj odkaz, přes který si můžete resetovat heslo.
+                Tento odkaz vyprší za 1 hodinu.
+            </p>
+            <p>
+                Pokud email neobdržíte, zkontrolujte SPAM složku nebo to <a href="{{ path('forgot_password_request') }}">zkuste znovu</a>.
+            </p>
+        </div>
+    </div>
+{% endblock %}

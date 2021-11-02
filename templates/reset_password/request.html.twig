@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+
+{% block title %} Obnova hesla - {{ site_name }} {% endblock %}
+
+{% block body %}
+
+    <div class="container">
+        <div class="container">
+            <h1>Obnova hesla</h1>
+
+            {% for flashFailure in app.flashes('failure') %}
+                <div class="card-panel red lighten-4 bold red-text text-darken-3">{{ flashFailure }}</div>
+            {% endfor %}
+
+            <br>
+            {{ form_start(requestForm) }}
+                <div class="row">
+                    <div class="input-field">
+                        {{ form_label(requestForm.email) }}
+                        {{ form_widget(requestForm.email) }}
+                    </div>
+                    <span class="helper-text red-text">{{ form_errors(requestForm.email) }}</span>
+                    <br>
+                    <small>Zadejte e-mail, na který jste zaregistrovali svůj účet a my vám na něj pošleme odkaz pro resetování hesla.</small>
+                </div>
+
+                <div class="center-align">
+                    <button type="submit" class="waves-effect waves-light btn-large light-blue">Poslat odkaz</button>
+                </div>
+            {{ form_end(requestForm) }}
+        </div>
+    </div>
+    <br><br>
+
+{% endblock %}

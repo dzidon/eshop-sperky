@@ -2,3 +2,7 @@ The link to verify your email has expired. Please request a new link.: Odkaz pro
 The link to verify your email is invalid. Please request a new link.: Odkaz pro ověření vašeho emailu je neplatný. Můžete si nechat poslat nový. Instrukce naleznete na vašem profilu.
 The link to verify your email appears to be for a different account or email. Please request a new link.: Odkaz pro ověření vašeho emailu je neplatný. Můžete si nechat poslat nový. Instrukce naleznete na vašem profilu.
 Your email address is already verified.: Vaše emailová adresa už je ověřená.
+
+The link in your email is expired. Please try to reset your password again.: Tento odkaz vypršel, nechte si poslat nový.
+The reset password link is invalid. Please try to reset your password again.: Tento odkaz je neplatný, nechte si poslat nový.
+You have already requested a reset password email. Please check your email or try again soon.: V posledních 10 minutách už jste si zažádal o odkaz na resetování hesla. Použijte odkaz z emailu nebo si za chvíli nechte poslat nový odkaz.
