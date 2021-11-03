@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use App\Security\LoginFormAuthenticator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -27,16 +26,11 @@ class SecurityController extends AbstractController
         // posledni username (email) zadany uzivatelem
         $lastUsername = $authenticationUtils->getLastUsername();
 
-        // stav "remember me" checkboxu
-        $rememberMeChecked = $request->getSession()->get(LoginFormAuthenticator::LAST_REMEMBER_ME, '');
-
         $request->getSession()->remove(Security::LAST_USERNAME);
-        $request->getSession()->remove(LoginFormAuthenticator::LAST_REMEMBER_ME);
 
         return $this->render('security/login.html.twig', [
             'last_username' => $lastUsername,
             'error' => $error,
-            'remember_me_checked' => $rememberMeChecked,
         ]);
     }
 
