@@ -10,6 +10,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Http\Authenticator\AbstractLoginFormAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\CsrfTokenBadge;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\RememberMeBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordCredentials;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
@@ -21,6 +22,7 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
     use TargetPathTrait;
 
     public const LOGIN_ROUTE = 'login';
+    public const LAST_REMEMBER_ME = '_last_remember_me';
 
     private UrlGeneratorInterface $urlGenerator;
 
@@ -33,15 +35,21 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
     {
         $email = $request->request->get('email', '');
         $password = $request->request->get('password', '');
+        $rememberMe = $request->request->get('_remember_me', '');
         $token = $request->request->get('_csrf_token');
 
         $request->getSession()->set(Security::LAST_USERNAME, $email);
+
+        if(mb_strlen($rememberMe, 'utf-8') > 0) {
+            $request->getSession()->set(LoginFormAuthenticator::LAST_REMEMBER_ME, 'checked');
+        }
 
         return new Passport(
             new UserBadge($email),
             new PasswordCredentials($password),
             [
                 new CsrfTokenBadge('authenticate', $token),
+                new RememberMeBadge(),
             ]
         );
     }

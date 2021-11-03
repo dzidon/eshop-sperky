@@ -31,6 +31,13 @@
                     </div>
                 </div>
 
+                <div class="row">
+                    <label>
+                        <input type="checkbox" id="remember_me" name="_remember_me" class="filled-in checkbox-light-blue" {{ remember_me_checked }}/>
+                        <span>Zůstat přihlášen</span>
+                    </label>
+                </div>
+
                 {# <input type="hidden" name="_target_path" value="/account"/> #}
                 <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
 
