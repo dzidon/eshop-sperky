@@ -60,3 +60,8 @@ main {
     border: 2px solid #03a9f4 !important;
     background-color: #03a9f4 !important;
 }
+
+label.required:after {
+    content: " *";
+    color: red;
+}

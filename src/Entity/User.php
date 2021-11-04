@@ -8,6 +8,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
@@ -30,6 +31,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      *      max = 180,
      *      minMessage = "Minimální délka e-mailu: {{ limit }} znaků.",
      *      maxMessage = "Maximální délka e-mailu: {{ limit }} znaků.")
+     * @Assert\NotBlank(message = "Zadejte email.")
      */
     private $email;
 
