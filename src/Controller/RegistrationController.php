@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\RememberMeBadge;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use SymfonyCasts\Bundle\VerifyEmail\Exception\VerifyEmailExceptionInterface;
 use App\Security\LoginFormAuthenticator;
@@ -63,7 +64,7 @@ class RegistrationController extends AbstractController
 
             $this->addFlash('success', 'Byli jste úspěšně zaregistrováni! Svůj účet aktivujete kliknutím na odkaz, který vám byl odeslán na email.');
 
-            return $userAuthenticator->authenticateUser($user, $appAuthenticator, $request);
+            return $userAuthenticator->authenticateUser($user, $appAuthenticator, $request, [new RememberMeBadge()]);
         }
 
         return $this->render('registration/register.html.twig', [
