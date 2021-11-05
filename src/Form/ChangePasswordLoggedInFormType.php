@@ -15,7 +15,8 @@ class ChangePasswordLoggedInFormType extends AbstractType
     {
         $builder
             ->add('oldPlainPassword', PasswordType::class, [
-                'attr' => ['autocomplete' => 'new-password'],
+                'attr' => ['autocomplete' => 'new-password',
+                           'autofocus' => 'autofocus'],
                 'constraints' => [
                     new NotBlank([
                         'message' => 'Zadejte heslo.',

@@ -65,3 +65,7 @@ label.required:after {
     content: " *";
     color: red;
 }
+
+.g-recaptcha > div {
+    margin: 0 auto;
+}

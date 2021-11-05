@@ -3,6 +3,8 @@
 namespace App\Form;
 
 use App\Entity\User;
+use EWZ\Bundle\RecaptchaBundle\Form\Type\EWZRecaptchaType;
+use EWZ\Bundle\RecaptchaBundle\Validator\Constraints\IsTrue as RecaptchaTrue;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
@@ -29,6 +31,12 @@ class RegistrationFormType extends AbstractType
             ->add('plainPassword', PasswordFormType::class, [
                 'mapped' => false,
                 'first_options_attr' => ['autocomplete' => 'new-password'],
+            ])
+            ->add('recaptcha', EWZRecaptchaType::class, [
+                'mapped' => false,
+                'constraints' => array(
+                    new RecaptchaTrue()
+                )
             ])
         ;
     }
