@@ -20,6 +20,7 @@
                     <li><a href="#" class="black-text"> <i class="material-icons left">shopping_cart</i> Košík <span class="cart-badge light-blue white-text">25</span></a></li>
 
                     {% if is_granted('IS_AUTHENTICATED_REMEMBERED') %}
+                        <li><a href=" {{ path('profile') }} " class="black-text"> <i class="material-icons left">account_circle</i> Profil</a></li>
                         <li><a href=" {{ path('logout') }} " class="black-text"> <i class="material-icons left">meeting_room</i> Odhlásit se</a></li>
                     {% else %}
                         <li><a href=" {{ path('login') }} " class="black-text"> <i class="material-icons left">vpn_key</i> Přihlásit se</a></li>
@@ -31,6 +32,7 @@
                     <li><a href="#"> <i class="material-icons left">shopping_cart</i> Košík <span class="cart-badge light-blue white-text">25</span></a></li>
 
                     {% if is_granted('IS_AUTHENTICATED_REMEMBERED') %}
+                        <li><a href=" {{ path('profile') }} "> <i class="material-icons left">account_circle</i> Profil</a></li>
                         <li><a href=" {{ path('logout') }} "> <i class="material-icons left">meeting_room</i> Odhlásit se</a></li>
                     {% else %}
                         <li><a href=" {{ path('login') }} "> <i class="material-icons left">vpn_key</i> Přihlásit se</a></li>

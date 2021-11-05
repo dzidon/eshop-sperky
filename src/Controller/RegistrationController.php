@@ -17,6 +17,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 use SymfonyCasts\Bundle\VerifyEmail\Exception\VerifyEmailExceptionInterface;
 use App\Security\LoginFormAuthenticator;
 use Symfony\Component\Security\Http\Authentication\UserAuthenticatorInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
 class RegistrationController extends AbstractController
 {
@@ -54,7 +55,7 @@ class RegistrationController extends AbstractController
             $entityManager->flush();
 
             // email
-            $this->emailVerifier->sendEmailConfirmation('app_verify_email', $user,
+            $this->emailVerifier->sendEmailConfirmation('verify_email', $user,
                 (new TemplatedEmail())
                     ->from(new Address($this->getParameter('app_email_noreply'), $this->getParameter('app_site_name')))
                     ->to($user->getEmail())
@@ -73,14 +74,13 @@ class RegistrationController extends AbstractController
     }
 
     /**
-     * @Route("/verify/email", name="app_verify_email")
+     * @Route("/verify-email", name="verify_email")
+     *
+     * @IsGranted("IS_AUTHENTICATED_FULLY")
      */
     public function verifyUserEmail(Request $request, TranslatorInterface $translator): Response
     {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-
-        // validate email confirmation link, sets User::isVerified=true and persists
-        try
+        try // validate email confirmation link, sets User::isVerified=true and persists
         {
             $this->emailVerifier->handleEmailConfirmation($request, $this->getUser());
         }
