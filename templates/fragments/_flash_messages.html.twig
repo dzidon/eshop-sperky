@@ -1,3 +1,6 @@
 {% for flashSuccess in app.flashes('success') %}
     <div class="card-panel light-green lighten-2 bold green-text text-darken-3">{{ flashSuccess }}</div>
 {% endfor %}
+{% for flashFailure in app.flashes('failure') %}
+    <div class="card-panel red lighten-4 bold red-text text-darken-3">{{ flashFailure }}</div>
+{% endfor %}

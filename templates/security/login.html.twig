@@ -7,6 +7,10 @@
     <div class="container">
         <div class="container">
             <h1>Přihlášení</h1>
+
+            {# Flash zprávy #}
+            {{ include('fragments/_flash_messages.html.twig') }}
+
             <br>
             <form method="post">
                 <div class="row">

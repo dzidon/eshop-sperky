@@ -8,8 +8,8 @@
         <div class="container">
             <h1>Obnova hesla</h1>
 
-            {# Flash failure zprávy #}
-            {{ include('fragments/flash/_flash_failure.html.twig') }}
+            {# Flash zprávy #}
+            {{ include('fragments/_flash_messages.html.twig') }}
 
             <br>
             {{ form_start(requestForm) }}

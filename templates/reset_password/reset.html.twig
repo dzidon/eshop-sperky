@@ -7,6 +7,10 @@
     <div class="container">
         <div class="container">
             <h1>Obnova hesla</h1>
+
+            {# Flash zprávy #}
+            {{ include('fragments/_flash_messages.html.twig') }}
+
             <br>
             {{ form_start(resetForm) }}
                 <div class="row">

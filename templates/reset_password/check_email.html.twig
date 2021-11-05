@@ -5,6 +5,10 @@
 {% block body %}
     <div class="container">
         <h1>Obnova hesla</h1>
+
+        {# Flash zprávy #}
+        {{ include('fragments/_flash_messages.html.twig') }}
+
         <div class="section">
             <p>
                 Pokud vámi zadaný email existuje, poslali jsme na něj odkaz, přes který si můžete resetovat heslo.
