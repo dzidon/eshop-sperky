@@ -69,3 +69,7 @@ label.required:after {
 .g-recaptcha > div {
     margin: 0 auto;
 }
+
+.margin-right15px {
+    margin-right: 15px;
+}
