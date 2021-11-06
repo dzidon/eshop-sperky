@@ -2,6 +2,7 @@
 
 namespace App\Security;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -24,10 +25,12 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
     public const LOGIN_ROUTE = 'login';
 
     private UrlGeneratorInterface $urlGenerator;
+    private LoggerInterface $logger;
 
-    public function __construct(UrlGeneratorInterface $urlGenerator)
+    public function __construct(UrlGeneratorInterface $urlGenerator, LoggerInterface $logger)
     {
         $this->urlGenerator = $urlGenerator;
+        $this->logger = $logger;
     }
 
     public function authenticate(Request $request): PassportInterface
@@ -50,6 +53,9 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
     {
+        $user = $token->getUser();
+        $this->logger->info(sprintf("User %s (ID: %s) has logged in using password.", $user->getUserIdentifier(), $user->getId()));
+
         if ($targetPath = $this->getTargetPath($request->getSession(), $firewallName)) {
             return new RedirectResponse($targetPath);
         }

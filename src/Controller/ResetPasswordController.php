@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Form\ChangePasswordFormType;
 use App\Form\ResetPasswordRequestFormType;
+use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -26,11 +27,13 @@ class ResetPasswordController extends AbstractController
 {
     use ResetPasswordControllerTrait;
 
-    private $resetPasswordHelper;
+    private ResetPasswordHelperInterface $resetPasswordHelper;
+    private LoggerInterface $logger;
 
-    public function __construct(ResetPasswordHelperInterface $resetPasswordHelper)
+    public function __construct(ResetPasswordHelperInterface $resetPasswordHelper, LoggerInterface $logger)
     {
         $this->resetPasswordHelper = $resetPasswordHelper;
+        $this->logger = $logger;
     }
 
     /**
@@ -123,6 +126,8 @@ class ResetPasswordController extends AbstractController
 
             $this->addFlash('success', "Vaše heslo bylo úspěšně změněno.");
 
+            $this->logger->info(sprintf("User %s (ID: %s) has changed their password (via email).", $user->getUserIdentifier(), $user->getId()));
+
             return $this->redirectToRoute('home');
         }
 
@@ -171,6 +176,8 @@ class ResetPasswordController extends AbstractController
 
         // Store the token object in session for retrieval in check-email route.
         $this->setTokenObjectInSession($resetToken);
+
+        $this->logger->info(sprintf("Someone has requested a password reset for %s (ID: %s)", $user->getUserIdentifier(), $user->getId()));
 
         return $this->redirectToRoute('check_email');
     }

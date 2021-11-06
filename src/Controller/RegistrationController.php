@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Form\RegistrationFormType;
 use App\Security\EmailVerifier;
+use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -22,10 +23,12 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 class RegistrationController extends AbstractController
 {
     private EmailVerifier $emailVerifier;
+    private LoggerInterface $logger;
 
-    public function __construct(EmailVerifier $emailVerifier)
+    public function __construct(EmailVerifier $emailVerifier, LoggerInterface $logger)
     {
         $this->emailVerifier = $emailVerifier;
+        $this->logger = $logger;
     }
 
     /**
@@ -65,6 +68,8 @@ class RegistrationController extends AbstractController
 
             $this->addFlash('success', 'Byli jste úspěšně zaregistrováni! Svůj účet aktivujete kliknutím na odkaz, který vám byl odeslán na email.');
 
+            $this->logger->info(sprintf("User %s (ID: %s) has registered using email and password.", $user->getUserIdentifier(), $user->getId()));
+
             return $userAuthenticator->authenticateUser($user, $appAuthenticator, $request, [new RememberMeBadge()]);
         }
 
@@ -80,9 +85,11 @@ class RegistrationController extends AbstractController
      */
     public function verifyUserEmail(Request $request, TranslatorInterface $translator): Response
     {
+        $user = $this->getUser();
+
         try // validate email confirmation link, sets User::isVerified=true and persists
         {
-            $this->emailVerifier->handleEmailConfirmation($request, $this->getUser());
+            $this->emailVerifier->handleEmailConfirmation($request, $user);
         }
         catch (VerifyEmailExceptionInterface $exception)
         {
@@ -91,6 +98,8 @@ class RegistrationController extends AbstractController
         }
 
         $this->addFlash('success', 'Vaše e-mailová adresa byla ověřena.');
+
+        $this->logger->info(sprintf("User %s (ID: %s) has verified their email.", $user->getUserIdentifier(), $user->getId()));
 
         return $this->redirectToRoute('home');
     }

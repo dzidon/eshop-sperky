@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Form\ChangePasswordLoggedInFormType;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -31,7 +32,7 @@ class ProfileController extends AbstractController
     /**
      * @Route("/change-password", name="profile_change_password")
      */
-    public function passwordChange(Request $request, UserPasswordHasherInterface $userPasswordHasherInterface): Response
+    public function passwordChange(Request $request, UserPasswordHasherInterface $userPasswordHasherInterface, LoggerInterface $logger): Response
     {
         $form = $this->createForm(ChangePasswordLoggedInFormType::class);
         $form->handleRequest($request);
@@ -51,6 +52,9 @@ class ProfileController extends AbstractController
             $entityManager->flush();
 
             $this->addFlash('success', 'Heslo změněno!');
+
+            $logger->info(sprintf("User %s (ID: %s) has changed their password (via profile).", $user->getUserIdentifier(), $user->getId()));
+
             return $this->redirectToRoute('profile_change_password');
         }
 
