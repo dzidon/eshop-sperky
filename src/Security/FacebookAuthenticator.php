@@ -1,6 +1,5 @@
 <?php
 
-
 namespace App\Security;
 
 use App\Entity\User;
@@ -57,39 +56,47 @@ class FacebookAuthenticator extends OAuth2Authenticator
                 /** @var FacebookUser $facebookUser */
                 $facebookUser = $client->fetchUserFromToken($accessToken);
 
-                $email = $facebookUser->getEmail();
+                $socialEmail = $facebookUser->getEmail();
+                $socialId = $facebookUser->getId();
 
                 // pokud už se v minulosti přihlašoval Facebookem
-                $existingUser = $this->entityManager->getRepository(User::class)->findOneBy(['facebookId' => $facebookUser->getId()]);
-
-                if ($existingUser)
+                $existingUser = $this->entityManager->getRepository(User::class)->findOneBy(['facebookId' => $socialId]);
+                if ($existingUser) //social id nalezeno
                 {
-                    $this->logger->info(sprintf("User %s (ID: %s) has logged in using Facebook. They have used Facebook to log in before (Facebook ID: %s).", $existingUser->getUserIdentifier(), $existingUser->getId(), $existingUser->getFacebookId()));
-                    return $existingUser;
+                    if($socialEmail === $existingUser->getUserIdentifier()) //v db exisutje user s danym emailem a social id
+                    {
+                        $this->logger->info(sprintf("User %s (ID: %s) has logged in using Facebook. They have used Facebook to log in before (Facebook ID: %s).", $existingUser->getUserIdentifier(), $existingUser->getId(), $existingUser->getFacebookId()));
+                        return $existingUser;
+                    }
+                    else //v db exisutje user s danym social id, email vsak nesedi, takze social id odpojime
+                    {
+                        $existingUser->setFacebookId(null);
+                        if($existingUser->getPassword() === null)
+                        {
+                            $existingUser->setIsVerified(false);
+                        }
+                        $this->entityManager->persist($existingUser);
+                    }
                 }
 
                 // v minulosti se nepřihlašoval přes Facebook
-                $user = $this->entityManager->getRepository(User::class)->findOneBy(['email' => $email]);
+                $user = $this->entityManager->getRepository(User::class)->findOneBy(['email' => $socialEmail]);
                 if($user) //nějaký e-mail z naší DB se shoduje s emailem daného FB účtu
                 {
-                    $user->setFacebookId($facebookUser->getId());
-                    $user->setIsVerified(true);
-                    $this->entityManager->persist($user);
-                    $this->entityManager->flush();
-
                     $this->logger->info(sprintf("User %s (ID: %s) has logged in using Facebook by linking email addresses (Facebook ID: %s).", $user->getUserIdentifier(), $user->getId(), $user->getFacebookId()));
                 }
                 else //žadný e-mail z naší DB se neshoduje s emailem daného FB účtu
                 {
                     $user = new User();
-                    $user->setEmail($facebookUser->getEmail());
-                    $user->setFacebookId($facebookUser->getId());
-                    $user->setIsVerified(true);
-                    $this->entityManager->persist($user);
-                    $this->entityManager->flush();
+                    $user->setEmail($socialEmail);
 
                     $this->logger->info(sprintf("User %s (ID: %s) has registered a new account using Facebook (Facebook ID: %s).", $user->getUserIdentifier(), $user->getId(), $user->getFacebookId()));
                 }
+
+                $user->setFacebookId($socialId);
+                $user->setIsVerified(true);
+                $this->entityManager->persist($user);
+                $this->entityManager->flush();
 
                 return $user;
             }),

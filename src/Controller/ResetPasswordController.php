@@ -119,7 +119,10 @@ class ResetPasswordController extends AbstractController
             );
 
             $user->setPassword($encodedPassword);
-            $this->getDoctrine()->getManager()->flush();
+            $user->setIsVerified(true);
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($user);
+            $em->flush();
 
             // The session is cleaned up after the password has been changed.
             $this->cleanSessionAfterReset();
