@@ -25,6 +25,7 @@ class ResetPasswordRequestFormType extends AbstractType
                         'message' => '{{ value }} není platná emailová adresa.',
                     ]),
                 ],
+                'data' => $options['email_empty_data'],
                 'mapped' => false,
             ])
         ;
@@ -36,6 +37,9 @@ class ResetPasswordRequestFormType extends AbstractType
             'csrf_protection' => true,
             'csrf_field_name' => '_token',
             'csrf_token_id'   => 'form_password_reset_email',
+            'email_empty_data' => '',
         ]);
+
+        $resolver->setAllowedTypes('email_empty_data', 'string');
     }
 }
