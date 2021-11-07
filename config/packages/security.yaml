@@ -18,7 +18,9 @@ security:
         main:
             lazy: true
             provider: app_user_provider
-            custom_authenticator: App\Security\LoginFormAuthenticator
+            custom_authenticators:
+                - App\Security\LoginFormAuthenticator
+                - App\Security\FacebookAuthenticator
             login_throttling:
                 max_attempts: 5
                 interval: '15 minutes'

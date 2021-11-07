@@ -2,7 +2,10 @@
 
 namespace App\Controller;
 
+use KnpU\OAuth2ClientBundle\Client\ClientRegistry;
+use KnpU\OAuth2ClientBundle\Client\Provider\GoogleClient;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -32,6 +35,16 @@ class SecurityController extends AbstractController
             'last_username' => $lastUsername,
             'error' => $error,
         ]);
+    }
+
+    /**
+     * @Route("/login/facebook", name="login_facebook")
+     */
+    public function loginFacebook(ClientRegistry $clientRegistry): RedirectResponse
+    {
+        /** @var GoogleClient $client */
+        $client = $clientRegistry->getClient('facebook');
+        return $client->redirect(['public_profile', 'email']);
     }
 
     /**
