@@ -73,6 +73,7 @@ class FacebookAuthenticator extends OAuth2Authenticator
                 if($user) //nějaký e-mail z naší DB se shoduje s emailem daného FB účtu
                 {
                     $user->setFacebookId($facebookUser->getId());
+                    $user->setIsVerified(true);
                     $this->entityManager->persist($user);
                     $this->entityManager->flush();
 
@@ -83,6 +84,7 @@ class FacebookAuthenticator extends OAuth2Authenticator
                     $user = new User();
                     $user->setEmail($facebookUser->getEmail());
                     $user->setFacebookId($facebookUser->getId());
+                    $user->setIsVerified(true);
                     $this->entityManager->persist($user);
                     $this->entityManager->flush();
 
