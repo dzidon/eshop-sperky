@@ -3,6 +3,7 @@
 namespace App\Security;
 
 use App\Entity\User;
+use App\Exception\InsufficientSocialDataException;
 use Doctrine\ORM\EntityManagerInterface;
 use KnpU\OAuth2ClientBundle\Client\ClientRegistry;
 use KnpU\OAuth2ClientBundle\Security\Authenticator\OAuth2Authenticator;
@@ -20,6 +21,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 use Symfony\Component\Security\Http\Util\TargetPathTrait;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FacebookAuthenticator extends OAuth2Authenticator
 {
@@ -30,14 +32,16 @@ class FacebookAuthenticator extends OAuth2Authenticator
     private RouterInterface $router;
     private LoggerInterface $logger;
     private UrlGeneratorInterface $urlGenerator;
+    private TranslatorInterface $translator;
 
-    public function __construct(ClientRegistry $clientRegistry, EntityManagerInterface $entityManager, RouterInterface $router, LoggerInterface $logger, UrlGeneratorInterface $urlGenerator)
+    public function __construct(ClientRegistry $clientRegistry, EntityManagerInterface $entityManager, RouterInterface $router, LoggerInterface $logger, UrlGeneratorInterface $urlGenerator, TranslatorInterface $translator)
     {
         $this->clientRegistry = $clientRegistry;
         $this->entityManager = $entityManager;
         $this->router = $router;
         $this->logger = $logger;
         $this->urlGenerator = $urlGenerator;
+        $this->translator = $translator;
     }
 
     public function supports(Request $request): ?bool
@@ -59,6 +63,11 @@ class FacebookAuthenticator extends OAuth2Authenticator
                 $socialEmail = $facebookUser->getEmail();
                 $socialId = $facebookUser->getId();
 
+                if($socialEmail === null || $socialId === null) {
+                    $this->logger->info(sprintf("Failed Facebook login due to insufficient data provided (Social email: %s, Social ID: %s).", $socialEmail, $socialId));
+                    throw new InsufficientSocialDataException();
+                }
+
                 // pokud už se v minulosti přihlašoval Facebookem
                 $existingUser = $this->entityManager->getRepository(User::class)->findOneBy(['facebookId' => $socialId]);
                 if ($existingUser) //social id nalezeno
@@ -76,6 +85,7 @@ class FacebookAuthenticator extends OAuth2Authenticator
                             $existingUser->setIsVerified(false);
                         }
                         $this->entityManager->persist($existingUser);
+                        //kod pokracuje a dalsi postup se resi dole
                     }
                 }
 
@@ -119,6 +129,8 @@ class FacebookAuthenticator extends OAuth2Authenticator
     {
         $message = strtr($exception->getMessageKey(), $exception->getMessageData());
 
-        return new Response($message, Response::HTTP_FORBIDDEN);
+        $request->getSession()->getFlashBag()->add('failure', $this->translator->trans($message));
+
+        return new RedirectResponse($this->urlGenerator->generate('home'));
     }
 }
