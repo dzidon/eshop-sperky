@@ -3,6 +3,7 @@
 namespace App\Security;
 
 use App\Entity\User;
+use App\Exception\AlreadyAuthenticatedException;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -31,16 +32,23 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
     private UrlGeneratorInterface $urlGenerator;
     private LoggerInterface $logger;
     private EntityManagerInterface $entityManager;
+    private Security $security;
 
-    public function __construct(UrlGeneratorInterface $urlGenerator, LoggerInterface $logger, EntityManagerInterface $entityManager)
+    public function __construct(UrlGeneratorInterface $urlGenerator, LoggerInterface $logger, EntityManagerInterface $entityManager, Security $security)
     {
         $this->urlGenerator = $urlGenerator;
         $this->logger = $logger;
         $this->entityManager = $entityManager;
+        $this->security = $security;
     }
 
     public function authenticate(Request $request): PassportInterface
     {
+        if($this->security->getUser()) //uživatel už je přihlášen
+        {
+            throw new AlreadyAuthenticatedException();
+        }
+
         $email = $request->request->get('email', '');
         $password = $request->request->get('password', '');
         $token = $request->request->get('_csrf_token');
@@ -48,14 +56,17 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
         $request->getSession()->set(Security::LAST_USERNAME, $email);
 
         return new Passport(
-            new UserBadge($email, function($userIdentifier) {
+            new UserBadge($email, function($userIdentifier)
+            {
                 $user = $this->entityManager->getRepository(User::class)->findOneBy(['email' => $userIdentifier]);
 
-                if (!$user) { //uzivatel nenalezen, nema cenu pokracovat
+                if (!$user) //uzivatel nenalezen, nema cenu pokracovat
+                {
                     throw new UserNotFoundException();
                 }
 
-                if($user->getPassword() === null) { //pokud uzivatel nema nastavene heslo, nema cenu pokracovat
+                if($user->getPassword() === null) //pokud uzivatel nema nastavene heslo, nema cenu pokracovat
+                {
                     throw new BadCredentialsException();
                 }
 
@@ -74,7 +85,8 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
         $user = $token->getUser();
         $this->logger->info(sprintf("User %s (ID: %s) has logged in using password.", $user->getUserIdentifier(), $user->getId()));
 
-        if ($targetPath = $this->getTargetPath($request->getSession(), $firewallName)) {
+        if ($targetPath = $this->getTargetPath($request->getSession(), $firewallName))
+        {
             return new RedirectResponse($targetPath);
         }
 

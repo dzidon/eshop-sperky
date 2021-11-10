@@ -34,7 +34,8 @@ class ProfileController extends AbstractController
      */
     public function passwordChange(Request $request, UserPasswordHasherInterface $userPasswordHasherInterface, LoggerInterface $logger): Response
     {
-        if ($this->getUser()->getPassword() === null) {
+        if ($this->getUser()->getPassword() === null)
+        {
             $this->addFlash('failure', 'Na tomto účtu nemáte nastavené heslo, takže si ho musíte změnit přes email.');
             return $this->redirectToRoute('forgot_password_request');
         }
@@ -42,8 +43,8 @@ class ProfileController extends AbstractController
         $form = $this->createForm(ChangePasswordLoggedInFormType::class);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-
+        if ($form->isSubmitted() && $form->isValid())
+        {
             $user = $this->getUser();
             $user->setPassword(
                 $userPasswordHasherInterface->hashPassword(

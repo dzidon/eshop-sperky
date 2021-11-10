@@ -47,7 +47,8 @@ class EmailVerifier
      */
     public function handleEmailConfirmation(Request $request, UserInterface $user): void
     {
-        if($user->isVerified()) {
+        if($user->isVerified())
+        {
             throw new EmailAlreadyVerifiedException();
         }
 

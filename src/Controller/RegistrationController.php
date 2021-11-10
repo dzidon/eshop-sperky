@@ -36,7 +36,8 @@ class RegistrationController extends AbstractController
      */
     public function register(Request $request, UserPasswordHasherInterface $userPasswordHasherInterface, LoginFormAuthenticator $appAuthenticator, UserAuthenticatorInterface $userAuthenticator): Response
     {
-        if ($this->getUser()) {
+        if ($this->getUser())
+        {
             return $this->redirectToRoute('home');
         }
 
@@ -44,7 +45,8 @@ class RegistrationController extends AbstractController
         $form = $this->createForm(RegistrationFormType::class, $user);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid())
+        {
             // encode the plain password
             $user->setPassword(
             $userPasswordHasherInterface->hashPassword(

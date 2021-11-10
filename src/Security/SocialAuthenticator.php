@@ -3,6 +3,7 @@
 namespace App\Security;
 
 use App\Entity\User;
+use App\Exception\AlreadyAuthenticatedException;
 use App\Exception\InsufficientSocialDataException;
 use Doctrine\ORM\EntityManagerInterface;
 use KnpU\OAuth2ClientBundle\Client\ClientRegistry;
@@ -19,6 +20,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\RememberMeBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
@@ -36,11 +38,12 @@ class SocialAuthenticator extends OAuth2Authenticator
     private LoggerInterface $logger;
     private UrlGeneratorInterface $urlGenerator;
     private TranslatorInterface $translator;
+    private Security $security;
 
     private string $requestedService;
     private array $serviceData;
 
-    public function __construct(ClientRegistry $clientRegistry, EntityManagerInterface $entityManager, RouterInterface $router, LoggerInterface $logger, UrlGeneratorInterface $urlGenerator, TranslatorInterface $translator)
+    public function __construct(ClientRegistry $clientRegistry, EntityManagerInterface $entityManager, RouterInterface $router, LoggerInterface $logger, UrlGeneratorInterface $urlGenerator, TranslatorInterface $translator, Security $security)
     {
         $this->clientRegistry = $clientRegistry;
         $this->entityManager = $entityManager;
@@ -48,6 +51,7 @@ class SocialAuthenticator extends OAuth2Authenticator
         $this->logger = $logger;
         $this->urlGenerator = $urlGenerator;
         $this->translator = $translator;
+        $this->security = $security;
 
         $this->serviceData = [
             'facebook' => [
@@ -71,6 +75,11 @@ class SocialAuthenticator extends OAuth2Authenticator
 
     public function authenticate(Request $request): PassportInterface
     {
+        if($this->security->getUser()) //uživatel už je přihlášen
+        {
+            throw new AlreadyAuthenticatedException();
+        }
+
         $serviceName = $this->serviceData[$this->requestedService]['name'];
         $serviceIdAttribute = $this->serviceData[$this->requestedService]['userIdAttribute'];
         $serviceIdAttributeSetter = $this->serviceData[$this->requestedService]['userIdAttributeSetter'];
@@ -88,7 +97,8 @@ class SocialAuthenticator extends OAuth2Authenticator
                 $socialEmail = $socialUser->getEmail();
                 $socialId = $socialUser->getId();
 
-                if($socialEmail === null || $socialId === null) {
+                if($socialEmail === null || $socialId === null)
+                {
                     $this->logger->info(sprintf("Failed %s login due to insufficient data provided (Social email: %s, Social ID: %s).", $serviceName, $socialEmail, $socialId));
                     throw new InsufficientSocialDataException();
                 }
@@ -139,7 +149,8 @@ class SocialAuthenticator extends OAuth2Authenticator
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
     {
-        if ($targetPath = $this->getTargetPath($request->getSession(), $firewallName)) {
+        if ($targetPath = $this->getTargetPath($request->getSession(), $firewallName))
+        {
             return new RedirectResponse($targetPath);
         }
 

@@ -45,7 +45,8 @@ class ResetPasswordController extends AbstractController
     {
         $options = ['email_empty_data' => ''];
         $user = $this->getUser();
-        if ($user) {
+        if ($user)
+        {
             $options = [
                 'email_empty_data' => $user->getUserIdentifier(), //pokud je uzivatel prihlaseny, doplnime do formulare jeho email
             ];
@@ -54,7 +55,8 @@ class ResetPasswordController extends AbstractController
         $form = $this->createForm(ResetPasswordRequestFormType::class, null, $options);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid())
+        {
             return $this->processSendingPasswordResetEmail(
                 $form->get('email')->getData(),
                 $mailer
@@ -75,7 +77,8 @@ class ResetPasswordController extends AbstractController
     {
         // Generate a fake token if the user does not exist or someone hit this page directly.
         // This prevents exposing whether or not a user was found with the given email address or not
-        if (null === ($resetToken = $this->getTokenObjectFromSession())) {
+        if (null === ($resetToken = $this->getTokenObjectFromSession()))
+        {
             $resetToken = $this->resetPasswordHelper->generateFakeResetToken();
         }
 
@@ -91,7 +94,8 @@ class ResetPasswordController extends AbstractController
      */
     public function reset(Request $request, UserPasswordHasherInterface $userPasswordHasherInterface, TranslatorInterface $translator, string $token = null): Response
     {
-        if ($token) {
+        if ($token)
+        {
             // We store the token in session and remove it from the URL, to avoid the URL being
             // loaded in a browser and potentially leaking the token to 3rd party JavaScript.
             $this->storeTokenInSession($token);
@@ -100,13 +104,17 @@ class ResetPasswordController extends AbstractController
         }
 
         $token = $this->getTokenFromSession();
-        if (null === $token) {
+        if (null === $token)
+        {
             throw $this->createNotFoundException('Nenalezen platný token na obnovu hesla.');
         }
 
-        try {
+        try
+        {
             $user = $this->resetPasswordHelper->validateTokenAndFetchUser($token);
-        } catch (ResetPasswordExceptionInterface $e) {
+        }
+        catch (ResetPasswordExceptionInterface $e)
+        {
             $this->addFlash('failure', $translator->trans($e->getReason()));
 
             return $this->redirectToRoute('forgot_password_request');
@@ -116,7 +124,8 @@ class ResetPasswordController extends AbstractController
         $form = $this->createForm(ChangePasswordFormType::class);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid())
+        {
             // A password reset token should be used only once, remove it.
             $this->resetPasswordHelper->removeResetRequest($token);
 
@@ -154,13 +163,17 @@ class ResetPasswordController extends AbstractController
         ]);
 
         // Do not reveal whether a user account was found or not.
-        if (!$user) {
+        if (!$user)
+        {
             return $this->redirectToRoute('check_email');
         }
 
-        try {
+        try
+        {
             $resetToken = $this->resetPasswordHelper->generateResetToken($user);
-        } catch (ResetPasswordExceptionInterface $e) {
+        }
+        catch (ResetPasswordExceptionInterface $e)
+        {
             // If you want to tell the user why a reset email was not sent, uncomment
             // the lines below and change the redirect to 'app_forgot_password_request'.
             // Caution: This may reveal if a user is registered or not.

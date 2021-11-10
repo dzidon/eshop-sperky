@@ -8,3 +8,4 @@ The reset password link is invalid. Please try to reset your password again.: Te
 You have already requested a reset password email. Please check your email or try again soon.: V posledních 10 minutách už jste si zažádal o odkaz na resetování hesla. Použijte odkaz z emailu nebo si za chvíli nechte poslat nový odkaz.
 
 We are unable to get all the required data from your social login.: Nepodařilo se nám získat všechna potřebná data z vašeho social loginu. Ujistěte se, že nám při přihlášení sdělujete svůj email. Odpojte vaší aplikaci (Facebook/Google) od našeho webu a zkuste to znovu. Pokud problém přetrvává, kontaktujte nás.
+You already are logged in.: Už jste přihlášen. Pro nové přihlášení se nejdříve odhlašte.
