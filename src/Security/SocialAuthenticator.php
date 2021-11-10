@@ -6,9 +6,11 @@ use App\Entity\User;
 use App\Exception\InsufficientSocialDataException;
 use Doctrine\ORM\EntityManagerInterface;
 use KnpU\OAuth2ClientBundle\Client\ClientRegistry;
+use KnpU\OAuth2ClientBundle\Client\Provider\FacebookClient;
 use KnpU\OAuth2ClientBundle\Client\Provider\GoogleClient;
 use KnpU\OAuth2ClientBundle\Security\Authenticator\OAuth2Authenticator;
 use League\OAuth2\Client\Provider\FacebookUser;
+use League\OAuth2\Client\Provider\GoogleUser;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -52,13 +54,11 @@ class SocialAuthenticator extends OAuth2Authenticator
                 'name' => 'Facebook',
                 'userIdAttribute' => 'facebookId',
                 'userIdAttributeSetter' => 'setFacebookId',
-                'userIdAttributeGetter' => 'getFacebookId',
             ],
             'google' => [
                 'name' => 'Google',
                 'userIdAttribute' => 'googleId',
                 'userIdAttributeSetter' => 'setGoogleId',
-                'userIdAttributeGetter' => 'getGoogleId',
             ],
         ];
     }
@@ -74,15 +74,15 @@ class SocialAuthenticator extends OAuth2Authenticator
         $serviceName = $this->serviceData[$this->requestedService]['name'];
         $serviceIdAttribute = $this->serviceData[$this->requestedService]['userIdAttribute'];
         $serviceIdAttributeSetter = $this->serviceData[$this->requestedService]['userIdAttributeSetter'];
-        $serviceIdAttributeGetter = $this->serviceData[$this->requestedService]['userIdAttributeGetter'];
 
+        /** @var FacebookClient|GoogleClient $client */
         $client = $this->clientRegistry->getClient($this->requestedService);
         $accessToken = $this->fetchAccessToken($client);
 
         return new SelfValidatingPassport(
-            new UserBadge($accessToken->getToken(), function() use ($accessToken, $client, $serviceName, $serviceIdAttribute, $serviceIdAttributeSetter, $serviceIdAttributeGetter)
+            new UserBadge($accessToken->getToken(), function() use ($accessToken, $client, $serviceName, $serviceIdAttribute, $serviceIdAttributeSetter)
             {
-                /** @var FacebookUser|GoogleClient $socialUser */
+                /** @var FacebookUser|GoogleUser $socialUser */
                 $socialUser = $client->fetchUserFromToken($accessToken);
 
                 $socialEmail = $socialUser->getEmail();
@@ -99,16 +99,12 @@ class SocialAuthenticator extends OAuth2Authenticator
                 {
                     if($socialEmail === $existingUser->getUserIdentifier()) //v db exisutje user s danym emailem a social id
                     {
-                        $this->logger->info(sprintf("User %s (ID: %s) has logged in using %s. They have used this service to log in before (Social ID: %s).", $existingUser->getUserIdentifier(), $existingUser->getId(), $serviceName, $existingUser->$serviceIdAttributeGetter()));
+                        $this->logger->info(sprintf("User %s (ID: %s) has logged in using %s. They have used this service to log in before (Social ID: %s).", $existingUser->getUserIdentifier(), $existingUser->getId(), $serviceName, $socialId));
                         return $existingUser;
                     }
                     else //v db exisutje user s danym social id, email vsak nesedi, takze social id odpojime
                     {
                         $existingUser->$serviceIdAttributeSetter(null);
-                        if($existingUser->getPassword() === null)
-                        {
-                            $existingUser->setIsVerified(false);
-                        }
                         $this->entityManager->persist($existingUser);
                         //kod pokracuje a dalsi postup se resi dole
                     }
@@ -118,14 +114,14 @@ class SocialAuthenticator extends OAuth2Authenticator
                 $user = $this->entityManager->getRepository(User::class)->findOneBy(['email' => $socialEmail]);
                 if($user) //nějaký e-mail z naší DB se shoduje s emailem daného social účtu
                 {
-                    $this->logger->info(sprintf("User %s (ID: %s) has logged in using %s by linking email addresses (Social ID: %s).", $user->getUserIdentifier(), $user->getId(), $serviceName, $user->$serviceIdAttributeGetter()));
+                    $this->logger->info(sprintf("User %s (ID: %s) has logged in using %s by linking email addresses (Social ID: %s).", $user->getUserIdentifier(), $user->getId(), $serviceName, $socialId));
                 }
                 else //žadný e-mail z naší DB se neshoduje s emailem daného social účtu
                 {
                     $user = new User();
                     $user->setEmail($socialEmail);
 
-                    $this->logger->info(sprintf("User %s (ID: %s) has registered a new account using %s (Social ID: %s).", $user->getUserIdentifier(), $user->getId(), $serviceName, $user->$serviceIdAttributeGetter()));
+                    $this->logger->info(sprintf("User %s has registered a new account using %s (Social ID: %s).", $user->getUserIdentifier(), $serviceName, $socialId));
                 }
 
                 $user->$serviceIdAttributeSetter($socialId);
