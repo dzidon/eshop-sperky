@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use KnpU\OAuth2ClientBundle\Client\ClientRegistry;
+use KnpU\OAuth2ClientBundle\Client\Provider\FacebookClient;
 use KnpU\OAuth2ClientBundle\Client\Provider\GoogleClient;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -38,13 +39,22 @@ class SecurityController extends AbstractController
     }
 
     /**
-     * @Route("/login/facebook", name="login_facebook")
+     * @Route("/login/{service<facebook|google>}", name="login_social")
      */
-    public function loginFacebook(ClientRegistry $clientRegistry): RedirectResponse
+    public function loginSocial(ClientRegistry $clientRegistry, $service): RedirectResponse
     {
-        /** @var GoogleClient $client */
-        $client = $clientRegistry->getClient('facebook');
-        return $client->redirect(['public_profile', 'email']);
+        $serviceData = [
+            'facebook' => [
+                'scopes' => ['public_profile', 'email']
+            ],
+            'google' => [
+                'scopes' => ['https://www.googleapis.com/auth/userinfo.email', 'https://www.googleapis.com/auth/userinfo.profile']
+            ],
+        ];
+
+        /** @var FacebookClient|GoogleClient $client */
+        $client = $clientRegistry->getClient($service);
+        return $client->redirect($serviceData[$service]['scopes']);
     }
 
     /**

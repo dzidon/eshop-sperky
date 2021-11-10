@@ -6,6 +6,7 @@ use App\Entity\User;
 use App\Exception\InsufficientSocialDataException;
 use Doctrine\ORM\EntityManagerInterface;
 use KnpU\OAuth2ClientBundle\Client\ClientRegistry;
+use KnpU\OAuth2ClientBundle\Client\Provider\GoogleClient;
 use KnpU\OAuth2ClientBundle\Security\Authenticator\OAuth2Authenticator;
 use League\OAuth2\Client\Provider\FacebookUser;
 use Psr\Log\LoggerInterface;
@@ -23,7 +24,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPasspor
 use Symfony\Component\Security\Http\Util\TargetPathTrait;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class FacebookAuthenticator extends OAuth2Authenticator
+class SocialAuthenticator extends OAuth2Authenticator
 {
     use TargetPathTrait;
 
@@ -34,6 +35,9 @@ class FacebookAuthenticator extends OAuth2Authenticator
     private UrlGeneratorInterface $urlGenerator;
     private TranslatorInterface $translator;
 
+    private string $requestedService;
+    private array $serviceData;
+
     public function __construct(ClientRegistry $clientRegistry, EntityManagerInterface $entityManager, RouterInterface $router, LoggerInterface $logger, UrlGeneratorInterface $urlGenerator, TranslatorInterface $translator)
     {
         $this->clientRegistry = $clientRegistry;
@@ -42,44 +46,65 @@ class FacebookAuthenticator extends OAuth2Authenticator
         $this->logger = $logger;
         $this->urlGenerator = $urlGenerator;
         $this->translator = $translator;
+
+        $this->serviceData = [
+            'facebook' => [
+                'name' => 'Facebook',
+                'userIdAttribute' => 'facebookId',
+                'userIdAttributeSetter' => 'setFacebookId',
+                'userIdAttributeGetter' => 'getFacebookId',
+            ],
+            'google' => [
+                'name' => 'Google',
+                'userIdAttribute' => 'googleId',
+                'userIdAttributeSetter' => 'setGoogleId',
+                'userIdAttributeGetter' => 'getGoogleId',
+            ],
+        ];
     }
 
     public function supports(Request $request): ?bool
     {
-        return $request->attributes->get('_route') === 'oauth_check' && $request->get('service') === 'facebook';
+        $this->requestedService = $request->get('service', ''); //facebook/google
+        return $request->attributes->get('_route') === 'oauth_check' && isset($this->serviceData[$this->requestedService]);
     }
 
     public function authenticate(Request $request): PassportInterface
     {
-        $client = $this->clientRegistry->getClient('facebook');
+        $serviceName = $this->serviceData[$this->requestedService]['name'];
+        $serviceIdAttribute = $this->serviceData[$this->requestedService]['userIdAttribute'];
+        $serviceIdAttributeSetter = $this->serviceData[$this->requestedService]['userIdAttributeSetter'];
+        $serviceIdAttributeGetter = $this->serviceData[$this->requestedService]['userIdAttributeGetter'];
+
+        $client = $this->clientRegistry->getClient($this->requestedService);
         $accessToken = $this->fetchAccessToken($client);
 
         return new SelfValidatingPassport(
-            new UserBadge($accessToken->getToken(), function() use ($accessToken, $client)
+            new UserBadge($accessToken->getToken(), function() use ($accessToken, $client, $serviceName, $serviceIdAttribute, $serviceIdAttributeSetter, $serviceIdAttributeGetter)
             {
-                /** @var FacebookUser $facebookUser */
-                $facebookUser = $client->fetchUserFromToken($accessToken);
+                /** @var FacebookUser|GoogleClient $socialUser */
+                $socialUser = $client->fetchUserFromToken($accessToken);
 
-                $socialEmail = $facebookUser->getEmail();
-                $socialId = $facebookUser->getId();
+                $socialEmail = $socialUser->getEmail();
+                $socialId = $socialUser->getId();
 
                 if($socialEmail === null || $socialId === null) {
-                    $this->logger->info(sprintf("Failed Facebook login due to insufficient data provided (Social email: %s, Social ID: %s).", $socialEmail, $socialId));
+                    $this->logger->info(sprintf("Failed %s login due to insufficient data provided (Social email: %s, Social ID: %s).", $serviceName, $socialEmail, $socialId));
                     throw new InsufficientSocialDataException();
                 }
 
-                // pokud už se v minulosti přihlašoval Facebookem
-                $existingUser = $this->entityManager->getRepository(User::class)->findOneBy(['facebookId' => $socialId]);
+                // pokud už se v minulosti přihlašoval danou službou
+                $existingUser = $this->entityManager->getRepository(User::class)->findOneBy([$serviceIdAttribute => $socialId]); //např. facebookId => 651519191561
                 if ($existingUser) //social id nalezeno
                 {
                     if($socialEmail === $existingUser->getUserIdentifier()) //v db exisutje user s danym emailem a social id
                     {
-                        $this->logger->info(sprintf("User %s (ID: %s) has logged in using Facebook. They have used Facebook to log in before (Facebook ID: %s).", $existingUser->getUserIdentifier(), $existingUser->getId(), $existingUser->getFacebookId()));
+                        $this->logger->info(sprintf("User %s (ID: %s) has logged in using %s. They have used this service to log in before (Social ID: %s).", $existingUser->getUserIdentifier(), $existingUser->getId(), $serviceName, $existingUser->$serviceIdAttributeGetter()));
                         return $existingUser;
                     }
                     else //v db exisutje user s danym social id, email vsak nesedi, takze social id odpojime
                     {
-                        $existingUser->setFacebookId(null);
+                        $existingUser->$serviceIdAttributeSetter(null);
                         if($existingUser->getPassword() === null)
                         {
                             $existingUser->setIsVerified(false);
@@ -89,21 +114,21 @@ class FacebookAuthenticator extends OAuth2Authenticator
                     }
                 }
 
-                // v minulosti se nepřihlašoval přes Facebook
+                // v minulosti se nepřihlašoval přes danou službu
                 $user = $this->entityManager->getRepository(User::class)->findOneBy(['email' => $socialEmail]);
-                if($user) //nějaký e-mail z naší DB se shoduje s emailem daného FB účtu
+                if($user) //nějaký e-mail z naší DB se shoduje s emailem daného social účtu
                 {
-                    $this->logger->info(sprintf("User %s (ID: %s) has logged in using Facebook by linking email addresses (Facebook ID: %s).", $user->getUserIdentifier(), $user->getId(), $user->getFacebookId()));
+                    $this->logger->info(sprintf("User %s (ID: %s) has logged in using %s by linking email addresses (Social ID: %s).", $user->getUserIdentifier(), $user->getId(), $serviceName, $user->$serviceIdAttributeGetter()));
                 }
-                else //žadný e-mail z naší DB se neshoduje s emailem daného FB účtu
+                else //žadný e-mail z naší DB se neshoduje s emailem daného social účtu
                 {
                     $user = new User();
                     $user->setEmail($socialEmail);
 
-                    $this->logger->info(sprintf("User %s (ID: %s) has registered a new account using Facebook (Facebook ID: %s).", $user->getUserIdentifier(), $user->getId(), $user->getFacebookId()));
+                    $this->logger->info(sprintf("User %s (ID: %s) has registered a new account using %s (Social ID: %s).", $user->getUserIdentifier(), $user->getId(), $serviceName, $user->$serviceIdAttributeGetter()));
                 }
 
-                $user->setFacebookId($socialId);
+                $user->$serviceIdAttributeSetter($socialId);
                 $user->setIsVerified(true);
                 $this->entityManager->persist($user);
                 $this->entityManager->flush();

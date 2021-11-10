@@ -20,7 +20,7 @@ security:
             provider: app_user_provider
             custom_authenticators:
                 - App\Security\LoginFormAuthenticator
-                - App\Security\FacebookAuthenticator
+                - App\Security\SocialAuthenticator
             login_throttling:
                 max_attempts: 5
                 interval: '15 minutes'
