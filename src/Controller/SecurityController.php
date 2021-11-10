@@ -34,7 +34,7 @@ class SecurityController extends AbstractController
         $request->getSession()->remove(Security::LAST_USERNAME);
 
         return $this->render('security/login.html.twig', [
-            'last_username' => $lastUsername,
+            'lastUsername' => $lastUsername,
             'error' => $error,
         ]);
     }

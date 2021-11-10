@@ -16,7 +16,7 @@
                 <div class="row">
                     <div class="input-field">
                         <label for="inputEmail" class="required">Email:</label>
-                        <input type="email" value="{{ last_username }}" name="email" id="inputEmail" required="required" autofocus="autofocus"/>
+                        <input type="email" value="{{ lastUsername }}" name="email" id="inputEmail" required="required" autofocus="autofocus"/>
 
                         {% if error %}
                             <ul>
@@ -54,7 +54,7 @@
             <div class="divider"></div>
 
             {# Social login #}
-            {{ include('fragments/_social_login.html.twig') }}
+            {{ include('fragments/_social_login.html.twig', {actionName: 'přihlásit'}) }}
         </div>
     </div>
     <br><br>
