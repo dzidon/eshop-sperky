@@ -149,6 +149,8 @@ class SocialAuthenticator extends OAuth2Authenticator
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
     {
+        $request->getSession()->getFlashBag()->add('success', sprintf('Přihlášení přes %s proběhlo úspěšně.', $this->serviceData[$this->requestedService]['name']));
+
         if ($targetPath = $this->getTargetPath($request->getSession(), $firewallName))
         {
             return new RedirectResponse($targetPath);

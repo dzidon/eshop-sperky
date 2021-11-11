@@ -82,6 +82,8 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
     {
+        $request->getSession()->getFlashBag()->add('success', 'Přihlášení heslem proběhlo úspěšně.');
+
         $user = $token->getUser();
         $this->logger->info(sprintf("User %s (ID: %s) has logged in using password.", $user->getUserIdentifier(), $user->getId()));
 
