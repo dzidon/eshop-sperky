@@ -23,10 +23,7 @@ class ProfileController extends AbstractController
      */
     public function overview(): Response
     {
-        //TODO: zobrazení profilu
-        $this->addFlash('failure', 'todo: overview');
-
-        return $this->redirectToRoute('home');
+        return $this->render('profile/profile_overview.html.twig');
     }
 
     /**
@@ -64,7 +61,7 @@ class ProfileController extends AbstractController
             return $this->redirectToRoute('profile_change_password');
         }
 
-        return $this->render('profile/change_password.html.twig', [
+        return $this->render('profile/profile_change_password.html.twig', [
             'changeForm' => $form->createView(),
         ]);
     }
