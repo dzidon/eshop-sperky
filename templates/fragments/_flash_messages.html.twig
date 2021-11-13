@@ -1,6 +1,22 @@
-{% for flashSuccess in app.flashes('success') %}
-    <div class="card-panel light-green lighten-2 bold green-text text-darken-3">{{ flashSuccess }}</div>
-{% endfor %}
-{% for flashFailure in app.flashes('failure') %}
-    <div class="card-panel red lighten-4 bold red-text text-darken-3">{{ flashFailure }}</div>
-{% endfor %}
+{% set flashBagLength = app.session.flashbag.peekAll|length %}
+
+{% if flashBagLength > 0 %}
+    <div class="row">
+{% endif %}
+
+    {% for flashSuccess in app.flashes('success') %}
+        <div class="card-panel light-green lighten-2 bold green-text text-darken-3">{{ flashSuccess }}</div>
+    {% endfor %}
+    {% for flashFailure in app.flashes('failure') %}
+        <div class="card-panel red lighten-4 bold red-text text-darken-3">{{ flashFailure }}</div>
+    {% endfor %}
+    {% for flashInfo in app.flashes('info') %}
+        <div class="card-panel blue lighten-4 bold blue-text text-darken-3">{{ flashInfo }}</div>
+    {% endfor %}
+    {% for flashWarning in app.flashes('warning') %}
+        <div class="card-panel yellow lighten-4 bold amber-text text-accent-4">{{ flashWarning }}</div>
+    {% endfor %}
+
+{% if flashBagLength > 0 %}
+    </div>
+{% endif %}
