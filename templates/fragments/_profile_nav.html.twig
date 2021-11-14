@@ -2,7 +2,8 @@
 
 <div class="collection">
     <a href="{{ path('profile') }}" class="collection-item {% if route == 'profile' %} active {% endif %}">Přehled</a>
-    {% if app.user.password is not null %}
-        <a href="{{ path('profile_change_password') }}" class="collection-item {% if route == 'profile_change_password' %} active {% endif %}">Změna hesla</a>
+    <a href="{{ path('profile_change_password') }}" class="collection-item {% if route == 'profile_change_password' %} active {% endif %}">Změna hesla</a>
+    {% if app.user.isVerified == false %}
+        <a href="{{ path('profile_verify') }}" class="collection-item {% if route == 'profile_verify' %} active {% endif %}">Ověření emailu</a>
     {% endif %}
 </div>

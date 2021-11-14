@@ -3,6 +3,8 @@
 namespace App\Controller;
 
 use App\Form\ChangePasswordLoggedInFormType;
+use App\Form\SendEmailToVerifyFormType;
+use App\Security\EmailVerifier;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,6 +20,13 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
  */
 class ProfileController extends AbstractController
 {
+    private LoggerInterface $logger;
+
+    public function __construct(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
+    }
+
     /**
      * @Route("", name="profile")
      */
@@ -29,7 +38,7 @@ class ProfileController extends AbstractController
     /**
      * @Route("/change-password", name="profile_change_password")
      */
-    public function passwordChange(Request $request, UserPasswordHasherInterface $userPasswordHasherInterface, LoggerInterface $logger): Response
+    public function passwordChange(Request $request, UserPasswordHasherInterface $userPasswordHasherInterface): Response
     {
         if ($this->getUser()->getPassword() === null)
         {
@@ -56,13 +65,43 @@ class ProfileController extends AbstractController
 
             $this->addFlash('success', 'Heslo změněno!');
 
-            $logger->info(sprintf("User %s (ID: %s) has changed their password (via profile).", $user->getUserIdentifier(), $user->getId()));
+            $this->logger->info(sprintf("User %s (ID: %s) has changed their password (via profile).", $user->getUserIdentifier(), $user->getId()));
 
             return $this->redirectToRoute('profile_change_password');
         }
 
         return $this->render('profile/profile_change_password.html.twig', [
             'changeForm' => $form->createView(),
+        ]);
+    }
+
+    /**
+     * @Route("/verify-email", name="profile_verify")
+     */
+    public function verify(Request $request, EmailVerifier $emailVerifier): Response
+    {
+        $user = $this->getUser();
+        if ($user->isVerified())
+        {
+            $this->addFlash('failure', 'Váš email už je ověřený.');
+            return $this->redirectToRoute('home');
+        }
+
+        $form = $this->createForm(SendEmailToVerifyFormType::class);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid())
+        {
+            $emailVerifier->sendEmailConfirmation('verify_email', $user);
+
+            $this->addFlash('success', 'E-mail odeslán!');
+            $this->logger->info(sprintf("User %s (ID: %s) has requested a new email verification link.", $user->getUserIdentifier(), $user->getId()));
+
+            return $this->redirectToRoute('profile_verify');
+        }
+
+        return $this->render('profile/profile_verify.html.twig', [
+            'sendAgainForm' => $form->createView(),
         ]);
     }
 }

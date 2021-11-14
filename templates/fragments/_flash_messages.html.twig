@@ -10,11 +10,11 @@
     {% for flashFailure in app.flashes('failure') %}
         <div class="card-panel red lighten-4 bold red-text text-darken-3">{{ flashFailure }}</div>
     {% endfor %}
+    {% for flashWarning in app.flashes('warning') %}
+        <div class="card-panel yellow lighten-4 bold lime-text text-darken-4">{{ flashWarning }}</div>
+    {% endfor %}
     {% for flashInfo in app.flashes('info') %}
         <div class="card-panel blue lighten-4 bold blue-text text-darken-3">{{ flashInfo }}</div>
-    {% endfor %}
-    {% for flashWarning in app.flashes('warning') %}
-        <div class="card-panel yellow lighten-4 bold amber-text text-accent-4">{{ flashWarning }}</div>
     {% endfor %}
 
 {% if flashBagLength > 0 %}
