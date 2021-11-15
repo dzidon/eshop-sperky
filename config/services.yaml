@@ -6,6 +6,7 @@
 parameters:
     app_site_name: 'Šperky'
     app_email_noreply: 'noreply@sperky-test.cz'
+    app_email_verify_link_throttle_limit: 600 # seconds
 
 services:
     # default configuration for services in *this* file

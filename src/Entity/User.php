@@ -61,6 +61,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     private $googleId;
 
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $verifyLinkLastSent;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -184,5 +189,39 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->googleId = $googleId;
 
         return $this;
+    }
+
+    public function getVerifyLinkLastSent(): ?\DateTimeInterface
+    {
+        return $this->verifyLinkLastSent;
+    }
+
+    public function setVerifyLinkLastSent(?\DateTimeInterface $verifyLinkLastSent): self
+    {
+        $this->verifyLinkLastSent = $verifyLinkLastSent;
+
+        return $this;
+    }
+
+    /**
+     * Vrátí true, pokud si uživatel může nechat poslat nový link pro potvrzení emailu
+     *
+     * @param $minTimeDiffSeconds
+     * @return bool
+     */
+    public function canSendAnotherVerifyLink($minTimeDiffSeconds): bool
+    {
+        $date1 = $this->getVerifyLinkLastSent();
+        if($date1 !== null)
+        {
+            $date2 = new \DateTime( 'now' );
+
+            if(($date2->getTimestamp() - $date1->getTimestamp()) < $minTimeDiffSeconds)
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

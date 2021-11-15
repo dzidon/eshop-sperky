@@ -9,9 +9,11 @@ use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @Route("/profile")
@@ -78,7 +80,7 @@ class ProfileController extends AbstractController
     /**
      * @Route("/verify-email", name="profile_verify")
      */
-    public function verify(Request $request, EmailVerifier $emailVerifier): Response
+    public function verify(Request $request, EmailVerifier $emailVerifier, TranslatorInterface $translator): Response
     {
         $user = $this->getUser();
         if ($user->isVerified())
@@ -92,11 +94,16 @@ class ProfileController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid())
         {
-            $emailVerifier->sendEmailConfirmation('verify_email', $user);
-
-            $this->addFlash('success', 'E-mail odeslán!');
-            $this->logger->info(sprintf("User %s (ID: %s) has requested a new email verification link.", $user->getUserIdentifier(), $user->getId()));
-
+            try
+            {
+                $emailVerifier->sendEmailConfirmation('verify_email', $user);
+                $this->addFlash('success', 'E-mail odeslán!');
+                $this->logger->info(sprintf("User %s (ID: %s) has requested a new email verification link.", $user->getUserIdentifier(), $user->getId()));
+            }
+            catch (\Exception | TransportExceptionInterface $exception)
+            {
+                $this->addFlash('failure', $translator->trans($exception->getMessage()));
+            }
             return $this->redirectToRoute('profile_verify');
         }
 

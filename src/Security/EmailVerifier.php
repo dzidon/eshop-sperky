@@ -7,6 +7,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -28,13 +29,22 @@ class EmailVerifier
         $this->parameterBag = $parameterBag;
     }
 
-    public function sendEmailConfirmation(string $verifyEmailRouteName, UserInterface $user): void
+    /**
+     * @throws \Exception
+     * @throws TransportExceptionInterface
+     */
+    public function sendEmailConfirmation(string $verifyEmailRouteName, UserInterface $user, bool $newUser = false): void
     {
+        if(!$user->canSendAnotherVerifyLink($this->parameterBag->get('app_email_verify_link_throttle_limit')))
+        {
+            throw new \Exception('You can only request one verification link per 10 minutes.');
+        }
+
         $email = new TemplatedEmail();
         $email->from(new Address($this->parameterBag->get('app_email_noreply'), $this->parameterBag->get('app_site_name')))
-              ->to($user->getEmail())
-              ->subject('Aktivace účtu')
-              ->htmlTemplate('registration/confirmation_email.html.twig');
+            ->to($user->getEmail())
+            ->subject('Aktivace účtu')
+            ->htmlTemplate('registration/confirmation_email.html.twig');
 
         $signatureComponents = $this->verifyEmailHelper->generateSignature(
             $verifyEmailRouteName,
@@ -50,6 +60,13 @@ class EmailVerifier
         $email->context($context);
 
         $this->mailer->send($email);
+
+        if(!$newUser)
+        {
+            $user->setVerifyLinkLastSent(new \DateTime('now'));
+            $this->entityManager->persist($user);
+            $this->entityManager->flush();
+        }
     }
 
     /**
