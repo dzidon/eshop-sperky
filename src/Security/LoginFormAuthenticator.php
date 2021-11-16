@@ -34,6 +34,8 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
     private EntityManagerInterface $entityManager;
     private Security $security;
 
+    private bool $justRegistered = false;
+
     public function __construct(UrlGeneratorInterface $urlGenerator, LoggerInterface $logger, EntityManagerInterface $entityManager, Security $security)
     {
         $this->urlGenerator = $urlGenerator;
@@ -82,10 +84,13 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
     {
-        $request->getSession()->getFlashBag()->add('success', 'Přihlášení heslem proběhlo úspěšně.');
+        if(!$this->justRegistered)
+        {
+            $request->getSession()->getFlashBag()->add('success', 'Přihlášení heslem proběhlo úspěšně.');
 
-        $user = $token->getUser();
-        $this->logger->info(sprintf("User %s (ID: %s) has logged in using password.", $user->getUserIdentifier(), $user->getId()));
+            $user = $token->getUser();
+            $this->logger->info(sprintf("User %s (ID: %s) has logged in using password.", $user->getUserIdentifier(), $user->getId()));
+        }
 
         if ($targetPath = $this->getTargetPath($request->getSession(), $firewallName))
         {
@@ -98,5 +103,12 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
     protected function getLoginUrl(Request $request): string
     {
         return $this->urlGenerator->generate(self::LOGIN_ROUTE);
+    }
+
+    public function setJustRegistered(bool $justRegistered): self
+    {
+        $this->justRegistered = $justRegistered;
+
+        return $this;
     }
 }

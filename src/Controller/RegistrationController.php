@@ -74,7 +74,7 @@ class RegistrationController extends AbstractController
 
             $this->logger->info(sprintf("User %s (ID: %s) has registered using email and password.", $user->getUserIdentifier(), $user->getId()));
 
-            return $userAuthenticator->authenticateUser($user, $appAuthenticator, $request, [new RememberMeBadge()]);
+            return $userAuthenticator->authenticateUser($user, $appAuthenticator->setJustRegistered(true), $request, [new RememberMeBadge()]);
         }
 
         return $this->render('registration/register.html.twig', [
