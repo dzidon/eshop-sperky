@@ -75,7 +75,7 @@ class SocialAuthenticator extends OAuth2Authenticator
 
     public function authenticate(Request $request): PassportInterface
     {
-        if($this->security->getUser()) //uživatel už je přihlášen
+        if($this->security->isGranted('IS_AUTHENTICATED_FULLY')) //uživatel už je přihlášen úplně
         {
             throw new AlreadyAuthenticatedException();
         }
@@ -99,7 +99,7 @@ class SocialAuthenticator extends OAuth2Authenticator
 
                 if($socialEmail === null || $socialId === null)
                 {
-                    $this->logger->info(sprintf("Failed %s login due to insufficient data provided (Social email: %s, Social ID: %s).", $serviceName, $socialEmail, $socialId));
+                    $this->logger->error(sprintf("Failed %s login due to insufficient data provided (Social email: %s, Social ID: %s).", $serviceName, $socialEmail, $socialId));
                     throw new InsufficientSocialDataException();
                 }
 

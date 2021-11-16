@@ -20,7 +20,7 @@ class SecurityController extends AbstractController
      */
     public function login(Request $request, AuthenticationUtils $authenticationUtils): Response
     {
-        if ($this->getUser())
+        if ($this->isGranted('IS_AUTHENTICATED_FULLY'))
         {
              return $this->redirectToRoute('home');
         }
@@ -44,6 +44,11 @@ class SecurityController extends AbstractController
      */
     public function loginSocial(ClientRegistry $clientRegistry, $service): RedirectResponse
     {
+        if ($this->isGranted('IS_AUTHENTICATED_FULLY'))
+        {
+            return $this->redirectToRoute('home');
+        }
+
         $serviceData = [
             'facebook' => [
                 'scopes' => ['public_profile', 'email']

@@ -41,9 +41,11 @@
                 <div class="center-align">
                     <button type="submit" class="waves-effect waves-light btn-large light-blue">Přihlásit se</button>
                     <br><br>
-                    <div>
-                        Ještě nemáte účet? <a href="{{ path('register') }}">Zaregistrovat se</a>
-                    </div>
+                    {% if not is_granted('IS_AUTHENTICATED_REMEMBERED') %}
+                        <div>
+                            Ještě nemáte účet? <a href="{{ path('register') }}">Zaregistrovat se</a>
+                        </div>
+                    {% endif %}
                     <div>
                         Zapomněli jste heslo? <a href="{{ path('forgot_password_request') }}">Obnovit</a>
                     </div>

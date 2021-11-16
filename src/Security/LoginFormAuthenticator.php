@@ -44,7 +44,7 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
 
     public function authenticate(Request $request): PassportInterface
     {
-        if($this->security->getUser()) //uživatel už je přihlášen
+        if($this->security->isGranted('IS_AUTHENTICATED_FULLY')) //uživatel už je přihlášen úplně
         {
             throw new AlreadyAuthenticatedException();
         }
