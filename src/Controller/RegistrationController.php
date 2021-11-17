@@ -48,13 +48,16 @@ class RegistrationController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid())
         {
-            // encode the plain password
+            // zasifrovani hesla
             $user->setPassword(
             $userPasswordHasherInterface->hashPassword(
                     $user,
                     $form->get('plainPassword')->get('repeated')->getData()
                 )
             );
+
+            //nastaveni datumu registrace
+            $user->setRegistered(new \DateTime('now'));
 
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($user);
@@ -69,10 +72,6 @@ class RegistrationController extends AbstractController
             {
                 $this->logger->error(sprintf("User %s (ID: %s) has registered, but the following error occurred in sendEmailConfirmation: %s", $user->getUserIdentifier(), $user->getId(), $exception->getMessage()));
             }
-
-            $this->addFlash('success', 'Byli jste úspěšně zaregistrováni! Svůj účet aktivujete kliknutím na odkaz, který vám byl odeslán na email.');
-
-            $this->logger->info(sprintf("User %s (ID: %s) has registered using email and password.", $user->getUserIdentifier(), $user->getId()));
 
             return $userAuthenticator->authenticateUser($user, $appAuthenticator->setJustRegistered(true), $request, [new RememberMeBadge()]);
         }

@@ -66,6 +66,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     private $verifyLinkLastSent;
 
+    /**
+     * @ORM\Column(type="datetime")
+     */
+    private $registered;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -223,5 +228,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         }
 
         return true;
+    }
+
+    public function getRegistered(): ?\DateTimeInterface
+    {
+        return $this->registered;
+    }
+
+    public function setRegistered(\DateTimeInterface $registered): self
+    {
+        $this->registered = $registered;
+
+        return $this;
     }
 }

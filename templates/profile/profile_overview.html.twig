@@ -8,11 +8,7 @@
         <div class="row">
             <h4 class="no-mar-top">Údaje</h4>
             E-mail: {{ app.user.email }}<br>
-            Test: test<br>
-            Test: test<br>
-            Test: test<br>
-            Test: test<br>
-            Test: test<br>
+            Datum registrace: {{ app.user.registered|date('d. m. Y H:i:s') }}<br>
         </div>
     </div>
 
