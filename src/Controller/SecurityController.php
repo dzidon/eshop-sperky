@@ -30,7 +30,8 @@ class SecurityController extends AbstractController
     {
         if ($this->isGranted('IS_AUTHENTICATED_FULLY'))
         {
-             return $this->redirectToRoute('home');
+            $this->addFlash('failure', 'Už jste přihlášen. Pro nové přihlášení se nejdříve odhlašte.');
+            return $this->redirectToRoute('home');
         }
 
         // ziska login error, pokud nejaky existuje
@@ -55,6 +56,7 @@ class SecurityController extends AbstractController
     {
         if ($this->isGranted('IS_AUTHENTICATED_FULLY'))
         {
+            $this->addFlash('failure', 'Už jste přihlášen. Pro nové přihlášení se nejdříve odhlašte.');
             return $this->redirectToRoute('home');
         }
 

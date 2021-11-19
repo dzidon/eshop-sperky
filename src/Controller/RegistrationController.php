@@ -42,6 +42,7 @@ class RegistrationController extends AbstractController
     {
         if ($this->getUser())
         {
+            $this->addFlash('failure', 'Už jste přihlášen. Pro zaregistrování se nejdříve odhlašte.');
             return $this->redirectToRoute('home');
         }
 
