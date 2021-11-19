@@ -23,6 +23,11 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
 use Symfony\Component\Security\Http\Util\TargetPathTrait;
 
+/**
+ * Třída LoginFormAuthenticator řeší autentizaci přes přihlašovací formulář (email a heslo).
+ *
+ * @package App\Security
+ */
 class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
 {
     use TargetPathTrait;

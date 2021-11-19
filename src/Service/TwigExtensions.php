@@ -6,6 +6,11 @@ use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
+/**
+ * Třída TwigExtensions přidává rozšířující metody a filtry šablonovacímu systému Twig.
+ *
+ * @package App\Service
+ */
 class TwigExtensions extends AbstractExtension
 {
     private ParameterBagInterface $params;
@@ -22,6 +27,13 @@ class TwigExtensions extends AbstractExtension
         ];
     }
 
+    /**
+     * Vrátí hodnotu parametru z services.yaml bez nutnosti vytvářet Twig global.
+     *
+     * @param string $name
+     *
+     * @return array|bool|float|int|string|null
+     */
     public function getParameter(string $name)
     {
         return $this->params->get($name);

@@ -31,8 +31,7 @@ class ProfileController extends AbstractController
         $this->logger = $logger;
         $this->breadcrumbs = $breadcrumbs;
 
-        $this->breadcrumbs->addRoute('home');
-        $this->breadcrumbs->addRoute('profile');
+        $this->breadcrumbs->addRoute('home')->addRoute('profile');
     }
 
     /**
@@ -40,10 +39,8 @@ class ProfileController extends AbstractController
      */
     public function overview(): Response
     {
-        $this->breadcrumbs->setPageTitleByRoute('profile');
-
         return $this->render('profile/profile_overview.html.twig', [
-            'breadcrumbs' => $this->breadcrumbs,
+            'breadcrumbs' => $this->breadcrumbs->setPageTitleByRoute('profile'),
         ]);
     }
 
@@ -82,11 +79,9 @@ class ProfileController extends AbstractController
             return $this->redirectToRoute('profile_change_password');
         }
 
-        $this->breadcrumbs->setPageTitleByRoute('profile_change_password');
-
         return $this->render('profile/profile_change_password.html.twig', [
             'changeForm' => $form->createView(),
-            'breadcrumbs' => $this->breadcrumbs,
+            'breadcrumbs' => $this->breadcrumbs->setPageTitleByRoute('profile_change_password'),
         ]);
     }
 
@@ -120,11 +115,9 @@ class ProfileController extends AbstractController
             return $this->redirectToRoute('profile_verify');
         }
 
-        $this->breadcrumbs->setPageTitleByRoute('profile_verify');
-
         return $this->render('profile/profile_verify.html.twig', [
             'sendAgainForm' => $form->createView(),
-            'breadcrumbs' => $this->breadcrumbs,
+            'breadcrumbs' => $this->breadcrumbs->setPageTitleByRoute('profile_verify'),
         ]);
     }
 }

@@ -41,13 +41,10 @@ class SecurityController extends AbstractController
 
         $request->getSession()->remove(Security::LAST_USERNAME);
 
-        $this->breadcrumbs->addRoute('home');
-        $this->breadcrumbs->addRoute('login');
-
         return $this->render('security/login.html.twig', [
             'lastUsername' => $lastUsername,
             'error' => $error,
-            'breadcrumbs' => $this->breadcrumbs,
+            'breadcrumbs' => $this->breadcrumbs->addRoute('home')->addRoute('login'),
         ]);
     }
 

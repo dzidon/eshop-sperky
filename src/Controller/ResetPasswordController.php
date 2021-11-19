@@ -12,6 +12,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -66,13 +67,9 @@ class ResetPasswordController extends AbstractController
             );
         }
 
-        $this->breadcrumbs->addRoute('home');
-        $this->breadcrumbs->addRoute('login');
-        $this->breadcrumbs->addRoute('forgot_password_request');
-
         return $this->render('reset_password/request.html.twig', [
             'requestForm' => $form->createView(),
-            'breadcrumbs' => $this->breadcrumbs,
+            'breadcrumbs' => $this->breadcrumbs->addRoute('home')->addRoute('login')->addRoute('forgot_password_request'),
         ]);
     }
 
@@ -90,14 +87,9 @@ class ResetPasswordController extends AbstractController
             $resetToken = $this->resetPasswordHelper->generateFakeResetToken();
         }
 
-        $this->breadcrumbs->addRoute('home');
-        $this->breadcrumbs->addRoute('login');
-        $this->breadcrumbs->addRoute('forgot_password_request');
-        $this->breadcrumbs->addRoute('check_email');
-
         return $this->render('reset_password/check_email.html.twig', [
             'resetToken' => $resetToken,
-            'breadcrumbs' => $this->breadcrumbs,
+            'breadcrumbs' => $this->breadcrumbs->addRoute('home')->addRoute('login')->addRoute('forgot_password_request')->addRoute('check_email'),
         ]);
     }
 
@@ -165,13 +157,9 @@ class ResetPasswordController extends AbstractController
             return $this->redirectToRoute('home');
         }
 
-        $this->breadcrumbs->addRoute('home');
-        $this->breadcrumbs->addRoute('login');
-        $this->breadcrumbs->addRoute('reset_password');
-
         return $this->render('reset_password/reset.html.twig', [
             'resetForm' => $form->createView(),
-            'breadcrumbs' => $this->breadcrumbs,
+            'breadcrumbs' => $this->breadcrumbs->addRoute('home')->addRoute('login')->addRoute('reset_password'),
         ]);
     }
 
@@ -215,7 +203,14 @@ class ResetPasswordController extends AbstractController
             ])
         ;
 
-        $mailer->send($email);
+        try
+        {
+            $mailer->send($email);
+        }
+        catch (TransportExceptionInterface $exception)
+        {
+            $this->logger->error(sprintf("Someone has requested a password reset email for %s (ID: %s), but the following error occurred in send: %s", $user->getUserIdentifier(), $user->getId(), $exception->getMessage()));
+        }
 
         // Store the token object in session for retrieval in check-email route.
         $this->setTokenObjectInSession($resetToken);

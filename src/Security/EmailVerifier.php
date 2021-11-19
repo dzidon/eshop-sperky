@@ -14,6 +14,11 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use SymfonyCasts\Bundle\VerifyEmail\Exception\VerifyEmailExceptionInterface;
 use SymfonyCasts\Bundle\VerifyEmail\VerifyEmailHelperInterface;
 
+/**
+ * Třída EmailVerifier řeší potvrzovací emaily uživatele
+ *
+ * @package App\Security
+ */
 class EmailVerifier
 {
     private VerifyEmailHelperInterface $verifyEmailHelper;
@@ -30,8 +35,14 @@ class EmailVerifier
     }
 
     /**
-     * @throws \Exception
+     * Odešle odkaz na ověření emailu
+     *
+     * @param string $verifyEmailRouteName
+     * @param UserInterface $user
+     * @param bool $newUser
+     *
      * @throws TransportExceptionInterface
+     * @throws \Exception
      */
     public function sendEmailConfirmation(string $verifyEmailRouteName, UserInterface $user, bool $newUser = false): void
     {
@@ -70,6 +81,12 @@ class EmailVerifier
     }
 
     /**
+     * Řeší aktivaci účtu po kliknutí na ověřovací odkaz
+     *
+     * @param Request $request
+     * @param UserInterface $user
+     *
+     * @throws EmailAlreadyVerifiedException
      * @throws VerifyEmailExceptionInterface
      */
     public function handleEmailConfirmation(Request $request, UserInterface $user): void

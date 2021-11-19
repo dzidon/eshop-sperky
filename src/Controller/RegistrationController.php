@@ -79,12 +79,9 @@ class RegistrationController extends AbstractController
             return $userAuthenticator->authenticateUser($user, $appAuthenticator->setJustRegistered(true), $request, [new RememberMeBadge()]);
         }
 
-        $this->breadcrumbs->addRoute('home');
-        $this->breadcrumbs->addRoute('register');
-
         return $this->render('registration/register.html.twig', [
             'registrationForm' => $form->createView(),
-            'breadcrumbs' => $this->breadcrumbs,
+            'breadcrumbs' => $this->breadcrumbs->addRoute('home')->addRoute('register'),
         ]);
     }
 

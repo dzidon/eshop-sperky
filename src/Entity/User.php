@@ -209,7 +209,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * Vrátí true, pokud si uživatel může nechat poslat nový link pro potvrzení emailu
+     * Vezme aktuální timestamp a odečte od něj timestamp posledního odeslání ověřovacího emailu. Pokud je rozdíl těchto
+     * hodnot větší než minTimeDiffSeconds, vrátí se true (uživateli můžeme poslat další odkaz).
+     * Pokud má uživatel nastavené datum posledního odeslání potvrzovacího emailu na null, vrátí se true.
      *
      * @param $minTimeDiffSeconds
      * @return bool

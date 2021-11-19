@@ -14,10 +14,8 @@ class MainController extends AbstractController
      */
     public function index(BreadcrumbsService $breadcrumbs): Response
     {
-        $breadcrumbs->addRoute('home');
-
         return $this->render('main/index.html.twig', [
-            'breadcrumbs' => $breadcrumbs,
+            'breadcrumbs' => $breadcrumbs->addRoute('home'),
         ]);
     }
 }

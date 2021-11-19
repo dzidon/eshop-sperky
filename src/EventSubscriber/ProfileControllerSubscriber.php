@@ -8,6 +8,11 @@ use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Core\Security;
 
+/**
+ * Subscriber pro ProfileController. Při vstupu na jakoukoli stránku profilu se zde neověřeným uživatelům nastaví varování jako flash message.
+ *
+ * @package App\EventSubscriber
+ */
 class ProfileControllerSubscriber implements EventSubscriberInterface
 {
     private Security $security;
@@ -29,23 +34,20 @@ class ProfileControllerSubscriber implements EventSubscriberInterface
         if ($controller instanceof ProfileController)
         {
             $user = $this->security->getUser();
-            if($user)
+            if($user && !$user->isVerified())
             {
-                if(!$user->isVerified())
-                {
-                    $messageText = 'Zatím jste si neověřili email, takže nemáte přístup ke všem funkcionalitám webu. Pokud vám nepřišel ověřovací email nebo pokud vypršel váš odkaz na ověření, můžete si nechat poslat nový (Profil > Ověření emailu).';
-                    $flashBag = $event->getRequest()->getSession()->getFlashBag();
+                $messageText = 'Zatím jste si neověřili email, takže nemáte přístup ke všem funkcionalitám webu. Pokud vám nepřišel ověřovací email nebo pokud vypršel váš odkaz na ověření, můžete si nechat poslat nový (Profil > Ověření emailu).';
+                $flashBag = $event->getRequest()->getSession()->getFlashBag();
 
-                    if(!in_array($messageText, $flashBag->peek('warning')))
-                    {
-                        $flashBag->add('warning', $messageText);
-                    }
+                if(!in_array($messageText, $flashBag->peek('warning')))
+                {
+                    $flashBag->add('warning', $messageText);
                 }
             }
         }
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             KernelEvents::CONTROLLER => 'onKernelController',

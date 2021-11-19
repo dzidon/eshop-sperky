@@ -28,6 +28,11 @@ use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPasspor
 use Symfony\Component\Security\Http\Util\TargetPathTrait;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Třída SocialAuthenticator řeší autentizaci přes třetí strany (Facebook, Google).
+ *
+ * @package App\Security
+ */
 class SocialAuthenticator extends OAuth2Authenticator
 {
     use TargetPathTrait;
@@ -105,14 +110,14 @@ class SocialAuthenticator extends OAuth2Authenticator
 
                 // pokud už se v minulosti přihlašoval danou službou
                 $existingUser = $this->entityManager->getRepository(User::class)->findOneBy([$serviceIdAttribute => $socialId]); //např. facebookId => 651519191561
-                if ($existingUser) //social id nalezeno
+                if ($existingUser) //social id nalezeno v naší db
                 {
                     if($socialEmail === $existingUser->getUserIdentifier()) //v db exisutje user s danym emailem a social id
                     {
                         $this->logger->info(sprintf("User %s (ID: %s) has logged in using %s. They have used this service to log in before (Social ID: %s).", $existingUser->getUserIdentifier(), $existingUser->getId(), $serviceName, $socialId));
                         return $existingUser;
                     }
-                    else //v db exisutje user s danym social id, email vsak nesedi, takze social id odpojime
+                    else //v db exisutje user s danym social id, email vsak nesedi, takze social id odpojime (tohle je edge case, ktery nastane jen pokud si uzivatel zmeni email na uctu treti strany)
                     {
                         $existingUser->$serviceIdAttributeSetter(null);
                         $this->entityManager->persist($existingUser);
