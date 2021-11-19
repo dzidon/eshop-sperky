@@ -22,34 +22,38 @@
     </head>
 
     <body>
-        <nav class="white lighten-1" role="navigation">
-            <div class="nav-wrapper container"><a id="logo-container" href="{{ path('home') }}" class="black-text brand-logo">Logo</a>
-                <ul class="right hide-on-med-and-down">
-                    <li><a href="#" class="black-text"> <i class="material-icons left">filter_vintage</i> Produkty</a></li>
-                    <li><a href="#" class="black-text"> <i class="material-icons left">shopping_cart</i> Košík <span class="cart-badge light-blue white-text">25</span></a></li>
+        <div class="navbar-fixed">
+            <nav class="white lighten-1" role="navigation">
+                <div class="nav-wrapper container">
+                    <a id="logo-container" href="{{ path('home') }}" class="black-text brand-logo">Logo</a>
+                    <ul class="right hide-on-med-and-down">
+                        <li><a href="#" class="black-text"> <i class="material-icons left">filter_vintage</i> Produkty</a></li>
+                        <li><a href="#" class="black-text"> <i class="material-icons left">shopping_cart</i> Košík <span class="cart-badge light-blue white-text">25</span></a></li>
 
-                    {% if is_granted('IS_AUTHENTICATED_REMEMBERED') %}
-                        <li><a href=" {{ path('profile') }} " class="black-text"> <i class="material-icons left">account_circle</i> Profil</a></li>
-                        <li><a href=" {{ path('logout') }} " class="black-text"> <i class="material-icons left">meeting_room</i> Odhlásit se</a></li>
-                    {% else %}
-                        <li><a href=" {{ path('login') }} " class="black-text"> <i class="material-icons left">vpn_key</i> Přihlásit se</a></li>
-                    {% endif %}
-                </ul>
+                        {% if is_granted('IS_AUTHENTICATED_REMEMBERED') %}
+                            <li><a href=" {{ path('profile') }} " class="black-text"> <i class="material-icons left">account_circle</i> Profil</a></li>
+                            <li><a href=" {{ path('logout') }} " class="black-text"> <i class="material-icons left">meeting_room</i> Odhlásit se</a></li>
+                        {% else %}
+                            <li><a href=" {{ path('login') }} " class="black-text"> <i class="material-icons left">vpn_key</i> Přihlásit se</a></li>
+                        {% endif %}
+                    </ul>
 
-                <ul id="nav-mobile" class="sidenav">
-                    <li><a href="#"> <i class="material-icons left">filter_vintage</i> Produkty</a></li>
-                    <li><a href="#"> <i class="material-icons left">shopping_cart</i> Košík <span class="cart-badge light-blue white-text">25</span></a></li>
+                    <a href="#" data-target="nav-mobile" class="sidenav-trigger"><i class="black-text material-icons">menu</i></a>
+                </div>
+            </nav>
+        </div>
 
-                    {% if is_granted('IS_AUTHENTICATED_REMEMBERED') %}
-                        <li><a href=" {{ path('profile') }} "> <i class="material-icons left">account_circle</i> Profil</a></li>
-                        <li><a href=" {{ path('logout') }} "> <i class="material-icons left">meeting_room</i> Odhlásit se</a></li>
-                    {% else %}
-                        <li><a href=" {{ path('login') }} "> <i class="material-icons left">vpn_key</i> Přihlásit se</a></li>
-                    {% endif %}
-                </ul>
-                <a href="#" data-target="nav-mobile" class="sidenav-trigger"><i class="black-text material-icons">menu</i></a>
-            </div>
-        </nav>
+        <ul id="nav-mobile" class="sidenav">
+            <li><a href="#"> <i class="material-icons left">filter_vintage</i> Produkty</a></li>
+            <li><a href="#"> <i class="material-icons left">shopping_cart</i> Košík <span class="cart-badge light-blue white-text">25</span></a></li>
+
+            {% if is_granted('IS_AUTHENTICATED_REMEMBERED') %}
+                <li><a href=" {{ path('profile') }} "> <i class="material-icons left">account_circle</i> Profil</a></li>
+                <li><a href=" {{ path('logout') }} "> <i class="material-icons left">meeting_room</i> Odhlásit se</a></li>
+            {% else %}
+                <li><a href=" {{ path('login') }} "> <i class="material-icons left">vpn_key</i> Přihlásit se</a></li>
+            {% endif %}
+        </ul>
 
         <main>
             {% block body %}

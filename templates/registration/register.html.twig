@@ -2,10 +2,10 @@
 
 {% block body %}
 
-    <div class="container">
-        {# Breadcrumbs #}
-        {{ include('fragments/_breadcrumbs.html.twig') }}
+    {# Breadcrumbs #}
+    {{ include('fragments/_breadcrumbs.html.twig') }}
 
+    <div class="container">
         <div class="container">
             {# h1 #}
             {{ include('fragments/_h1.html.twig', {route: app.request.get('_route')}) }}

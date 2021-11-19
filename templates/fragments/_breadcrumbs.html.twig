@@ -1,9 +1,16 @@
-<div class="section no-pad-bot">
-    {% for breadcrumb in breadcrumbs.getBreadcrumbsData() %}
-        {% if loop.last %}
-            <span class="breadcrumb">{{ breadcrumb.title }}</span>
-        {% else %}
-            <a href="{{ path(breadcrumb.route, breadcrumb.parameters) }}" class="breadcrumb">{{ breadcrumb.title }}</a>
-        {% endif %}
-    {% endfor %}
+<div class="section grey lighten-4">
+    <div class="container valign-wrapper flex-wrap">
+        {% for breadcrumb in breadcrumbs.getBreadcrumbsData() %}
+            {% if loop.last %}
+                <span>{{ breadcrumb.title }}</span>
+            {% else %}
+                <strong>
+                    <a href="{{ path(breadcrumb.route, breadcrumb.parameters) }}">
+                        {{ breadcrumb.title }}
+                    </a>
+                </strong>
+                <span>&nbsp;/&nbsp;</span>
+            {% endif %}
+        {% endfor %}
+    </div>
 </div>
