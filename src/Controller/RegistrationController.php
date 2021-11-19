@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Form\RegistrationFormType;
 use App\Security\EmailVerifier;
+use App\Service\BreadcrumbsService;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -24,12 +25,14 @@ class RegistrationController extends AbstractController
     private EmailVerifier $emailVerifier;
     private LoggerInterface $logger;
     private TranslatorInterface $translator;
+    private BreadcrumbsService $breadcrumbs;
 
-    public function __construct(EmailVerifier $emailVerifier, LoggerInterface $logger, TranslatorInterface $translator)
+    public function __construct(EmailVerifier $emailVerifier, LoggerInterface $logger, TranslatorInterface $translator, BreadcrumbsService $breadcrumbs)
     {
         $this->emailVerifier = $emailVerifier;
         $this->logger = $logger;
         $this->translator = $translator;
+        $this->breadcrumbs = $breadcrumbs;
     }
 
     /**
@@ -76,8 +79,12 @@ class RegistrationController extends AbstractController
             return $userAuthenticator->authenticateUser($user, $appAuthenticator->setJustRegistered(true), $request, [new RememberMeBadge()]);
         }
 
+        $this->breadcrumbs->addRoute('home');
+        $this->breadcrumbs->addRoute('register');
+
         return $this->render('registration/register.html.twig', [
             'registrationForm' => $form->createView(),
+            'breadcrumbs' => $this->breadcrumbs,
         ]);
     }
 

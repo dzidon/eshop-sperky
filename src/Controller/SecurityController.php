@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Service\BreadcrumbsService;
 use KnpU\OAuth2ClientBundle\Client\ClientRegistry;
 use KnpU\OAuth2ClientBundle\Client\Provider\FacebookClient;
 use KnpU\OAuth2ClientBundle\Client\Provider\GoogleClient;
@@ -15,6 +16,13 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 class SecurityController extends AbstractController
 {
+    private BreadcrumbsService $breadcrumbs;
+
+    public function __construct(BreadcrumbsService $breadcrumbs)
+    {
+        $this->breadcrumbs = $breadcrumbs;
+    }
+
     /**
      * @Route("/login", name="login")
      */
@@ -33,9 +41,13 @@ class SecurityController extends AbstractController
 
         $request->getSession()->remove(Security::LAST_USERNAME);
 
+        $this->breadcrumbs->addRoute('home');
+        $this->breadcrumbs->addRoute('login');
+
         return $this->render('security/login.html.twig', [
             'lastUsername' => $lastUsername,
             'error' => $error,
+            'breadcrumbs' => $this->breadcrumbs,
         ]);
     }
 

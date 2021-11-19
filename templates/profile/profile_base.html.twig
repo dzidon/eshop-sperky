@@ -1,11 +1,13 @@
 {% extends 'base.html.twig' %}
 
-{% block title %} Profil - {{ site_name }} {% endblock %}
-
 {% block body %}
 
     <div class="container">
-        <h1>Profil</h1>
+        {# Breadcrumbs #}
+        {{ include('fragments/_breadcrumbs.html.twig') }}
+
+        {# h1 #}
+        {{ include('fragments/_h1.html.twig', {route: 'profile'}) }}
 
         <div class="row">
             <div class="col s12 m5 l4 xl3 no-padding">

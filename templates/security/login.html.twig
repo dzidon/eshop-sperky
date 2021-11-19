@@ -1,12 +1,14 @@
 {% extends 'base.html.twig' %}
 
-{% block title %} Přihlášení - {{ site_name }} {% endblock %}
-
 {% block body %}
 
     <div class="container">
+        {# Breadcrumbs #}
+        {{ include('fragments/_breadcrumbs.html.twig') }}
+
         <div class="container">
-            <h1>Přihlášení</h1>
+            {# h1 #}
+            {{ include('fragments/_h1.html.twig', {route: app.request.get('_route')}) }}
 
             {# Flash zprávy #}
             {{ include('fragments/_flash_messages.html.twig') }}

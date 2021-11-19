@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Form\ChangePasswordFormType;
 use App\Form\ResetPasswordRequestFormType;
+use App\Service\BreadcrumbsService;
 use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -29,11 +30,13 @@ class ResetPasswordController extends AbstractController
 
     private ResetPasswordHelperInterface $resetPasswordHelper;
     private LoggerInterface $logger;
+    private BreadcrumbsService $breadcrumbs;
 
-    public function __construct(ResetPasswordHelperInterface $resetPasswordHelper, LoggerInterface $logger)
+    public function __construct(ResetPasswordHelperInterface $resetPasswordHelper, LoggerInterface $logger, BreadcrumbsService $breadcrumbs)
     {
         $this->resetPasswordHelper = $resetPasswordHelper;
         $this->logger = $logger;
+        $this->breadcrumbs = $breadcrumbs;
     }
 
     /**
@@ -63,8 +66,13 @@ class ResetPasswordController extends AbstractController
             );
         }
 
+        $this->breadcrumbs->addRoute('home');
+        $this->breadcrumbs->addRoute('login');
+        $this->breadcrumbs->addRoute('forgot_password_request');
+
         return $this->render('reset_password/request.html.twig', [
             'requestForm' => $form->createView(),
+            'breadcrumbs' => $this->breadcrumbs,
         ]);
     }
 
@@ -82,8 +90,14 @@ class ResetPasswordController extends AbstractController
             $resetToken = $this->resetPasswordHelper->generateFakeResetToken();
         }
 
+        $this->breadcrumbs->addRoute('home');
+        $this->breadcrumbs->addRoute('login');
+        $this->breadcrumbs->addRoute('forgot_password_request');
+        $this->breadcrumbs->addRoute('check_email');
+
         return $this->render('reset_password/check_email.html.twig', [
             'resetToken' => $resetToken,
+            'breadcrumbs' => $this->breadcrumbs,
         ]);
     }
 
@@ -151,8 +165,13 @@ class ResetPasswordController extends AbstractController
             return $this->redirectToRoute('home');
         }
 
+        $this->breadcrumbs->addRoute('home');
+        $this->breadcrumbs->addRoute('login');
+        $this->breadcrumbs->addRoute('reset_password');
+
         return $this->render('reset_password/reset.html.twig', [
             'resetForm' => $form->createView(),
+            'breadcrumbs' => $this->breadcrumbs,
         ]);
     }
 

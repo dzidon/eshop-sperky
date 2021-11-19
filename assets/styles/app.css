@@ -86,3 +86,20 @@ a.collection-item.active {
 .no-mar-top {
     margin-top: 0;
 }
+
+.breadcrumb:before {
+    color: black;
+}
+
+.breadcrumb {
+    color: #03a9f4;
+
+}
+
+.breadcrumb:before {
+    vertical-align: middle;
+}
+
+.breadcrumb:last-child {
+    color: black;
+}

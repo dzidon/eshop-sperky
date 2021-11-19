@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Form\ChangePasswordLoggedInFormType;
 use App\Form\SendEmailToVerifyFormType;
 use App\Security\EmailVerifier;
+use App\Service\BreadcrumbsService;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,10 +24,15 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class ProfileController extends AbstractController
 {
     private LoggerInterface $logger;
+    private BreadcrumbsService $breadcrumbs;
 
-    public function __construct(LoggerInterface $logger)
+    public function __construct(LoggerInterface $logger, BreadcrumbsService $breadcrumbs)
     {
         $this->logger = $logger;
+        $this->breadcrumbs = $breadcrumbs;
+
+        $this->breadcrumbs->addRoute('home');
+        $this->breadcrumbs->addRoute('profile');
     }
 
     /**
@@ -34,7 +40,11 @@ class ProfileController extends AbstractController
      */
     public function overview(): Response
     {
-        return $this->render('profile/profile_overview.html.twig');
+        $this->breadcrumbs->setPageTitleByRoute('profile');
+
+        return $this->render('profile/profile_overview.html.twig', [
+            'breadcrumbs' => $this->breadcrumbs,
+        ]);
     }
 
     /**
@@ -72,8 +82,11 @@ class ProfileController extends AbstractController
             return $this->redirectToRoute('profile_change_password');
         }
 
+        $this->breadcrumbs->setPageTitleByRoute('profile_change_password');
+
         return $this->render('profile/profile_change_password.html.twig', [
             'changeForm' => $form->createView(),
+            'breadcrumbs' => $this->breadcrumbs,
         ]);
     }
 
@@ -107,8 +120,11 @@ class ProfileController extends AbstractController
             return $this->redirectToRoute('profile_verify');
         }
 
+        $this->breadcrumbs->setPageTitleByRoute('profile_verify');
+
         return $this->render('profile/profile_verify.html.twig', [
             'sendAgainForm' => $form->createView(),
+            'breadcrumbs' => $this->breadcrumbs,
         ]);
     }
 }
