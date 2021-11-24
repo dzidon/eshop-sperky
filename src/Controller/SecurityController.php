@@ -24,7 +24,7 @@ class SecurityController extends AbstractController
     }
 
     /**
-     * @Route("/login", name="login")
+     * @Route("/prihlaseni", name="login")
      */
     public function login(Request $request, AuthenticationUtils $authenticationUtils): Response
     {
@@ -50,7 +50,7 @@ class SecurityController extends AbstractController
     }
 
     /**
-     * @Route("/login/{service<facebook|google>}", name="login_social")
+     * @Route("/prihlaseni/{service<facebook|google>}", name="login_social")
      */
     public function loginSocial(ClientRegistry $clientRegistry, $service): RedirectResponse
     {
@@ -75,7 +75,7 @@ class SecurityController extends AbstractController
     }
 
     /**
-     * @Route("/logout", name="logout")
+     * @Route("/odhlaseni", name="logout")
      */
     public function logout(): void
     {

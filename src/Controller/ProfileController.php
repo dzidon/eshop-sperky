@@ -17,7 +17,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * @Route("/profile")
+ * @Route("/profil")
  *
  * @IsGranted("IS_AUTHENTICATED_REMEMBERED")
  */
@@ -45,7 +45,7 @@ class ProfileController extends AbstractController
     }
 
     /**
-     * @Route("/change-password", name="profile_change_password")
+     * @Route("/zmena-hesla", name="profile_change_password")
      */
     public function passwordChange(Request $request, UserPasswordHasherInterface $userPasswordHasherInterface): Response
     {
@@ -86,7 +86,7 @@ class ProfileController extends AbstractController
     }
 
     /**
-     * @Route("/verify-email", name="profile_verify")
+     * @Route("/overeni-emailu", name="profile_verify")
      */
     public function verify(Request $request, EmailVerifier $emailVerifier, TranslatorInterface $translator): Response
     {

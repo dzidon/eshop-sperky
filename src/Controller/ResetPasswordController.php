@@ -23,7 +23,7 @@ use SymfonyCasts\Bundle\ResetPassword\Exception\ResetPasswordExceptionInterface;
 use SymfonyCasts\Bundle\ResetPassword\ResetPasswordHelperInterface;
 
 /**
- * @Route("/reset-password")
+ * @Route("/obnova-hesla")
  */
 class ResetPasswordController extends AbstractController
 {
@@ -76,7 +76,7 @@ class ResetPasswordController extends AbstractController
     /**
      * Potvrzovací stránka po zažádání o reset hesla.
      *
-     * @Route("/check-email", name="check_email")
+     * @Route("/potvrzeni", name="check_email")
      */
     public function checkEmail(): Response
     {
@@ -96,7 +96,7 @@ class ResetPasswordController extends AbstractController
     /**
      * Validace a zpracování resetovací URL, na kterou uživatel kliknul v jeho emailu.
      *
-     * @Route("/reset/{token}", name="reset_password")
+     * @Route("/zpracovani/{token}", name="reset_password")
      */
     public function reset(Request $request, UserPasswordHasherInterface $userPasswordHasherInterface, TranslatorInterface $translator, string $token = null): Response
     {

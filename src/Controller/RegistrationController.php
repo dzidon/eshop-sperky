@@ -36,7 +36,7 @@ class RegistrationController extends AbstractController
     }
 
     /**
-     * @Route("/register", name="register")
+     * @Route("/registrace", name="register")
      */
     public function register(Request $request, UserPasswordHasherInterface $userPasswordHasherInterface, LoginFormAuthenticator $appAuthenticator, UserAuthenticatorInterface $userAuthenticator): Response
     {
@@ -87,7 +87,7 @@ class RegistrationController extends AbstractController
     }
 
     /**
-     * @Route("/verify-email", name="verify_email")
+     * @Route("/overeni-emailu", name="verify_email")
      *
      * @IsGranted("IS_AUTHENTICATED_REMEMBERED")
      */
