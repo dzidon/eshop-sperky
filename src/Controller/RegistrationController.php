@@ -8,7 +8,7 @@ use App\Security\EmailVerifier;
 use App\Service\BreadcrumbsService;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -26,19 +26,21 @@ class RegistrationController extends AbstractController
     private LoggerInterface $logger;
     private TranslatorInterface $translator;
     private BreadcrumbsService $breadcrumbs;
+    private $request;
 
-    public function __construct(EmailVerifier $emailVerifier, LoggerInterface $logger, TranslatorInterface $translator, BreadcrumbsService $breadcrumbs)
+    public function __construct(EmailVerifier $emailVerifier, LoggerInterface $logger, TranslatorInterface $translator, BreadcrumbsService $breadcrumbs, RequestStack $requestStack)
     {
         $this->emailVerifier = $emailVerifier;
         $this->logger = $logger;
         $this->translator = $translator;
         $this->breadcrumbs = $breadcrumbs;
+        $this->request = $requestStack->getCurrentRequest();
     }
 
     /**
      * @Route("/registrace", name="register")
      */
-    public function register(Request $request, UserPasswordHasherInterface $userPasswordHasherInterface, LoginFormAuthenticator $appAuthenticator, UserAuthenticatorInterface $userAuthenticator): Response
+    public function register(UserPasswordHasherInterface $userPasswordHasherInterface, LoginFormAuthenticator $appAuthenticator, UserAuthenticatorInterface $userAuthenticator): Response
     {
         if ($this->getUser())
         {
@@ -48,7 +50,7 @@ class RegistrationController extends AbstractController
 
         $user = new User();
         $form = $this->createForm(RegistrationFormType::class, $user);
-        $form->handleRequest($request);
+        $form->handleRequest($this->request);
 
         if ($form->isSubmitted() && $form->isValid())
         {
@@ -77,7 +79,7 @@ class RegistrationController extends AbstractController
                 $this->logger->error(sprintf("User %s (ID: %s) has registered, but the following error occurred in sendEmailConfirmation: %s", $user->getUserIdentifier(), $user->getId(), $exception->getMessage()));
             }
 
-            return $userAuthenticator->authenticateUser($user, $appAuthenticator->setJustRegistered(true), $request, [new RememberMeBadge()]);
+            return $userAuthenticator->authenticateUser($user, $appAuthenticator->setJustRegistered(true), $this->request, [new RememberMeBadge()]);
         }
 
         return $this->render('registration/register.html.twig', [
@@ -91,13 +93,13 @@ class RegistrationController extends AbstractController
      *
      * @IsGranted("IS_AUTHENTICATED_REMEMBERED")
      */
-    public function verifyUserEmail(Request $request): Response
+    public function verifyUserEmail(): Response
     {
         $user = $this->getUser();
 
         try // validate email confirmation link, sets User::isVerified=true and persists
         {
-            $this->emailVerifier->handleEmailConfirmation($request, $user);
+            $this->emailVerifier->handleEmailConfirmation($this->request, $user);
         }
         catch (VerifyEmailExceptionInterface $exception)
         {
