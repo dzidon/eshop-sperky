@@ -10,4 +10,52 @@
         </div>
     </div>
 
+    <div class="section">
+        {{ form_start(personalDataForm) }}
+            <div class="row">
+                <label>Pohlaví:</label>
+                <br>
+                {% for key, choiceItem in personalDataForm.gender.children %}
+                    <label>
+                        {{ form_widget(choiceItem, {'attr': {'class': 'with-gap'}}) }}
+                        <span>{{ choiceItem.vars.label }}</span>
+                    </label>
+                    <br>
+                {% endfor %}
+
+                <span class="helper-text red-text">{{ form_errors(personalDataForm.gender) }}</span>
+            </div>
+            <br>
+
+            <div class="row">
+                <div class="input-field">
+                    {{ form_label(personalDataForm.nameFirst, 'Křestní jméno') }}
+                    {{ form_widget(personalDataForm.nameFirst) }}
+                </div>
+                <span class="helper-text red-text">{{ form_errors(personalDataForm.nameFirst) }}</span>
+            </div>
+
+            <div class="row">
+                <div class="input-field">
+                    {{ form_label(personalDataForm.nameLast, 'Příjmení') }}
+                    {{ form_widget(personalDataForm.nameLast) }}
+                </div>
+                <span class="helper-text red-text">{{ form_errors(personalDataForm.nameLast) }}</span>
+            </div>
+
+            <div class="row">
+                <label>
+                    {{ form_widget(personalDataForm.agreePrivacy, {'attr': {'class': 'filled-in checkbox-light-blue'}}) }}
+                    <span>Souhlasím se zpracováním osobních údajů</span>
+                </label>
+                <span class="helper-text red-text">{{ form_errors(personalDataForm.agreePrivacy) }}</span>
+            </div>
+            <br>
+
+            <div class="center-align">
+                <button type="submit" class="waves-effect waves-light btn-large light-blue">Uložit</button>
+            </div>
+        {{ form_end(personalDataForm) }}
+    </div>
+
 {% endblock %}

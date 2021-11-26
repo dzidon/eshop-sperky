@@ -16,6 +16,11 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  */
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
+    public const GENDER_ID_MALE = false;
+    public const GENDER_ID_FEMALE = true;
+    public const GENDER_NAME_MALE = 'Muž';
+    public const GENDER_NAME_FEMALE = 'Žena';
+
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
@@ -70,6 +75,31 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @ORM\Column(type="datetime")
      */
     private $registered;
+
+    /**
+     * @ORM\Column(type="boolean", options={"default" : 0})
+     * @Assert\Type(
+     *     type="bool",
+     *     message="Odeslal jste neplatnou hodnotu."
+     * )
+     */
+    private $gender;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Assert\Length(
+     *      max = 255,
+     *      maxMessage = "Maximální délka křestního jména: {{ limit }} znaků.")
+     */
+    private $nameFirst;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     * @Assert\Length(
+     *      max = 255,
+     *      maxMessage = "Maximální délka příjmení: {{ limit }} znaků.")
+     */
+    private $nameLast;
 
     public function getId(): ?int
     {
@@ -240,6 +270,59 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setRegistered(\DateTimeInterface $registered): self
     {
         $this->registered = $registered;
+
+        return $this;
+    }
+
+    public function getGender(): ?bool
+    {
+        return $this->gender;
+    }
+
+    /**
+     * Vrací buď 'Muž' nebo 'Žena'
+     *
+     * @return string
+     */
+    public function getGenderName(): string
+    {
+        if($this->gender === self::GENDER_ID_MALE)
+        {
+            return self::GENDER_NAME_MALE;
+        }
+        else
+        {
+            return self::GENDER_NAME_FEMALE;
+        }
+    }
+
+    public function setGender(bool $gender): self
+    {
+        $this->gender = $gender;
+
+        return $this;
+    }
+
+    public function getNameFirst(): ?string
+    {
+        return $this->nameFirst;
+    }
+
+    public function setNameFirst(?string $nameFirst): self
+    {
+        $this->nameFirst = $nameFirst;
+
+        return $this;
+    }
+
+    public function getNameLast(): ?string
+    {
+        return $this->nameLast;
+    }
+
+    public function setNameLast(?string $nameLast): self
+    {
+        $this->nameLast = $nameLast;
 
         return $this;
     }

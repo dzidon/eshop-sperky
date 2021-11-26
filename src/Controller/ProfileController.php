@@ -3,12 +3,13 @@
 namespace App\Controller;
 
 use App\Form\ChangePasswordLoggedInFormType;
+use App\Form\PersonalInfoFormType;
 use App\Form\SendEmailToVerifyFormType;
 use App\Security\EmailVerifier;
 use App\Service\BreadcrumbsService;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -25,11 +26,13 @@ class ProfileController extends AbstractController
 {
     private LoggerInterface $logger;
     private BreadcrumbsService $breadcrumbs;
+    private $request;
 
-    public function __construct(LoggerInterface $logger, BreadcrumbsService $breadcrumbs)
+    public function __construct(LoggerInterface $logger, BreadcrumbsService $breadcrumbs, RequestStack $requestStack)
     {
         $this->logger = $logger;
         $this->breadcrumbs = $breadcrumbs;
+        $this->request = $requestStack->getCurrentRequest();
 
         $this->breadcrumbs->addRoute('home')->addRoute('profile');
     }
@@ -39,7 +42,25 @@ class ProfileController extends AbstractController
      */
     public function overview(): Response
     {
+        $user = $this->getUser();
+        $form = $this->createForm(PersonalInfoFormType::class, $user);
+        $form->handleRequest($this->request);
+
+        if ($form->isSubmitted() && $form->isValid())
+        {
+            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager->persist($user);
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Osobní údaje uloženy!');
+
+            $this->logger->info(sprintf("User %s (ID: %s) has changed their personal information.", $user->getUserIdentifier(), $user->getId()));
+
+            return $this->redirectToRoute('profile');
+        }
+
         return $this->render('profile/profile_overview.html.twig', [
+            'personalDataForm' => $form->createView(),
             'breadcrumbs' => $this->breadcrumbs->setPageTitleByRoute('profile'),
         ]);
     }
@@ -47,7 +68,7 @@ class ProfileController extends AbstractController
     /**
      * @Route("/zmena-hesla", name="profile_change_password")
      */
-    public function passwordChange(Request $request, UserPasswordHasherInterface $userPasswordHasherInterface): Response
+    public function passwordChange(UserPasswordHasherInterface $userPasswordHasherInterface): Response
     {
         if ($this->getUser()->getPassword() === null)
         {
@@ -56,7 +77,7 @@ class ProfileController extends AbstractController
         }
 
         $form = $this->createForm(ChangePasswordLoggedInFormType::class);
-        $form->handleRequest($request);
+        $form->handleRequest($this->request);
 
         if ($form->isSubmitted() && $form->isValid())
         {
@@ -88,7 +109,7 @@ class ProfileController extends AbstractController
     /**
      * @Route("/overeni-emailu", name="profile_verify")
      */
-    public function verify(Request $request, EmailVerifier $emailVerifier, TranslatorInterface $translator): Response
+    public function verify(EmailVerifier $emailVerifier, TranslatorInterface $translator): Response
     {
         $user = $this->getUser();
         if ($user->isVerified())
@@ -98,7 +119,7 @@ class ProfileController extends AbstractController
         }
 
         $form = $this->createForm(SendEmailToVerifyFormType::class);
-        $form->handleRequest($request);
+        $form->handleRequest($this->request);
 
         if ($form->isSubmitted() && $form->isValid())
         {
