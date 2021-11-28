@@ -55,7 +55,7 @@ class EmailVerifier
         $email->from(new Address($this->parameterBag->get('app_email_noreply'), $this->parameterBag->get('app_site_name')))
             ->to($user->getEmail())
             ->subject('Aktivace účtu')
-            ->htmlTemplate('registration/confirmation_email.html.twig');
+            ->htmlTemplate('fragments/emails/_verify_account.html.twig');
 
         $signatureComponents = $this->verifyEmailHelper->generateSignature(
             $verifyEmailRouteName,
