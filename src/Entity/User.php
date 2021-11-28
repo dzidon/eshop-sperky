@@ -18,8 +18,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     public const GENDER_ID_MALE = false;
     public const GENDER_ID_FEMALE = true;
-    public const GENDER_NAME_MALE = 'Muž';
-    public const GENDER_NAME_FEMALE = 'Žena';
+    public const GENDER_NAME_MALE = 'Pan';
+    public const GENDER_NAME_FEMALE = 'Paní';
 
     /**
      * @ORM\Id
@@ -100,6 +100,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      *      maxMessage = "Maximální délka příjmení: {{ limit }} znaků.")
      */
     private $nameLast;
+
+    /**
+     * @ORM\Column(type="phone_number", nullable=true)
+     */
+    private $phoneNumber;
 
     public function getId(): ?int
     {
@@ -323,6 +328,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setNameLast(?string $nameLast): self
     {
         $this->nameLast = $nameLast;
+
+        return $this;
+    }
+
+    public function getPhoneNumber()
+    {
+        return $this->phoneNumber;
+    }
+
+    public function setPhoneNumber($phoneNumber): self
+    {
+        $this->phoneNumber = $phoneNumber;
 
         return $this;
     }

@@ -111,6 +111,6 @@ class RegistrationController extends AbstractController
 
         $this->logger->info(sprintf("User %s (ID: %s) has verified their email.", $user->getUserIdentifier(), $user->getId()));
 
-        return $this->redirectToRoute('home');
+        return $this->redirectToRoute('profile');
     }
 }

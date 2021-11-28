@@ -43,24 +43,30 @@ class ProfileController extends AbstractController
     public function overview(): Response
     {
         $user = $this->getUser();
-        $form = $this->createForm(PersonalInfoFormType::class, $user);
-        $form->handleRequest($this->request);
+        $formView = null;
 
-        if ($form->isSubmitted() && $form->isValid())
+        if($user->isVerified())
         {
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->persist($user);
-            $entityManager->flush();
+            $form = $this->createForm(PersonalInfoFormType::class, $user);
+            $form->handleRequest($this->request);
 
-            $this->addFlash('success', 'Osobní údaje uloženy!');
+            if ($form->isSubmitted() && $form->isValid())
+            {
+                $entityManager = $this->getDoctrine()->getManager();
+                $entityManager->persist($user);
+                $entityManager->flush();
 
-            $this->logger->info(sprintf("User %s (ID: %s) has changed their personal information.", $user->getUserIdentifier(), $user->getId()));
+                $this->addFlash('success', 'Osobní údaje uloženy!');
+                $this->logger->info(sprintf("User %s (ID: %s) has changed their personal information.", $user->getUserIdentifier(), $user->getId()));
 
-            return $this->redirectToRoute('profile');
+                return $this->redirectToRoute('profile');
+            }
+
+            $formView = $form->createView();
         }
 
         return $this->render('profile/profile_overview.html.twig', [
-            'personalDataForm' => $form->createView(),
+            'personalDataForm' => $formView,
             'breadcrumbs' => $this->breadcrumbs->setPageTitleByRoute('profile'),
         ]);
     }
@@ -94,7 +100,6 @@ class ProfileController extends AbstractController
             $entityManager->flush();
 
             $this->addFlash('success', 'Heslo změněno!');
-
             $this->logger->info(sprintf("User %s (ID: %s) has changed their password (via profile).", $user->getUserIdentifier(), $user->getId()));
 
             return $this->redirectToRoute('profile_change_password');
