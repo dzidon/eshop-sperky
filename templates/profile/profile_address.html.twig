@@ -1,0 +1,98 @@
+{% extends 'profile/profile_base.html.twig' %}
+
+{% block profile_body %}
+
+    <div class="section">
+        <div class="row">
+            {% if addressInstance.getId() is null %}
+                <h4 class="no-mar-top">Nová adresa</h4>
+            {% else %}
+                <h4 class="no-mar-top">Upravit adresu</h4>
+            {% endif %}
+        </div>
+
+        {{ form_start(addressForm) }}
+            <div class="row">
+                <div class="input-field">
+                    {{ form_label(addressForm.alias, 'Alias') }}
+                    {{ form_widget(addressForm.alias) }}
+                </div>
+                <span class="helper-text red-text">{{ form_errors(addressForm.alias) }}</span>
+            </div>
+
+            <div class="row">
+                <div class="input-field">
+                    {{ form_widget(addressForm.country) }}
+                    {{ form_label(addressForm.country, 'Země') }}
+                </div>
+                <span class="helper-text red-text">{{ form_errors(addressForm.country) }}</span>
+            </div>
+
+            <div class="row">
+                <div class="input-field">
+                    {{ form_label(addressForm.street, 'Ulice a číslo popisné') }}
+                    {{ form_widget(addressForm.street) }}
+                </div>
+                <span class="helper-text red-text">{{ form_errors(addressForm.street) }}</span>
+            </div>
+
+            <div class="row">
+                <div class="input-field">
+                    {{ form_label(addressForm.town, 'Obec') }}
+                    {{ form_widget(addressForm.town) }}
+                </div>
+                <span class="helper-text red-text">{{ form_errors(addressForm.town) }}</span>
+            </div>
+
+            <div class="row">
+                <div class="input-field">
+                    {{ form_label(addressForm.zip, 'PSČ') }}
+                    {{ form_widget(addressForm.zip) }}
+                </div>
+                <span class="helper-text red-text">{{ form_errors(addressForm.zip) }}</span>
+            </div>
+
+            <div class="row">
+                <div class="input-field">
+                    {{ form_label(addressForm.company, 'Firma') }}
+                    {{ form_widget(addressForm.company) }}
+                </div>
+                <span class="helper-text red-text">{{ form_errors(addressForm.company) }}</span>
+            </div>
+
+            <div class="row">
+                <div class="input-field">
+                    {{ form_label(addressForm.ic, 'IČ') }}
+                    {{ form_widget(addressForm.ic) }}
+                </div>
+                <span class="helper-text red-text">{{ form_errors(addressForm.ic) }}</span>
+            </div>
+
+            <div class="row">
+                <div class="input-field">
+                    {{ form_label(addressForm.dic, 'DIČ') }}
+                    {{ form_widget(addressForm.dic) }}
+                </div>
+                <span class="helper-text red-text">{{ form_errors(addressForm.dic) }}</span>
+            </div>
+
+            <div class="row">
+                <label>
+                    {{ form_widget(addressForm.agreePrivacy, {'attr': {'class': 'filled-in checkbox-light-blue'}}) }}
+                    <span>Souhlasím se zpracováním osobních údajů</span>
+                </label>
+                <span class="helper-text red-text">{{ form_errors(addressForm.agreePrivacy) }}</span>
+            </div>
+            <br>
+
+            <div class="center-align">
+                {{ form_widget(addressForm.actionSave) }}
+
+                {% if addressInstance.getId() is not null %}
+                    {{ form_widget(addressForm.actionDelete) }}
+                {% endif %}
+            </div>
+        {{ form_end(addressForm) }}
+    </div>
+
+{% endblock %}

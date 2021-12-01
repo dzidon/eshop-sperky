@@ -1,0 +1,56 @@
+{% extends 'profile/profile_base.html.twig' %}
+
+{% block profile_body %}
+
+    <div class="section">
+        <div class="row">
+            <h4 class="no-mar-top">
+                Adresy
+                <a href="{{ path('profile_address') }}" class="btn-floating btn-medium waves-effect waves-light light-blue"><i class="material-icons">add</i></a>
+            </h4>
+
+            <div class="card white black-text">
+                <div class="card-content">
+                    <span class="card-title">Alias</span>
+                    <p>Země: Česká republika</p>
+                    <p>Ulice a číslo popisné: Dlouhá 55</p>
+                    <p>Město: Neratovice</p>
+                    <p>PSČ: 277 11</p>
+                    <br>
+                    <p>Firma: Firma s.r.o.</p>
+                    <p>IČ: 654546654</p>
+                    <p>DIČ: CZ654546654</p>
+                </div>
+                <div class="card-action">
+                    <a href="#">Upravit</a>
+                </div>
+            </div>
+
+            <div class="card white black-text">
+                <div class="card-content">
+                    <span class="card-title">Alias</span>
+                    <p>Ulice a číslo popisné: Dlouhá 55</p>
+                    <p>Město: Neratovice</p>
+                    <p>PSČ: 277 11</p>
+                </div>
+                <div class="card-action">
+                    <a href="#">Upravit</a>
+                </div>
+            </div>
+
+            <div class="card white black-text">
+                <div class="card-content">
+                    <span class="card-title">Alias</span>
+                    <p>Ulice a číslo popisné: Dlouhá 55</p>
+                    <p>Město: Neratovice</p>
+                    <p>PSČ: 277 11</p>
+                </div>
+                <div class="card-action">
+                    <a href="#">Upravit</a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+{% endblock %}

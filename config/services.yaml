@@ -13,12 +13,12 @@ parameters:
     app_page_title.profile: 'Profil'
     app_page_title.profile_change_password: 'Změna hesla'
     app_page_title.profile_verify: 'Ověření emailu'
+    app_page_title.profile_addresses: 'Adresy'
     app_page_title.register: 'Registrace'
     app_page_title.forgot_password_request: 'Obnova hesla'
     app_page_title.check_email: 'Potvrzení obnovy hesla'
     app_page_title.reset_password: 'Obnova hesla'
     app_page_title.login: 'Přihlášení'
-
 
 services:
     # default configuration for services in *this* file

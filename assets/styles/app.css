@@ -78,6 +78,13 @@ main {
     margin-left: 0;
 }*/
 
+/*
+    Select
+*/
+ul.dropdown-content.select-dropdown li span {
+    color: #03a9f4;
+}
+
 
 label.required:after {
     content: " *";
