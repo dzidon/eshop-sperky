@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\AddressRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=AddressRepository::class)
@@ -26,36 +27,64 @@ class Address
 
     /**
      * @ORM\Column(type="string", length=32)
+     * @Assert\Choice(choices={Address::COUNTRY_CODE_CZ, Address::COUNTRY_CODE_SK}, message="Zvolte platnou zemi.")
      */
     private $country;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\Length(
+     *      min = 1,
+     *      max = 255,
+     *      minMessage = "Minimální počet znaků: {{ limit }}",
+     *      maxMessage = "Maximální počet znaků: {{ limit }}")
+     * @Assert\NotBlank(message = "Zadejte ulici a číslo popisné.")
      */
     private $street;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\Length(
+     *      min = 1,
+     *      max = 255,
+     *      minMessage = "Minimální počet znaků: {{ limit }}",
+     *      maxMessage = "Maximální počet znaků: {{ limit }}")
+     * @Assert\NotBlank(message = "Zadejte město.")
      */
     private $town;
 
     /**
      * @ORM\Column(type="string", length=5)
+     * @Assert\Regex(
+     *     pattern="/^\d{5}$/",
+     *     message="PSČ musí být ve tvaru pěti číslic bez mezery.")
+     * @Assert\NotBlank(message = "Zadejte PSČ.")
      */
     private $zip;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Assert\Length(
+     *      max = 255,
+     *      maxMessage = "Maximální počet znaků: {{ limit }}")
      */
     private $company;
 
     /**
      * @ORM\Column(type="string", length=8, nullable=true)
+     * @Assert\Regex(
+     *     pattern="/^\d{8}$/",
+     *     message="IČ musí být ve tvaru osmi číslic bez mezery.")
      */
     private $ic;
 
     /**
      * @ORM\Column(type="string", length=12, nullable=true)
+     * @Assert\Length(
+     *      min = 10,
+     *      max = 12,
+     *      minMessage = "Minimální počet znaků: {{ limit }}",
+     *      maxMessage = "Maximální počet znaků: {{ limit }}")
      */
     private $dic;
 
@@ -67,6 +96,10 @@ class Address
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\Length(
+     *      max = 255,
+     *      maxMessage = "Maximální počet znaků: {{ limit }}")
+     * @Assert\NotBlank(message = "Zadejte alias.")
      */
     private $alias;
 
