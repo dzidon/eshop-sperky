@@ -4,11 +4,7 @@
 
     <div class="section">
         <div class="row">
-            {% if addressInstance.getId() is null %}
-                <h4 class="no-mar-top">Nová adresa</h4>
-            {% else %}
-                <h4 class="no-mar-top">Upravit adresu</h4>
-            {% endif %}
+            <h3 class="no-mar-top">{{ breadcrumbs.getPageTitle() }}</h3>
         </div>
 
         {{ form_start(addressForm) }}
@@ -86,11 +82,7 @@
             <br>
 
             <div class="center-align">
-                {{ form_widget(addressForm.actionSave) }}
-
-                {% if addressInstance.getId() is not null %}
-                    {{ form_widget(addressForm.actionDelete) }}
-                {% endif %}
+                <button type="submit" class="waves-effect waves-light btn-large light-blue">Uložit</button>
             </div>
         {{ form_end(addressForm) }}
     </div>

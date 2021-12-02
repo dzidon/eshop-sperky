@@ -14,6 +14,7 @@ parameters:
     app_page_title.profile_change_password: 'Změna hesla'
     app_page_title.profile_verify: 'Ověření emailu'
     app_page_title.profile_addresses: 'Adresy'
+    app_page_title.profile_address_delete: 'Smazat adresu'
     app_page_title.register: 'Registrace'
     app_page_title.forgot_password_request: 'Obnova hesla'
     app_page_title.check_email: 'Potvrzení obnovy hesla'

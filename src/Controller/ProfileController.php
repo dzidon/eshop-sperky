@@ -6,7 +6,7 @@ use App\Entity\Address;
 use App\Form\AddressFormType;
 use App\Form\ChangePasswordLoggedInFormType;
 use App\Form\PersonalInfoFormType;
-use App\Form\SendEmailToVerifyFormType;
+use App\Form\HiddenTrueFormType;
 use App\Security\EmailVerifier;
 use App\Service\BreadcrumbsService;
 use Psr\Log\LoggerInterface;
@@ -19,7 +19,6 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
  * @Route("/profil")
@@ -127,7 +126,7 @@ class ProfileController extends AbstractController
             return $this->redirectToRoute('home');
         }
 
-        $form = $this->createForm(SendEmailToVerifyFormType::class);
+        $form = $this->createForm(HiddenTrueFormType::class);
         $form->handleRequest($this->request);
 
         if ($form->isSubmitted() && $form->isValid())
@@ -156,12 +155,19 @@ class ProfileController extends AbstractController
      */
     public function addresses(): Response
     {
-        if(!$this->getUser()->isVerified())
+        $user = $this->getUser();
+        if(!$user->isVerified())
         {
-            throw new AccessDeniedException('Nemáte ověřený email.');
+            $this->addFlash('failure', 'Nemáte ověřený účet.');
+            return $this->redirectToRoute('profile');
         }
 
+        $addresses = $this->getDoctrine()->getRepository(Address::class)->findBy([
+            'user' => $user,
+        ]);
+
         return $this->render('profile/profile_addresses.html.twig', [
+            'addresses' => $addresses,
             'breadcrumbs' => $this->breadcrumbs->setPageTitleByRoute('profile_addresses'),
         ]);
     }
@@ -174,7 +180,8 @@ class ProfileController extends AbstractController
         $user = $this->getUser();
         if(!$user->isVerified())
         {
-            throw new AccessDeniedException('Nemáte ověřený email.');
+            $this->addFlash('failure', 'Nemáte ověřený účet.');
+            return $this->redirectToRoute('profile');
         }
 
         $address = new Address();
@@ -198,26 +205,15 @@ class ProfileController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid())
         {
+            $address->setUser($user);
+
             $entityManager = $this->getDoctrine()->getManager();
-            if($form->get('actionDelete')->isClicked()) //tlačítko smazat
-            {
-                $this->logger->info(sprintf("User %s (ID: %s) has deleted their address %s (ID: %s).", $user->getUserIdentifier(), $user->getId(), $address->getAlias(), $address->getId()));
+            $entityManager->persist($address);
+            $entityManager->flush();
 
-                $entityManager->remove($address);
-                $entityManager->flush();
+            $this->addFlash('success', 'Adresa uložena!');
+            $this->logger->info(sprintf("User %s (ID: %s) has saved their address %s (ID: %s).", $user->getUserIdentifier(), $user->getId(), $address->getAlias(), $address->getId()));
 
-                $this->addFlash('success', 'Adresa odstraněna!');
-            }
-            else //tlačítko uložit
-            {
-                $address->setUser($user);
-
-                $entityManager->persist($address);
-                $entityManager->flush();
-
-                $this->addFlash('success', 'Adresa uložena!');
-                $this->logger->info(sprintf("User %s (ID: %s) has saved their address %s (ID: %s).", $user->getUserIdentifier(), $user->getId(), $address->getAlias(), $address->getId()));
-            }
             return $this->redirectToRoute('profile_addresses');
         }
 
@@ -225,6 +221,49 @@ class ProfileController extends AbstractController
             'addressForm' => $form->createView(),
             'addressInstance' => $address,
             'breadcrumbs' => $this->breadcrumbs,
+        ]);
+    }
+
+    /**
+     * @Route("/adresa/{id}/smazat", name="profile_address_delete", requirements={"id"="\d+"})
+     */
+    public function addressDelete($id): Response
+    {
+        $user = $this->getUser();
+        if (!$user->isVerified()) {
+            $this->addFlash('failure', 'Nemáte ověřený účet.');
+            return $this->redirectToRoute('profile');
+        }
+
+        $address = $this->getDoctrine()->getRepository(Address::class)->findOneBy([
+            'id' => $id,
+        ]);
+
+        if($address === null || $address->getUser() !== $user) //nenaslo to zadnou adresu, nebo to nejakou adresu naslo, ale ta neni uzivatele
+        {
+            throw new NotFoundHttpException('Adresa nenalezena.');
+        }
+
+        $form = $this->createForm(HiddenTrueFormType::class);
+        $form->handleRequest($this->request);
+
+        if ($form->isSubmitted() && $form->isValid())
+        {
+            $this->logger->info(sprintf("User %s (ID: %s) has deleted their address %s (ID: %s).", $user->getUserIdentifier(), $user->getId(), $address->getAlias(), $address->getId()));
+
+            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager->remove($address);
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Adresa smazána!');
+
+            return $this->redirectToRoute('profile_addresses');
+        }
+
+        return $this->render('profile/profile_address_delete.html.twig', [
+            'addressDeleteForm' => $form->createView(),
+            'addressInstance' => $address,
+            'breadcrumbs' => $this->breadcrumbs->setPageTitleByRoute('profile_address_delete'),
         ]);
     }
 }

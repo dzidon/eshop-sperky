@@ -12,8 +12,10 @@ class Address
 {
     public const COUNTRY_CODE_CZ = 'CS';
     public const COUNTRY_CODE_SK = 'SK';
-    public const COUNTRY_NAME_CZ = 'Česká republika';
-    public const COUNTRY_NAME_SK = 'Slovensko';
+    public const COUNTRY_NAMES = [
+        self::COUNTRY_CODE_CZ => 'Česká republika',
+        self::COUNTRY_CODE_SK => 'Slovensko',
+    ];
 
     /**
      * @ORM\Id
@@ -67,6 +69,17 @@ class Address
      * @ORM\Column(type="string", length=255)
      */
     private $alias;
+
+    /**
+     * Vrátí název země podle kódu
+     *
+     * @param string $code
+     * @return string
+     */
+    public static function getCountryNameByCode(string $code): string
+    {
+        return self::COUNTRY_NAMES[$code];
+    }
 
     public function getId(): ?int
     {

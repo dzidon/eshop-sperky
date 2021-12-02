@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Entity\Address;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -24,6 +25,7 @@ class TwigExtensions extends AbstractExtension
     {
         return [
             new TwigFunction('get_parameter', [$this, 'getParameter']),
+            new TwigFunction('get_country_name', [Address::class, 'getCountryNameByCode']),
         ];
     }
 

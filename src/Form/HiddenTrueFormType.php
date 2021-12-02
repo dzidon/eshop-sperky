@@ -8,12 +8,12 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-class SendEmailToVerifyFormType extends AbstractType
+class HiddenTrueFormType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('sendAgain', HiddenType::class, [
+            ->add('hiddenTrue', HiddenType::class, [
                 'data' => '1',
                 'constraints' => [
                     new NotBlank([
@@ -28,7 +28,7 @@ class SendEmailToVerifyFormType extends AbstractType
         $resolver->setDefaults([
             'csrf_protection' => true,
             'csrf_field_name' => '_token',
-            'csrf_token_id'   => 'form_email_verify_again',
+            'csrf_token_id'   => 'form_hidden_true',
         ]);
     }
 }

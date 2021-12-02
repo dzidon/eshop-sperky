@@ -6,7 +6,6 @@ use App\Entity\Address;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -22,8 +21,8 @@ class AddressFormType extends AbstractType
             ])
             ->add('country', ChoiceType::class, [
                 'choices'  => [
-                    Address::COUNTRY_NAME_CZ => Address::COUNTRY_CODE_CZ,
-                    Address::COUNTRY_NAME_SK => Address::COUNTRY_CODE_SK,
+                    Address::COUNTRY_NAMES[Address::COUNTRY_CODE_CZ] => Address::COUNTRY_CODE_CZ,
+                    Address::COUNTRY_NAMES[Address::COUNTRY_CODE_SK] => Address::COUNTRY_CODE_SK,
                 ],
             ])
             ->add('street', TextType::class)
@@ -45,14 +44,6 @@ class AddressFormType extends AbstractType
                         'message' => 'Musíte souhlasit se zpracováním osobních údajů.',
                     ]),
                 ],
-            ])
-            ->add('actionSave', SubmitType::class, [
-                'label' => 'Uložit',
-                'attr' => ['class' => 'waves-effect waves-light btn-large light-blue'],
-            ])
-            ->add('actionDelete', SubmitType::class, [
-                'label' => 'Smazat',
-                'attr' => ['class' => 'waves-effect waves-light btn-large red'],
             ])
         ;
     }

@@ -4,18 +4,20 @@
 
     <div class="section">
         <div class="row">
-            <h4 class="no-mar-top">Nedostali jste email na ověření účtu? Vypršel vám odkaz v emailu? Nechte si poslat nový:</h4>
-
-            <br><br>
-            {{ form_start(sendAgainForm) }}
-                <div class="center-align">
-                    <button type="submit" class="waves-effect waves-light btn-large light-blue">Poslat znovu</button>
-
-                    {{ form_widget(sendAgainForm.sendAgain) }}
-                    <span class="helper-text red-text">{{ form_errors(sendAgainForm.sendAgain) }}</span>
-                </div>
-            {{ form_end(sendAgainForm) }}
+            <h3 class="no-mar-top">{{ breadcrumbs.getPageTitle() }}</h3>
         </div>
+
+        <div class="row">Nedostali jste email na ověření účtu? Vypršel vám odkaz v emailu? Nechte si poslat nový.</div>
+
+        {{ form_start(sendAgainForm) }}
+            <div class="center-align">
+
+                <button type="submit" class="waves-effect waves-light btn-large light-blue">Poslat znovu</button>
+
+                {{ form_widget(sendAgainForm.hiddenTrue) }}
+                <span class="helper-text red-text">{{ form_errors(sendAgainForm.hiddenTrue) }}</span>
+            </div>
+        {{ form_end(sendAgainForm) }}
     </div>
 
 {% endblock %}
