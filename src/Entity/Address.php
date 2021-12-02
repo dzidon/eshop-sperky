@@ -5,9 +5,11 @@ namespace App\Entity;
 use App\Repository\AddressRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+use App\Validation as AssertCustom;
 
 /**
  * @ORM\Entity(repositoryClass=AddressRepository::class)
+ * @AssertCustom\AllOrNone(targetAttributes={"company", "ic", "dic"})
  */
 class Address
 {
@@ -38,6 +40,9 @@ class Address
      *      max = 255,
      *      minMessage = "Minimální počet znaků: {{ limit }}",
      *      maxMessage = "Maximální počet znaků: {{ limit }}")
+     * @Assert\Regex(
+     *     pattern="/^(.*[^0-9]+) (([1-9][0-9]*)\/)?([1-9][0-9]*[a-cA-C]?)$/",
+     *     message="Neplatný tvar.")
      * @Assert\NotBlank(message = "Zadejte ulici a číslo popisné.")
      */
     private $street;
@@ -80,11 +85,9 @@ class Address
 
     /**
      * @ORM\Column(type="string", length=12, nullable=true)
-     * @Assert\Length(
-     *      min = 10,
-     *      max = 12,
-     *      minMessage = "Minimální počet znaků: {{ limit }}",
-     *      maxMessage = "Maximální počet znaků: {{ limit }}")
+     * @Assert\Regex(
+     *     pattern="/^((CZ|SK)(\d{8,10}))?$/",
+     *     message="Neplatný tvar.")
      */
     private $dic;
 

@@ -24,10 +24,14 @@
                             <p>Ulice a číslo popisné: {{ address.getStreet() }}</p>
                             <p>Město: {{ address.getTown() }}</p>
                             <p>PSČ: {{ address.getZip() }}</p>
-                            <br>
-                            <p>Firma: {{ address.getCompany() }}</p>
-                            <p>IČ: {{ address.getIc() }}</p>
-                            <p>DIČ: {{ address.getDic() }}</p>
+
+                            {% if address.getCompany() is not null and address.getIc() is not null and address.getDic() is not null %}
+                                <br>
+
+                                <p>Firma: {{ address.getCompany() }}</p>
+                                <p>IČ: {{ address.getIc() }}</p>
+                                <p>DIČ: {{ address.getDic() }}</p>
+                            {% endif %}
                         </div>
                         <div class="card-action">
                             <a href="{{ path('profile_address', {id: address.getId()}) }}">Upravit</a>
