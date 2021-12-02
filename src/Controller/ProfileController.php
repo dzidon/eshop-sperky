@@ -226,6 +226,7 @@ class ProfileController extends AbstractController
 
     /**
      * @Route("/adresa/{id}/smazat", name="profile_address_delete", requirements={"id"="\d+"})
+     * @IsGranted("IS_AUTHENTICATED_FULLY")
      */
     public function addressDelete($id): Response
     {
