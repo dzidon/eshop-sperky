@@ -174,6 +174,7 @@ class ProfileController extends AbstractController
 
     /**
      * @Route("/adresa/{id}", name="profile_address", requirements={"id"="\d+"})
+     * @IsGranted("IS_AUTHENTICATED_FULLY")
      */
     public function address($id = null): Response
     {
