@@ -4,11 +4,10 @@ namespace App\Form;
 
 use App\Entity\Address;
 use App\Form\Type\Address as AddressTypes;
+use App\Form\Type\AgreePrivacyType;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Validator\Constraints\IsTrue;
 
 class AddressFormType extends AbstractType
 {
@@ -34,14 +33,7 @@ class AddressFormType extends AbstractType
             ->add('dic', AddressTypes\AddressDicType::class, [
                 'required' => false,
             ])
-            ->add('agreePrivacy', CheckboxType::class, [
-                'mapped' => false,
-                'constraints' => [
-                    new IsTrue([
-                        'message' => 'Musíte souhlasit se zpracováním osobních údajů.',
-                    ]),
-                ],
-            ])
+            ->add('agreePrivacy', AgreePrivacyType::class)
         ;
     }
 

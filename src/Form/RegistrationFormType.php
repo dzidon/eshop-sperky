@@ -3,14 +3,13 @@
 namespace App\Form;
 
 use App\Entity\User;
+use App\Form\Type\AgreeTermsType;
 use EWZ\Bundle\RecaptchaBundle\Form\Type\EWZRecaptchaType;
 use EWZ\Bundle\RecaptchaBundle\Validator\Constraints\IsTrue as RecaptchaTrue;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Validator\Constraints\IsTrue;
 
 class RegistrationFormType extends AbstractType
 {
@@ -20,18 +19,11 @@ class RegistrationFormType extends AbstractType
             ->add('email', EmailType::class, [
                 'attr' => ['autofocus' => 'autofocus'],
             ])
-            ->add('agreeTerms', CheckboxType::class, [
-                'mapped' => false,
-                'constraints' => [
-                    new IsTrue([
-                        'message' => 'Musíte souhlasit s podmínkami používání.',
-                    ]),
-                ],
-            ])
             ->add('plainPassword', PasswordFormType::class, [
                 'mapped' => false,
                 'first_options_attr' => ['autocomplete' => 'new-password'],
             ])
+            ->add('agreeTerms', AgreeTermsType::class)
             ->add('recaptcha', EWZRecaptchaType::class, [
                 'mapped' => false,
                 'constraints' => array(

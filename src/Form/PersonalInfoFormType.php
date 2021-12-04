@@ -3,14 +3,13 @@
 namespace App\Form;
 
 use App\Entity\User;
+use App\Form\Type\AgreePrivacyType;
 use libphonenumber\PhoneNumberFormat;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Validator\Constraints\IsTrue;
 use Misd\PhoneNumberBundle\Form\Type\PhoneNumberType;
 
 class PersonalInfoFormType extends AbstractType
@@ -35,14 +34,7 @@ class PersonalInfoFormType extends AbstractType
                 'required' => false,
                 'default_region' => 'CZ',
                 'format' => PhoneNumberFormat::INTERNATIONAL])
-            ->add('agreePrivacy', CheckboxType::class, [
-                'mapped' => false,
-                'constraints' => [
-                    new IsTrue([
-                        'message' => 'Musíte souhlasit se zpracováním osobních údajů.',
-                    ]),
-                ],
-            ])
+            ->add('agreePrivacy', AgreePrivacyType::class)
         ;
     }
 
