@@ -22,13 +22,18 @@
                             <span class="card-title">{{ address.getAlias() }}</span>
                             <p>Země: {{ get_country_name(address.getCountry()) }}</p>
                             <p>Ulice a číslo popisné: {{ address.getStreet() }}</p>
-                            <p>Město: {{ address.getTown() }}</p>
+
+                            {% if address.getAdditionalInfo() is not null %}
+                                <p>Doplněk adresy: {{ address.getAdditionalInfo() }}</p>
+                            {% endif %}
+
+                            <p>Obec: {{ address.getTown() }}</p>
                             <p>PSČ: {{ address.getZip() }}</p>
 
                             {% if address.getCompany() is not null and address.getIc() is not null and address.getDic() is not null %}
                                 <br>
 
-                                <p>Firma: {{ address.getCompany() }}</p>
+                                <p>Název firmy: {{ address.getCompany() }}</p>
                                 <p>IČ: {{ address.getIc() }}</p>
                                 <p>DIČ: {{ address.getDic() }}</p>
                             {% endif %}

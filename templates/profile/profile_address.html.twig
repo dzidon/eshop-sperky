@@ -34,6 +34,14 @@
 
             <div class="row">
                 <div class="input-field">
+                    {{ form_label(addressForm.additionalInfo, 'Doplněk adresy') }}
+                    {{ form_widget(addressForm.additionalInfo) }}
+                </div>
+                <span class="helper-text red-text">{{ form_errors(addressForm.additionalInfo) }}</span>
+            </div>
+
+            <div class="row">
+                <div class="input-field">
                     {{ form_label(addressForm.town, 'Obec') }}
                     {{ form_widget(addressForm.town) }}
                 </div>
@@ -50,7 +58,7 @@
 
             <div class="row">
                 <div class="input-field">
-                    {{ form_label(addressForm.company, 'Firma') }}
+                    {{ form_label(addressForm.company, 'Název firmy') }}
                     {{ form_widget(addressForm.company) }}
                 </div>
                 <span class="helper-text red-text">{{ form_errors(addressForm.company) }}</span>

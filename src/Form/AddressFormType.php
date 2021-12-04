@@ -3,10 +3,9 @@
 namespace App\Form;
 
 use App\Entity\Address;
+use App\Form\Type\Address as AddressTypes;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\IsTrue;
@@ -16,25 +15,23 @@ class AddressFormType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('alias', TextType::class, [
+            ->add('alias', AddressTypes\AddressAliasType::class, [
                 'attr' => ['autofocus' => 'autofocus'],
             ])
-            ->add('country', ChoiceType::class, [
-                'choices'  => [
-                    Address::COUNTRY_NAMES[Address::COUNTRY_CODE_CZ] => Address::COUNTRY_CODE_CZ,
-                    Address::COUNTRY_NAMES[Address::COUNTRY_CODE_SK] => Address::COUNTRY_CODE_SK,
-                ],
-            ])
-            ->add('street', TextType::class)
-            ->add('town', TextType::class)
-            ->add('zip', TextType::class)
-            ->add('company', TextType::class, [
+            ->add('country', AddressTypes\AddressCountryType::class)
+            ->add('street', AddressTypes\AddressStreetType::class)
+            ->add('additionalInfo', AddressTypes\AddressAdditionalInfoType::class, [
                 'required' => false,
             ])
-            ->add('ic', TextType::class, [
+            ->add('town', AddressTypes\AddressTownType::class)
+            ->add('zip', AddressTypes\AddressZipType::class)
+            ->add('company', AddressTypes\AddressCompanyNameType::class, [
                 'required' => false,
             ])
-            ->add('dic', TextType::class, [
+            ->add('ic', AddressTypes\AddressIcType::class, [
+                'required' => false,
+            ])
+            ->add('dic', AddressTypes\AddressDicType::class, [
                 'required' => false,
             ])
             ->add('agreePrivacy', CheckboxType::class, [

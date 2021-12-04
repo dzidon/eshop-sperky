@@ -4,7 +4,6 @@ namespace App\Entity;
 
 use App\Repository\AddressRepository;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Validator\Constraints as Assert;
 use App\Validation as AssertCustom;
 
 /**
@@ -29,65 +28,50 @@ class Address
 
     /**
      * @ORM\Column(type="string", length=32)
-     * @Assert\Choice(choices={Address::COUNTRY_CODE_CZ, Address::COUNTRY_CODE_SK}, message="Zvolte platnou zemi.")
+     *
+     * Validace se resi pres AddressCountryType
      */
     private $country;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Assert\Length(
-     *      min = 1,
-     *      max = 255,
-     *      minMessage = "Minimální počet znaků: {{ limit }}",
-     *      maxMessage = "Maximální počet znaků: {{ limit }}")
-     * @Assert\Regex(
-     *     pattern="/^(.*[^0-9]+) (([1-9][0-9]*)\/)?([1-9][0-9]*[a-cA-C]?)$/",
-     *     message="Neplatný tvar.")
-     * @Assert\NotBlank(message = "Zadejte ulici a číslo popisné.")
+     *
+     * Validace se resi pres AddressStreetType
      */
     private $street;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Assert\Length(
-     *      min = 1,
-     *      max = 255,
-     *      minMessage = "Minimální počet znaků: {{ limit }}",
-     *      maxMessage = "Maximální počet znaků: {{ limit }}")
-     * @Assert\NotBlank(message = "Zadejte město.")
+     *
+     * Validace se resi pres AddressTownType
      */
     private $town;
 
     /**
      * @ORM\Column(type="string", length=5)
-     * @Assert\Regex(
-     *     pattern="/^\d{5}$/",
-     *     message="PSČ musí být ve tvaru pěti číslic bez mezery.")
-     * @Assert\NotBlank(message = "Zadejte PSČ.")
+     *
+     * Validace se resi pres AddressZipType
      */
     private $zip;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Assert\Length(
-     *      max = 255,
-     *      maxMessage = "Maximální počet znaků: {{ limit }}")
+     *
+     * Validace se resi pres AddressCompanyNameType
      */
     private $company;
 
     /**
      * @ORM\Column(type="string", length=8, nullable=true)
-     * @Assert\Regex(
-     *     pattern="/^\d{8}$/",
-     *     message="IČ musí být ve tvaru osmi číslic bez mezery.")
+     *
+     * Validace se resi pres AddressIcType
      */
     private $ic;
 
     /**
      * @ORM\Column(type="string", length=12, nullable=true)
-     * @Assert\Regex(
-     *     pattern="/^((CZ|SK)(\d{8,10}))?$/",
-     *     message="Neplatný tvar.")
+     *
+     * Validace se resi pres AddressDicType
      */
     private $dic;
 
@@ -99,12 +83,17 @@ class Address
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Assert\Length(
-     *      max = 255,
-     *      maxMessage = "Maximální počet znaků: {{ limit }}")
-     * @Assert\NotBlank(message = "Zadejte alias.")
+     *
+     * Validace se resi pres AddressDicType
      */
     private $alias;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     *
+     * Validace se resi pres AddressAdditionalInfoType
+     */
+    private $additionalInfo;
 
     /**
      * Vrátí název země podle kódu
@@ -127,7 +116,7 @@ class Address
         return $this->country;
     }
 
-    public function setCountry(string $country): self
+    public function setCountry(?string $country): self
     {
         $this->country = $country;
 
@@ -139,7 +128,7 @@ class Address
         return $this->street;
     }
 
-    public function setStreet(string $street): self
+    public function setStreet(?string $street): self
     {
         $this->street = $street;
 
@@ -151,7 +140,7 @@ class Address
         return $this->town;
     }
 
-    public function setTown(string $town): self
+    public function setTown(?string $town): self
     {
         $this->town = $town;
 
@@ -163,7 +152,7 @@ class Address
         return $this->zip;
     }
 
-    public function setZip(string $zip): self
+    public function setZip(?string $zip): self
     {
         $this->zip = $zip;
 
@@ -223,9 +212,21 @@ class Address
         return $this->alias;
     }
 
-    public function setAlias(string $alias): self
+    public function setAlias(?string $alias): self
     {
         $this->alias = $alias;
+
+        return $this;
+    }
+
+    public function getAdditionalInfo(): ?string
+    {
+        return $this->additionalInfo;
+    }
+
+    public function setAdditionalInfo(?string $additionalInfo): self
+    {
+        $this->additionalInfo = $additionalInfo;
 
         return $this;
     }
