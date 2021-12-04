@@ -4,10 +4,9 @@ namespace App\Form;
 
 use App\Entity\User;
 use App\Form\Type\AgreePrivacyType;
+use App\Form\Type\User as UserTypes;
 use libphonenumber\PhoneNumberFormat;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Misd\PhoneNumberBundle\Form\Type\PhoneNumberType;
@@ -17,17 +16,11 @@ class PersonalInfoFormType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('gender', ChoiceType::class, [
-                'choices' => array(
-                    User::GENDER_NAME_MALE => User::GENDER_ID_MALE,
-                    User::GENDER_NAME_FEMALE => User::GENDER_ID_FEMALE,
-                ),
-                'expanded' => true,
-            ])
-            ->add('nameFirst', TextType::class, [
+            ->add('gender', UserTypes\UserGenderType::class)
+            ->add('nameFirst', UserTypes\UserFirstNameType::class, [
                 'required' => false,
             ])
-            ->add('nameLast', TextType::class, [
+            ->add('nameLast', UserTypes\UserLastNameType::class, [
                 'required' => false,
             ])
             ->add('phoneNumber', PhoneNumberType::class, [

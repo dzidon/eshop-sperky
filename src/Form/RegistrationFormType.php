@@ -4,10 +4,10 @@ namespace App\Form;
 
 use App\Entity\User;
 use App\Form\Type\AgreeTermsType;
+use App\Form\Type\User as UserTypes;
 use EWZ\Bundle\RecaptchaBundle\Form\Type\EWZRecaptchaType;
 use EWZ\Bundle\RecaptchaBundle\Validator\Constraints\IsTrue as RecaptchaTrue;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -16,7 +16,7 @@ class RegistrationFormType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('email', EmailType::class, [
+            ->add('email', UserTypes\UserEmailType::class, [
                 'attr' => ['autofocus' => 'autofocus'],
             ])
             ->add('plainPassword', PasswordFormType::class, [

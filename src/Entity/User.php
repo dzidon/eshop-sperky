@@ -32,13 +32,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * @ORM\Column(type="string", length=180, unique=true)
-     * @Assert\Email(message = "{{ value }} není platná e-mailová adresa.")
-     * @Assert\Length(
-     *      min = 1,
-     *      max = 180,
-     *      minMessage = "Minimální délka e-mailu: {{ limit }} znaků.",
-     *      maxMessage = "Maximální délka e-mailu: {{ limit }} znaků.")
-     * @Assert\NotBlank(message = "Zadejte email.")
+     *
+     * Validace se resi pres UserEmailType
      */
     private $email;
 
@@ -80,26 +75,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * @ORM\Column(type="boolean", options={"default" : 0})
-     * @Assert\Type(
-     *     type="bool",
-     *     message="Odeslal jste neplatnou hodnotu."
-     * )
+     *
+     * Validace se resi pres UserGenderType
      */
     private $gender;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Assert\Length(
-     *      max = 255,
-     *      maxMessage = "Maximální délka křestního jména: {{ limit }} znaků.")
+     *
+     * Validace se resi pres UserFirstNameType
      */
     private $nameFirst;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
-     * @Assert\Length(
-     *      max = 255,
-     *      maxMessage = "Maximální délka příjmení: {{ limit }} znaků.")
+     *
+     * Validace se resi pres UserLastNameType
      */
     private $nameLast;
 
