@@ -96,6 +96,16 @@ class Address
     private $additionalInfo;
 
     /**
+     * @ORM\Column(type="datetime")
+     */
+    private $created;
+
+    /**
+     * @ORM\Column(type="datetime")
+     */
+    private $updated;
+
+    /**
      * Vrátí název země podle kódu
      *
      * @param string $code
@@ -227,6 +237,30 @@ class Address
     public function setAdditionalInfo(?string $additionalInfo): self
     {
         $this->additionalInfo = $additionalInfo;
+
+        return $this;
+    }
+
+    public function getCreated(): ?\DateTimeInterface
+    {
+        return $this->created;
+    }
+
+    public function setCreated(\DateTimeInterface $created): self
+    {
+        $this->created = $created;
+
+        return $this;
+    }
+
+    public function getUpdated(): ?\DateTimeInterface
+    {
+        return $this->updated;
+    }
+
+    public function setUpdated(\DateTimeInterface $updated): self
+    {
+        $this->updated = $updated;
 
         return $this;
     }

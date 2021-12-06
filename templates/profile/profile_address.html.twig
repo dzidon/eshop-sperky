@@ -7,6 +7,19 @@
             <h3 class="no-mar-top">{{ breadcrumbs.getPageTitle() }}</h3>
         </div>
 
+        {% if addressInstance.getId() is not null %}
+            <div class="row">
+                {% if addressInstance.getCreated() is not null %}
+                    Vytvořeno: {{ addressInstance.getCreated()|date('d. m. Y H:i:s') }}
+                {% endif %}
+
+                {% if addressInstance.getCreated() != addressInstance.getUpdated() and addressInstance.getUpdated() is not null %}
+                    <br>Upraveno: {{ addressInstance.getUpdated()|date('d. m. Y H:i:s') }}
+                {% endif %}
+            </div>
+            <br>
+        {% endif %}
+
         {{ form_start(addressForm) }}
             <div class="row">
                 <div class="input-field">

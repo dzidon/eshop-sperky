@@ -187,6 +187,7 @@ class ProfileController extends AbstractController
 
         $address = new Address();
         $this->breadcrumbs->setPageTitle('Nová adresa');
+
         if($id !== null) //zadal id do url
         {
             $address = $this->getDoctrine()->getRepository(Address::class)->findOneBy([
@@ -207,6 +208,11 @@ class ProfileController extends AbstractController
         if ($form->isSubmitted() && $form->isValid())
         {
             $address->setUser($user);
+            $address->setUpdated(new \DateTime('now'));
+            if($address->getId() === null)
+            {
+                $address->setCreated(new \DateTime('now'));
+            }
 
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($address);
