@@ -4,7 +4,9 @@ namespace App\Repository;
 
 use App\Entity\Address;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Query;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * @method Address|null find($id, $lockMode = null, $lockVersion = null)
@@ -19,32 +21,12 @@ class AddressRepository extends ServiceEntityRepository
         parent::__construct($registry, Address::class);
     }
 
-    // /**
-    //  * @return Address[] Returns an array of Address objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    public function getQueryForPagination(UserInterface $user): Query
     {
         return $this->createQueryBuilder('a')
-            ->andWhere('a.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('a.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
+            ->andWhere('a.user = :user')
+            ->setParameter('user', $user)
+            ->orderBy('a.updated', 'DESC')
+            ->getQuery();
     }
-    */
-
-    /*
-    public function findOneBySomeField($value): ?Address
-    {
-        return $this->createQueryBuilder('a')
-            ->andWhere('a.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-    */
 }

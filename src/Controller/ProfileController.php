@@ -9,6 +9,7 @@ use App\Form\PersonalInfoFormType;
 use App\Form\HiddenTrueFormType;
 use App\Security\EmailVerifier;
 use App\Service\BreadcrumbsService;
+use App\Service\PaginatorService;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -153,7 +154,7 @@ class ProfileController extends AbstractController
     /**
      * @Route("/adresy", name="profile_addresses")
      */
-    public function addresses(): Response
+    public function addresses(PaginatorService $paginatorService): Response
     {
         $user = $this->getUser();
         if(!$user->isVerified())
@@ -162,9 +163,16 @@ class ProfileController extends AbstractController
             return $this->redirectToRoute('profile');
         }
 
-        $addresses = $this->getDoctrine()->getRepository(Address::class)->findBy([
-            'user' => $user,
-        ]);
+        $page = (int) $this->request->query->get('page', '1');
+        $queryForPagination = $this->getDoctrine()->getRepository(Address::class)->getQueryForPagination($user);
+        $addresses = $paginatorService
+            ->build($queryForPagination, 2, $page)
+            ->getCurrentPageObjects();
+
+        if($paginatorService->isPageOutOfBounds($paginatorService->getCurrentPage()))
+        {
+            throw new NotFoundHttpException('Na této stránce nebyly nalezeny žádné adresy.');
+        }
 
         return $this->render('profile/profile_addresses.html.twig', [
             'addresses' => $addresses,
