@@ -85,6 +85,13 @@ ul.dropdown-content.select-dropdown li span {
     color: #03a9f4;
 }
 
+/*
+    Pagination
+*/
+.pagination li.active {
+    background-color: #03a9f4;
+}
+
 
 label.required:after {
     content: " *";

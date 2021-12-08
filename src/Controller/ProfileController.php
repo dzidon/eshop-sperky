@@ -166,7 +166,7 @@ class ProfileController extends AbstractController
         $page = (int) $this->request->query->get('page', '1');
         $queryForPagination = $this->getDoctrine()->getRepository(Address::class)->getQueryForPagination($user);
         $addresses = $paginatorService
-            ->build($queryForPagination, 2, $page)
+            ->initialize($queryForPagination, 5, $page)
             ->getCurrentPageObjects();
 
         if($paginatorService->isPageOutOfBounds($paginatorService->getCurrentPage()))
@@ -177,6 +177,7 @@ class ProfileController extends AbstractController
         return $this->render('profile/profile_addresses.html.twig', [
             'addresses' => $addresses,
             'breadcrumbs' => $this->breadcrumbs->setPageTitleByRoute('profile_addresses'),
+            'pagination' => $paginatorService->createViewData(),
         ]);
     }
 

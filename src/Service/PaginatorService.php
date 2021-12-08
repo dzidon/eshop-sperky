@@ -53,7 +53,7 @@ class PaginatorService
      * @param int $page
      * @return $this
      */
-    public function build(Query $query, int $pageSize, int $page): self
+    public function initialize(Query $query, int $pageSize, int $page): self
     {
         $this->pageSize = $pageSize;
         $this->setCurrentPageAndSanitize($page);
@@ -62,14 +62,22 @@ class PaginatorService
         $totalItems = count($paginator);
         $this->pagesCount = ceil($totalItems / $this->pageSize);
 
-        $this->createViewData();
-
         $this->currentPageObjects = $paginator->getQuery()
             ->setFirstResult($this->pageSize * ($this->currentPage-1))
             ->setMaxResults($this->pageSize)
             ->getResult();
 
         return $this;
+    }
+
+    /**
+     * Vrátí data pro vykreslení view
+     *
+     * @return array
+     */
+    public function getViewData(): array
+    {
+        return $this->viewData;
     }
 
     /**
@@ -114,6 +122,46 @@ class PaginatorService
     }
 
     /**
+     * Sestaví data pro view
+     */
+    public function createViewData(): self
+    {
+        $slotsSurroundingCenter = self::VIEW_INNER_PAGES - self::VIEW_INNER_CENTER; //2
+        for($i = 1; $i <= $slotsSurroundingCenter; $i++) // 1, 2
+        {
+            $this->exploreSurroundings($i);
+        }
+
+        //Stránky před aktuální stránkou
+        if($this->viewCurrentPageSurroundings['before'] > 0)
+        {
+            $minimum = $this->currentPage - $this->viewCurrentPageSurroundings['before'];
+            for ($i = $this->currentPage - 1; $i >= $minimum; $i--)
+            {
+                if(!$this->addViewPage($i, true)) break;
+            }
+        }
+
+        // Aktuální stránka
+        $this->addViewPage($this->currentPage, false);
+
+        // Stránky po aktuální stránce
+        if($this->viewCurrentPageSurroundings['after'] > 0)
+        {
+            $maximum = $this->currentPage + $this->viewCurrentPageSurroundings['after'];
+            for ($i = $this->currentPage + 1; $i <= $maximum; $i++)
+            {
+                if(!$this->addViewPage($i, false)) break;
+            }
+        }
+
+        // Vykreslení první a poslední stránky pokud to dává smysl
+        $this->addAdditionalViewData();
+
+        return $this;
+    }
+
+    /**
      * Nastaví aktuální stránku a zároveň zajistí, že nebude menší než 1
      *
      * @param int $page
@@ -134,89 +182,103 @@ class PaginatorService
      * Přidá číslo stránky do view spolu s informací o tom, zda se jedná o aktuálně navštívenou stránku
      *
      * @param int $page
+     * @param bool $prepend
+     * @param bool $isDivider
+     * @return bool
      */
-    private function addViewPage(int $page)
+    private function addViewPage(int $page, bool $prepend, bool $isDivider = false): bool
     {
-        $this->viewData[] = [
-            'pageNumber' => $page,
-            'isCurrent' => $page === $this->currentPage,
+        if(!$isDivider)
+        {
+            if($this->isPageOutOfBounds($page))
+            {
+                return false;
+            }
+        }
+
+        $functionBasedOnPrepend = [
+            true => 'array_unshift',
+            false => 'array_push',
         ];
+
+        $functionBasedOnPrepend[$prepend] ($this->viewData, [
+            'number' => $page,
+            'isCurrent' => $page === $this->currentPage,
+            'isDivider' => $isDivider,
+        ]);
+        return true;
     }
 
     /**
      * Zjistí, jestli je v zadaném okolí validní stránka. Pokud tam není, koukne se na druhou stranu.
      *
      * @param int $currentPageOffset
-     * @param bool $before
      */
-    private function exploreSurroundings(int $currentPageOffset, bool $before)
+    private function exploreSurroundings(int $currentPageOffset)
     {
-        if($before)
+        //před
+        if($this->isPageOutOfBounds($this->currentPage-$currentPageOffset) && !$this->isPageOutOfBounds($this->currentPage+$currentPageOffset))
         {
-            if($this->isPageOutOfBounds($this->currentPage-$currentPageOffset) && !$this->isPageOutOfBounds($this->currentPage+$currentPageOffset))
-            {
-                $this->viewCurrentPageSurroundings['after']++;
-            }
-            else
-            {
-                $this->viewCurrentPageSurroundings['before']++;
-            }
+            $this->viewCurrentPageSurroundings['after']++;
         }
-        else
+        else if (!$this->isPageOutOfBounds($this->currentPage-$currentPageOffset))
         {
-            if($this->isPageOutOfBounds($this->currentPage+$currentPageOffset) && !$this->isPageOutOfBounds($this->currentPage-$currentPageOffset))
-            {
-                $this->viewCurrentPageSurroundings['before']++;
-            }
-            else
-            {
-                $this->viewCurrentPageSurroundings['after']++;
-            }
+            $this->viewCurrentPageSurroundings['before']++;
+        }
+
+        //po
+        if($this->isPageOutOfBounds($this->currentPage+$currentPageOffset) && !$this->isPageOutOfBounds($this->currentPage-$currentPageOffset))
+        {
+            $this->viewCurrentPageSurroundings['before']++;
+        }
+        else if (!$this->isPageOutOfBounds($this->currentPage+$currentPageOffset))
+        {
+            $this->viewCurrentPageSurroundings['after']++;
         }
     }
 
     /**
-     * Sestaví data pro view
+     * Pokud to má smysl, přidá ke stránkování ještě první a poslední stránku
      */
-    private function createViewData()
+    private function addAdditionalViewData()
     {
-        $slotsSurroundingCenter = self::VIEW_INNER_PAGES - self::VIEW_INNER_CENTER; //2
-
-        /*
-         * Prozkoumá okolí
-         */
-        for($i = 1; $i <= $slotsSurroundingCenter; $i++) // 1, 2
+        //Divider a úplně první stránka (pokud má smysl to renderovat)
+        if(isset($this->viewData[array_key_first($this->viewData)]['number']))
         {
-            $this->exploreSurroundings($i, true); //kontrola pred aktualni strankou
-            $this->exploreSurroundings($i, false); //kontrola po aktualni strance
-        }
-
-        /*
-         * Stránky před aktuální stránkou
-         */
-        if($this->viewCurrentPageSurroundings['before'] > 0)
-        {
-            $start = $this->currentPage - $this->viewCurrentPageSurroundings['before'];
-            for ($i = $start; $i < $this->currentPage; $i++)
+            $difference = $this->viewData[array_key_first($this->viewData)]['number'] - 1;
+            if($difference == 1)
             {
-                $this->addViewPage($i); // 1, 2
+                $this->addViewPage(1, true);
+            }
+            else if($difference == 2)
+            {
+                $this->addViewPage(2, true);
+                $this->addViewPage(1, true);
+            }
+            else if($difference > 2)
+            {
+                $this->addViewPage(0, true, true);
+                $this->addViewPage(1, true);
             }
         }
 
-        /*
-         * Aktuální stránka
-         */
-        $this->addViewPage($this->currentPage); // 3
-
-        /*
-         * Stránky po aktuální stránce
-         */
-        if($this->viewCurrentPageSurroundings['after'] > 0)
+        //Divider a úplně poslední stránka (pokud má smysl to renderovat)
+        if(isset($this->viewData[array_key_last($this->viewData)]['number']))
         {
-            $maximum = $this->currentPage + $this->viewCurrentPageSurroundings['after'];
-            for ($i = $this->currentPage + 1; $i <= $maximum; $i++)
+            $difference = $this->pagesCount - $this->viewData[array_key_last($this->viewData)]['number'];
+            if($difference == 1)
             {
-                $this->addViewPage($i); // 4 5
+                $this->addViewPage($this->pagesCount, false);
+            }
+            else if($difference == 2)
+            {
+                $this->addViewPage($this->pagesCount-1, false);
+                $this->addViewPage($this->pagesCount, false);
+            }
+            else if($difference > 2)
+            {
+                $this->addViewPage(0, false, true);
+                $this->addViewPage($this->pagesCount, false);
             }
         }
     }
