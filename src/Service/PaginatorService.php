@@ -1,6 +1,5 @@
 <?php
 
-
 namespace App\Service;
 
 use Doctrine\ORM\Query;
@@ -35,14 +34,6 @@ class PaginatorService
      * @var array Data pro klikatelné stránkování
      */
     private array $viewData = [];
-
-    /**
-     * @var array|int[] Informace o tom, kolik je validních stránek před a po aktuální stránce
-     */
-    private array $viewCurrentPageSurroundings = [
-        'before' => 0,
-        'after' => 0,
-    ];
 
     /**
      * Vezme dotaz, požadovaný počet prvků na stránku, aktuální stránku a získá pouze prvky patřící na danou stránku.
@@ -126,32 +117,46 @@ class PaginatorService
      */
     public function createViewData(): self
     {
-        $slotsSurroundingCenter = self::VIEW_INNER_PAGES - self::VIEW_INNER_CENTER; //2
-        for($i = 1; $i <= $slotsSurroundingCenter; $i++) // 1, 2
-        {
-            $this->exploreSurroundings($i);
-        }
+        $maxSlotsSurroundingCenter = self::VIEW_INNER_PAGES - self::VIEW_INNER_CENTER; //2
+        $slotsLeftToCenter = $this->currentPage - 1;
+        $slotsRightToCenter = $this->pagesCount - $this->currentPage;
+        if($slotsLeftToCenter > $maxSlotsSurroundingCenter) $slotsLeftToCenter = $maxSlotsSurroundingCenter;
+        if($slotsRightToCenter > $maxSlotsSurroundingCenter) $slotsRightToCenter = $maxSlotsSurroundingCenter;
 
-        //Stránky před aktuální stránkou
-        if($this->viewCurrentPageSurroundings['before'] > 0)
+        $directions = [
+            'left' => [
+                'offset' => -1,
+                'next' => 'right',
+                'allowedDistance' => $slotsLeftToCenter + ($maxSlotsSurroundingCenter - $slotsRightToCenter),
+            ],
+            'right' => [
+                'offset' => 1,
+                'next' => 'stop',
+                'allowedDistance' => $slotsRightToCenter + ($maxSlotsSurroundingCenter - $slotsLeftToCenter),
+            ],
+            'stop' => [
+                'offset' => 0,
+            ],
+        ];
+
+        $direction = $directions['left'];
+        $visitedPage = $this->currentPage;
+        while(count($this->viewData) < self::VIEW_INNER_PAGES and $direction !== $directions['stop'])
         {
-            $minimum = $this->currentPage - $this->viewCurrentPageSurroundings['before'];
-            for ($i = $this->currentPage - 1; $i >= $minimum; $i--)
+            if(!$this->viewContainsPage($visitedPage))
             {
-                if(!$this->addViewPage($i, true)) break;
+                $this->addViewPage($visitedPage, $direction === $directions['left']);
             }
-        }
 
-        // Aktuální stránka
-        $this->addViewPage($this->currentPage, false);
-
-        // Stránky po aktuální stránce
-        if($this->viewCurrentPageSurroundings['after'] > 0)
-        {
-            $maximum = $this->currentPage + $this->viewCurrentPageSurroundings['after'];
-            for ($i = $this->currentPage + 1; $i <= $maximum; $i++)
+            $nextPage = $visitedPage + $direction['offset'];
+            if($this->isPageOutOfBounds($nextPage) || abs($this->currentPage - $visitedPage) >= $direction['allowedDistance'])
             {
-                if(!$this->addViewPage($i, false)) break;
+                $direction = $directions[$direction['next']];
+                $visitedPage = $this->currentPage;
+            }
+            else
+            {
+                $visitedPage = $nextPage;
             }
         }
 
@@ -210,31 +215,21 @@ class PaginatorService
     }
 
     /**
-     * Zjistí, jestli je v zadaném okolí validní stránka. Pokud tam není, koukne se na druhou stranu.
+     * Zjistí, jestli už je v datech o view požadovaná stránka
      *
-     * @param int $currentPageOffset
+     * @param int $page
+     * @return bool
      */
-    private function exploreSurroundings(int $currentPageOffset)
+    private function viewContainsPage(int $page): bool
     {
-        //před
-        if($this->isPageOutOfBounds($this->currentPage-$currentPageOffset) && !$this->isPageOutOfBounds($this->currentPage+$currentPageOffset))
+        foreach ($this->viewData as $pageData)
         {
-            $this->viewCurrentPageSurroundings['after']++;
+            if($pageData['number'] === $page)
+            {
+                return true;
+            }
         }
-        else if (!$this->isPageOutOfBounds($this->currentPage-$currentPageOffset))
-        {
-            $this->viewCurrentPageSurroundings['before']++;
-        }
-
-        //po
-        if($this->isPageOutOfBounds($this->currentPage+$currentPageOffset) && !$this->isPageOutOfBounds($this->currentPage-$currentPageOffset))
-        {
-            $this->viewCurrentPageSurroundings['before']++;
-        }
-        else if (!$this->isPageOutOfBounds($this->currentPage+$currentPageOffset))
-        {
-            $this->viewCurrentPageSurroundings['after']++;
-        }
+        return false;
     }
 
     /**
