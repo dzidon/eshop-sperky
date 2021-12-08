@@ -69,6 +69,8 @@ class ProfileController extends AbstractController
             $formView = $form->createView();
         }
 
+        $this->isUserNotVerified($user, false);
+
         return $this->render('profile/profile_overview.html.twig', [
             'personalDataForm' => $formView,
             'breadcrumbs' => $this->breadcrumbs->setPageTitleByRoute('profile'),
@@ -80,7 +82,8 @@ class ProfileController extends AbstractController
      */
     public function passwordChange(UserPasswordHasherInterface $userPasswordHasherInterface): Response
     {
-        if ($this->getUser()->getPassword() === null)
+        $user = $this->getUser();
+        if ($user->getPassword() === null)
         {
             $this->addFlash('failure', 'Na tomto účtu nemáte nastavené heslo, takže si ho musíte změnit přes email.');
             return $this->redirectToRoute('forgot_password_request');
@@ -91,7 +94,6 @@ class ProfileController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid())
         {
-            $user = $this->getUser();
             $user->setPassword(
                 $userPasswordHasherInterface->hashPassword(
                     $user,
@@ -109,6 +111,8 @@ class ProfileController extends AbstractController
             return $this->redirectToRoute('profile_change_password');
         }
 
+        $this->isUserNotVerified($user, false);
+
         return $this->render('profile/profile_change_password.html.twig', [
             'changeForm' => $form->createView(),
             'breadcrumbs' => $this->breadcrumbs->setPageTitleByRoute('profile_change_password'),
@@ -124,7 +128,7 @@ class ProfileController extends AbstractController
         if ($user->isVerified())
         {
             $this->addFlash('failure', 'Váš email už je ověřený.');
-            return $this->redirectToRoute('home');
+            return $this->redirectToRoute('profile');
         }
 
         $form = $this->createForm(HiddenTrueFormType::class);
@@ -145,6 +149,8 @@ class ProfileController extends AbstractController
             return $this->redirectToRoute('profile_verify');
         }
 
+        $this->isUserNotVerified($user, false);
+
         return $this->render('profile/profile_verify.html.twig', [
             'sendAgainForm' => $form->createView(),
             'breadcrumbs' => $this->breadcrumbs->setPageTitleByRoute('profile_verify'),
@@ -157,9 +163,8 @@ class ProfileController extends AbstractController
     public function addresses(PaginatorService $paginatorService): Response
     {
         $user = $this->getUser();
-        if(!$user->isVerified())
+        if($this->isUserNotVerified($user, true))
         {
-            $this->addFlash('failure', 'Nemáte ověřený účet.');
             return $this->redirectToRoute('profile');
         }
 
@@ -183,14 +188,12 @@ class ProfileController extends AbstractController
 
     /**
      * @Route("/adresa/{id}", name="profile_address", requirements={"id"="\d+"})
-     * @IsGranted("IS_AUTHENTICATED_FULLY")
      */
     public function address($id = null): Response
     {
         $user = $this->getUser();
-        if(!$user->isVerified())
+        if($this->isUserNotVerified($user, true))
         {
-            $this->addFlash('failure', 'Nemáte ověřený účet.');
             return $this->redirectToRoute('profile');
         }
 
@@ -242,13 +245,12 @@ class ProfileController extends AbstractController
 
     /**
      * @Route("/adresa/{id}/smazat", name="profile_address_delete", requirements={"id"="\d+"})
-     * @IsGranted("IS_AUTHENTICATED_FULLY")
      */
     public function addressDelete($id): Response
     {
         $user = $this->getUser();
-        if (!$user->isVerified()) {
-            $this->addFlash('failure', 'Nemáte ověřený účet.');
+        if($this->isUserNotVerified($user, true))
+        {
             return $this->redirectToRoute('profile');
         }
 
@@ -282,5 +284,28 @@ class ProfileController extends AbstractController
             'addressInstance' => $address,
             'breadcrumbs' => $this->breadcrumbs->setPageTitleByRoute('profile_address_delete'),
         ]);
+    }
+
+    private function isUserNotVerified($user, bool $restrictAccess): bool
+    {
+        if (!$user->isVerified())
+        {
+            if ($restrictAccess)
+            {
+                $this->addFlash('failure', 'Nemáte ověřený účet.');
+            }
+            else
+            {
+                $messageText = 'Zatím jste si neověřili email, takže nemáte přístup ke všem funkcionalitám webu. Pokud vám nepřišel ověřovací email nebo pokud vypršel váš odkaz na ověření, můžete si nechat poslat nový (Profil > Ověření emailu).';
+                $flashBag = $this->request->getSession()->getFlashBag();
+
+                if(!in_array($messageText, $flashBag->peek('warning')))
+                {
+                    $flashBag->add('warning', $messageText);
+                }
+            }
+            return true;
+        }
+        return false;
     }
 }
