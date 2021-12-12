@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Entity\Address;
+use App\Entity\Review;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -25,6 +26,7 @@ class TwigExtensions extends AbstractExtension
     {
         return [
             new TwigFunction('get_parameter', [$this, 'getParameter']),
+            new TwigFunction('rating_to_stars', [$this, 'ratingToStars']),
             new TwigFunction('get_country_name', [Address::class, 'getCountryNameByCode']),
         ];
     }
@@ -39,5 +41,36 @@ class TwigExtensions extends AbstractExtension
     public function getParameter(string $name)
     {
         return $this->params->get($name);
+    }
+
+    /**
+     * Vezme hodnocení a převede ho na data, podle kterých jde zobrazit hvězdy v šabloně
+     *
+     * @param float $rating
+     * @return array
+     */
+    public function ratingToStars(float $rating): array
+    {
+        $fullStars = (int) floor($rating);
+        $fullStarsAndHalfStar = (int) round($rating);
+
+        $starData = [];
+        for($star = 1; $star <= Review::STAR_COUNT; $star++)
+        {
+            if($star <= $fullStars)
+            {
+                $starData[] = 'full';
+            }
+            else if($star === $fullStarsAndHalfStar)
+            {
+                $starData[] = 'half';
+            }
+            else
+            {
+                $starData[] = 'empty';
+            }
+        }
+
+        return $starData;
     }
 }

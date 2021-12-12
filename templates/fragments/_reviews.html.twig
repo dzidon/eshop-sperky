@@ -1,0 +1,40 @@
+{% if reviews is empty %}
+    {% if showErrorIfEmpty == true %}
+        <div class="row">
+            Nebyly nalezeny žádné recenze.
+        </div>
+    {% endif %}
+{% else %}
+    {% for review in reviews %}
+        <div class="row">
+            <div class="card white">
+                <div class="card-content black-text">
+                    <span class="card-title">{{ review.getUser().getNameFirst() }} {{ review.getUser().getNameLast() }}</span>
+
+                    <div class="amber-text accent-3">
+                        {# Hvězdy #}
+                        {{ include('fragments/_review_stars.html.twig', {stars: rating_to_stars(review.getStars())}) }}
+                    </div>
+
+                    <small class="light">
+                        {{ review.getCreated()|date('d. m. Y H:i:s') }}
+                        {% if review.getCreated() != review.getUpdated() and review.getUpdated() is not null %}
+                            (upraveno: {{ review.getUpdated()|date('d. m. Y H:i:s') }})
+                        {% endif %}
+                    </small>
+
+                    {% if review.getText() is not null %}
+                        <br><br>
+                        <p>{{ review.getText() }}</p>
+                    {% endif %}
+                </div>
+
+                {% if review.getUser() is same as( app.user ) and app.user is not null %}
+                    <div class="card-action">
+                        <a href="#">Upravit</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    {% endfor %}
+{% endif %}

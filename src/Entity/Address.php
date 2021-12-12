@@ -210,7 +210,7 @@ class Address
         return $this->user;
     }
 
-    public function setUser(?User $user): self
+    public function setUser(User $user): self
     {
         $this->user = $user;
 
@@ -246,7 +246,7 @@ class Address
         return $this->created;
     }
 
-    public function setCreated(\DateTimeInterface $created): self
+    public function setCreated(?\DateTimeInterface $created): self
     {
         $this->created = $created;
 
@@ -258,7 +258,7 @@ class Address
         return $this->updated;
     }
 
-    public function setUpdated(\DateTimeInterface $updated): self
+    public function setUpdated(?\DateTimeInterface $updated): self
     {
         $this->updated = $updated;
 

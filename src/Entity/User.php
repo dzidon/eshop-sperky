@@ -102,6 +102,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     private $addresses;
 
+    /**
+     * @ORM\OneToOne(targetEntity=Review::class, mappedBy="user", cascade={"persist", "remove"})
+     */
+    private $review;
+
     public function __construct()
     {
         $this->addresses = new ArrayCollection();
@@ -117,7 +122,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->email;
     }
 
-    public function setEmail(string $email): self
+    public function setEmail(?string $email): self
     {
         $this->email = $email;
 
@@ -169,7 +174,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->password;
     }
 
-    public function setPassword(string $password): self
+    public function setPassword(?string $password): self
     {
         $this->password = $password;
 
@@ -201,7 +206,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->isVerified;
     }
 
-    public function setIsVerified(bool $isVerified): self
+    public function setIsVerified(?bool $isVerified): self
     {
         $this->isVerified = $isVerified;
 
@@ -273,7 +278,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->registered;
     }
 
-    public function setRegistered(\DateTimeInterface $registered): self
+    public function setRegistered(?\DateTimeInterface $registered): self
     {
         $this->registered = $registered;
 
@@ -302,7 +307,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         }
     }
 
-    public function setGender(bool $gender): self
+    public function setGender(?bool $gender): self
     {
         $this->gender = $gender;
 
@@ -371,6 +376,23 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $address->setUser(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getReview(): ?Review
+    {
+        return $this->review;
+    }
+
+    public function setReview(Review $review): self
+    {
+        // set the owning side of the relation if necessary
+        if ($review->getUser() !== $this) {
+            $review->setUser($this);
+        }
+
+        $this->review = $review;
 
         return $this;
     }

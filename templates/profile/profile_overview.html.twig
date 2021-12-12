@@ -62,6 +62,18 @@
                     </label>
                     <span class="helper-text red-text">{{ form_errors(personalDataForm.agreePrivacy) }}</span>
                 </div>
+
+                <div class="row">
+
+                    <label>Hodnocení:</label>
+                    <div class="rating">
+                        {% for key, choiceItem in personalDataForm.rating.children %}
+                            {{ form_widget(choiceItem) }}
+                            <label for="{{ choiceItem.vars.id }}">☆</label>
+                        {% endfor %}
+                    </div>
+                    <span class="helper-text red-text">{{ form_errors(personalDataForm.rating) }}</span>
+                </div>
                 <br>
 
                 <div class="center-align">

@@ -27,6 +27,11 @@ class PersonalInfoFormType extends AbstractType
                 'required' => false,
                 'default_region' => 'CZ',
                 'format' => PhoneNumberFormat::INTERNATIONAL])
+
+            /*->add('rating', RatingType::class, [
+                'mapped' => false,
+            ])*/
+
             ->add('agreePrivacy', AgreePrivacyType::class)
         ;
     }
