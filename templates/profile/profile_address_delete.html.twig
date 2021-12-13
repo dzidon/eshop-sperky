@@ -7,17 +7,18 @@
             <h3 class="no-mar-top">{{ breadcrumbs.getPageTitle() }}</h3>
         </div>
 
-        <div class="row">Opravdu si přejete smazat adresu '{{ addressInstance.getAlias() }}'? Tato akce je nevratná.</div>
+        <div class="row">
+            {{ form_start(addressDeleteForm) }}
+                <div class="center-align">
+                    <div class="row">Opravdu si přejete smazat adresu '{{ addressInstance.getAlias() }}'? Tato akce je nevratná.</div>
 
-        {{ form_start(addressDeleteForm) }}
-            <div class="center-align">
+                    <button type="submit" class="waves-effect waves-light btn-large red">Smazat</button>
 
-                <button type="submit" class="waves-effect waves-light btn-large red">Smazat</button>
-
-                {{ form_widget(addressDeleteForm.hiddenTrue) }}
-                <span class="helper-text red-text">{{ form_errors(addressDeleteForm.hiddenTrue) }}</span>
-            </div>
-        {{ form_end(addressDeleteForm) }}
+                    {{ form_widget(addressDeleteForm.hiddenTrue) }}
+                    <span class="helper-text red-text">{{ form_errors(addressDeleteForm.hiddenTrue) }}</span>
+                </div>
+            {{ form_end(addressDeleteForm) }}
+        </div>
     </div>
 
 {% endblock %}

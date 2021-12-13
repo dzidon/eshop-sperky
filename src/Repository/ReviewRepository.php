@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Review;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Query;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -17,6 +18,15 @@ class ReviewRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Review::class);
+    }
+
+    public function getQueryForPagination(): Query
+    {
+        return $this->createQueryBuilder('r')
+            ->select('r', 'u')
+            ->innerJoin('r.user', 'u')
+            ->orderBy('r.created', 'DESC')
+            ->getQuery();
     }
 
     public function findLatest(int $count)
@@ -37,33 +47,4 @@ class ReviewRepository extends ServiceEntityRepository
             ->getQuery()
             ->getScalarResult()[0];
     }
-
-    // /**
-    //  * @return Review[] Returns an array of Review objects
-    //  */
-    /*
-    public function findByExampleField($value)
-    {
-        return $this->createQueryBuilder('r')
-            ->andWhere('r.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('r.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
-    */
-
-    /*
-    public function findOneBySomeField($value): ?Review
-    {
-        return $this->createQueryBuilder('r')
-            ->andWhere('r.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-    */
 }

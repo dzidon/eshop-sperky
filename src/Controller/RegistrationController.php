@@ -62,8 +62,8 @@ class RegistrationController extends AbstractController
                 )
             );
 
-            //nastaveni datumu registrace
             $user->setRegistered(new \DateTime('now'));
+            $user->setGender(false);
 
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($user);

@@ -103,7 +103,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private $addresses;
 
     /**
-     * @ORM\OneToOne(targetEntity=Review::class, mappedBy="user", cascade={"persist", "remove"})
+     * @ORM\OneToOne(targetEntity=Review::class, mappedBy="user", cascade={"remove"})
      */
     private $review;
 
@@ -242,7 +242,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->verifyLinkLastSent;
     }
 
-    public function setVerifyLinkLastSent(?\DateTimeInterface $verifyLinkLastSent): self
+    public function setVerifyLinkLastSent(\DateTimeInterface $verifyLinkLastSent): self
     {
         $this->verifyLinkLastSent = $verifyLinkLastSent;
 
@@ -278,7 +278,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->registered;
     }
 
-    public function setRegistered(?\DateTimeInterface $registered): self
+    public function setRegistered(\DateTimeInterface $registered): self
     {
         $this->registered = $registered;
 

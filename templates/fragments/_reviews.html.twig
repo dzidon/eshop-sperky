@@ -32,6 +32,7 @@
                 {% if review.getUser() is same as( app.user ) and app.user is not null %}
                     <div class="card-action">
                         <a href="#">Upravit</a>
+                        <a href="{{ path('review_delete', {id: review.getId()}) }}">Smazat</a>
                     </div>
                 {% endif %}
             </div>

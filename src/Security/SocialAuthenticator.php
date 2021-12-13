@@ -136,6 +136,7 @@ class SocialAuthenticator extends OAuth2Authenticator
                     $user = new User();
                     $user->setEmail($socialEmail);
                     $user->setRegistered(new \DateTime('now'));
+                    $user->setGender(false);
 
                     $this->logger->info(sprintf("User %s has registered a new account using %s (Social ID: %s).", $user->getUserIdentifier(), $serviceName, $socialId));
                 }

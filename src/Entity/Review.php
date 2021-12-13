@@ -31,7 +31,7 @@ class Review
     private $text;
 
     /**
-     * @ORM\OneToOne(targetEntity=User::class, inversedBy="review", cascade={"persist", "remove"})
+     * @ORM\OneToOne(targetEntity=User::class, inversedBy="review")
      * @ORM\JoinColumn(nullable=false)
      */
     private $user;
@@ -92,7 +92,7 @@ class Review
         return $this->created;
     }
 
-    public function setCreated(?\DateTimeInterface $created): self
+    public function setCreated(\DateTimeInterface $created): self
     {
         $this->created = $created;
 
@@ -104,7 +104,7 @@ class Review
         return $this->updated;
     }
 
-    public function setUpdated(?\DateTimeInterface $updated): self
+    public function setUpdated(\DateTimeInterface $updated): self
     {
         $this->updated = $updated;
 
