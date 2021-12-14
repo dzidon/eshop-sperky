@@ -56,13 +56,20 @@ main {
 }
 
 /*
-    Checkbox
+    Input, Textarea
 */
-.row .input-field input:focus {
+.input-field input:focus + label, .materialize-textarea:focus:not([readonly]) + label {
+    color: #03a9f4 !important;
+}
+
+.input-field input:focus, .materialize-textarea:focus:not([readonly]) {
     border-bottom: 1px solid #03a9f4 !important;
     box-shadow: 0 1px 0 0 #03a9f4 !important;
 }
 
+/*
+    Checkbox
+*/
 .checkbox-light-blue[type="checkbox"].filled-in:checked+span:not(.lever):after {
     border: 2px solid #03a9f4 !important;
     background-color: #03a9f4 !important;
@@ -78,9 +85,6 @@ main {
 [type="radio"].with-gap:checked+span:after {
     border: 2px solid #03a9f4;
 }
-/*[type="radio"].with-gap+span:after, [type="radio"].with-gap+span:before {
-    margin-left: 0;
-}*/
 
 /*
     Select
@@ -95,7 +99,7 @@ ul.dropdown-content.select-dropdown li span {
 .pagination li.active {
     background-color: #03a9f4;
 }
-
+/* === */
 
 label.required:after {
     content: " *";

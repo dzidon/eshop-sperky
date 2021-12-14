@@ -33,24 +33,24 @@
 
                 <div class="row">
                     <div class="input-field">
-                        {{ form_label(personalDataForm.nameFirst, 'Křestní jméno') }}
                         {{ form_widget(personalDataForm.nameFirst) }}
+                        {{ form_label(personalDataForm.nameFirst, 'Křestní jméno') }}
                     </div>
                     <span class="helper-text red-text">{{ form_errors(personalDataForm.nameFirst) }}</span>
                 </div>
 
                 <div class="row">
                     <div class="input-field">
-                        {{ form_label(personalDataForm.nameLast, 'Příjmení') }}
                         {{ form_widget(personalDataForm.nameLast) }}
+                        {{ form_label(personalDataForm.nameLast, 'Příjmení') }}
                     </div>
                     <span class="helper-text red-text">{{ form_errors(personalDataForm.nameLast) }}</span>
                 </div>
 
                 <div class="row">
                     <div class="input-field">
-                        {{ form_label(personalDataForm.phoneNumber, 'Telefon') }}
                         {{ form_widget(personalDataForm.phoneNumber) }}
+                        {{ form_label(personalDataForm.phoneNumber, 'Telefon') }}
                     </div>
                     <span class="helper-text red-text">{{ form_errors(personalDataForm.phoneNumber) }}</span>
                 </div>

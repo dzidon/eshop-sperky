@@ -17,8 +17,8 @@
             {{ form_start(requestForm) }}
                 <div class="row">
                     <div class="input-field">
-                        {{ form_label(requestForm.email) }}
                         {{ form_widget(requestForm.email) }}
+                        {{ form_label(requestForm.email) }}
                     </div>
                     <span class="helper-text red-text">{{ form_errors(requestForm.email) }}</span>
                     <small>Zadejte e-mail, na který jste zaregistrovali svůj účet a my vám na něj pošleme odkaz pro resetování hesla.</small>

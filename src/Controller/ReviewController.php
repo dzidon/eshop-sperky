@@ -61,6 +61,8 @@ class ReviewController extends AbstractController
 
     /**
      * @Route("/{id}", name="review_edit", requirements={"id"="\d+"})
+     *
+     * @IsGranted("IS_AUTHENTICATED_REMEMBERED")
      */
     public function reviewEdit($id = null): Response
     {

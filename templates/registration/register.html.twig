@@ -17,24 +17,24 @@
             {{ form_start(registrationForm) }}
                 <div class="row">
                     <div class="input-field">
-                        {{ form_label(registrationForm.email) }}
                         {{ form_widget(registrationForm.email) }}
+                        {{ form_label(registrationForm.email) }}
                     </div>
                     <span class="helper-text red-text">{{ form_errors(registrationForm.email) }}</span>
                 </div>
 
                 <div class="row">
                     <div class="input-field">
-                        {{ form_label(registrationForm.plainPassword.repeated.first, 'Heslo') }}
                         {{ form_widget(registrationForm.plainPassword.repeated.first) }}
+                        {{ form_label(registrationForm.plainPassword.repeated.first, 'Heslo') }}
                     </div>
                     <span class="helper-text red-text">{{ form_errors(registrationForm.plainPassword.repeated.first) }}</span>
                 </div>
 
                 <div class="row">
                     <div class="input-field">
-                        {{ form_label(registrationForm.plainPassword.repeated.second, 'Heslo znovu') }}
                         {{ form_widget(registrationForm.plainPassword.repeated.second) }}
+                        {{ form_label(registrationForm.plainPassword.repeated.second, 'Heslo znovu') }}
                     </div>
                     <span class="helper-text red-text">{{ form_errors(registrationForm.plainPassword.repeated.second) }}</span>
                 </div>

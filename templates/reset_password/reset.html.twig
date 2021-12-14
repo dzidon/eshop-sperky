@@ -17,16 +17,16 @@
             {{ form_start(resetForm) }}
                 <div class="row">
                     <div class="input-field">
-                        {{ form_label(resetForm.plainPassword.repeated.first, 'Heslo') }}
                         {{ form_widget(resetForm.plainPassword.repeated.first) }}
+                        {{ form_label(resetForm.plainPassword.repeated.first, 'Heslo') }}
                     </div>
                     <span class="helper-text red-text">{{ form_errors(resetForm.plainPassword.repeated.first) }}</span>
                 </div>
 
                 <div class="row">
                     <div class="input-field">
-                        {{ form_label(resetForm.plainPassword.repeated.second, 'Heslo znovu') }}
                         {{ form_widget(resetForm.plainPassword.repeated.second) }}
+                        {{ form_label(resetForm.plainPassword.repeated.second, 'Heslo znovu') }}
                     </div>
                     <span class="helper-text red-text">{{ form_errors(resetForm.plainPassword.repeated.second) }}</span>
                 </div>
