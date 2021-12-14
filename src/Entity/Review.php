@@ -22,11 +22,15 @@ class Review
 
     /**
      * @ORM\Column(type="float")
+     *
+     * Validace se resi pres ReviewStarsType
      */
     private $stars;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     *
+     * Validace se resi pres ReviewTextareaType
      */
     private $text;
 

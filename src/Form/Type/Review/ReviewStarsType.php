@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Form\Type;
+namespace App\Form\Type\Review;
 
 use App\Entity\Review;
 use Symfony\Component\Form\AbstractType;
@@ -9,7 +9,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Choice;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-class RatingType extends AbstractType
+class ReviewStarsType extends AbstractType
 {
     public function configureOptions(OptionsResolver $resolver): void
     {

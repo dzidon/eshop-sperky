@@ -26,17 +26,15 @@ class ReviewRepository extends ServiceEntityRepository
             ->select('r', 'u')
             ->innerJoin('r.user', 'u')
             ->orderBy('r.created', 'DESC')
+            ->andWhere('u.nameFirst IS NOT NULL')
+            ->andWhere('u.nameLast IS NOT NULL')
             ->getQuery();
     }
 
     public function findLatest(int $count)
     {
-        return $this->createQueryBuilder('r')
-            ->select('r', 'u')
-            ->innerJoin('r.user', 'u')
+        return $this->getQueryForPagination()
             ->setMaxResults($count)
-            ->orderBy('r.created', 'DESC')
-            ->getQuery()
             ->getResult();
     }
 
@@ -44,6 +42,9 @@ class ReviewRepository extends ServiceEntityRepository
     {
         return $this->createQueryBuilder('r')
             ->select('count(r.id) as total, avg(r.stars) as average')
+            ->innerJoin('r.user', 'u')
+            ->andWhere('u.nameFirst IS NOT NULL')
+            ->andWhere('u.nameLast IS NOT NULL')
             ->getQuery()
             ->getScalarResult()[0];
     }

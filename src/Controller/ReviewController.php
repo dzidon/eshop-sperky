@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Review;
 use App\Form\HiddenTrueFormType;
+use App\Form\ReviewFormType;
 use App\Service\BreadcrumbsService;
 use App\Service\PaginatorService;
 use Psr\Log\LoggerInterface;
@@ -33,7 +34,7 @@ class ReviewController extends AbstractController
     }
 
     /**
-     * @Route("", name="reviews")
+     * @Route("/vsechny", name="reviews")
      */
     public function reviews(PaginatorService $paginatorService): Response
     {
@@ -55,6 +56,73 @@ class ReviewController extends AbstractController
             'agregateReviewData' => $totalAndAverage,
             'breadcrumbs' => $this->breadcrumbs,
             'pagination' => $paginatorService->createViewData(),
+        ]);
+    }
+
+    /**
+     * @Route("/{id}", name="review_edit", requirements={"id"="\d+"})
+     */
+    public function reviewEdit($id = null): Response
+    {
+        $user = $this->getUser();
+        if (!$user->isVerified())
+        {
+            $this->addFlash('failure', 'Nemáte ověřený účet.');
+            return $this->redirectToRoute('reviews');
+        }
+        if ($user->getNameFirst() === null || $user->getNameLast() === null)
+        {
+            $this->addFlash('failure', 'Musíte mít nastavené jméno a příjmení.');
+            return $this->redirectToRoute('reviews');
+        }
+
+        $review = new Review();
+        $this->breadcrumbs->setPageTitle('Nová recenze');
+
+        if($id !== null) //zadal id do url
+        {
+            $review = $this->getDoctrine()->getRepository(Review::class)->findOneBy([
+                'id' => $id,
+            ]);
+
+            if($review === null || $review->getUser() !== $user) //nenaslo to zadnou adresu, nebo to nejakou adresu naslo, ale ta neni uzivatele
+            {
+                throw new NotFoundHttpException('Recenze nenalezena.');
+            }
+
+            $this->breadcrumbs->setPageTitle('Upravit recenzi');
+        }
+        else if($user->getReview() !== null) //už napsal recenzi, nemůže přidat další
+        {
+            $this->addFlash('failure', 'Už jste přidal recenzi.');
+            return $this->redirectToRoute('reviews');
+        }
+
+        $form = $this->createForm(ReviewFormType::class, $review);
+        $form->handleRequest($this->request);
+
+        if ($form->isSubmitted() && $form->isValid())
+        {
+            $review->setUser($user);
+            $review->setUpdated(new \DateTime('now'));
+            if($review->getId() === null)
+            {
+                $review->setCreated(new \DateTime('now'));
+            }
+
+            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager->persist($review);
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Recenze uložena!');
+            $this->logger->info(sprintf("User %s (ID: %s) has saved their review (ID: %s).", $user->getUserIdentifier(), $user->getId(), $review->getId()));
+
+            return $this->redirectToRoute('reviews');
+        }
+
+        return $this->render('reviews/review_edit.html.twig', [
+            'reviewForm' => $form->createView(),
+            'breadcrumbs' => $this->breadcrumbs->addRoute('review_edit', ['id' => $review->getId()], $this->breadcrumbs->getPageTitle()),
         ]);
     }
 

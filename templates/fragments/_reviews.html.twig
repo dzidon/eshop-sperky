@@ -5,6 +5,17 @@
         </div>
     {% endif %}
 {% else %}
+    <div class="row center-align">
+        <h3>{{ agregateReviewData.average|number_format(1) }}<span class="grey-text">/5</span></h3>
+
+        <div class="row amber-text accent-3">
+            {# Hvězdy #}
+            {{ include('fragments/_review_stars.html.twig', {stars: rating_to_stars(agregateReviewData.average)}) }}
+
+            <div class="black-text">Celkem recenzí: {{ agregateReviewData.total }}</div>
+        </div>
+    </div>
+
     {% for review in reviews %}
         <div class="row">
             <div class="card white">
@@ -31,7 +42,7 @@
 
                 {% if review.getUser() is same as( app.user ) and app.user is not null %}
                     <div class="card-action">
-                        <a href="#">Upravit</a>
+                        <a href="{{ path('review_edit', {id: review.getId()}) }}">Upravit</a>
                         <a href="{{ path('review_delete', {id: review.getId()}) }}">Smazat</a>
                     </div>
                 {% endif %}

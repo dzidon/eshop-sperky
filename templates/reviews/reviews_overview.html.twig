@@ -6,33 +6,22 @@
     {{ include('fragments/_breadcrumbs.html.twig') }}
 
     <div class="container">
+        <div class="container left-align">
+            {# h1 #}
+            <h1>
+                {{ get_parameter(['app_page_title', app.request.get('_route')]|join('.')) }}
+                <a href="{{ path('review_edit') }}" class="btn-floating btn-medium waves-effect waves-light light-blue"><i class="material-icons">add</i></a>
+            </h1>
 
-        {# h1 #}
-        {{ include('fragments/_h1.html.twig', {route: app.request.get('_route')}) }}
+            {# Flash zprávy #}
+            {{ include('fragments/_flash_messages.html.twig') }}
 
-        {# Flash zprávy #}
-        {{ include('fragments/_flash_messages.html.twig') }}
-
-        <div class="section">
-            <div class="row center-align">
-                <h3>{{ agregateReviewData.average|number_format(1) }}<span class="grey-text">/5</span></h3>
-
-                <div class="row amber-text accent-3">
-                    {# Hvězdy #}
-                    {{ include('fragments/_review_stars.html.twig', {stars: rating_to_stars(agregateReviewData.average)}) }}
-
-                    <div class="black-text">Celkem recenzí: {{ agregateReviewData.total }}</div>
-                </div>
-            </div>
-
-            <div class="container left-align">
-                {# Recenze #}
-                {{ include('fragments/_reviews.html.twig', {reviews: reviews, showErrorIfEmpty: true}) }}
-            </div>
-
-            {# Pagination #}
-            {{ include('fragments/_pagination.html.twig') }}
+            {# Recenze #}
+            {{ include('fragments/_reviews.html.twig', {reviews: reviews, agregateReviewData: agregateReviewData, showErrorIfEmpty: true}) }}
         </div>
+
+        {# Pagination #}
+        {{ include('fragments/_pagination.html.twig') }}
     </div>
 
 {% endblock %}

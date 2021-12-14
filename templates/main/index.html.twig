@@ -292,20 +292,9 @@
 
         <div class="section center-align">
             <h2>Recenze zákazníků</h2>
-            <div class="row">
-                <h3>{{ agregateReviewData.average|number_format(1) }}<span class="grey-text">/5</span></h3>
-
-                <div class="row amber-text accent-3">
-                    {# Hvězdy #}
-                    {{ include('fragments/_review_stars.html.twig', {stars: rating_to_stars(agregateReviewData.average)}) }}
-
-                    <div class="black-text">Celkem recenzí: {{ agregateReviewData.total }}</div>
-                </div>
-            </div>
-
             <div class="container left-align">
                 {# Recenze #}
-                {{ include('fragments/_reviews.html.twig', {reviews: latestReviews, showErrorIfEmpty: false}) }}
+                {{ include('fragments/_reviews.html.twig', {reviews: latestReviews, agregateReviewData: agregateReviewData, showErrorIfEmpty: false}) }}
             </div>
 
             <a href="{{ path('reviews') }}" class="waves-effect waves-light btn-large light-blue">Všechny recenze</a>
