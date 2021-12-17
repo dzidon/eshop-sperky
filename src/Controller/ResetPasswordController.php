@@ -140,7 +140,7 @@ class ResetPasswordController extends AbstractController
             // Encode(hash) the plain password, and set it.
             $encodedPassword = $userPasswordHasherInterface->hashPassword(
                 $user,
-                $form->get('plainPassword')->get('repeated')->getData()
+                $form->get('plainPassword')->getData()
             );
 
             $user->setPassword($encodedPassword);

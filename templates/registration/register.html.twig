@@ -14,56 +14,14 @@
             {{ include('fragments/_flash_messages.html.twig') }}
 
             <br>
-            {{ form_start(registrationForm) }}
+            {{ form(registrationForm) }}
+
+            <div class="section center-align">
                 <div class="row">
-                    <div class="input-field">
-                        {{ form_widget(registrationForm.email) }}
-                        {{ form_label(registrationForm.email) }}
-                    </div>
-                    <span class="helper-text red-text">{{ form_errors(registrationForm.email) }}</span>
+                    Už máte účet? <a href="{{ path('login') }}">Přihlásit se</a>
                 </div>
+            </div>
 
-                <div class="row">
-                    <div class="input-field">
-                        {{ form_widget(registrationForm.plainPassword.repeated.first) }}
-                        {{ form_label(registrationForm.plainPassword.repeated.first, 'Heslo') }}
-                    </div>
-                    <span class="helper-text red-text">{{ form_errors(registrationForm.plainPassword.repeated.first) }}</span>
-                </div>
-
-                <div class="row">
-                    <div class="input-field">
-                        {{ form_widget(registrationForm.plainPassword.repeated.second) }}
-                        {{ form_label(registrationForm.plainPassword.repeated.second, 'Heslo znovu') }}
-                    </div>
-                    <span class="helper-text red-text">{{ form_errors(registrationForm.plainPassword.repeated.second) }}</span>
-                </div>
-
-                <div class="row">
-                    <label>
-                        {{ form_widget(registrationForm.agreeTerms, {'attr': {'class': 'filled-in checkbox-light-blue'}}) }}
-                        <span>Souhlasím s podmínkami používání</span>
-                    </label>
-                    <span class="helper-text red-text">{{ form_errors(registrationForm.agreeTerms) }}</span>
-                </div>
-                <br>
-
-                <div class="center-align">
-                    {{ form_widget(registrationForm.recaptcha) }}
-                    <span class="helper-text red-text">{{ form_errors(registrationForm.recaptcha) }}</span>
-                </div>
-                <br><br>
-
-                <div class="center-align">
-                    <button type="submit" class="waves-effect waves-light btn-large light-blue">Zaregistrovat se</button>
-                    <br><br>
-                    <div>
-                        Už máte účet? <a href="{{ path('login') }}">Přihlásit se</a>
-                    </div>
-                </div>
-            {{ form_end(registrationForm) }}
-
-            <br><br>
             <div class="divider"></div>
 
             {# Social login #}

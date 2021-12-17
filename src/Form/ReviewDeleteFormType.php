@@ -2,25 +2,25 @@
 
 namespace App\Form;
 
+use App\Form\Type\HiddenTrueType;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Validator\Constraints\NotBlank;
 
-class HiddenTrueFormType extends AbstractType
+class ReviewDeleteFormType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('hiddenTrue', HiddenType::class, [
-                'data' => '1',
-                'constraints' => [
-                    new NotBlank([
-                        'message' => 'Něco se nezdařilo, zkuste to znovu.',
-                    ]),
+            ->add('hiddenTrue', HiddenTrueType::class)
+            ->add('submit', SubmitType::class, [
+                'label' => 'Smazat',
+                'attr' => [
+                    'class' => 'waves-effect waves-light btn-large red',
                 ],
-            ]);
+            ])
+        ;
     }
 
     public function configureOptions(OptionsResolver $resolver): void
@@ -28,7 +28,7 @@ class HiddenTrueFormType extends AbstractType
         $resolver->setDefaults([
             'csrf_protection' => true,
             'csrf_field_name' => '_token',
-            'csrf_token_id'   => 'form_hidden_true',
+            'csrf_token_id'   => 'form_review_delete',
         ]);
     }
 }

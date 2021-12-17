@@ -13,28 +13,7 @@
             {# Flash zprávy #}
             {{ include('fragments/_flash_messages.html.twig') }}
 
-            <br>
-            {{ form_start(resetForm) }}
-                <div class="row">
-                    <div class="input-field">
-                        {{ form_widget(resetForm.plainPassword.repeated.first) }}
-                        {{ form_label(resetForm.plainPassword.repeated.first, 'Heslo') }}
-                    </div>
-                    <span class="helper-text red-text">{{ form_errors(resetForm.plainPassword.repeated.first) }}</span>
-                </div>
-
-                <div class="row">
-                    <div class="input-field">
-                        {{ form_widget(resetForm.plainPassword.repeated.second) }}
-                        {{ form_label(resetForm.plainPassword.repeated.second, 'Heslo znovu') }}
-                    </div>
-                    <span class="helper-text red-text">{{ form_errors(resetForm.plainPassword.repeated.second) }}</span>
-                </div>
-
-                <div class="center-align">
-                    <button type="submit" class="waves-effect waves-light btn-large light-blue">Nastavit</button>
-                </div>
-            {{ form_end(resetForm) }}
+            {{ form(resetForm) }}
         </div>
     </div>
     <br><br>

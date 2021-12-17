@@ -102,7 +102,13 @@ ul.dropdown-content.select-dropdown li span {
 /* === */
 
 label.required:after {
-    content: " *";
+    display: initial !important;
+    position: initial !important;
+    top: initial !important;
+    left: initial !important;
+    opacity: initial !important;
+
+    content: " *" !important;
     color: red;
 }
 

@@ -15,16 +15,8 @@
 
         <div class="section">
             <div class="row">
-                {{ form_start(reviewDeleteForm) }}
-                    <div class="center-align">
-                        <div class="row">Opravdu si přejete smazat svou recenzi? Tato akce je nevratná.</div>
-
-                        <button type="submit" class="waves-effect waves-light btn-large red">Smazat</button>
-
-                        {{ form_widget(reviewDeleteForm.hiddenTrue) }}
-                        <span class="helper-text red-text">{{ form_errors(reviewDeleteForm.hiddenTrue) }}</span>
-                    </div>
-                {{ form_end(reviewDeleteForm) }}
+                <div class="row center-align">Opravdu si přejete smazat svou recenzi? Tato akce je nevratná.</div>
+                {{ form(reviewDeleteForm) }}
             </div>
         </div>
     </div>

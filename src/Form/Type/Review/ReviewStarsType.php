@@ -14,6 +14,7 @@ class ReviewStarsType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
+            'block_prefix' => 'star_choice',
             'choices' => array(
                 Review::STAR_VALUES,
             ),

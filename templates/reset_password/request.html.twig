@@ -13,22 +13,7 @@
             {# Flash zprávy #}
             {{ include('fragments/_flash_messages.html.twig') }}
 
-            <br>
-            {{ form_start(requestForm) }}
-                <div class="row">
-                    <div class="input-field">
-                        {{ form_widget(requestForm.email) }}
-                        {{ form_label(requestForm.email) }}
-                    </div>
-                    <span class="helper-text red-text">{{ form_errors(requestForm.email) }}</span>
-                    <small>Zadejte e-mail, na který jste zaregistrovali svůj účet a my vám na něj pošleme odkaz pro resetování hesla.</small>
-                </div>
-                <br>
-
-                <div class="center-align">
-                    <button type="submit" class="waves-effect waves-light btn-large light-blue">Poslat odkaz</button>
-                </div>
-            {{ form_end(requestForm) }}
+            {{ form(requestForm) }}
         </div>
     </div>
     <br><br>

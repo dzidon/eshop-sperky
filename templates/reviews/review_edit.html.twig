@@ -12,31 +12,7 @@
             {# Flash zprávy #}
             {{ include('fragments/_flash_messages.html.twig') }}
 
-            <br>
-            {{ form_start(reviewForm) }}
-                <div class="row">
-                    <label>Hodnocení:</label>
-                    <div class="rating">
-                        {% for key, choiceItem in reviewForm.stars.children %}
-                            {{ form_widget(choiceItem) }}
-                            <label for="{{ choiceItem.vars.id }}">☆</label>
-                        {% endfor %}
-                    </div>
-                    <span class="helper-text red-text">{{ form_errors(reviewForm.stars) }}</span>
-                </div>
-
-                <div class="row">
-                    <div class="input-field">
-                        {{ form_widget(reviewForm.text, {'attr': {'class': 'materialize-textarea'}}) }}
-                        {{ form_label(reviewForm.text, 'Text') }}
-                    </div>
-                    <span class="helper-text red-text">{{ form_errors(reviewForm.text) }}</span>
-                </div>
-
-                <div class="center-align">
-                    <button type="submit" class="waves-effect waves-light btn-large light-blue">Uložit</button>
-                </div>
-            {{ form_end(reviewForm) }}
+            {{ form(reviewForm) }}
         </div>
     </div>
     <br><br>

@@ -3,7 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Review;
-use App\Form\HiddenTrueFormType;
+use App\Form\ReviewDeleteFormType;
 use App\Form\ReviewFormType;
 use App\Service\BreadcrumbsService;
 use App\Service\PaginatorService;
@@ -145,7 +145,7 @@ class ReviewController extends AbstractController
             throw new NotFoundHttpException('Recenze nenalezena.');
         }
 
-        $form = $this->createForm(HiddenTrueFormType::class);
+        $form = $this->createForm(ReviewDeleteFormType::class);
         $form->handleRequest($this->request);
 
         if ($form->isSubmitted() && $form->isValid())

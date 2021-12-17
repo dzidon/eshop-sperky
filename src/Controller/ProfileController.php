@@ -6,7 +6,8 @@ use App\Entity\Address;
 use App\Form\AddressFormType;
 use App\Form\ChangePasswordLoggedInFormType;
 use App\Form\PersonalInfoFormType;
-use App\Form\HiddenTrueFormType;
+use App\Form\AddressDeleteFormType;
+use App\Form\RegistrationVerifyEmailSendAgainType;
 use App\Security\EmailVerifier;
 use App\Service\BreadcrumbsService;
 use App\Service\PaginatorService;
@@ -101,7 +102,7 @@ class ProfileController extends AbstractController
             $user->setPassword(
                 $userPasswordHasherInterface->hashPassword(
                     $user,
-                    $form->get('newPlainPassword')->get('repeated')->getData()
+                    $form->get('newPlainPassword')->getData()
                 )
             );
 
@@ -135,7 +136,7 @@ class ProfileController extends AbstractController
             return $this->redirectToRoute('profile');
         }
 
-        $form = $this->createForm(HiddenTrueFormType::class);
+        $form = $this->createForm(RegistrationVerifyEmailSendAgainType::class);
         $form->handleRequest($this->request);
 
         if ($form->isSubmitted() && $form->isValid())
@@ -267,7 +268,7 @@ class ProfileController extends AbstractController
             throw new NotFoundHttpException('Adresa nenalezena.');
         }
 
-        $form = $this->createForm(HiddenTrueFormType::class);
+        $form = $this->createForm(AddressDeleteFormType::class);
         $form->handleRequest($this->request);
 
         if ($form->isSubmitted() && $form->isValid())

@@ -1,0 +1,104 @@
+{% extends 'form_div_layout.html.twig' %}
+
+{# Řádek formuláře #}
+{% block form_row %}
+    <div class="row{% if (not compound or force_error|default(false)) and not valid %} has-error{% endif %}">
+        <div class="input-field">
+            {{ form_widget(form) }}
+            {{ form_label(form) }}
+            {{ form_help(form) }}
+            {{ form_errors(form) }}
+        </div>
+    </div>
+{% endblock form_row %}
+
+{# Errory #}
+{% block form_errors %}
+    {% if errors|length > 0 %}
+        {% for error in errors %}
+            <span class="helper-text red-text">{{ error.message }}</span>
+        {% endfor %}
+    {% endif %}
+{% endblock form_errors %}
+
+{# Pomocný text #}
+{% block form_help %}
+    {% if help is not null %}
+        <span class="helper-text">{{ help }}</span>
+    {% endif %}
+{% endblock form_help %}
+
+{# Řádek checkboxu #}
+{% block checkbox_row %}
+    <div class="row {% if not valid %} has-error{% endif %}">
+        <label>
+            {{ form_widget(form, {'attr': {'class': 'filled-in checkbox-light-blue'}}) }}
+            {{ form_label(form) }}
+            <br>
+            {{ form_help(form) }}
+            {{ form_errors(form) }}
+        </label>
+    </div>
+{% endblock checkbox_row %}
+
+{# Label checkboxu #}
+{% block checkbox_label %}
+    <span>{{ label }}</span>
+{% endblock checkbox_label %}
+
+{# Tlačítko #}
+{% block button_widget -%}
+    {% set attr = attr|merge({class: (attr.class|default('waves-effect waves-light btn-large light-blue') ~ ' btn')|trim}) %}
+    <div class="center-align">
+        {{- parent() -}}
+    </div>
+{% endblock %}
+
+{# Radio buttony #}
+{% block choice_row %}
+    <div class="row {% if not valid %} has-error{% endif %}">
+        {{ form_label(form) }}
+        <br>
+        {{ form_widget(form) }}
+        {{ form_help(form) }}
+        {{ form_errors(form) }}
+        <br>
+    </div>
+{% endblock %}
+
+{# Konkrétní radio button #}
+{% block choice_widget_expanded %}
+    {% for child in form %}
+        <label>
+            {{ form_widget(child, {'attr': {'class': 'with-gap'}}) }}
+            {{ form_label(child, null) }}
+        </label>
+        <br>
+    {% endfor %}
+{% endblock choice_widget_expanded %}
+
+{# Textarea #}
+{% block textarea_widget %}
+    {% set attr = attr|merge({class: (attr.class|default('') ~ 'materialize-textarea')|trim}) %}
+    {{ parent() }}
+{% endblock %}
+
+{# Klikatelné hodnocení s hvězdami #}
+{% block star_choice_row %}
+    <div class="row {% if not valid %} has-error{% endif %}">
+        {{ form_label(form) }}
+        <div class="rating">
+            {{ form_widget(form) }}
+        </div>
+        {{ form_help(form) }}
+        {{ form_errors(form) }}
+    </div>
+{% endblock %}
+
+{# Konkrétní hvězda #}
+{% block star_choice_widget %}
+    {% for child in form %}
+        {{ form_widget(child) }}
+        <label for="{{ child.vars.id }}">☆</label>
+    {% endfor %}
+{% endblock star_choice_widget %}

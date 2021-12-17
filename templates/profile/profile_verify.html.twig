@@ -8,16 +8,8 @@
         </div>
 
         <div class="row">
-            {{ form_start(sendAgainForm) }}
-                <div class="center-align">
-                    <div class="row">Nedostali jste email na ověření účtu? Vypršel vám odkaz v emailu? Nechte si poslat nový.</div>
-
-                    <button type="submit" class="waves-effect waves-light btn-large light-blue">Poslat znovu</button>
-
-                    {{ form_widget(sendAgainForm.hiddenTrue) }}
-                    <span class="helper-text red-text">{{ form_errors(sendAgainForm.hiddenTrue) }}</span>
-                </div>
-            {{ form_end(sendAgainForm) }}
+            <div class="row center-align">Nedostali jste email na ověření účtu? Vypršel vám odkaz v emailu? Nechte si poslat nový.</div>
+            {{ form(sendAgainForm) }}
         </div>
     </div>
 

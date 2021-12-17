@@ -6,6 +6,7 @@ use App\Entity\Address;
 use App\Form\Type\Address as AddressTypes;
 use App\Form\Type\AgreePrivacyType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -16,24 +17,42 @@ class AddressFormType extends AbstractType
         $builder
             ->add('alias', AddressTypes\AddressAliasType::class, [
                 'attr' => ['autofocus' => 'autofocus'],
+                'label' => 'Alias',
             ])
-            ->add('country', AddressTypes\AddressCountryType::class)
-            ->add('street', AddressTypes\AddressStreetType::class)
+            ->add('country', AddressTypes\AddressCountryType::class, [
+                'label' => 'Země',
+            ])
+            ->add('street', AddressTypes\AddressStreetType::class, [
+                'label' => 'Ulice a číslo popisné',
+            ])
             ->add('additionalInfo', AddressTypes\AddressAdditionalInfoType::class, [
                 'required' => false,
+                'label' => 'Doplněk adresy',
             ])
-            ->add('town', AddressTypes\AddressTownType::class)
-            ->add('zip', AddressTypes\AddressZipType::class)
+            ->add('town', AddressTypes\AddressTownType::class, [
+                'label' => 'Obec',
+            ])
+            ->add('zip', AddressTypes\AddressZipType::class, [
+                'label' => 'PSČ',
+            ])
             ->add('company', AddressTypes\AddressCompanyNameType::class, [
                 'required' => false,
+                'label' => 'Název firmy',
             ])
             ->add('ic', AddressTypes\AddressIcType::class, [
                 'required' => false,
+                'label' => 'IČ',
             ])
             ->add('dic', AddressTypes\AddressDicType::class, [
                 'required' => false,
+                'label' => 'DIČ',
             ])
-            ->add('agreePrivacy', AgreePrivacyType::class)
+            ->add('agreePrivacy', AgreePrivacyType::class, [
+                'label' => 'Souhlasím se zpracováním osobních údajů',
+            ])
+            ->add('submit', SubmitType::class, [
+                'label' => 'Uložit',
+            ])
         ;
     }
 
