@@ -1,7 +1,11 @@
 {% if reviews is empty %}
-    {% if showErrorIfEmpty == true %}
-        <div class="row left-align">
+    {% if template == 'index' %}
+        <div class="row center-align">
             Nebyly nalezeny žádné recenze.
+        </div>
+    {% elseif template == 'overview' %}
+        <div class="row left-align">
+            Nebyly nalezeny žádné recenze. Klikněte na "+" pro napsání nové recenze.
         </div>
     {% endif %}
 {% else %}

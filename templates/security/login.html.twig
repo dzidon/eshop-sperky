@@ -13,36 +13,39 @@
             {# Flash zprávy #}
             {{ include('fragments/_flash_messages.html.twig') }}
 
-            <br>
-            <form method="post">
-                <div class="row">
-                    <div class="input-field">
-                        <input type="email" value="{{ lastUsername }}" name="email" id="inputEmail" required="required" autofocus="autofocus"/>
-                        <label for="inputEmail" class="required">Email:</label>
+            <div class="section">
+                <form method="post">
+                    <div class="row">
+                        <div class="input-field">
+                            <input type="email" value="{{ lastUsername }}" name="email" id="inputEmail" required="required" autofocus="autofocus"/>
+                            <label for="inputEmail" class="required">Email:</label>
 
-                        {% if error %}
-                            <ul>
-                                <li>
-                                    <span class="helper-text red-text">{{ error.messageKey|trans(error.messageData, 'security') }}</span>
-                                </li>
-                            </ul>
-                        {% endif %}
+                            {% if error %}
+                                <ul>
+                                    <li>
+                                        <span class="helper-text red-text">{{ error.messageKey|trans(error.messageData, 'security') }}</span>
+                                    </li>
+                                </ul>
+                            {% endif %}
+                        </div>
                     </div>
-                </div>
 
-                <div class="row">
-                    <div class="input-field">
-                        <input type="password" id="inputPassword" name="password" required="required"/>
-                        <label for="inputPassword" class="required">Heslo:</label>
+                    <div class="row">
+                        <div class="input-field">
+                            <input type="password" id="inputPassword" name="password" required="required"/>
+                            <label for="inputPassword" class="required">Heslo:</label>
+                        </div>
                     </div>
-                </div>
 
-                {# <input type="hidden" name="_target_path" value="/account"/> #}
-                <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+                    {# <input type="hidden" name="_target_path" value="/account"/> #}
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
 
-                <div class="center-align">
-                    <button type="submit" class="waves-effect waves-light btn-large light-blue">Přihlásit se</button>
-                    <br><br>
+                    <div class="row center-align">
+                        <button type="submit" class="waves-effect waves-light btn-large light-blue">Přihlásit se</button>
+                    </div>
+                </form>
+
+                <div class="row center-align">
                     {% if not is_granted('IS_AUTHENTICATED_REMEMBERED') %}
                         <div>
                             Ještě nemáte účet? <a href="{{ path('register') }}">Zaregistrovat se</a>
@@ -52,15 +55,13 @@
                         Zapomněli jste heslo? <a href="{{ path('forgot_password_request') }}">Obnovit</a>
                     </div>
                 </div>
-            </form>
 
-            <br><br>
-            <div class="divider"></div>
+                <div class="divider row"></div>
 
-            {# Social login #}
-            {{ include('fragments/_social_login.html.twig', {actionName: 'přihlásit'}) }}
+                {# Social login #}
+                {{ include('fragments/_social_login.html.twig', {actionName: 'přihlásit'}) }}
+            </div>
         </div>
     </div>
-    <br><br>
 
 {% endblock %}

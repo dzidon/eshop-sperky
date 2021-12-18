@@ -16,12 +16,14 @@
             {# Flash zprávy #}
             {{ include('fragments/_flash_messages.html.twig') }}
 
-            {# Recenze #}
-            {{ include('fragments/_reviews.html.twig', {reviews: reviews, agregateReviewData: agregateReviewData, showErrorIfEmpty: true}) }}
-        </div>
+            <div class="section">
+                {# Recenze #}
+                {{ include('fragments/_reviews.html.twig', {reviews: reviews, agregateReviewData: agregateReviewData, template: 'overview'}) }}
 
-        {# Pagination #}
-        {{ include('fragments/_pagination.html.twig') }}
+                {# Pagination #}
+                {{ include('fragments/_pagination.html.twig') }}
+            </div>
+        </div>
     </div>
 
 {% endblock %}

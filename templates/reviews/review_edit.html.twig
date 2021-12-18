@@ -12,9 +12,10 @@
             {# Flash zprávy #}
             {{ include('fragments/_flash_messages.html.twig') }}
 
-            {{ form(reviewForm) }}
+            <div class="section">
+                {{ form(reviewForm) }}
+            </div>
         </div>
     </div>
-    <br><br>
 
 {% endblock %}

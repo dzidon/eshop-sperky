@@ -49,7 +49,7 @@
 {# Tlačítko #}
 {% block button_widget -%}
     {% set attr = attr|merge({class: (attr.class|default('waves-effect waves-light btn-large light-blue') ~ ' btn')|trim}) %}
-    <div class="center-align">
+    <div class="row center-align">
         {{- parent() -}}
     </div>
 {% endblock %}

@@ -13,21 +13,19 @@
             {# Flash zprávy #}
             {{ include('fragments/_flash_messages.html.twig') }}
 
-            <br>
-            {{ form(registrationForm) }}
+            <div class="section">
+                {{ form(registrationForm) }}
 
-            <div class="section center-align">
-                <div class="row">
+                <div class="row center-align">
                     Už máte účet? <a href="{{ path('login') }}">Přihlásit se</a>
                 </div>
+
+                <div class="row divider"></div>
+
+                {# Social login #}
+                {{ include('fragments/_social_login.html.twig', {actionName: 'zaregistrovat'}) }}
             </div>
-
-            <div class="divider"></div>
-
-            {# Social login #}
-            {{ include('fragments/_social_login.html.twig', {actionName: 'zaregistrovat'}) }}
         </div>
     </div>
-    <br><br>
 
 {% endblock %}
