@@ -79,8 +79,6 @@ class ReviewController extends AbstractController
         }
 
         $review = new Review();
-        $this->breadcrumbs->setPageTitle('Nová recenze');
-
         if($id !== null) //zadal id do url
         {
             $review = $this->getDoctrine()->getRepository(Review::class)->findOneBy([
@@ -92,12 +90,16 @@ class ReviewController extends AbstractController
                 throw new NotFoundHttpException('Recenze nenalezena.');
             }
 
-            $this->breadcrumbs->setPageTitle('Upravit recenzi');
+            $this->breadcrumbs->addRoute('review_edit', ['id' => $review->getId()], '', 'edit');
         }
         else if($user->getReview() !== null) //už napsal recenzi, nemůže přidat další
         {
             $this->addFlash('failure', 'Už jste přidal recenzi.');
             return $this->redirectToRoute('reviews');
+        }
+        else
+        {
+            $this->breadcrumbs->addRoute('review_edit', [], '', 'new');
         }
 
         $form = $this->createForm(ReviewFormType::class, $review);
@@ -124,7 +126,7 @@ class ReviewController extends AbstractController
 
         return $this->render('reviews/review_edit.html.twig', [
             'reviewForm' => $form->createView(),
-            'breadcrumbs' => $this->breadcrumbs->addRoute('review_edit', ['id' => $review->getId()], $this->breadcrumbs->getPageTitle()),
+            'breadcrumbs' => $this->breadcrumbs,
         ]);
     }
 

@@ -28,14 +28,19 @@ class BreadcrumbsService
      * @param string $route
      * @param array $parameters
      * @param string $title
-     *
+     * @param string $variation
      * @return $this
      */
-    public function addRoute(string $route, array $parameters = [], string $title = ''): self
+    public function addRoute(string $route, array $parameters = [], string $title = '', string $variation = ''): self
     {
         if(mb_strlen($title, 'utf-8') === 0)
         {
-            $title = (string) $this->parameterBag->get('app_page_title.' . $route);
+            $title = $this->parameterBag->get('app_page_title.' . $route);
+            if(is_array($title))
+            {
+                $title = $title[$variation];
+            }
+            $title = (string) $title;
         }
 
         $this->breadcrumbsData[] = ['route' => $route, 'title' => $title, 'parameters' => $parameters];
@@ -58,12 +63,17 @@ class BreadcrumbsService
      * Manuálně nastaví aktuální title z configu podle zadanáho názvu cesty.
      *
      * @param string $route
-     *
+     * @param string $variation
      * @return $this
      */
-    public function setPageTitleByRoute(string $route): self
+    public function setPageTitleByRoute(string $route, string $variation = ''): self
     {
-        $this->currentTitle = (string) $this->parameterBag->get('app_page_title.' . $route);
+        $title = $this->parameterBag->get('app_page_title.' . $route);
+        if(is_array($title))
+        {
+            $title = $title[$variation];
+        }
+        $this->currentTitle = (string) $title;
 
         return $this;
     }

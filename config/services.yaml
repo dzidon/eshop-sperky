@@ -14,15 +14,19 @@ parameters:
     app_page_title.profile_change_password: 'Změna hesla'
     app_page_title.profile_verify: 'Ověření emailu'
     app_page_title.profile_addresses: 'Adresy'
-    app_page_title.profile_address: 'Nová adresa'
+    app_page_title.profile_address:
+        new: 'Nová adresaa'
+        edit: 'Upravit adresuu'
     app_page_title.profile_address_delete: 'Smazat adresu'
-    app_page_title.register: 'Registrace'
     app_page_title.reviews: 'Recenze'
-    app_page_title.review_edit: 'Nová recenze'
+    app_page_title.review_edit:
+        new: 'Nová recenze'
+        edit: 'Upravit recenzi'
     app_page_title.review_delete: 'Smazat recenzi'
     app_page_title.forgot_password_request: 'Obnova hesla'
     app_page_title.check_email: 'Potvrzení obnovy hesla'
     app_page_title.reset_password: 'Obnova hesla'
+    app_page_title.register: 'Registrace'
     app_page_title.login: 'Přihlášení'
 
 services:

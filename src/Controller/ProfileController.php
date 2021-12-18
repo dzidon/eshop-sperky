@@ -203,8 +203,6 @@ class ProfileController extends AbstractController
         }
 
         $address = new Address();
-        $this->breadcrumbs->setPageTitle('Nová adresa');
-
         if($id !== null) //zadal id do url
         {
             $address = $this->getDoctrine()->getRepository(Address::class)->findOneBy([
@@ -216,7 +214,11 @@ class ProfileController extends AbstractController
                 throw new NotFoundHttpException('Adresa nenalezena.');
             }
 
-            $this->breadcrumbs->setPageTitle('Upravit adresu');
+            $this->breadcrumbs->addRoute('profile_address', ['id' => $address->getId()], '', 'edit');
+        }
+        else
+        {
+            $this->breadcrumbs->addRoute('profile_address', [], '', 'new');
         }
 
         $form = $this->createForm(AddressFormType::class, $address);
