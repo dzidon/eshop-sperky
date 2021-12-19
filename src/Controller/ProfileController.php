@@ -15,6 +15,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -205,13 +206,14 @@ class ProfileController extends AbstractController
         $address = new Address();
         if($id !== null) //zadal id do url
         {
-            $address = $this->getDoctrine()->getRepository(Address::class)->findOneBy([
-                'id' => $id,
-            ]);
-
-            if($address === null || $address->getUser() !== $user) //nenaslo to zadnou adresu, nebo to nejakou adresu naslo, ale ta neni uzivatele
+            $address = $this->getDoctrine()->getRepository(Address::class)->findOneBy(['id' => $id]);
+            if($address === null) //nenaslo to zadnou adresu
             {
                 throw new NotFoundHttpException('Adresa nenalezena.');
+            }
+            else if($address->getUser() !== $user) //nalezena adresa neni uzivatele
+            {
+                throw new AccessDeniedHttpException('Tuto adresu nemůžete editovat.');
             }
 
             $this->breadcrumbs->addRoute('profile_address', ['id' => $address->getId()], '', 'edit');
@@ -261,13 +263,14 @@ class ProfileController extends AbstractController
             return $this->redirectToRoute('profile');
         }
 
-        $address = $this->getDoctrine()->getRepository(Address::class)->findOneBy([
-            'id' => $id,
-        ]);
-
-        if($address === null || $address->getUser() !== $user) //nenaslo to zadnou adresu, nebo to nejakou adresu naslo, ale ta neni uzivatele
+        $address = $this->getDoctrine()->getRepository(Address::class)->findOneBy(['id' => $id]);
+        if($address === null) //nenaslo to zadnou adresu
         {
             throw new NotFoundHttpException('Adresa nenalezena.');
+        }
+        else if($address->getUser() !== $user) //nalezena adresa neni uzivatele
+        {
+            throw new AccessDeniedHttpException('Tuto adresu nemůžete smazat.');
         }
 
         $form = $this->createForm(AddressDeleteFormType::class);

@@ -11,6 +11,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -81,13 +82,15 @@ class ReviewController extends AbstractController
         $review = new Review();
         if($id !== null) //zadal id do url
         {
-            $review = $this->getDoctrine()->getRepository(Review::class)->findOneBy([
-                'id' => $id,
-            ]);
+            $review = $this->getDoctrine()->getRepository(Review::class)->findOneBy(['id' => $id]);
 
-            if($review === null || $review->getUser() !== $user) //nenaslo to zadnou adresu, nebo to nejakou adresu naslo, ale ta neni uzivatele
+            if($review === null) //nenaslo to zadnou recenzi
             {
                 throw new NotFoundHttpException('Recenze nenalezena.');
+            }
+            else if(!$this->isGranted('edit', $review)) //recenzi to naslo, jenze patri jinemu uzivateli
+            {
+                throw new AccessDeniedHttpException('Tuto recenzi nemůžete editovat.');
             }
 
             $this->breadcrumbs->addRoute('review_edit', ['id' => $review->getId()], '', 'edit');
@@ -138,13 +141,15 @@ class ReviewController extends AbstractController
     public function reviewDelete($id): Response
     {
         $user = $this->getUser();
-        $review = $this->getDoctrine()->getRepository(Review::class)->findOneBy([
-            'id' => $id,
-        ]);
+        $review = $this->getDoctrine()->getRepository(Review::class)->findOneBy(['id' => $id]);
 
-        if($review === null || $review->getUser() !== $user) //nenaslo to zadnou adresu, nebo to nejakou adresu naslo, ale ta neni uzivatele
+        if($review === null) //nenaslo to zadnou recenzi
         {
             throw new NotFoundHttpException('Recenze nenalezena.');
+        }
+        else if(!$this->isGranted('delete', $review)) //recenzi to naslo, jenze patri jinemu uzivateli
+        {
+            throw new AccessDeniedHttpException('Tuto recenzi nemůžete smazat.');
         }
 
         $form = $this->createForm(ReviewDeleteFormType::class);

@@ -44,10 +44,18 @@
                     {% endif %}
                 </div>
 
-                {% if review.getUser() is same as( app.user ) and app.user is not null %}
+                {% set can_edit = is_granted('edit', review) %}
+                {% set can_delete = is_granted('delete', review) %}
+
+                {% if can_edit or can_delete %}
                     <div class="card-action">
-                        <a href="{{ path('review_edit', {id: review.getId()}) }}">Upravit</a>
-                        <a href="{{ path('review_delete', {id: review.getId()}) }}">Smazat</a>
+                        {% if can_edit %}
+                            <a href="{{ path('review_edit', {id: review.getId()}) }}">Upravit</a>
+                        {% endif %}
+
+                        {% if can_delete %}
+                            <a href="{{ path('review_delete', {id: review.getId()}) }}">Smazat</a>
+                        {% endif %}
                     </div>
                 {% endif %}
             </div>
