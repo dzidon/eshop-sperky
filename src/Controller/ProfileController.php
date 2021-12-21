@@ -203,23 +203,23 @@ class ProfileController extends AbstractController
             return $this->redirectToRoute('profile');
         }
 
-        $address = new Address();
-        if($id !== null) //zadal id do url
+        if($id !== null) //zadal id do url, snazi se editovat existujici
         {
             $address = $this->getDoctrine()->getRepository(Address::class)->findOneBy(['id' => $id]);
             if($address === null) //nenaslo to zadnou adresu
             {
                 throw new NotFoundHttpException('Adresa nenalezena.');
             }
-            else if($address->getUser() !== $user) //nalezena adresa neni uzivatele
+            else if(!$this->isGranted('edit', $address)) //nalezena adresa neni uzivatele
             {
                 throw new AccessDeniedHttpException('Tuto adresu nemůžete editovat.');
             }
 
             $this->breadcrumbs->addRoute('profile_address', ['id' => $address->getId()], '', 'edit');
         }
-        else
+        else //nezadal id do url, vytvari novou adresu
         {
+            $address = new Address();
             $this->breadcrumbs->addRoute('profile_address', [], '', 'new');
         }
 
@@ -268,7 +268,7 @@ class ProfileController extends AbstractController
         {
             throw new NotFoundHttpException('Adresa nenalezena.');
         }
-        else if($address->getUser() !== $user) //nalezena adresa neni uzivatele
+        else if(!$this->isGranted('delete', $address)) //nalezena adresa neni uzivatele
         {
             throw new AccessDeniedHttpException('Tuto adresu nemůžete smazat.');
         }

@@ -79,7 +79,6 @@ class ReviewController extends AbstractController
             return $this->redirectToRoute('reviews');
         }
 
-        $review = new Review();
         if($id !== null) //zadal id do url
         {
             $review = $this->getDoctrine()->getRepository(Review::class)->findOneBy(['id' => $id]);
@@ -95,13 +94,14 @@ class ReviewController extends AbstractController
 
             $this->breadcrumbs->addRoute('review_edit', ['id' => $review->getId()], '', 'edit');
         }
-        else if($user->getReview() !== null) //už napsal recenzi, nemůže přidat další
+        else if($user->getReview() !== null) //nezadal id do url, ale už napsal recenzi, nemůže přidat další
         {
             $this->addFlash('failure', 'Už jste přidal recenzi.');
             return $this->redirectToRoute('reviews');
         }
-        else
+        else //nezadal id do url + jeste nenapsal zadnou recenzi, takže vytvari novou recenzi
         {
+            $review = new Review();
             $this->breadcrumbs->addRoute('review_edit', [], '', 'new');
         }
 
