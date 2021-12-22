@@ -16,8 +16,10 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
-    public const GENDER_ID_MALE = false;
-    public const GENDER_ID_FEMALE = true;
+    public const GENDER_ID_UNDISCLOSED = 'U';
+    public const GENDER_ID_MALE = 'M';
+    public const GENDER_ID_FEMALE = 'F';
+    public const GENDER_NAME_UNDISCLOSED = 'Neuvádět';
     public const GENDER_NAME_MALE = 'Pan';
     public const GENDER_NAME_FEMALE = 'Paní';
 
@@ -72,7 +74,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private $registered;
 
     /**
-     * @ORM\Column(type="boolean", options={"default" : 0})
+     * @ORM\Column(type="string", length=1)
      *
      * Validace se resi pres UserGenderType
      */
@@ -285,13 +287,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getGender(): ?bool
+    public function getGender(): ?string
     {
         return $this->gender;
     }
 
     /**
-     * Vrací buď 'Muž' nebo 'Žena'
+     * Vrací buď 'Neuvádět', 'Muž' nebo 'Žena'
      *
      * @return string
      */
@@ -301,13 +303,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         {
             return self::GENDER_NAME_MALE;
         }
-        else
+        else if($this->gender === self::GENDER_ID_FEMALE)
         {
             return self::GENDER_NAME_FEMALE;
         }
+
+        return self::GENDER_NAME_UNDISCLOSED;
     }
 
-    public function setGender(?bool $gender): self
+    public function setGender(?string $gender): self
     {
         $this->gender = $gender;
 

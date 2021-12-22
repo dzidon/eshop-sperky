@@ -292,12 +292,21 @@
 
         <div class="section center-align">
             <h2>Recenze zákazníků</h2>
+
             <div class="container left-align">
                 {# Recenze #}
                 {{ include('fragments/_reviews.html.twig', {reviews: latestReviews, agregateReviewData: agregateReviewData, template: 'index'}) }}
             </div>
 
-            <a href="{{ path('reviews') }}" class="row waves-effect waves-light btn-large light-blue">Všechny recenze</a>
+            <div class="inline-block">
+                <div class="row">
+                    <a href="{{ path('reviews') }}" class="waves-effect waves-light btn-large light-blue width-max">Všechny recenze</a>
+                </div>
+
+                <div class="row">
+                    <a href="{{ path('review_edit') }}" class="waves-effect waves-light btn-large grey width-max">Napsat recenzi</a>
+                </div>
+            </div>
         </div>
     </div>
 

@@ -55,6 +55,14 @@ main {
     justify-content: space-between;
 }
 
+.inline-block {
+    display: inline-block;
+}
+
+.width-max {
+    width: 100%;
+}
+
 /*
     Input, Textarea
 */

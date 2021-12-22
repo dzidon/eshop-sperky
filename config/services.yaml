@@ -15,8 +15,8 @@ parameters:
     app_page_title.profile_verify: 'Ověření emailu'
     app_page_title.profile_addresses: 'Adresy'
     app_page_title.profile_address:
-        new: 'Nová adresaa'
-        edit: 'Upravit adresuu'
+        new: 'Nová adresa'
+        edit: 'Upravit adresu'
     app_page_title.profile_address_delete: 'Smazat adresu'
     app_page_title.reviews: 'Recenze'
     app_page_title.review_edit:

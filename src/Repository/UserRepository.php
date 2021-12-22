@@ -26,7 +26,8 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     {
         $user = new User();
         $user->setRegistered(new \DateTime('now'))
-             ->setGender(false);
+             ->setGender(User::GENDER_ID_UNDISCLOSED);
+
         return $user;
     }
 
