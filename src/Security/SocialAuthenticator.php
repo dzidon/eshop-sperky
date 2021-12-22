@@ -46,7 +46,18 @@ class SocialAuthenticator extends OAuth2Authenticator
     private Security $security;
 
     private string $requestedService;
-    private array $serviceData;
+    private array $serviceData = [
+        'facebook' => [
+            'name' => 'Facebook',
+            'userIdAttribute' => 'facebookId',
+            'userIdAttributeSetter' => 'setFacebookId',
+        ],
+        'google' => [
+            'name' => 'Google',
+            'userIdAttribute' => 'googleId',
+            'userIdAttributeSetter' => 'setGoogleId',
+        ],
+    ];
 
     public function __construct(ClientRegistry $clientRegistry, EntityManagerInterface $entityManager, RouterInterface $router, LoggerInterface $logger, UrlGeneratorInterface $urlGenerator, TranslatorInterface $translator, Security $security)
     {
@@ -57,19 +68,6 @@ class SocialAuthenticator extends OAuth2Authenticator
         $this->urlGenerator = $urlGenerator;
         $this->translator = $translator;
         $this->security = $security;
-
-        $this->serviceData = [
-            'facebook' => [
-                'name' => 'Facebook',
-                'userIdAttribute' => 'facebookId',
-                'userIdAttributeSetter' => 'setFacebookId',
-            ],
-            'google' => [
-                'name' => 'Google',
-                'userIdAttribute' => 'googleId',
-                'userIdAttributeSetter' => 'setGoogleId',
-            ],
-        ];
     }
 
     public function supports(Request $request): ?bool
@@ -109,7 +107,8 @@ class SocialAuthenticator extends OAuth2Authenticator
                 }
 
                 // pokud už se v minulosti přihlašoval danou službou
-                $existingUser = $this->entityManager->getRepository(User::class)->findOneBy([$serviceIdAttribute => $socialId]); //např. facebookId => 651519191561
+                $userRepository = $this->entityManager->getRepository(User::class);
+                $existingUser = $userRepository->findOneBy([$serviceIdAttribute => $socialId]); //např. facebookId => 651519191561
                 if ($existingUser) //social id nalezeno v naší db
                 {
                     if($socialEmail === $existingUser->getUserIdentifier()) //v db exisutje user s danym emailem a social id
@@ -126,17 +125,20 @@ class SocialAuthenticator extends OAuth2Authenticator
                 }
 
                 // v minulosti se nepřihlašoval přes danou službu
-                $user = $this->entityManager->getRepository(User::class)->findOneBy(['email' => $socialEmail]);
+                $user = $userRepository->findOneBy(['email' => $socialEmail]);
                 if($user) //nějaký e-mail z naší DB se shoduje s emailem daného social účtu
                 {
                     $this->logger->info(sprintf("User %s (ID: %s) has logged in using %s by linking email addresses (Social ID: %s).", $user->getUserIdentifier(), $user->getId(), $serviceName, $socialId));
                 }
                 else //žadný e-mail z naší DB se neshoduje s emailem daného social účtu
                 {
-                    $user = new User();
+                    $socialNameFirst = $socialUser->getFirstName();
+                    $socialNameLast = $socialUser->getLastName();
+
+                    $user = $userRepository->createNew();
                     $user->setEmail($socialEmail);
-                    $user->setRegistered(new \DateTime('now'));
-                    $user->setGender(false);
+                    $user->setNameFirst($socialNameFirst);
+                    $user->setNameLast($socialNameLast);
 
                     $this->logger->info(sprintf("User %s has registered a new account using %s (Social ID: %s).", $user->getUserIdentifier(), $serviceName, $socialId));
                 }
@@ -157,7 +159,6 @@ class SocialAuthenticator extends OAuth2Authenticator
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
     {
         $request->getSession()->getFlashBag()->add('success', sprintf('Přihlášení přes %s proběhlo úspěšně.', $this->serviceData[$this->requestedService]['name']));
-
         if ($targetPath = $this->getTargetPath($request->getSession(), $firewallName))
         {
             return new RedirectResponse($targetPath);
@@ -169,7 +170,6 @@ class SocialAuthenticator extends OAuth2Authenticator
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
     {
         $message = strtr($exception->getMessageKey(), $exception->getMessageData());
-
         $request->getSession()->getFlashBag()->add('failure', $this->translator->trans($message));
 
         return new RedirectResponse($this->urlGenerator->generate('home'));

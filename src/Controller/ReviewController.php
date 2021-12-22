@@ -101,7 +101,7 @@ class ReviewController extends AbstractController
         }
         else //nezadal id do url + jeste nenapsal zadnou recenzi, takže vytvari novou recenzi
         {
-            $review = new Review();
+            $review = $this->getDoctrine()->getRepository(Review::class)->createNew($user);
             $this->breadcrumbs->addRoute('review_edit', [], '', 'new');
         }
 
@@ -110,11 +110,9 @@ class ReviewController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid())
         {
-            $review->setUser($user);
-            $review->setUpdated(new \DateTime('now'));
-            if($review->getId() === null)
+            if($review->getId() !== null)
             {
-                $review->setCreated(new \DateTime('now'));
+                $review->setUpdated(new \DateTime('now'));
             }
 
             $entityManager = $this->getDoctrine()->getManager();

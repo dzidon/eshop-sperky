@@ -3,10 +3,10 @@
 namespace App\Repository;
 
 use App\Entity\Address;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Query;
 use Doctrine\Persistence\ManagerRegistry;
-use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * @method Address|null find($id, $lockMode = null, $lockVersion = null)
@@ -21,7 +21,18 @@ class AddressRepository extends ServiceEntityRepository
         parent::__construct($registry, Address::class);
     }
 
-    public function getQueryForPagination(UserInterface $user): Query
+    public function createNew(User $user): Address
+    {
+        $address = new Address();
+        $now = new \DateTime('now');
+        $address->setCreated($now)
+                ->setUpdated($now)
+                ->setUser($user);
+
+        return $address;
+    }
+
+    public function getQueryForPagination(User $user): Query
     {
         return $this->createQueryBuilder('a')
             ->andWhere('a.user = :user')

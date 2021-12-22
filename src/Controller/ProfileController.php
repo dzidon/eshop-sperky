@@ -219,7 +219,7 @@ class ProfileController extends AbstractController
         }
         else //nezadal id do url, vytvari novou adresu
         {
-            $address = new Address();
+            $address = $this->getDoctrine()->getRepository(Address::class)->createNew($user);
             $this->breadcrumbs->addRoute('profile_address', [], '', 'new');
         }
 
@@ -228,11 +228,9 @@ class ProfileController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid())
         {
-            $address->setUser($user);
-            $address->setUpdated(new \DateTime('now'));
-            if($address->getId() === null)
+            if($address->getId() !== null)
             {
-                $address->setCreated(new \DateTime('now'));
+                $address->setUpdated(new \DateTime('now'));
             }
 
             $entityManager = $this->getDoctrine()->getManager();

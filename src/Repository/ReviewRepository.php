@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\User;
 use App\Entity\Review;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Query;
@@ -18,6 +19,17 @@ class ReviewRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Review::class);
+    }
+
+    public function createNew(User $user): Review
+    {
+        $review = new Review();
+        $now = new \DateTime('now');
+        $review->setCreated($now)
+               ->setUpdated($now)
+               ->setUser($user);
+
+        return $review;
     }
 
     public function getQueryForPagination(): Query

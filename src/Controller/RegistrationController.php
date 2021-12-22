@@ -48,7 +48,7 @@ class RegistrationController extends AbstractController
             return $this->redirectToRoute('home');
         }
 
-        $user = new User();
+        $user = $this->getDoctrine()->getRepository(User::class)->createNew();
         $form = $this->createForm(RegistrationFormType::class, $user);
         $form->handleRequest($this->request);
 
@@ -61,9 +61,6 @@ class RegistrationController extends AbstractController
                     $form->get('plainPassword')->getData()
                 )
             );
-
-            $user->setRegistered(new \DateTime('now'));
-            $user->setGender(false);
 
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($user);

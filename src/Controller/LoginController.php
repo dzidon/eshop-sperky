@@ -65,7 +65,7 @@ class LoginController extends AbstractController
                 'scopes' => ['public_profile', 'email']
             ],
             'google' => [
-                'scopes' => ['https://www.googleapis.com/auth/userinfo.email', 'https://www.googleapis.com/auth/userinfo.profile']
+                'scopes' => ['https://www.googleapis.com/auth/userinfo.profile', 'https://www.googleapis.com/auth/userinfo.email']
             ],
         ];
 
