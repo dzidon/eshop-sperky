@@ -436,6 +436,25 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
+     * Vrátí true, pokud má uživatel oprávnění s daným kódem
+     *
+     * @param string $code
+     * @return bool
+     */
+    public function hasPermission(string $code): bool
+    {
+        foreach ($this->permissions as $permission)
+        {
+            if($permission->getCode() === $code)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Vrátí true, pokud uživatel může vstoupit do administrace (má takové oprávnění, se kterým jde v administraci něco dělat)
      *
      * @return bool
