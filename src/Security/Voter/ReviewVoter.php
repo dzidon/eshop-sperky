@@ -10,9 +10,12 @@ use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
 class ReviewVoter extends Voter
 {
-    const EDIT = 'edit';
-    const DELETE = 'delete';
+    const EDIT = 'review_edit';
+    const DELETE = 'review_delete';
 
+    /**
+     * {@inheritdoc}
+     */
     protected function supports(string $attribute, $subject): bool
     {
         if (!in_array($attribute, [self::EDIT, self::DELETE]))
@@ -28,6 +31,9 @@ class ReviewVoter extends Voter
         return true;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function voteOnAttribute(string $attribute, $subject, TokenInterface $token): bool
     {
         $user = $token->getUser();

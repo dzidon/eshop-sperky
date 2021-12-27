@@ -87,7 +87,7 @@ class ReviewController extends AbstractController
             {
                 throw new NotFoundHttpException('Recenze nenalezena.');
             }
-            else if(!$this->isGranted('edit', $review)) //recenzi to naslo, jenze patri jinemu uzivateli
+            else if(!$this->isGranted('review_edit', $review)) //recenzi to naslo, jenze patri jinemu uzivateli
             {
                 throw new AccessDeniedHttpException('Tuto recenzi nemůžete editovat.');
             }
@@ -145,7 +145,7 @@ class ReviewController extends AbstractController
         {
             throw new NotFoundHttpException('Recenze nenalezena.');
         }
-        else if(!$this->isGranted('delete', $review)) //recenzi to naslo, jenze patri jinemu uzivateli
+        else if(!$this->isGranted('review_delete', $review)) //recenzi to naslo, jenze patri jinemu uzivateli
         {
             throw new AccessDeniedHttpException('Tuto recenzi nemůžete smazat.');
         }

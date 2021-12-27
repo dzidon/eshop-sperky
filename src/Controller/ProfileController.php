@@ -210,7 +210,7 @@ class ProfileController extends AbstractController
             {
                 throw new NotFoundHttpException('Adresa nenalezena.');
             }
-            else if(!$this->isGranted('edit', $address)) //nalezena adresa neni uzivatele
+            else if(!$this->isGranted('address_edit', $address)) //nalezena adresa neni uzivatele
             {
                 throw new AccessDeniedHttpException('Tuto adresu nemůžete editovat.');
             }
@@ -266,7 +266,7 @@ class ProfileController extends AbstractController
         {
             throw new NotFoundHttpException('Adresa nenalezena.');
         }
-        else if(!$this->isGranted('delete', $address)) //nalezena adresa neni uzivatele
+        else if(!$this->isGranted('address_delete', $address)) //nalezena adresa neni uzivatele
         {
             throw new AccessDeniedHttpException('Tuto adresu nemůžete smazat.');
         }

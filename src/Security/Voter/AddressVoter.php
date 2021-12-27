@@ -9,9 +9,12 @@ use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
 class AddressVoter extends Voter
 {
-    const EDIT = 'edit';
-    const DELETE = 'delete';
+    const EDIT = 'address_edit';
+    const DELETE = 'address_delete';
 
+    /**
+     * {@inheritdoc}
+     */
     protected function supports(string $attribute, $subject): bool
     {
         if (!in_array($attribute, [self::EDIT, self::DELETE]))
@@ -27,6 +30,9 @@ class AddressVoter extends Voter
         return true;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function voteOnAttribute(string $attribute, $subject, TokenInterface $token): bool
     {
         $user = $token->getUser();

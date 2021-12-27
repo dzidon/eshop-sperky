@@ -109,9 +109,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     private $review;
 
+    /**
+     * @ORM\ManyToMany(targetEntity=Permission::class)
+     */
+    private $permissions;
+
     public function __construct()
     {
         $this->addresses = new ArrayCollection();
+        $this->permissions = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -364,7 +370,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function addAddress(Address $address): self
     {
-        if (!$this->addresses->contains($address)) {
+        if (!$this->addresses->contains($address))
+        {
             $this->addresses[] = $address;
             $address->setUser($this);
         }
@@ -376,7 +383,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         if ($this->addresses->removeElement($address)) {
             // set the owning side to null (unless already changed)
-            if ($address->getUser() === $this) {
+            if ($address->getUser() === $this)
+            {
                 $address->setUser(null);
             }
         }
@@ -392,12 +400,50 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setReview(Review $review): self
     {
         // set the owning side of the relation if necessary
-        if ($review->getUser() !== $this) {
+        if ($review->getUser() !== $this)
+        {
             $review->setUser($this);
         }
 
         $this->review = $review;
 
         return $this;
+    }
+
+    /**
+     * @return Collection|Permission[]
+     */
+    public function getPermissions(): Collection
+    {
+        return $this->permissions;
+    }
+
+    public function addPermission(Permission $permission): self
+    {
+        if (!$this->permissions->contains($permission))
+        {
+            $this->permissions[] = $permission;
+        }
+
+        return $this;
+    }
+
+    public function removePermission(Permission $permission): self
+    {
+        $this->permissions->removeElement($permission);
+
+        return $this;
+    }
+
+    /**
+     * Vrátí true, pokud uživatel může vstoupit do administrace (má takové oprávnění, se kterým jde v administraci něco dělat)
+     *
+     * @return bool
+     */
+    public function canEnterAdmin(): bool
+    {
+        //TODO...
+
+        return false;
     }
 }
