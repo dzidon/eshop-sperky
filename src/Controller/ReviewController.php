@@ -105,6 +105,11 @@ class ReviewController extends AbstractController
             $this->breadcrumbs->addRoute('review_edit', [], '', 'new');
         }
 
+        if ($review->getUser() !== null && $review->getUser() !== $user && !$this->isGranted('IS_AUTHENTICATED_FULLY')) //admin prihlaseny pres rememberme cookie se snazi upravit cizi recenzi
+        {
+            throw $this->createAccessDeniedException();
+        }
+
         $form = $this->createForm(ReviewFormType::class, $review);
         $form->handleRequest($this->request);
 
@@ -120,7 +125,7 @@ class ReviewController extends AbstractController
             $entityManager->flush();
 
             $this->addFlash('success', 'Recenze uložena!');
-            $this->logger->info(sprintf("User %s (ID: %s) has saved their review (ID: %s).", $user->getUserIdentifier(), $user->getId(), $review->getId()));
+            $this->logger->info(sprintf("User %s (ID: %s) has saved a review (ID: %s).", $user->getUserIdentifier(), $user->getId(), $review->getId()));
 
             return $this->redirectToRoute('reviews');
         }
@@ -150,12 +155,17 @@ class ReviewController extends AbstractController
             throw new AccessDeniedHttpException('Tuto recenzi nemůžete smazat.');
         }
 
+        if ($review->getUser() !== $user && !$this->isGranted('IS_AUTHENTICATED_FULLY')) //admin prihlaseny pres rememberme cookie se snazi smazat recenzi
+        {
+            throw $this->createAccessDeniedException();
+        }
+
         $form = $this->createForm(ReviewDeleteFormType::class);
         $form->handleRequest($this->request);
 
         if ($form->isSubmitted() && $form->isValid())
         {
-            $this->logger->info(sprintf("User %s (ID: %s) has deleted their review (ID: %s).", $user->getUserIdentifier(), $user->getId(), $review->getId()));
+            $this->logger->info(sprintf("User %s (ID: %s) has deleted a review (ID: %s).", $user->getUserIdentifier(), $user->getId(), $review->getId()));
 
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->remove($review);
