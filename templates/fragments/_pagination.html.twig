@@ -9,7 +9,8 @@
                 {% else %}
                     <li class="{% if pageData.isCurrent %} active {% else %} waves-effect {% endif %}">
                         <a href="{{ path(app.request.get('_route'), pageData.queryParameters) }}">
-                            {{ pageData.queryParameters.page }}
+                            {% set page = constant('QUERY_PARAMETER_PAGE_NAME', pagination) %}
+                            {{ pageData.queryParameters[page] }}
                         </a>
                     </li>
                 {% endif %}

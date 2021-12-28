@@ -8,6 +8,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class PaginatorService
 {
+    public const QUERY_PARAMETER_PAGE_NAME = 'stranka';
+
     private const VIEW_INNER_PAGES = 5;
     private const VIEW_INNER_CENTER = 3;
 
@@ -219,7 +221,7 @@ class PaginatorService
             false => 'array_push',
         ];
 
-        $this->queryParameters['page'] = $page;
+        $this->queryParameters[self::QUERY_PARAMETER_PAGE_NAME] = $page;
         $functionBasedOnPrepend[$prepend] ($this->viewData, [
             'queryParameters' => $this->queryParameters,
             'isCurrent' => $page === $this->currentPage,
@@ -239,7 +241,7 @@ class PaginatorService
     {
         foreach ($this->viewData as $pageData)
         {
-            if(isset($pageData['queryParameters']['page']) && $pageData['queryParameters']['page'] === $page)
+            if(isset($pageData['queryParameters'][self::QUERY_PARAMETER_PAGE_NAME]) && $pageData['queryParameters'][self::QUERY_PARAMETER_PAGE_NAME] === $page)
             {
                 return true;
             }
@@ -253,9 +255,9 @@ class PaginatorService
     private function addAdditionalViewData()
     {
         //Divider a úplně první stránka (pokud má smysl to renderovat)
-        if(isset($this->viewData[array_key_first($this->viewData)]['queryParameters']['page']))
+        if(isset($this->viewData[array_key_first($this->viewData)]['queryParameters'][self::QUERY_PARAMETER_PAGE_NAME]))
         {
-            $difference = $this->viewData[array_key_first($this->viewData)]['queryParameters']['page'] - 1;
+            $difference = $this->viewData[array_key_first($this->viewData)]['queryParameters'][self::QUERY_PARAMETER_PAGE_NAME] - 1;
             if($difference == 1)
             {
                 $this->addViewPage(1, true);
@@ -273,9 +275,9 @@ class PaginatorService
         }
 
         //Divider a úplně poslední stránka (pokud má smysl to renderovat)
-        if(isset($this->viewData[array_key_last($this->viewData)]['queryParameters']['page']))
+        if(isset($this->viewData[array_key_last($this->viewData)]['queryParameters'][self::QUERY_PARAMETER_PAGE_NAME]))
         {
-            $difference = $this->pagesCount - $this->viewData[array_key_last($this->viewData)]['queryParameters']['page'];
+            $difference = $this->pagesCount - $this->viewData[array_key_last($this->viewData)]['queryParameters'][self::QUERY_PARAMETER_PAGE_NAME];
             if($difference == 1)
             {
                 $this->addViewPage($this->pagesCount, false);
