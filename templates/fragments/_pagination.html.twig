@@ -1,15 +1,15 @@
 {% if pagination.getCurrentPageObjects()|length > 0 %}
     <div class="row center-align">
         <ul class="pagination">
-            {% for page in pagination.getViewData() %}
-                {% if page.isDivider %}
+            {% for pageData in pagination.getViewData() %}
+                {% if pageData.isDivider %}
                     <li>
                         ...
                     </li>
                 {% else %}
-                    <li class="{% if page.isCurrent %} active {% else %} waves-effect {% endif %}">
-                        <a href="{{ path(app.request.get('_route'), {page: page.number}) }}">
-                            {{ page.number }}
+                    <li class="{% if pageData.isCurrent %} active {% else %} waves-effect {% endif %}">
+                        <a href="{{ path(app.request.get('_route'), pageData.queryParameters) }}">
+                            {{ pageData.queryParameters.page }}
                         </a>
                     </li>
                 {% endif %}

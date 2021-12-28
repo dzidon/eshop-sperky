@@ -4,6 +4,7 @@ namespace App\Service;
 
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class PaginatorService
 {
@@ -34,6 +35,18 @@ class PaginatorService
      * @var array Data pro klikatelné stránkování
      */
     private array $viewData = [];
+
+    /**
+     * Parametry GET požadavku
+     *
+     * @var array
+     */
+    private array $queryParameters;
+
+    public function __construct(RequestStack $requestStack)
+    {
+        $this->queryParameters = $requestStack->getCurrentRequest()->query->all();
+    }
 
     /**
      * Vezme dotaz, požadovaný počet prvků na stránku, aktuální stránku a získá pouze prvky patřící na danou stránku.
@@ -206,11 +219,13 @@ class PaginatorService
             false => 'array_push',
         ];
 
+        $this->queryParameters['page'] = $page;
         $functionBasedOnPrepend[$prepend] ($this->viewData, [
-            'number' => $page,
+            'queryParameters' => $this->queryParameters,
             'isCurrent' => $page === $this->currentPage,
             'isDivider' => $isDivider,
         ]);
+
         return true;
     }
 
@@ -224,7 +239,7 @@ class PaginatorService
     {
         foreach ($this->viewData as $pageData)
         {
-            if($pageData['number'] === $page)
+            if(isset($pageData['queryParameters']['page']) && $pageData['queryParameters']['page'] === $page)
             {
                 return true;
             }
@@ -238,9 +253,9 @@ class PaginatorService
     private function addAdditionalViewData()
     {
         //Divider a úplně první stránka (pokud má smysl to renderovat)
-        if(isset($this->viewData[array_key_first($this->viewData)]['number']))
+        if(isset($this->viewData[array_key_first($this->viewData)]['queryParameters']['page']))
         {
-            $difference = $this->viewData[array_key_first($this->viewData)]['number'] - 1;
+            $difference = $this->viewData[array_key_first($this->viewData)]['queryParameters']['page'] - 1;
             if($difference == 1)
             {
                 $this->addViewPage(1, true);
@@ -258,9 +273,9 @@ class PaginatorService
         }
 
         //Divider a úplně poslední stránka (pokud má smysl to renderovat)
-        if(isset($this->viewData[array_key_last($this->viewData)]['number']))
+        if(isset($this->viewData[array_key_last($this->viewData)]['queryParameters']['page']))
         {
-            $difference = $this->pagesCount - $this->viewData[array_key_last($this->viewData)]['number'];
+            $difference = $this->pagesCount - $this->viewData[array_key_last($this->viewData)]['queryParameters']['page'];
             if($difference == 1)
             {
                 $this->addViewPage($this->pagesCount, false);
