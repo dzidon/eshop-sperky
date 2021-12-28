@@ -12,6 +12,45 @@
     </div>
 {% endblock form_row %}
 
+{% block form_label -%}
+    {% if label is not same as(false) -%}
+        {% if not compound -%}
+            {% set label_attr = label_attr|merge({'for': id}) %}
+        {%- endif -%}
+        {% if required -%}
+            {% set label_attr = label_attr|merge({'class': (label_attr.class|default('') ~ ' required')|trim}) %}
+        {%- endif -%}
+        {% if label is empty -%}
+            {%- if label_format is not empty -%}
+                {% set label = label_format|replace({
+                    '%name%': name,
+                    '%id%': id,
+                }) %}
+            {%- else -%}
+                {% set label = name|humanize %}
+            {%- endif -%}
+        {%- endif -%}
+        <{{ element|default('label') }}{% if label_attr %}{% with { attr: label_attr } %}{{ block('attributes') }}{% endwith %}{% endif %}>
+        {%- if translation_domain is same as(false) -%}
+            {%- if label_html is same as(false) -%}
+                {{- label -}}
+            {%- else -%}
+                {{- label|raw -}}
+            {%- endif -%}
+        {%- else -%}
+            {%- if label_html is same as(false) -%}
+                {{- label|trans(label_translation_parameters, translation_domain) -}}
+            {%- else -%}
+                {{- label|trans(label_translation_parameters, translation_domain)|raw -}}
+            {%- endif -%}
+        {%- endif -%}
+        {%- if required -%}
+            <span class="required-star"> *</span>
+        {%- endif -%}
+        </{{ element|default('label') }}>
+    {%- endif -%}
+{% endblock form_label %}
+
 {# Errory #}
 {% block form_errors %}
     {% if errors|length > 0 %}
@@ -43,14 +82,26 @@
 
 {# Label checkboxu #}
 {% block checkbox_label %}
-    <span>{{ label }}</span>
+    <span>
+        {{ label }}
+        {% if required %}
+            <span class="required-star">*</span>
+        {% endif %}
+    </span>
 {% endblock checkbox_label %}
+
+{# Label radio buttonu #}
+{% block radio_label %}
+    <span>
+        {{ label }}
+    </span>
+{% endblock radio_label %}
 
 {# Tlačítko #}
 {% block button_widget -%}
     {% set attr = attr|merge({class: (attr.class|default('waves-effect waves-light btn-large light-blue') ~ ' btn')|trim}) %}
     <div class="row center-align">
-        {{- parent() -}}
+        {{ parent() }}
     </div>
 {% endblock %}
 

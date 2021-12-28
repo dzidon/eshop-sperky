@@ -101,6 +101,10 @@ ul.dropdown-content.select-dropdown li span {
     color: #03a9f4;
 }
 
+.select-wrapper input.select-dropdown:focus {
+    border-bottom: 1px solid #03a9f4;
+}
+
 /*
     Pagination
 */
@@ -109,14 +113,7 @@ ul.dropdown-content.select-dropdown li span {
 }
 /* === */
 
-label.required:after {
-    display: initial !important;
-    position: initial !important;
-    top: initial !important;
-    left: initial !important;
-    opacity: initial !important;
-
-    content: " *" !important;
+.required-star {
     color: red;
 }
 

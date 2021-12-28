@@ -168,6 +168,7 @@ class ReviewController extends AbstractController
 
         return $this->render('reviews/review_delete.html.twig', [
             'reviewDeleteForm' => $form->createView(),
+            'reviewInstance' => $review,
             'breadcrumbs' => $this->breadcrumbs->addRoute('review_delete'),
         ]);
     }
