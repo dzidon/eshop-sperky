@@ -2,6 +2,7 @@
 
 namespace App\Security\Voter;
 
+use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
@@ -36,15 +37,20 @@ class PermissionVoter implements VoterInterface
      */
     public function vote(TokenInterface $token, $subject, array $attributes): int
     {
-        $vote = self::ACCESS_ABSTAIN;
+        $user = $token->getUser();
+        if(!$user instanceof User)
+        {
+            return self::ACCESS_DENIED;
+        }
 
+        $vote = self::ACCESS_ABSTAIN;
         foreach ($attributes as $attribute)
         {
             if(isset(self::PERMISSIONS[$attribute]))
             {
                 $vote = self::ACCESS_DENIED;
 
-                if($token->getUser()->hasPermission($attribute))
+                if ($user->hasPermission($attribute))
                 {
                     return self::ACCESS_GRANTED;
                 }

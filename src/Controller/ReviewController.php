@@ -96,8 +96,8 @@ class ReviewController extends AbstractController
         }
         else if($user->getReview() !== null) //nezadal id do url, ale už napsal recenzi, nemůže přidat další
         {
-            $this->addFlash('failure', 'Už jste přidal recenzi.');
-            return $this->redirectToRoute('reviews');
+            $this->addFlash('failure', 'Můžete napsat pouze jednu recenzi. Protože už jste nějakou napsali, byli jste přesměrováni na úpravu vaší stávající recenze.');
+            return $this->redirectToRoute('review_edit', ['id' => $user->getReview()->getId()]);
         }
         else //nezadal id do url + jeste nenapsal zadnou recenzi, takže vytvari novou recenzi
         {
