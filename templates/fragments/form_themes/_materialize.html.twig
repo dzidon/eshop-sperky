@@ -12,6 +12,7 @@
     </div>
 {% endblock form_row %}
 
+{# Label #}
 {% block form_label -%}
     {% if label is not same as(false) -%}
         {% if not compound -%}
@@ -153,3 +154,13 @@
         <label for="{{ child.vars.id }}">☆</label>
     {% endfor %}
 {% endblock star_choice_widget %}
+
+{# Error pod recaptchou #}
+{% block ewz_recaptcha_errors %}
+    {% if errors|length > 0 %}
+        {% for error in errors %}
+            <div class="center-align helper-text red-text">{{ error.message }}</div>
+        {% endfor %}
+    {% endif %}
+{% endblock ewz_recaptcha_errors %}
+

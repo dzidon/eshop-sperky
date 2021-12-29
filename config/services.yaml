@@ -5,11 +5,16 @@
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
     app_site_name: 'Šperky'
+    app_site_phone: '+420 123 456 789'
+    app_site_email: 'demo@localhost.com'
+    app_site_facebook: 'https://www.facebook.com'
+    app_site_instagram: 'https://www.instagram.com'
     app_email_noreply: 'noreply@sperky-test.cz'
     app_email_verify_link_throttle_limit: 600 # seconds
 
     # route titles
     app_page_title.home: 'Domů'
+    app_page_title.contact: 'Kontakt'
     app_page_title.profile: 'Profil'
     app_page_title.profile_change_password: 'Změna hesla'
     app_page_title.profile_verify: 'Ověření emailu'

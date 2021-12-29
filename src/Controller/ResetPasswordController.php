@@ -49,16 +49,7 @@ class ResetPasswordController extends AbstractController
      */
     public function request(MailerInterface $mailer): Response
     {
-        $options = ['email_empty_data' => ''];
-        $user = $this->getUser();
-        if ($user)
-        {
-            $options = [
-                'email_empty_data' => $user->getUserIdentifier(), //pokud je uzivatel prihlaseny, doplnime do formulare jeho email
-            ];
-        }
-
-        $form = $this->createForm(ResetPasswordRequestFormType::class, null, $options);
+        $form = $this->createForm(ResetPasswordRequestFormType::class, null, ['email_empty_data' => ($this->getUser() === null ? '' : $this->getUser()->getUserIdentifier()) ]);
         $form->handleRequest($this->request);
 
         if ($form->isSubmitted() && $form->isValid())

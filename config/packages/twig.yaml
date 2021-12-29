@@ -4,6 +4,10 @@ twig:
         - 'fragments/form_themes/_materialize.html.twig'
     globals:
         site_name: '%app_site_name%'
+        site_phone: '%app_site_phone%'
+        site_email: '%app_site_email%'
+        site_facebook: '%app_site_facebook%'
+        site_instagram: '%app_site_instagram%'
 
 when@test:
     twig:
