@@ -2,10 +2,10 @@
 
 namespace App\Form;
 
+use App\Entity\User;
 use App\Form\Type\PasswordRepeatedType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Security\Core\Validator\Constraints\UserPassword;
@@ -17,6 +17,7 @@ class ChangePasswordLoggedInFormType extends AbstractType
     {
         $builder
             ->add('oldPlainPassword', PasswordType::class, [
+                'mapped' => false,
                 'attr' => ['autocomplete' => 'new-password',
                            'autofocus' => 'autofocus'],
                 'constraints' => [
@@ -27,18 +28,16 @@ class ChangePasswordLoggedInFormType extends AbstractType
                         'message' => 'Zadal jste špatné heslo.',
                     ]),
                 ],
-                'label' => 'Staré heslo',
+                'label' => 'Aktuální heslo',
             ])
-            ->add('newPlainPassword', PasswordRepeatedType::class)
-            ->add('submit', SubmitType::class, [
-                'label' => 'Uložit',
-            ])
+            ->add('plainPassword', PasswordRepeatedType::class)
         ;
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
+            'data_class' => User::class,
             'csrf_protection' => true,
             'csrf_field_name' => '_token',
             'csrf_token_id'   => 'form_password_change_logged_in',

@@ -4,7 +4,6 @@ namespace App\Form;
 
 use App\Form\Type\HiddenTrueType;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -12,12 +11,7 @@ class RegistrationVerifyEmailSendAgainType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder
-            ->add('hiddenTrue', HiddenTrueType::class)
-            ->add('submit', SubmitType::class, [
-                'label' => 'Poslat znovu',
-            ])
-        ;
+        $builder->add('hiddenTrue', HiddenTrueType::class);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

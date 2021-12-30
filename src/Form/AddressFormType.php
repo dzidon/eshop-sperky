@@ -3,10 +3,10 @@
 namespace App\Form;
 
 use App\Entity\Address;
-use App\Form\Type\Address as AddressTypes;
 use App\Form\Type\AgreePrivacyType;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -15,43 +15,41 @@ class AddressFormType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('alias', AddressTypes\AddressAliasType::class, [
+            ->add('alias', TextType::class, [
                 'attr' => ['autofocus' => 'autofocus'],
                 'label' => 'Alias',
             ])
-            ->add('country', AddressTypes\AddressCountryType::class, [
+            ->add('country', ChoiceType::class, [
+                'choices' => Address::COUNTRY_NAMES,
                 'label' => 'Země',
             ])
-            ->add('street', AddressTypes\AddressStreetType::class, [
+            ->add('street', TextType::class, [
                 'label' => 'Ulice a číslo popisné',
             ])
-            ->add('additionalInfo', AddressTypes\AddressAdditionalInfoType::class, [
+            ->add('additionalInfo', TextType::class, [
                 'required' => false,
                 'label' => 'Doplněk adresy',
             ])
-            ->add('town', AddressTypes\AddressTownType::class, [
+            ->add('town', TextType::class, [
                 'label' => 'Obec',
             ])
-            ->add('zip', AddressTypes\AddressZipType::class, [
+            ->add('zip', TextType::class, [
                 'label' => 'PSČ',
             ])
-            ->add('company', AddressTypes\AddressCompanyNameType::class, [
+            ->add('company', TextType::class, [
                 'required' => false,
                 'label' => 'Název firmy',
             ])
-            ->add('ic', AddressTypes\AddressIcType::class, [
+            ->add('ic', TextType::class, [
                 'required' => false,
                 'label' => 'IČ',
             ])
-            ->add('dic', AddressTypes\AddressDicType::class, [
+            ->add('dic', TextType::class, [
                 'required' => false,
                 'label' => 'DIČ',
             ])
             ->add('agreePrivacy', AgreePrivacyType::class, [
                 'label' => 'Souhlasím se zpracováním osobních údajů',
-            ])
-            ->add('submit', SubmitType::class, [
-                'label' => 'Uložit',
             ])
         ;
     }

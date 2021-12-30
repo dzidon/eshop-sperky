@@ -9,6 +9,8 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
+use App\Validation\Compound as AssertCompound;
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
@@ -33,7 +35,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @ORM\Column(type="string", length=180, unique=true)
      *
-     * Validace se resi pres UserEmailType
+     * @AssertCompound\EmailRequirements
+     * @Assert\NotBlank
      */
     private $email;
 
@@ -47,6 +50,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $password;
+
+    /**
+     * @Assert\Length(min=6, minMessage="Minimální počet znaků v hesle: {{ limit }}",
+     *                max=4096, maxMessage="Maximální počet znaků v hesle: {{ limit }}")
+     * @Assert\NotBlank
+     */
+    private $plainPassword;
 
     /**
      * @ORM\Column(type="boolean")
@@ -76,21 +86,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @ORM\Column(type="string", length=1)
      *
-     * Validace se resi pres UserGenderType
+     * @Assert\Choice(choices={User::GENDER_ID_UNDISCLOSED, User::GENDER_ID_MALE, User::GENDER_ID_FEMALE}, message="Zvolte platné oslovení.")
+     * @Assert\NotBlank
      */
     private $gender;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      *
-     * Validace se resi pres UserFirstNameType
+     * @Assert\Length(max=255, maxMessage="Maximální počet znaků v křestním jméně: {{ limit }}")
      */
     private $nameFirst;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      *
-     * Validace se resi pres UserLastNameType
+     * @Assert\Length(max=255, maxMessage="Maximální počet znaků v příjmení: {{ limit }}")
      */
     private $nameLast;
 
@@ -189,6 +200,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    public function getPlainPassword(): ?string
+    {
+        return $this->plainPassword;
+    }
+
+    public function setPlainPassword(?string $plainPassword): self
+    {
+        $this->plainPassword = $plainPassword;
+
+        return $this;
+    }
+
     /**
      * Returning a salt is only needed, if you are not using a modern
      * hashing algorithm (e.g. bcrypt or sodium) in your security.yaml.
@@ -205,8 +228,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function eraseCredentials()
     {
-        // If you store any temporary, sensitive data on the user, clear it here
-        // $this->plainPassword = null;
+        $this->plainPassword = null;
     }
 
     public function isVerified(): bool

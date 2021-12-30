@@ -2,6 +2,7 @@
 
 namespace App\Form;
 
+use App\Validation\Compound\EmailRequirements;
 use EWZ\Bundle\RecaptchaBundle\Form\Type\EWZRecaptchaType;
 use EWZ\Bundle\RecaptchaBundle\Validator\Constraints\IsTrue as RecaptchaTrue;
 use Symfony\Component\Form\AbstractType;
@@ -10,7 +11,6 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
@@ -23,13 +23,7 @@ class ContactFormType extends AbstractType
                 'attr' => ['autocomplete' => 'email',
                            'autofocus' => 'autofocus'],
                 'constraints' => [
-                    new Email([
-                        'message' => '{{ value }} není platná e-mailová adresa.',
-                    ]),
-                    new Length([
-                        'max' => 180,
-                        'maxMessage' => 'Maximální počet znaků v e-mailu: {{ limit }}',
-                    ]),
+                    new EmailRequirements(),
                     new NotBlank([
                         'message' => 'Zadejte email.',
                     ]),

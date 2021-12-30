@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\AddressRepository;
 use Doctrine\ORM\Mapping as ORM;
 use App\Validation as AssertCustom;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=AddressRepository::class)
@@ -14,9 +15,13 @@ class Address
 {
     public const COUNTRY_CODE_CZ = 'CS';
     public const COUNTRY_CODE_SK = 'SK';
+    public const COUNTRY_CODES = [
+        self::COUNTRY_CODE_CZ,
+        self::COUNTRY_CODE_SK,
+    ];
     public const COUNTRY_NAMES = [
-        self::COUNTRY_CODE_CZ => 'Česká republika',
-        self::COUNTRY_CODE_SK => 'Slovensko',
+        'Česká republika' => self::COUNTRY_CODE_CZ,
+        'Slovensko' => self::COUNTRY_CODE_SK,
     ];
 
     /**
@@ -29,49 +34,53 @@ class Address
     /**
      * @ORM\Column(type="string", length=32)
      *
-     * Validace se resi pres AddressCountryType
+     * @Assert\Choice(choices=Address::COUNTRY_CODES, message="Zvolte platnou zemi.")
+     * @Assert\NotBlank
      */
     private $country;
 
     /**
      * @ORM\Column(type="string", length=255)
      *
-     * Validace se resi pres AddressStreetType
+     * @AssertCustom\Compound\StreetRequirements
+     * @Assert\NotBlank
      */
     private $street;
 
     /**
      * @ORM\Column(type="string", length=255)
      *
-     * Validace se resi pres AddressTownType
+     * @Assert\Length(max=255, maxMessage="Maximální počet znaků v obci: {{ limit }}")
+     * @Assert\NotBlank
      */
     private $town;
 
     /**
      * @ORM\Column(type="string", length=5)
      *
-     * Validace se resi pres AddressZipType
+     * @AssertCustom\ZipCode
+     * @Assert\NotBlank
      */
     private $zip;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      *
-     * Validace se resi pres AddressCompanyNameType
+     * @Assert\Length(max=255, maxMessage="Maximální počet znaků v názvu firmy: {{ limit }}")
      */
     private $company;
 
     /**
      * @ORM\Column(type="string", length=8, nullable=true)
      *
-     * Validace se resi pres AddressIcType
+     * @AssertCustom\Ic
      */
     private $ic;
 
     /**
      * @ORM\Column(type="string", length=12, nullable=true)
      *
-     * Validace se resi pres AddressDicType
+     * @AssertCustom\Dic
      */
     private $dic;
 
@@ -84,14 +93,15 @@ class Address
     /**
      * @ORM\Column(type="string", length=255)
      *
-     * Validace se resi pres AddressDicType
+     * @Assert\Length(max=255, maxMessage="Maximální počet znaků v aliasu: {{ limit }}")
+     * @Assert\NotBlank
      */
     private $alias;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      *
-     * Validace se resi pres AddressAdditionalInfoType
+     * @Assert\Length(max=255, maxMessage="Maximální počet znaků v doplňku adresy: {{ limit }}")
      */
     private $additionalInfo;
 
@@ -108,12 +118,19 @@ class Address
     /**
      * Vrátí název země podle kódu
      *
-     * @param string $code
+     * @param string $searchedCode
      * @return string
      */
-    public static function getCountryNameByCode(string $code): string
+    public static function getCountryNameByCode(string $searchedCode): string
     {
-        return self::COUNTRY_NAMES[$code];
+        foreach (self::COUNTRY_NAMES as $name => $code)
+        {
+            if($searchedCode === $code)
+            {
+                return $name;
+            }
+        }
+        return 'Nenalezeno';
     }
 
     public function getId(): ?int

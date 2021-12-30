@@ -9,6 +9,7 @@ use App\Service\BreadcrumbsService;
 use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -50,6 +51,9 @@ class ResetPasswordController extends AbstractController
     public function request(MailerInterface $mailer): Response
     {
         $form = $this->createForm(ResetPasswordRequestFormType::class, null, ['email_empty_data' => ($this->getUser() === null ? '' : $this->getUser()->getUserIdentifier()) ]);
+        $form->add('submit', SubmitType::class, [
+            'label' => 'Poslat odkaz',
+        ]);
         $form->handleRequest($this->request);
 
         if ($form->isSubmitted() && $form->isValid())
@@ -120,7 +124,8 @@ class ResetPasswordController extends AbstractController
         }
 
         // The token is valid; allow the user to change their password.
-        $form = $this->createForm(ChangePasswordFormType::class);
+        $form = $this->createForm(ChangePasswordFormType::class, $user);
+        $form->add('submit', SubmitType::class, ['label' => 'Změnit']);
         $form->handleRequest($this->request);
 
         if ($form->isSubmitted() && $form->isValid())
@@ -131,11 +136,12 @@ class ResetPasswordController extends AbstractController
             // Encode(hash) the plain password, and set it.
             $encodedPassword = $userPasswordHasherInterface->hashPassword(
                 $user,
-                $form->get('plainPassword')->getData()
+                $user->getPlainPassword(),
             );
 
             $user->setPassword($encodedPassword);
             $user->setIsVerified(true);
+
             $em = $this->getDoctrine()->getManager();
             $em->persist($user);
             $em->flush();
@@ -144,7 +150,6 @@ class ResetPasswordController extends AbstractController
             $this->cleanSessionAfterReset();
 
             $this->addFlash('success', "Vaše heslo bylo úspěšně změněno.");
-
             $this->logger->info(sprintf("User %s (ID: %s) has changed their password (via email).", $user->getUserIdentifier(), $user->getId()));
 
             return $this->redirectToRoute('home');

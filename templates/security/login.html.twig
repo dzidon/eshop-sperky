@@ -21,11 +21,7 @@
                             <label for="inputEmail" class="required">Email:</label>
 
                             {% if error %}
-                                <ul>
-                                    <li>
-                                        <span class="helper-text red-text">{{ error.messageKey|trans(error.messageData, 'security') }}</span>
-                                    </li>
-                                </ul>
+                                <span class="helper-text red-text">{{ error.messageKey|trans(error.messageData, 'security') }}</span>
                             {% endif %}
                         </div>
                     </div>

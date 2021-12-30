@@ -8,6 +8,7 @@ use App\Security\EmailVerifier;
 use App\Service\BreadcrumbsService;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
@@ -50,6 +51,7 @@ class RegistrationController extends AbstractController
 
         $user = $this->getDoctrine()->getRepository(User::class)->createNew();
         $form = $this->createForm(RegistrationFormType::class, $user);
+        $form->add('submit', SubmitType::class, ['label' => 'Zaregistrovat se']);
         $form->handleRequest($this->request);
 
         if ($form->isSubmitted() && $form->isValid())
@@ -58,7 +60,7 @@ class RegistrationController extends AbstractController
             $user->setPassword(
             $userPasswordHasherInterface->hashPassword(
                     $user,
-                    $form->get('plainPassword')->getData()
+                    $user->getPlainPassword(),
                 )
             );
 
@@ -105,7 +107,6 @@ class RegistrationController extends AbstractController
         }
 
         $this->addFlash('success', 'Vaše e-mailová adresa byla ověřena.');
-
         $this->logger->info(sprintf("User %s (ID: %s) has verified their email.", $user->getUserIdentifier(), $user->getId()));
 
         return $this->redirectToRoute('profile');

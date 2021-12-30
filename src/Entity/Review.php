@@ -4,13 +4,14 @@ namespace App\Entity;
 
 use App\Repository\ReviewRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=ReviewRepository::class)
  */
 class Review
 {
-    public const STAR_VALUES = [5,4,3,2,1];
+    public const STAR_VALUES = [5.0,4.0,3.0,2.0,1.0];
     public const STAR_COUNT = 5;
 
     /**
@@ -23,14 +24,15 @@ class Review
     /**
      * @ORM\Column(type="float")
      *
-     * Validace se resi pres ReviewStarsType
+     * @Assert\Choice(choices=Review::STAR_VALUES, message="Zvolte platné hodnocení.")
+     * @Assert\NotBlank(message="Vyberte hodnocení.")
      */
     private $stars;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      *
-     * Validace se resi pres ReviewTextareaType
+     * @Assert\Length(max=255, maxMessage="Maximální počet znaků v textu recenze: {{ limit }}")
      */
     private $text;
 

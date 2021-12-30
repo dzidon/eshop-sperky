@@ -3,9 +3,9 @@
 namespace App\Form;
 
 use App\Entity\Review;
-use App\Form\Type\Review as ReviewTypes;
+use App\Form\Type\ReviewStarsType;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -14,15 +14,12 @@ class ReviewFormType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('stars', ReviewTypes\ReviewStarsType::class, [
+            ->add('stars', ReviewStarsType::class, [
                 'label' => 'Hodnocení',
             ])
-            ->add('text', ReviewTypes\ReviewTextareaType::class, [
+            ->add('text', TextareaType::class, [
                 'required' => false,
                 'label' => 'Text',
-            ])
-            ->add('submit', SubmitType::class, [
-                'label' => 'Uložit',
             ])
         ;
     }

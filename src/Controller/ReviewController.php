@@ -9,6 +9,7 @@ use App\Service\BreadcrumbsService;
 use App\Service\PaginatorService;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -111,6 +112,7 @@ class ReviewController extends AbstractController
         }
 
         $form = $this->createForm(ReviewFormType::class, $review);
+        $form->add('submit', SubmitType::class, ['label' => 'Uložit']);
         $form->handleRequest($this->request);
 
         if ($form->isSubmitted() && $form->isValid())
@@ -161,6 +163,12 @@ class ReviewController extends AbstractController
         }
 
         $form = $this->createForm(ReviewDeleteFormType::class);
+        $form->add('submit',SubmitType::class, [
+            'label' => 'Smazat',
+            'attr' => [
+                'class' => 'waves-effect waves-light btn-large red',
+            ],
+        ]);
         $form->handleRequest($this->request);
 
         if ($form->isSubmitted() && $form->isValid())

@@ -13,6 +13,7 @@ use App\Service\BreadcrumbsService;
 use App\Service\PaginatorService;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -54,6 +55,7 @@ class ProfileController extends AbstractController
         if($user->isVerified())
         {
             $form = $this->createForm(PersonalInfoFormType::class, $user);
+            $form->add('submit', SubmitType::class, ['label' => 'Uložit']);
             $form->handleRequest($this->request);
 
             if ($form->isSubmitted() && $form->isValid())
@@ -95,7 +97,8 @@ class ProfileController extends AbstractController
             return $this->redirectToRoute('forgot_password_request');
         }
 
-        $form = $this->createForm(ChangePasswordLoggedInFormType::class);
+        $form = $this->createForm(ChangePasswordLoggedInFormType::class, $user);
+        $form->add('submit', SubmitType::class, ['label' => 'Uložit']);
         $form->handleRequest($this->request);
 
         if ($form->isSubmitted() && $form->isValid())
@@ -103,7 +106,7 @@ class ProfileController extends AbstractController
             $user->setPassword(
                 $userPasswordHasherInterface->hashPassword(
                     $user,
-                    $form->get('newPlainPassword')->getData()
+                    $user->getPlainPassword()
                 )
             );
 
@@ -138,6 +141,7 @@ class ProfileController extends AbstractController
         }
 
         $form = $this->createForm(RegistrationVerifyEmailSendAgainType::class);
+        $form->add('submit', SubmitType::class, ['label' => 'Poslat znovu']);
         $form->handleRequest($this->request);
 
         if ($form->isSubmitted() && $form->isValid())
@@ -224,6 +228,7 @@ class ProfileController extends AbstractController
         }
 
         $form = $this->createForm(AddressFormType::class, $address);
+        $form->add('submit', SubmitType::class, ['label' => 'Uložit']);
         $form->handleRequest($this->request);
 
         if ($form->isSubmitted() && $form->isValid())
@@ -272,6 +277,12 @@ class ProfileController extends AbstractController
         }
 
         $form = $this->createForm(AddressDeleteFormType::class);
+        $form->add('submit', SubmitType::class, [
+            'label' => 'Smazat',
+            'attr' => [
+                'class' => 'waves-effect waves-light btn-large red',
+            ],
+        ]);
         $form->handleRequest($this->request);
 
         if ($form->isSubmitted() && $form->isValid())
