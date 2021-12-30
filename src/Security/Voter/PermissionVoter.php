@@ -3,14 +3,11 @@
 namespace App\Security\Voter;
 
 use App\Entity\User;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 class PermissionVoter implements VoterInterface
 {
-    private EntityManagerInterface $entityManager;
-
     const CATEGORY_REVIEWS = 'reviews';
 
     /*
@@ -26,11 +23,6 @@ class PermissionVoter implements VoterInterface
             'category' => self::CATEGORY_REVIEWS,
         ],
     ];
-
-    public function __construct(EntityManagerInterface $entityManager)
-    {
-        $this->entityManager = $entityManager;
-    }
 
     /**
      * {@inheritdoc}
@@ -50,7 +42,7 @@ class PermissionVoter implements VoterInterface
             {
                 $vote = self::ACCESS_DENIED;
 
-                if ($user->hasPermission($attribute))
+                if($user->hasPermission($attribute))
                 {
                     return self::ACCESS_GRANTED;
                 }

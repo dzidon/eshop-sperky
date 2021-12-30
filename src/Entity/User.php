@@ -53,8 +53,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * @Assert\Length(min=6, minMessage="Minimální počet znaků v hesle: {{ limit }}",
-     *                max=4096, maxMessage="Maximální počet znaků v hesle: {{ limit }}")
-     * @Assert\NotBlank
+     *                max=4096, maxMessage="Maximální počet znaků v hesle: {{ limit }}",
+     *                groups={"validateNewPassword"})
+     * @Assert\NotBlank(groups={"validateNewPassword"})
      */
     private $plainPassword;
 
@@ -472,18 +473,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 return true;
             }
         }
-
-        return false;
-    }
-
-    /**
-     * Vrátí true, pokud uživatel může vstoupit do administrace (má takové oprávnění, se kterým jde v administraci něco dělat)
-     *
-     * @return bool
-     */
-    public function canEnterAdmin(): bool
-    {
-        //TODO...
 
         return false;
     }

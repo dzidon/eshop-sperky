@@ -31,7 +31,7 @@
                         <li><a href="#" class="black-text"> <i class="material-icons left">shopping_cart</i> Košík <span class="cart-badge light-blue white-text">25</span></a></li>
 
                         {% if is_granted('IS_AUTHENTICATED_REMEMBERED') %}
-                            {% if app.user.canEnterAdmin() %}
+                            {% if is_granted('admin_permission_overview') %}
                                 <ul id="dropdown_nav_profile_desktop" class="dropdown-content">
                                     <li><a href=" {{ path('profile') }} " class="black-text">Osobní</a></li>
                                     <li><a href="#!" class="black-text">Administrace</a></li>
@@ -59,7 +59,7 @@
             <li><a href="#"> <i class="material-icons left">shopping_cart</i> Košík <span class="cart-badge light-blue white-text">25</span></a></li>
 
             {% if is_granted('IS_AUTHENTICATED_REMEMBERED') %}
-                {% if app.user.canEnterAdmin() %}
+                {% if is_granted('admin_permission_overview') %}
                     <ul id="dropdown_nav_profile_mobile" class="dropdown-content black-text">
                         <li><a href=" {{ path('profile') }} ">Osobní</a></li>
                         <li><a href="#!">Administrace</a></li>
