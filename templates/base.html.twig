@@ -1,3 +1,8 @@
+{% set granted = {
+     'IS_AUTHENTICATED_REMEMBERED': is_granted('IS_AUTHENTICATED_REMEMBERED'),
+     'admin_permission_overview': is_granted('admin_permission_overview')
+} %}
+
 <!DOCTYPE html>
 <html lang="cs">
     <head>
@@ -30,11 +35,11 @@
                         <li><a href="#" class="black-text"> <i class="material-icons left">filter_vintage</i> Produkty</a></li>
                         <li><a href="#" class="black-text"> <i class="material-icons left">shopping_cart</i> Košík <span class="cart-badge light-blue white-text">25</span></a></li>
 
-                        {% if is_granted('IS_AUTHENTICATED_REMEMBERED') %}
-                            {% if is_granted('admin_permission_overview') %}
+                        {% if granted.IS_AUTHENTICATED_REMEMBERED %}
+                            {% if granted.admin_permission_overview  %}
                                 <ul id="dropdown_nav_profile_desktop" class="dropdown-content">
                                     <li><a href=" {{ path('profile') }} " class="black-text">Osobní</a></li>
-                                    <li><a href="#!" class="black-text">Administrace</a></li>
+                                    <li><a href=" {{ path('admin_permission_overview') }} " class="black-text">Admin</a></li>
                                 </ul>
                                 <li>
                                     <a href="#!" class="dropdown-trigger black-text" data-target="dropdown_nav_profile_desktop"> <i class="material-icons left">account_circle</i> Profil <i class="material-icons right">arrow_drop_down</i></a>
@@ -58,11 +63,11 @@
             <li><a href="#"> <i class="material-icons left">filter_vintage</i> Produkty</a></li>
             <li><a href="#"> <i class="material-icons left">shopping_cart</i> Košík <span class="cart-badge light-blue white-text">25</span></a></li>
 
-            {% if is_granted('IS_AUTHENTICATED_REMEMBERED') %}
-                {% if is_granted('admin_permission_overview') %}
+            {% if granted.IS_AUTHENTICATED_REMEMBERED %}
+                {% if granted.admin_permission_overview  %}
                     <ul id="dropdown_nav_profile_mobile" class="dropdown-content black-text">
                         <li><a href=" {{ path('profile') }} ">Osobní</a></li>
-                        <li><a href="#!">Administrace</a></li>
+                        <li><a href=" {{ path('admin_permission_overview') }} ">Admin</a></li>
                     </ul>
                     <li>
                         <a href="#!" class="dropdown-trigger" data-target="dropdown_nav_profile_mobile"> <i class="material-icons left">account_circle</i> Profil <i class="material-icons right margin-0">arrow_drop_down</i></a>

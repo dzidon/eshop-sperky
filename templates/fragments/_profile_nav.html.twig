@@ -1,11 +1,21 @@
 {% set route = app.request.get('_route') %}
 
 <div class="collection">
-    <a href="{{ path('profile') }}" class="collection-item {% if route == 'profile' %} active {% endif %}">Přehled</a>
-    <a href="{{ path('profile_change_password') }}" class="collection-item {% if route == 'profile_change_password' %} active {% endif %}">Změna hesla</a>
+    <a href="{{ path('profile') }}" class="collection-item {% if route == 'profile' %} active {% endif %}">
+        {{ get_parameter('app_page_title.profile') }}
+    </a>
+
+    <a href="{{ path('profile_change_password') }}" class="collection-item {% if route == 'profile_change_password' %} active {% endif %}">
+        {{ get_parameter('app_page_title.profile_change_password') }}
+    </a>
+
     {% if app.user.isVerified == true %}
-        <a href="{{ path('profile_addresses') }}" class="collection-item {% if route == 'profile_addresses' or route == 'profile_address' or route == 'profile_address_delete' %} active {% endif %}">Adresy</a>
+        <a href="{{ path('profile_addresses') }}" class="collection-item {% if route == 'profile_addresses' or route == 'profile_address' or route == 'profile_address_delete' %} active {% endif %}">
+            {{ get_parameter('app_page_title.profile_addresses') }}
+        </a>
     {% else %}
-        <a href="{{ path('profile_verify') }}" class="collection-item {% if route == 'profile_verify' %} active {% endif %}">Ověření emailu</a>
+        <a href="{{ path('profile_verify') }}" class="collection-item {% if route == 'profile_verify' %} active {% endif %}">
+            {{ get_parameter('app_page_title.profile_verify') }}
+        </a>
     {% endif %}
 </div>

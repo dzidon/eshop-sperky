@@ -4,7 +4,6 @@ namespace App\Security\Voter;
 
 use App\Entity\Review;
 use App\Entity\User;
-use LogicException;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
@@ -45,24 +44,6 @@ class ReviewVoter extends Voter
         /** @var Review $review */
         $review = $subject;
 
-        switch ($attribute)
-        {
-            case self::EDIT:
-                return $this->canEdit($review, $user);
-            case self::DELETE:
-                return $this->canDelete($review, $user);
-        }
-
-        throw new LogicException('This code should not be reached!');
-    }
-
-    private function canEdit(Review $review, User $user): bool
-    {
-        return $review->getUser() === $user; //TODO: admin permission
-    }
-
-    private function canDelete(Review $review, User $user): bool
-    {
-        return $review->getUser() === $user; //TODO: admin permission
+        return $review->getUser() === $user;
     }
 }

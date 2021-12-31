@@ -41,7 +41,7 @@ class ProfileController extends AbstractController
         $this->breadcrumbs = $breadcrumbs;
         $this->request = $requestStack->getCurrentRequest();
 
-        $this->breadcrumbs->addRoute('home')->addRoute('profile');
+        $this->breadcrumbs->addRoute('home')->addRoute('profile', [], 'Profil');
     }
 
     /**

@@ -15,7 +15,7 @@ parameters:
     # route titles
     app_page_title.home: 'Domů'
     app_page_title.contact: 'Kontakt'
-    app_page_title.profile: 'Profil'
+    app_page_title.profile: 'Osobní údaje'
     app_page_title.profile_change_password: 'Změna hesla'
     app_page_title.profile_verify: 'Ověření emailu'
     app_page_title.profile_addresses: 'Adresy'
@@ -33,6 +33,7 @@ parameters:
     app_page_title.reset_password: 'Obnova hesla'
     app_page_title.register: 'Registrace'
     app_page_title.login: 'Přihlášení'
+    app_page_title.admin_permission_overview: 'Moje oprávnění'
 
 services:
     # default configuration for services in *this* file

@@ -69,16 +69,6 @@ class ReviewController extends AbstractController
     public function reviewEdit($id = null): Response
     {
         $user = $this->getUser();
-        if (!$user->isVerified())
-        {
-            $this->addFlash('failure', 'Nemáte ověřený účet.');
-            return $this->redirectToRoute('reviews');
-        }
-        if ($user->getNameFirst() === null || $user->getNameLast() === null)
-        {
-            $this->addFlash('failure', 'Musíte mít nastavené jméno a příjmení.');
-            return $this->redirectToRoute('reviews');
-        }
 
         if($id !== null) //zadal id do url
         {
@@ -88,27 +78,46 @@ class ReviewController extends AbstractController
             {
                 throw new NotFoundHttpException('Recenze nenalezena.');
             }
-            else if(!$this->isGranted('review_edit', $review)) //recenzi to naslo, jenze patri jinemu uzivateli
+
+            if(!$this->isGranted('review_edit', $review)) //recenzi to naslo, ale nemuze ji editovat ani jako vlastnik a ani jako admin
             {
                 throw new AccessDeniedHttpException('Tuto recenzi nemůžete editovat.');
             }
 
+            if ($review->getUser() !== $user && !$this->isGranted('IS_AUTHENTICATED_FULLY')) //admin prihlaseny pres rememberme cookie se snazi upravit cizi recenzi, takze by si mel zopakovat prihlaseni
+            {
+                throw $this->createAccessDeniedException();
+            }
+
+            if ($review->getUser() === $user && !$user->fullNameIsSet())
+            {
+                $this->addFlash('warning', 'Nemáte nastavené jméno a příjmení, vaše recenze nebude vidět.');
+            }
+
             $this->breadcrumbs->addRoute('review_edit', ['id' => $review->getId()], '', 'edit');
         }
-        else if($user->getReview() !== null) //nezadal id do url, ale už napsal recenzi, nemůže přidat další
+        else //nezadal id do url
         {
-            $this->addFlash('failure', 'Můžete napsat pouze jednu recenzi. Protože už jste nějakou napsali, byli jste přesměrováni na úpravu vaší stávající recenze.');
-            return $this->redirectToRoute('review_edit', ['id' => $user->getReview()->getId()]);
-        }
-        else //nezadal id do url + jeste nenapsal zadnou recenzi, takže vytvari novou recenzi
-        {
+            if (!$user->isVerified())
+            {
+                $this->addFlash('failure', 'Nemáte ověřený účet.');
+                return $this->redirectToRoute('reviews');
+            }
+
+            if (!$user->fullNameIsSet())
+            {
+                $this->addFlash('failure', 'Musíte mít nastavené jméno a příjmení.');
+                return $this->redirectToRoute('reviews');
+            }
+
+            if($user->getReview() !== null)
+            {
+                $this->addFlash('failure', 'Můžete napsat pouze jednu recenzi. Protože už jste nějakou napsali, byli jste přesměrováni na úpravu vaší stávající recenze.');
+                return $this->redirectToRoute('review_edit', ['id' => $user->getReview()->getId()]);
+            }
+
             $review = $this->getDoctrine()->getRepository(Review::class)->createNew($user);
             $this->breadcrumbs->addRoute('review_edit', [], '', 'new');
-        }
-
-        if ($review->getUser() !== null && $review->getUser() !== $user && !$this->isGranted('IS_AUTHENTICATED_FULLY')) //admin prihlaseny pres rememberme cookie se snazi upravit cizi recenzi
-        {
-            throw $this->createAccessDeniedException();
         }
 
         $form = $this->createForm(ReviewFormType::class, $review);
@@ -152,7 +161,7 @@ class ReviewController extends AbstractController
         {
             throw new NotFoundHttpException('Recenze nenalezena.');
         }
-        else if(!$this->isGranted('review_delete', $review)) //recenzi to naslo, jenze patri jinemu uzivateli
+        else if(!$this->isGranted('review_delete', $review)) //recenzi to naslo, ale nemuze ji smazat ani jako vlastnik a ani jako admin
         {
             throw new AccessDeniedHttpException('Tuto recenzi nemůžete smazat.');
         }

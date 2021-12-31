@@ -371,6 +371,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    /**
+     * Vrátí true, pokud je nastavené jméno a příjmení zároveň
+     *
+     * @return bool
+     */
+    public function fullNameIsSet(): bool
+    {
+        return $this->getNameFirst() !== null && $this->getNameLast() !== null;
+    }
+
     public function getPhoneNumber()
     {
         return $this->phoneNumber;

@@ -42,7 +42,7 @@
                 </form>
 
                 <div class="row center-align">
-                    {% if not is_granted('IS_AUTHENTICATED_REMEMBERED') %}
+                    {% if not granted.IS_AUTHENTICATED_REMEMBERED %}
                         <div>
                             Ještě nemáte účet? <a href="{{ path('register') }}">Zaregistrovat se</a>
                         </div>
