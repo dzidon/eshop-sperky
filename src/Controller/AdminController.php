@@ -36,9 +36,8 @@ class AdminController extends AbstractController
      */
     public function overview(): Response
     {
-
-
         return $this->render('admin/admin_permission_overview.html.twig', [
+            'permissionsGrouped' => $this->getUser()->getPermissionsGrouped(),
             'breadcrumbs' => $this->breadcrumbs->setPageTitleByRoute('admin_permission_overview'),
         ]);
     }

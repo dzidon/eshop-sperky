@@ -451,6 +451,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->permissions;
     }
 
+    public function getPermissionsGrouped(): array
+    {
+        $permissionsGrouped = array();
+        foreach ($this->permissions as $permission)
+        {
+            $permissionsGrouped[$permission->getCategory()][] = $permission;
+        }
+
+        return $permissionsGrouped;
+    }
+
     public function addPermission(Permission $permission): self
     {
         if (!$this->permissions->contains($permission))

@@ -1,8 +1,3 @@
-{% set granted = {
-     'IS_AUTHENTICATED_REMEMBERED': is_granted('IS_AUTHENTICATED_REMEMBERED'),
-     'admin_permission_overview': is_granted('admin_permission_overview')
-} %}
-
 <!DOCTYPE html>
 <html lang="cs">
     <head>
@@ -35,8 +30,11 @@
                         <li><a href="#" class="black-text"> <i class="material-icons left">filter_vintage</i> Produkty</a></li>
                         <li><a href="#" class="black-text"> <i class="material-icons left">shopping_cart</i> Košík <span class="cart-badge light-blue white-text">25</span></a></li>
 
-                        {% if granted.IS_AUTHENTICATED_REMEMBERED %}
-                            {% if granted.admin_permission_overview  %}
+                        {% set is_authenticated_remembered = is_granted('IS_AUTHENTICATED_REMEMBERED') %}
+                        {% set can_enter_admin = is_granted('admin_permission_overview') %}
+
+                        {% if is_authenticated_remembered %}
+                            {% if can_enter_admin  %}
                                 <ul id="dropdown_nav_profile_desktop" class="dropdown-content">
                                     <li><a href=" {{ path('profile') }} " class="black-text">Osobní</a></li>
                                     <li><a href=" {{ path('admin_permission_overview') }} " class="black-text">Admin</a></li>
@@ -63,8 +61,8 @@
             <li><a href="#"> <i class="material-icons left">filter_vintage</i> Produkty</a></li>
             <li><a href="#"> <i class="material-icons left">shopping_cart</i> Košík <span class="cart-badge light-blue white-text">25</span></a></li>
 
-            {% if granted.IS_AUTHENTICATED_REMEMBERED %}
-                {% if granted.admin_permission_overview  %}
+            {% if is_authenticated_remembered %}
+                {% if can_enter_admin  %}
                     <ul id="dropdown_nav_profile_mobile" class="dropdown-content black-text">
                         <li><a href=" {{ path('profile') }} ">Osobní</a></li>
                         <li><a href=" {{ path('admin_permission_overview') }} ">Admin</a></li>

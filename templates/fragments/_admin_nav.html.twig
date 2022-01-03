@@ -1,7 +1,7 @@
 {% set route = app.request.get('_route') %}
 
 <div class="collection">
-    {% if granted.admin_permission_overview %}
+    {% if can_enter_admin %}
         <a href="{{ path('admin_permission_overview') }}" class="collection-item {% if route == 'admin_permission_overview' %} active {% endif %}">
             {{ get_parameter('app_page_title.admin_permission_overview') }}
         </a>

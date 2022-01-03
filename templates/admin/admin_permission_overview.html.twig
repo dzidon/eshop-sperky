@@ -8,7 +8,17 @@
         </div>
 
         <div class="row">
-            prehled...
+            {% for groupName, groupElements in permissionsGrouped %}
+                <h4>
+                    {{ groupName }}
+                </h4>
+
+                <ul>
+                    {% for permission in groupElements %}
+                        <li>- {{ permission.getName() }}</li>
+                    {% endfor %}
+                </ul>
+            {% endfor %}
         </div>
     </div>
 
