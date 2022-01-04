@@ -34,6 +34,7 @@ parameters:
     app_page_title.register: 'Registrace'
     app_page_title.login: 'Přihlášení'
     app_page_title.admin_permission_overview: 'Moje oprávnění'
+    app_page_title.admin_user_management: 'Správa uživatelů'
 
 services:
     # default configuration for services in *this* file

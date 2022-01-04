@@ -9,11 +9,13 @@ use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 class PermissionVoter implements VoterInterface
 {
     const CATEGORY_REVIEWS = 'Recenze';
+    const CATEGORY_USERS = 'Správa uživatelů';
 
     /*
      * (!!!) Po úpravě téhle konstanty je nutné vyvolat příkaz 'php bin/console app:refresh-permissions', aby se aktualizoval obsah tabulky 'permission'
      */
     public const PERMISSIONS = [
+        //recenze
         'review_edit' => [
             'name' => 'Editace recenzí',
             'category' => self::CATEGORY_REVIEWS,
@@ -21,6 +23,20 @@ class PermissionVoter implements VoterInterface
         'review_delete' => [
             'name' => 'Mazání recenzí',
             'category' => self::CATEGORY_REVIEWS,
+        ],
+
+        //sprava uzivatelu
+        'user_edit_credentials' => [
+            'name' => 'Editace osobních údajů uživatelů',
+            'category' => self::CATEGORY_USERS,
+        ],
+        'user_block_reviews' => [
+            'name' => 'Zablokování možnosti napsání recenze uživatelů',
+            'category' => self::CATEGORY_USERS,
+        ],
+        'user_set_permissions' => [
+            'name' => 'Nastavení oprávnění uživatelů',
+            'category' => self::CATEGORY_USERS,
         ],
     ];
 

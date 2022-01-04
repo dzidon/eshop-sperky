@@ -18,9 +18,20 @@
                     {# Flash zprávy #}
                     {{ include('fragments/_flash_messages.html.twig') }}
 
-                    {% block profile_body %}
+                    <div class="section">
+                        <div class="row">
+                            <h3 class="no-mar-top">
+                                {{ breadcrumbs.getPageTitle() }}
+                                {% block profile_subheading_extra %}
 
-                    {% endblock %}
+                                {% endblock %}
+                            </h3>
+                        </div>
+
+                        {% block profile_body %}
+
+                        {% endblock %}
+                    </div>
                 </div>
             </div>
         </div>

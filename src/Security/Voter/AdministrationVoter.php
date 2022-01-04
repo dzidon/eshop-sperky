@@ -9,12 +9,12 @@ use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 class AdministrationVoter implements VoterInterface
 {
     const SECTION_PERMISSION_OVERVIEW = 'admin_permission_overview';
-    const SECTION_USER_MANAGER = 'admin_user_manager';
+    const SECTION_USER_MANAGEMENT = 'admin_user_management';
 
     const REQUIRED_PERMISSIONS = [
         self::SECTION_PERMISSION_OVERVIEW => '_any',
-        self::SECTION_USER_MANAGER => [
-            '...'
+        self::SECTION_USER_MANAGEMENT => [
+            'user_edit_credentials', 'user_block_reviews', 'user_set_permissions'
         ],
     ];
 

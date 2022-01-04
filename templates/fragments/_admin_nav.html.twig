@@ -6,4 +6,10 @@
             {{ get_parameter('app_page_title.admin_permission_overview') }}
         </a>
     {% endif %}
+
+    {% if is_granted('admin_user_management') %}
+        <a href="{{ path('admin_user_management') }}" class="collection-item {% if route == 'admin_user_management' %} active {% endif %}">
+            {{ get_parameter('app_page_title.admin_user_management') }}
+        </a>
+    {% endif %}
 </div>

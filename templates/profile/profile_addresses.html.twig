@@ -1,54 +1,48 @@
 {% extends 'profile/profile_base.html.twig' %}
 
+{% block profile_subheading_extra %}
+    <a href="{{ path('profile_address') }}" class="btn-floating btn-medium waves-effect waves-light light-blue"><i class="material-icons">add</i></a>
+{% endblock %}
+
 {% block profile_body %}
-
-    <div class="section">
+    {% if addresses is empty %}
         <div class="row">
-            <h3 class="no-mar-top">
-                {{ breadcrumbs.getPageTitle() }}
-                <a href="{{ path('profile_address') }}" class="btn-floating btn-medium waves-effect waves-light light-blue"><i class="material-icons">add</i></a>
-            </h3>
+            Nemáte uložené žádné adresy. Klikněte na "+" pro přidání.
         </div>
-
-        {% if addresses is empty %}
+    {% else %}
+        {% for address in addresses %}
             <div class="row">
-                Nemáte uložené žádné adresy. Klikněte na "+" pro přidání.
-            </div>
-        {% else %}
-            {% for address in addresses %}
-                <div class="row">
-                    <div class="card white black-text">
-                        <div class="card-content">
-                            <span class="card-title">{{ address.getAlias() }}</span>
-                            <p>Země: {{ get_country_name(address.getCountry()) }}</p>
-                            <p>Ulice a číslo popisné: {{ address.getStreet() }}</p>
+                <div class="card white black-text">
+                    <div class="card-content">
+                        <span class="card-title">{{ address.getAlias() }}</span>
+                        <p>Země: {{ get_country_name(address.getCountry()) }}</p>
+                        <p>Ulice a číslo popisné: {{ address.getStreet() }}</p>
 
-                            {% if address.getAdditionalInfo() is not null %}
-                                <p>Doplněk adresy: {{ address.getAdditionalInfo() }}</p>
-                            {% endif %}
+                        {% if address.getAdditionalInfo() is not null %}
+                            <p>Doplněk adresy: {{ address.getAdditionalInfo() }}</p>
+                        {% endif %}
 
-                            <p>Obec: {{ address.getTown() }}</p>
-                            <p>PSČ: {{ address.getZip() }}</p>
+                        <p>Obec: {{ address.getTown() }}</p>
+                        <p>PSČ: {{ address.getZip() }}</p>
 
-                            {% if address.getCompany() is not null and address.getIc() is not null and address.getDic() is not null %}
-                                <br>
+                        {% if address.getCompany() is not null and address.getIc() is not null and address.getDic() is not null %}
+                            <br>
 
-                                <p>Název firmy: {{ address.getCompany() }}</p>
-                                <p>IČ: {{ address.getIc() }}</p>
-                                <p>DIČ: {{ address.getDic() }}</p>
-                            {% endif %}
-                        </div>
-                        <div class="card-action">
-                            <a href="{{ path('profile_address', {id: address.getId()}) }}">Upravit</a>
-                            <a href="{{ path('profile_address_delete', {id: address.getId()}) }}">Smazat</a>
-                        </div>
+                            <p>Název firmy: {{ address.getCompany() }}</p>
+                            <p>IČ: {{ address.getIc() }}</p>
+                            <p>DIČ: {{ address.getDic() }}</p>
+                        {% endif %}
+                    </div>
+                    <div class="card-action">
+                        <a href="{{ path('profile_address', {id: address.getId()}) }}">Upravit</a>
+                        <a href="{{ path('profile_address_delete', {id: address.getId()}) }}">Smazat</a>
                     </div>
                 </div>
-            {% endfor %}
-        {% endif %}
+            </div>
+        {% endfor %}
+    {% endif %}
 
-        {# Pagination #}
-        {{ include('fragments/_pagination.html.twig') }}
-    </div>
+    {# Pagination #}
+    {{ include('fragments/_pagination.html.twig') }}
 
 {% endblock %}

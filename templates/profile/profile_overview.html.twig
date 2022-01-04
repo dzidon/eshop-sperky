@@ -2,21 +2,13 @@
 
 {% block profile_body %}
 
-    <div class="section">
-        <div class="row">
-            <h3 class="no-mar-top">{{ breadcrumbs.getPageTitle() }}</h3>
-        </div>
-
-        <div class="row">
-            E-mail: {{ app.user.email }}<br>
-            Datum registrace: {{ app.user.registered|date('d. m. Y H:i:s') }}<br>
-        </div>
+    <div class="row">
+        E-mail: {{ app.user.email }}<br>
+        Datum registrace: {{ app.user.registered|date('d. m. Y H:i:s') }}<br>
     </div>
 
     {% if personalDataForm is not null %}
-        <div class="section">
-            {{ form(personalDataForm) }}
-        </div>
+        {{ form(personalDataForm) }}
     {% endif %}
 
 {% endblock %}

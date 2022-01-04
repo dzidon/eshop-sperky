@@ -2,13 +2,7 @@
 
 {% block profile_body %}
 
-    <div class="section">
-        <div class="row">
-            <h3 class="no-mar-top">{{ breadcrumbs.getPageTitle() }}</h3>
-        </div>
-
-        <div class="row center-align">Opravdu si přejete smazat adresu '{{ addressInstance.getAlias() }}'? Tato akce je nevratná.</div>
-        {{ form(addressDeleteForm) }}
-    </div>
+    <div class="row center-align">Opravdu si přejete smazat adresu '{{ addressInstance.getAlias() }}'? Tato akce je nevratná.</div>
+    {{ form(addressDeleteForm) }}
 
 {% endblock %}

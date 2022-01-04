@@ -2,24 +2,18 @@
 
 {% block admin_body %}
 
-    <div class="section">
-        <div class="row">
-            <h3 class="no-mar-top">{{ breadcrumbs.getPageTitle() }}</h3>
-        </div>
+    <div class="row">
+        {% for groupName, groupElements in permissionsGrouped %}
+            <h4>
+                {{ groupName }}
+            </h4>
 
-        <div class="row">
-            {% for groupName, groupElements in permissionsGrouped %}
-                <h4>
-                    {{ groupName }}
-                </h4>
-
-                <ul>
-                    {% for permission in groupElements %}
-                        <li>- {{ permission.getName() }}</li>
-                    {% endfor %}
-                </ul>
-            {% endfor %}
-        </div>
+            <ul>
+                {% for permission in groupElements %}
+                    <li>- {{ permission.getName() }}</li>
+                {% endfor %}
+            </ul>
+        {% endfor %}
     </div>
 
 {% endblock %}
