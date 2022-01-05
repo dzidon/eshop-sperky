@@ -57,7 +57,19 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $sortData = $this->sorting->createSortData($sortAttribute, User::getSortData());
 
         return $this->createQueryBuilder('u')
-            ->orderBy('u.'.$sortData['attribute'], $sortData['order'])
+
+            //podminky
+            ->orWhere('u.email LIKE :email')
+            ->setParameter('email', '%' . $searchPhrase . '%')
+
+            ->orWhere('CONCAT(u.nameFirst, \' \', u.nameLast) LIKE :fullName')
+            ->setParameter('fullName', '%' . $searchPhrase . '%')
+
+            ->orWhere('u.phoneNumber LIKE :phoneNumber')
+            ->setParameter('phoneNumber', '%' . str_replace(' ', '', $searchPhrase) . '%')
+
+            //razeni
+            ->orderBy('u.' . $sortData['attribute'], $sortData['order'])
             ->getQuery();
     }
 }
