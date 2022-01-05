@@ -3,11 +3,13 @@
 namespace App\Repository;
 
 use App\Entity\User;
+use App\Service\SortingService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
+use Doctrine\ORM\Query;
 
 /**
  * @method User|null find($id, $lockMode = null, $lockVersion = null)
@@ -17,9 +19,13 @@ use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
  */
 class UserRepository extends ServiceEntityRepository implements PasswordUpgraderInterface
 {
-    public function __construct(ManagerRegistry $registry)
+    private SortingService $sorting;
+
+    public function __construct(ManagerRegistry $registry, SortingService $sorting)
     {
         parent::__construct($registry, User::class);
+
+        $this->sorting = $sorting;
     }
 
     public function createNew(): User
@@ -44,5 +50,14 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $user->setPassword($newHashedPassword);
         $this->_em->persist($user);
         $this->_em->flush();
+    }
+
+    public function getQueryForSearchAndPagination($searchPhrase = null, string $sortAttribute = null): Query
+    {
+        $sortData = $this->sorting->createSortData($sortAttribute, User::getSortData());
+
+        return $this->createQueryBuilder('u')
+            ->orderBy('u.'.$sortData['attribute'], $sortData['order'])
+            ->getQuery();
     }
 }

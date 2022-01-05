@@ -29,17 +29,31 @@
 
     <div class="row">
         <h4>Nalezení uživatelé</h4>
-        <div class="collection">
-            <a href="#!" class="collection-item">
-                david@seznam.cz
-                <span class="black-text">
-                    - Pan David Dey
-                </span>
-            </a>
-            <a href="#!" class="collection-item">david@seznam.cz</a>
-            <a href="#!" class="collection-item">david@seznam.cz</a>
-            <a href="#!" class="collection-item">david@seznam.cz</a>
-        </div>
+        {% if users is empty %}
+            Hledání neodpovídají žádní uživatelé.
+        {% else %}
+            {% set genderIdUndisclosed = constant('App\\Entity\\User::GENDER_ID_UNDISCLOSED') %}
+
+            <div class="collection">
+                {% for user in users %}
+                    <a href="#!" class="collection-item">
+                        {{ user.getEmail() }}
+                        {% if user.getNameFirst() is not null and user.getNameLast() is not null %}
+                            <span class="black-text">
+                                -
+                                {% if user.getGender() is not same as(genderIdUndisclosed) %}
+                                    {{ user.getGenderName() }}
+                                {% endif %}
+                                {{ user.getNameFirst() }} {{ user.getNameLast() }}
+                            </span>
+                        {% endif %}
+                    </a>
+                {% endfor %}
+            </div>
+        {% endif %}
     </div>
+
+    {# Pagination #}
+    {{ include('fragments/_pagination.html.twig') }}
 
 {% endblock %}

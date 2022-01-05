@@ -178,7 +178,7 @@ class ProfileController extends AbstractController
             return $this->redirectToRoute('profile');
         }
 
-        $page = (int) $this->request->query->get('page', '1');
+        $page = (int) $this->request->query->get(PaginatorService::QUERY_PARAMETER_PAGE_NAME, '1');
         $queryForPagination = $this->getDoctrine()->getRepository(Address::class)->getQueryForPagination($user);
         $addresses = $paginatorService
             ->initialize($queryForPagination, 5, $page)

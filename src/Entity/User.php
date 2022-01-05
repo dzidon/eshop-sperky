@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use App\Service\SortingService;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -496,5 +497,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         }
 
         return false;
+    }
+
+    public static function getSortData(): array
+    {
+        return [
+            'E-mail (A-Z)' => 'email'.SortingService::ATTRIBUTE_TAG_ASC,
+            'E-mail (Z-A)' => 'email'.SortingService::ATTRIBUTE_TAG_DESC,
+            'Od nejstaršího' => 'registered'.SortingService::ATTRIBUTE_TAG_ASC,
+            'Od nejnovějšího' => 'registered'.SortingService::ATTRIBUTE_TAG_DESC,
+        ];
     }
 }

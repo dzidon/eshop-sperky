@@ -40,7 +40,7 @@ class ReviewController extends AbstractController
      */
     public function reviews(PaginatorService $paginatorService): Response
     {
-        $page = (int) $this->request->query->get('page', '1');
+        $page = (int) $this->request->query->get(PaginatorService::QUERY_PARAMETER_PAGE_NAME, '1');
         $queryForPagination = $this->getDoctrine()->getRepository(Review::class)->getQueryForPagination();
         $reviews = $paginatorService
             ->initialize($queryForPagination, 5, $page)

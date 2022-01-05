@@ -19,6 +19,7 @@ class SearchTextAndSortFormType extends AbstractType
             ])
             ->add('razeni', ChoiceType::class, [
                 'choices' => $options['sort_choices'],
+                'invalid_message' => 'Zvolte platný atribut řazení.',
                 'label' => 'Seřadit podle',
             ])
         ;
@@ -29,6 +30,7 @@ class SearchTextAndSortFormType extends AbstractType
         $resolver->setDefaults([
             'csrf_protection' => false,
             'method' => 'GET',
+            'allow_extra_fields' => true,
             'sort_choices' => [],
         ]);
 
