@@ -91,4 +91,17 @@ class BreadcrumbsService
 
         return $this;
     }
+
+    /**
+     * Přidá string k aktuálnímu title.
+     *
+     * @param string $string
+     * @return BreadcrumbsService
+     */
+    public function appendToPageTitle(string $string): self
+    {
+        $this->currentTitle .= $string;
+
+        return $this;
+    }
 }

@@ -3,11 +3,13 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Form\AdminMuteUserFormType;
 use App\Form\SearchTextAndSortFormType;
 use App\Service\BreadcrumbsService;
 use App\Service\PaginatorService;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -37,6 +39,7 @@ class AdminController extends AbstractController
 
     /**
      * @Route("", name="admin_permission_overview")
+     *
      * @IsGranted("admin_permission_overview")
      */
     public function overview(): Response
@@ -49,6 +52,7 @@ class AdminController extends AbstractController
 
     /**
      * @Route("/uzivatele", name="admin_user_management")
+     *
      * @IsGranted("admin_user_management")
      */
     public function users(FormFactoryInterface $formFactory, PaginatorService $paginatorService): Response
@@ -81,6 +85,66 @@ class AdminController extends AbstractController
             'users' => $users,
             'breadcrumbs' => $this->breadcrumbs->setPageTitleByRoute('admin_user_management'),
             'pagination' => $paginatorService->createViewData(),
+        ]);
+    }
+
+    /**
+     * @Route("/uzivatel/{id}", name="admin_user_management_specific", requirements={"id"="\d+"})
+     *
+     * @IsGranted("admin_user_management")
+     */
+    public function editUser($id): Response
+    {
+        $entityManager = $this->getDoctrine()->getManager();
+        $user = $this->getUser();
+        $userEdited = $this->getDoctrine()->getRepository(User::class)->findOneBy(['id' => $id]);
+        if($userEdited === null) //nenaslo to zadneho uzivatele
+        {
+            throw new NotFoundHttpException('Uzivatel nenalezen.');
+        }
+
+        $granted = [
+            'user_block_reviews' => $this->isGranted('user_block_reviews'),
+        ];
+
+        $formMute = null;
+        if($granted['user_block_reviews'])
+        {
+            $formMute = $this->createForm(AdminMuteUserFormType::class);
+            if($userEdited->isMuted())
+            {
+                $formMute->add('submit', SubmitType::class, ['label' => 'Odmlčet', 'attr' => ['class' => 'waves-effect waves-light btn-large green left']]);
+            }
+            else
+            {
+                $formMute->add('submit', SubmitType::class, ['label' => 'Umlčet', 'attr' => ['class' => 'waves-effect waves-light btn-large red left']]);
+            }
+            $formMute->handleRequest($this->request);
+
+            if($formMute->isSubmitted() && $formMute->isValid())
+            {
+                $userEdited->setIsMuted( !$userEdited->isMuted() );
+                $entityManager->flush();
+
+                if($userEdited->isMuted())
+                {
+                    $this->addFlash('success', 'Uživatel umlčen.');
+                    $this->logger->info(sprintf("Admin %s (ID: %s) has muted user %s (ID: %s).", $user->getUserIdentifier(), $user->getId(), $userEdited->getUserIdentifier(), $userEdited->getId()));
+                }
+                else
+                {
+                    $this->addFlash('success', 'Uživatel odmlčen.');
+                    $this->logger->info(sprintf("Admin %s (ID: %s) has unmuted user %s (ID: %s).", $user->getUserIdentifier(), $user->getId(), $userEdited->getUserIdentifier(), $userEdited->getId()));
+                }
+                return $this->redirectToRoute('admin_user_management_specific', ['id' => $userEdited->getId()]);
+            }
+        }
+
+        return $this->render('admin/admin_user_management_specific.html.twig', [
+            'userEdited' => $userEdited,
+            'granted' => $granted,
+            'formMute' => $formMute->createView(),
+            'breadcrumbs' => $this->breadcrumbs->setPageTitleByRoute('admin_user_management_specific')->appendToPageTitle( ($userEdited->fullNameIsSet() ? ' ' . $userEdited->getFullName() : '') ),
         ]);
     }
 }

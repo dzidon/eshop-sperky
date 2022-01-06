@@ -127,6 +127,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     private $permissions;
 
+    /**
+     * @ORM\Column(type="boolean", options={"default" : 0})
+     */
+    private $isMuted = false;
+
     public function __construct()
     {
         $this->addresses = new ArrayCollection();
@@ -382,6 +387,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->getNameFirst() !== null && $this->getNameLast() !== null;
     }
 
+    /**
+     * Vrátí celé jméno
+     *
+     * @return string
+     */
+    public function getFullName(): string
+    {
+        return $this->getNameFirst() . ' ' . $this->getNameLast();
+    }
+
     public function getPhoneNumber()
     {
         return $this->phoneNumber;
@@ -497,6 +512,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         }
 
         return false;
+    }
+
+    public function isMuted(): ?bool
+    {
+        return $this->isMuted;
+    }
+
+    public function setIsMuted(bool $isMuted): self
+    {
+        $this->isMuted = $isMuted;
+
+        return $this;
     }
 
     public static function getSortData(): array

@@ -36,7 +36,7 @@
 
             <div class="collection">
                 {% for user in users %}
-                    <a href="#!" class="collection-item">
+                    <a href=" {{ path('admin_user_management_specific', {id: user.getId()}) }} " class="collection-item">
                         {{ user.getEmail() }}
                         {% if user.getNameFirst() is not null and user.getNameLast() is not null %}
                             <span class="black-text">

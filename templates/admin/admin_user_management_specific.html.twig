@@ -1,0 +1,24 @@
+{% extends 'admin/admin_base.html.twig' %}
+
+{% block admin_body %}
+
+    <div class="row">
+        E-mail: {{ userEdited.getEmail() }}<br>
+        Datum registrace: {{ userEdited.getRegistered()|date('d. m. Y H:i:s') }}<br>
+    </div>
+
+    {% if granted.user_block_reviews %}
+        <div class="row">
+            <h4>Psaní recenzí</h4>
+
+            {% if userEdited.isMuted() %}
+                <div>Tento uživatel nemůže psát recenze.</div>
+            {% else %}
+                <div>Tento uživatel může psát recenze.</div>
+            {% endif %}
+        </div>
+
+        {{ form(formMute) }}
+    {% endif %}
+
+{% endblock %}

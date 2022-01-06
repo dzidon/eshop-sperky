@@ -1,14 +1,14 @@
 {% set route = app.request.get('_route') %}
 
 <div class="collection">
-    {% if can_enter_admin %}
+    {% if can_enter_admin %} {# proměnná nastavovaná v base.html.twig #}
         <a href="{{ path('admin_permission_overview') }}" class="collection-item {% if route == 'admin_permission_overview' %} active {% endif %}">
             {{ get_parameter('app_page_title.admin_permission_overview') }}
         </a>
     {% endif %}
 
     {% if is_granted('admin_user_management') %}
-        <a href="{{ path('admin_user_management') }}" class="collection-item {% if route == 'admin_user_management' %} active {% endif %}">
+        <a href="{{ path('admin_user_management') }}" class="collection-item {% if route == 'admin_user_management' or route == 'admin_user_management_specific' %} active {% endif %}">
             {{ get_parameter('app_page_title.admin_user_management') }}
         </a>
     {% endif %}
