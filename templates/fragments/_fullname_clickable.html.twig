@@ -1,0 +1,5 @@
+{% if authorized %}
+    <a href=" {{ path('admin_user_management_specific', {id: user.getId()}) }} ">{{ user.getFullName() }}</a>
+{% else %}
+    {{ user.getFullName() }}
+{% endif %}

@@ -20,11 +20,16 @@
         </div>
     </div>
 
+    {% set can_manage_users = is_granted('admin_user_management') %}
+
     {% for review in reviews %}
         <div class="row">
             <div class="card white">
                 <div class="card-content black-text">
-                    <span class="card-title">{{ review.getUser().getNameFirst() }} {{ review.getUser().getNameLast() }}</span>
+                    <span class="card-title">
+                        {# Klikatelné jméno, pokud je oprávněn nějak upravovat ostatní uživatele #}
+                        {{ include('fragments/_fullname_clickable.html.twig', {user: review.getUser(), authorized: can_manage_users}) }}
+                    </span>
 
                     <div class="amber-text accent-3">
                         {# Hvězdy #}

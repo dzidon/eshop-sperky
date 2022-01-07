@@ -219,12 +219,12 @@ class ProfileController extends AbstractController
                 throw new AccessDeniedHttpException('Tuto adresu nemůžete editovat.');
             }
 
-            $this->breadcrumbs->addRoute('profile_address', ['id' => $address->getId()], '', 'edit');
+            $this->breadcrumbs->setPageTitleByRoute('profile_address', 'edit');
         }
         else //nezadal id do url, vytvari novou adresu
         {
             $address = $this->getDoctrine()->getRepository(Address::class)->createNew($user);
-            $this->breadcrumbs->addRoute('profile_address', [], '', 'new');
+            $this->breadcrumbs->setPageTitleByRoute('profile_address', 'new');
         }
 
         $form = $this->createForm(AddressFormType::class, $address);
