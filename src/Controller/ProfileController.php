@@ -141,7 +141,7 @@ class ProfileController extends AbstractController
         }
 
         $form = $this->createForm(RegistrationVerifyEmailSendAgainType::class);
-        $form->add('submit', SubmitType::class, ['label' => 'Poslat znovu']);
+        $form->add('submit', SubmitType::class, ['label' => 'Poslat znovu', 'attr' => ['class' => 'waves-effect waves-light btn-large light-blue left']]);
         $form->handleRequest($this->request);
 
         if ($form->isSubmitted() && $form->isValid())
@@ -280,7 +280,7 @@ class ProfileController extends AbstractController
         $form->add('submit', SubmitType::class, [
             'label' => 'Smazat',
             'attr' => [
-                'class' => 'waves-effect waves-light btn-large red',
+                'class' => 'waves-effect waves-light btn-large red left',
             ],
         ]);
         $form->handleRequest($this->request);

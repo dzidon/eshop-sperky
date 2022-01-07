@@ -2,7 +2,7 @@
 
 {% block profile_body %}
 
-    <div class="row center-align">Opravdu si přejete smazat adresu '{{ addressInstance.getAlias() }}'? Tato akce je nevratná.</div>
+    <div class="row">Opravdu si přejete smazat adresu '{{ addressInstance.getAlias() }}'? Tato akce je nevratná.</div>
     {{ form(addressDeleteForm) }}
 
 {% endblock %}
