@@ -91,7 +91,12 @@ class ReviewController extends AbstractController
 
             if ($review->getUser() === $user && !$user->fullNameIsSet())
             {
-                $this->addFlash('warning', 'Nemáte nastavené jméno a příjmení, vaše recenze nebude vidět.');
+                $this->addFlash('warning', 'Nemáte nastavené jméno a příjmení, vaše recenze nebude vidět a nijak neovlivní celkové hodnocení.');
+            }
+
+            if ($user->isMuted())
+            {
+                $this->addFlash('warning', 'Jste umlčeni, vaše recenze nebude vidět a nijak neovlivní celkové hodnocení.');
             }
 
             $this->breadcrumbs->addRoute('review_edit', ['id' => $review->getId()], '', 'edit');
@@ -114,6 +119,12 @@ class ReviewController extends AbstractController
             {
                 $this->addFlash('failure', 'Můžete napsat pouze jednu recenzi. Protože už jste nějakou napsali, byli jste přesměrováni na úpravu vaší stávající recenze.');
                 return $this->redirectToRoute('review_edit', ['id' => $user->getReview()->getId()]);
+            }
+
+            if ($user->isMuted())
+            {
+                $this->addFlash('failure', 'Jste umlčeni, nemůžete napsat recenzi.');
+                return $this->redirectToRoute('reviews');
             }
 
             $review = $this->getDoctrine()->getRepository(Review::class)->createNew($user);
@@ -142,6 +153,7 @@ class ReviewController extends AbstractController
         }
 
         return $this->render('reviews/review_edit.html.twig', [
+            'review' => $review,
             'reviewForm' => $form->createView(),
             'breadcrumbs' => $this->breadcrumbs,
         ]);
@@ -175,7 +187,7 @@ class ReviewController extends AbstractController
         $form->add('submit',SubmitType::class, [
             'label' => 'Smazat',
             'attr' => [
-                'class' => 'waves-effect waves-light btn-large red',
+                'class' => 'waves-effect waves-light btn-large red left',
             ],
         ]);
         $form->handleRequest($this->request);

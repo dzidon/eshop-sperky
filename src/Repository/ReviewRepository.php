@@ -40,6 +40,8 @@ class ReviewRepository extends ServiceEntityRepository
             ->orderBy('r.created', 'DESC')
             ->andWhere('u.nameFirst IS NOT NULL')
             ->andWhere('u.nameLast IS NOT NULL')
+            ->andWhere('u.nameLast IS NOT NULL')
+            ->andWhere('u.isMuted = 0')
             ->getQuery();
     }
 
@@ -57,6 +59,7 @@ class ReviewRepository extends ServiceEntityRepository
             ->innerJoin('r.user', 'u')
             ->andWhere('u.nameFirst IS NOT NULL')
             ->andWhere('u.nameLast IS NOT NULL')
+            ->andWhere('u.isMuted = 0')
             ->getQuery()
             ->getScalarResult()[0];
     }

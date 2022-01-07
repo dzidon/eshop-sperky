@@ -14,7 +14,7 @@
         {{ include('fragments/_flash_messages.html.twig') }}
 
         <div class="section no-pad-top">
-            <div class="row center-align">Opravdu si přejete smazat
+            <div class="row">Opravdu si přejete smazat
                 {% if app.user is same as(reviewInstance.getUser()) %}svou {% else %}cizí {% endif %}
                 recenzi? Tato akce je nevratná.
             </div>

@@ -107,6 +107,9 @@ class AdminController extends AbstractController
             'user_block_reviews' => $this->isGranted('user_block_reviews'),
         ];
 
+        /*
+         * Formulář - umlčení
+         */
         $formMute = null;
         if($granted['user_block_reviews'])
         {
