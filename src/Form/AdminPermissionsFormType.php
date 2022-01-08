@@ -20,7 +20,7 @@ class AdminPermissionsFormType extends AbstractType
             'multiple' => true,
             'expanded' => true,
             'required' => false,
-            'label' => 'Nastavení oprávnění uživatele',
+            'label' => false,
         ]);
     }
 

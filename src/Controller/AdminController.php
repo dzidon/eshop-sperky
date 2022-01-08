@@ -112,7 +112,7 @@ class AdminController extends AbstractController
         if($this->isGranted('user_edit_credentials'))
         {
             $formCredentials = $this->createForm(PersonalInfoFormType::class, $userEdited);
-            $formCredentials->add('submit', SubmitType::class, ['label' => 'Uložit', 'attr' => ['class' => 'waves-effect waves-light btn-large light-blue']]);
+            $formCredentials->add('submit', SubmitType::class, ['label' => 'Uložit', 'attr' => ['class' => 'btn-large light-blue left']]);
             $formCredentials->handleRequest($this->request);
 
             if ($formCredentials->isSubmitted() && $formCredentials->isValid())
@@ -141,7 +141,7 @@ class AdminController extends AbstractController
         if($this->isGranted('user_set_permissions'))
         {
             $formPermissions = $this->createForm(AdminPermissionsFormType::class, $userEdited);
-            $formPermissions->add('submit', SubmitType::class, ['label' => 'Uložit', 'attr' => ['class' => 'waves-effect waves-light btn-large light-blue left']]);
+            $formPermissions->add('submit', SubmitType::class, ['label' => 'Uložit', 'attr' => ['class' => 'btn-large light-blue left']]);
             $formPermissions->handleRequest($this->request);
 
             if ($formPermissions->isSubmitted() && $formPermissions->isValid())
@@ -164,11 +164,11 @@ class AdminController extends AbstractController
             $formMute = $this->createForm(AdminMuteUserFormType::class);
             if($userEdited->isMuted())
             {
-                $formMute->add('submit', SubmitType::class, ['label' => 'Odmlčet', 'attr' => ['class' => 'waves-effect waves-light btn-large green left']]);
+                $formMute->add('submit', SubmitType::class, ['label' => 'Odmlčet', 'attr' => ['class' => 'btn-large green left']]);
             }
             else
             {
-                $formMute->add('submit', SubmitType::class, ['label' => 'Umlčet', 'attr' => ['class' => 'waves-effect waves-light btn-large red left']]);
+                $formMute->add('submit', SubmitType::class, ['label' => 'Umlčet', 'attr' => ['class' => 'btn-large red left']]);
             }
             $formMute->handleRequest($this->request);
 

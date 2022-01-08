@@ -91,20 +91,20 @@
     </span>
 {% endblock checkbox_label %}
 
+{# Tlačítko #}
+{% block button_widget -%}
+    {% set attr = attr|merge({class: (attr.class|default('btn-large light-blue') ~ ' waves-effect waves-light btn')|trim}) %}
+    <div class="row center-align">
+        {{ parent() }}
+    </div>
+{% endblock %}
+
 {# Label radio buttonu #}
 {% block radio_label %}
     <span>
         {{ label }}
     </span>
 {% endblock radio_label %}
-
-{# Tlačítko #}
-{% block button_widget -%}
-    {% set attr = attr|merge({class: (attr.class|default('waves-effect waves-light btn-large light-blue') ~ ' btn')|trim}) %}
-    <div class="row center-align">
-        {{ parent() }}
-    </div>
-{% endblock %}
 
 {# Radio buttony #}
 {% block choice_row %}
@@ -118,15 +118,32 @@
     </div>
 {% endblock %}
 
-{# Konkrétní radio button #}
+{# Konkrétní radio button nebo skupina radio buttonu #}
 {% block choice_widget_expanded %}
-    {% for child in form %}
-        <div>
-            <label>
-                {{ form_widget(child, {'attr': {'class': 'filled-in checkbox-light-blue with-gap'}}) }}
-                {{ form_label(child, null) }}
-            </label>
-        </div>
+    {% for name, choices in form.vars.choices %}
+        {% if choices is iterable  %}
+            <div class="radio-label">
+                <label>
+                    {{ choice_translation_domain is same as(false) ? name : name|trans({}, choice_translation_domain) }}
+                </label>
+            </div>
+
+            {% for key,choice in choices %}
+                <div>
+                    <label>
+                        {{ form_widget(form[key], {'attr': {'class': 'filled-in checkbox-light-blue with-gap'}}) }}
+                        {{ form_label(form[key], null) }}
+                    </label>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div>
+                <label>
+                    {{ form_widget(form[name], {'attr': {'class': 'filled-in checkbox-light-blue with-gap'}}) }}
+                    {{ form_label(form[name], null) }}
+                </label>
+            </div>
+        {% endif %}
     {% endfor %}
 {% endblock choice_widget_expanded %}
 

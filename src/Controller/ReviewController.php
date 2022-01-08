@@ -187,7 +187,7 @@ class ReviewController extends AbstractController
         $form->add('submit',SubmitType::class, [
             'label' => 'Smazat',
             'attr' => [
-                'class' => 'waves-effect waves-light btn-large red left',
+                'class' => 'btn-large red left',
             ],
         ]);
         $form->handleRequest($this->request);
