@@ -4,6 +4,8 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Form\AdminMuteUserFormType;
+use App\Form\AdminPermissionsFormType;
+use App\Form\PersonalInfoFormType;
 use App\Form\SearchTextAndSortFormType;
 use App\Service\BreadcrumbsService;
 use App\Service\PaginatorService;
@@ -103,15 +105,61 @@ class AdminController extends AbstractController
             throw new NotFoundHttpException('Uzivatel nenalezen.');
         }
 
-        $granted = [
-            'user_block_reviews' => $this->isGranted('user_block_reviews'),
-        ];
+        /*
+         * Formulář - úprava osobních údajů
+         */
+        $formCredentialsView = null;
+        if($this->isGranted('user_edit_credentials'))
+        {
+            $formCredentials = $this->createForm(PersonalInfoFormType::class, $userEdited);
+            $formCredentials->add('submit', SubmitType::class, ['label' => 'Uložit', 'attr' => ['class' => 'waves-effect waves-light btn-large light-blue']]);
+            $formCredentials->handleRequest($this->request);
+
+            if ($formCredentials->isSubmitted() && $formCredentials->isValid())
+            {
+                $entityManager = $this->getDoctrine()->getManager();
+                $entityManager->persist($userEdited);
+                $entityManager->flush();
+
+                if ($user === $userEdited && $userEdited->getReview() !== null && !$userEdited->fullNameIsSet())
+                {
+                    $this->addFlash('warning', 'Vaše recenze se nebude zobrazovat, dokud nebudete mít nastavené křestní jméno a příjmení zároveň.');
+                }
+                $this->addFlash('success', 'Osobní údaje uživatele uloženy!');
+                $this->logger->info(sprintf("User %s (ID: %s) has changed personal information of user %s (ID: %s).", $user->getUserIdentifier(), $user->getId(), $userEdited->getUserIdentifier(), $userEdited->getId()));
+
+                return $this->redirectToRoute('admin_user_management_specific', ['id' => $userEdited->getId()]);
+            }
+
+            $formCredentialsView = $formCredentials->createView();
+        }
+
+        /*
+         * Formulář - oprávnění
+         */
+        $formPermissionsView = null;
+        if($this->isGranted('user_set_permissions'))
+        {
+            $formPermissions = $this->createForm(AdminPermissionsFormType::class, $userEdited);
+            $formPermissions->add('submit', SubmitType::class, ['label' => 'Uložit', 'attr' => ['class' => 'waves-effect waves-light btn-large light-blue left']]);
+            $formPermissions->handleRequest($this->request);
+
+            if ($formPermissions->isSubmitted() && $formPermissions->isValid())
+            {
+                $entityManager->flush();
+
+                $this->addFlash('success', 'Oprávnění uživatele uloženy.');
+                return $this->redirectToRoute('admin_user_management_specific', ['id' => $userEdited->getId()]);
+            }
+
+            $formPermissionsView = $formPermissions->createView();
+        }
 
         /*
          * Formulář - umlčení
          */
-        $formMute = null;
-        if($granted['user_block_reviews'])
+        $formMuteView = null;
+        if($this->isGranted('user_block_reviews'))
         {
             $formMute = $this->createForm(AdminMuteUserFormType::class);
             if($userEdited->isMuted())
@@ -141,12 +189,15 @@ class AdminController extends AbstractController
                 }
                 return $this->redirectToRoute('admin_user_management_specific', ['id' => $userEdited->getId()]);
             }
+
+            $formMuteView = $formMute->createView();
         }
 
         return $this->render('admin/admin_user_management_specific.html.twig', [
+            'formCredentials' => $formCredentialsView,
+            'formPermissions' => $formPermissionsView,
+            'formMute' => $formMuteView,
             'userEdited' => $userEdited,
-            'granted' => $granted,
-            'formMute' => $formMute->createView(),
             'breadcrumbs' => $this->breadcrumbs->setPageTitleByRoute('admin_user_management_specific')->appendToPageTitle( ($userEdited->fullNameIsSet() ? ' ' . $userEdited->getFullName() : '') ),
         ]);
     }

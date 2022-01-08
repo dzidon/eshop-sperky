@@ -94,6 +94,10 @@ main {
     border: 2px solid #03a9f4;
 }
 
+.radio-label {
+    margin-bottom: 5px;
+}
+
 /*
     Select
 */
@@ -136,6 +140,10 @@ a.collection-item.active {
 
 .no-mar-top {
     margin-top: 0;
+}
+
+.no-mar-bot {
+    margin-bottom: 0;
 }
 
 .product-title {

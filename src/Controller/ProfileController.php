@@ -64,7 +64,7 @@ class ProfileController extends AbstractController
                 $entityManager->persist($user);
                 $entityManager->flush();
 
-                if ($user->getReview() !== null && ($user->getNameFirst() === null || $user->getNameLast() === null))
+                if ($user->getReview() !== null && !$user->fullNameIsSet())
                 {
                     $this->addFlash('warning', 'Vaše recenze se nebude zobrazovat, dokud nebudete mít nastavené křestní jméno a příjmení zároveň.');
                 }

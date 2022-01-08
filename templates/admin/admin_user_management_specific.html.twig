@@ -7,7 +7,23 @@
         Datum registrace: {{ userEdited.getRegistered()|date('d. m. Y H:i:s') }}<br>
     </div>
 
-    {% if granted.user_block_reviews %}
+    {% if formCredentials is not null %}
+        <div class="row no-mar-bot">
+            <h4>Osobní údaje</h4>
+        </div>
+
+        {{ form(formCredentials) }}
+    {% endif %}
+
+    {% if formPermissions is not null %}
+        <div class="row no-mar-bot">
+            <h4>Oprávnění</h4>
+        </div>
+
+        {{ form(formPermissions) }}
+    {% endif %}
+
+    {% if formMute is not null %}
         <div class="row">
             <h4>Psaní recenzí</h4>
 
