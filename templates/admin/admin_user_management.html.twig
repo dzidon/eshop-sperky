@@ -32,8 +32,6 @@
         {% if users is empty %}
             Hledání neodpovídají žádní uživatelé.
         {% else %}
-            {% set genderIdUndisclosed = constant('App\\Entity\\User::GENDER_ID_UNDISCLOSED') %}
-
             <div class="collection">
                 {% for user in users %}
                     <a href=" {{ path('admin_user_management_specific', {id: user.getId()}) }} " class="collection-item">
@@ -41,7 +39,7 @@
                         {% if user.fullNameIsSet() %}
                             <span class="black-text">
                                 -
-                                {% if user.getGender() is not same as(genderIdUndisclosed) %}
+                                {% if user.genderIsSet() %}
                                     {{ user.getGenderName() }}
                                 {% endif %}
                                 {{ user.getNameFirst() }} {{ user.getNameLast() }}

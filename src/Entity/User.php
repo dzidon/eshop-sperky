@@ -346,6 +346,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return self::GENDER_NAME_UNDISCLOSED;
     }
 
+    public function genderIsSet(): bool
+    {
+        if($this->gender === self::GENDER_ID_MALE || $this->gender === self::GENDER_ID_FEMALE)
+        {
+            return true;
+        }
+        return false;
+    }
+
     public function setGender(?string $gender): self
     {
         $this->gender = $gender;

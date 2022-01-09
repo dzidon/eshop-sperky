@@ -15,7 +15,7 @@
             <div class="section">
                 {{ form(reviewForm) }}
 
-                {% if review.getId() is not null %}
+                {% if review.getId() is not null and is_granted('review_delete', review) %}
                     <div class="row center-align">
                         <a href="{{ path('review_delete', {id: review.getId()}) }}">Smazat</a>
                     </div>

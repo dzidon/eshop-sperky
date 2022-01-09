@@ -117,7 +117,6 @@ class AdminController extends AbstractController
 
             if ($formCredentials->isSubmitted() && $formCredentials->isValid())
             {
-                $entityManager = $this->getDoctrine()->getManager();
                 $entityManager->persist($userEdited);
                 $entityManager->flush();
 
@@ -126,7 +125,7 @@ class AdminController extends AbstractController
                     $this->addFlash('warning', 'Vaše recenze se nebude zobrazovat, dokud nebudete mít nastavené křestní jméno a příjmení zároveň.');
                 }
                 $this->addFlash('success', 'Osobní údaje uživatele uloženy!');
-                $this->logger->info(sprintf("User %s (ID: %s) has changed personal information of user %s (ID: %s).", $user->getUserIdentifier(), $user->getId(), $userEdited->getUserIdentifier(), $userEdited->getId()));
+                $this->logger->info(sprintf("Admin %s (ID: %s) has changed personal information of user %s (ID: %s).", $user->getUserIdentifier(), $user->getId(), $userEdited->getUserIdentifier(), $userEdited->getId()));
 
                 return $this->redirectToRoute('admin_user_management_specific', ['id' => $userEdited->getId()]);
             }
@@ -146,9 +145,12 @@ class AdminController extends AbstractController
 
             if ($formPermissions->isSubmitted() && $formPermissions->isValid())
             {
+                $entityManager->persist($userEdited);
                 $entityManager->flush();
 
                 $this->addFlash('success', 'Oprávnění uživatele uloženy.');
+                $this->logger->info(sprintf("Admin %s (ID: %s) has changed permissions of user %s (ID: %s).", $user->getUserIdentifier(), $user->getId(), $userEdited->getUserIdentifier(), $userEdited->getId()));
+
                 return $this->redirectToRoute('admin_user_management_specific', ['id' => $userEdited->getId()]);
             }
 
@@ -175,6 +177,7 @@ class AdminController extends AbstractController
             if($formMute->isSubmitted() && $formMute->isValid())
             {
                 $userEdited->setIsMuted( !$userEdited->isMuted() );
+                $entityManager->persist($userEdited);
                 $entityManager->flush();
 
                 if($userEdited->isMuted())
