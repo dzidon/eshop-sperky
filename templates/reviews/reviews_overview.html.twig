@@ -5,24 +5,22 @@
     {# Breadcrumbs #}
     {{ include('fragments/_breadcrumbs.html.twig') }}
 
-    <div class="container">
-        <div class="container left-align">
-            {# h1 #}
-            <h1>
-                {{ get_parameter(['app_page_title', app.request.get('_route')]|join('.')) }}
-                <a href="{{ path('review_edit') }}" class="btn-floating btn-medium waves-effect waves-light light-blue"><i class="material-icons">add</i></a>
-            </h1>
+    <div class="container left-align">
+        {# h1 #}
+        <h1>
+            {{ get_parameter(['app_page_title', app.request.get('_route')]|join('.')) }}
+            <a href="{{ path('review_edit') }}" class="btn-floating btn-medium waves-effect waves-light light-blue"><i class="material-icons">add</i></a>
+        </h1>
 
-            {# Flash zprávy #}
-            {{ include('fragments/_flash_messages.html.twig') }}
+        {# Flash zprávy #}
+        {{ include('fragments/_flash_messages.html.twig') }}
 
-            <div class="section no-pad-top">
-                {# Recenze #}
-                {{ include('fragments/_reviews.html.twig', {reviews: reviews, agregateReviewData: agregateReviewData, template: 'overview'}) }}
+        <div class="section no-pad-top">
+            {# Recenze #}
+            {{ include('fragments/_reviews.html.twig', {reviews: reviews, agregateReviewData: agregateReviewData, template: 'overview'}) }}
 
-                {# Pagination #}
-                {{ include('fragments/_pagination.html.twig') }}
-            </div>
+            {# Pagination #}
+            {{ include('fragments/_pagination.html.twig') }}
         </div>
     </div>
 

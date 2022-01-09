@@ -47,6 +47,11 @@ main {
     flex-wrap: wrap;
 }
 
+.cols-no-border {
+    margin-left: -0.75rem;
+    margin-right: -0.75rem;
+}
+
 .margin-0 {
     margin: 0 !important;
 }
@@ -62,6 +67,11 @@ main {
 .width-max {
     width: 100%;
 }
+
+.width200px {
+    width: 200px;
+}
+
 
 /*
     Input, Textarea

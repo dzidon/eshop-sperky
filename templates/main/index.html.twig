@@ -56,15 +56,11 @@
                 </div>
             </div>
 
-        </div>
-
-        <div class="section">
-
             <h2>Novinky</h2>
 
-            <div class="row flex-wrap">
+            <div class="row flex-wrap cols-no-border">
 
-                <div class="col s6 l4 xl3 margin-0">
+                <div class="col s6 l4 xl3 product-card">
                     <div class="card">
                         <a href="#" class="card-image waves-effect waves-block waves-light">
                             <img alt="Obrázek produktu" src="https://materializecss.com/images/office.jpg">
@@ -176,29 +172,29 @@
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div class="section center-align">
-            <h2>Recenze zákazníků</h2>
+            <h2>Recenze</h2>
 
-            <div class="container left-align">
-                {# Recenze #}
-                {{ include('fragments/_reviews.html.twig', {reviews: latestReviews, agregateReviewData: agregateReviewData, template: 'index'}) }}
-            </div>
-
-            <div class="row hide-on-small-and-down">
-                <a href="{{ path('reviews') }}" class="waves-effect waves-light btn-large light-blue margin-right15px">Všechny recenze</a>
-
-                <a href="{{ path('review_edit') }}" class="waves-effect waves-light btn-large grey">Napsat recenzi</a>
-            </div>
-
-            <div class="inline-block hide-on-med-and-up">
-                <div class="row">
-                    <a href="{{ path('reviews') }}" class="waves-effect waves-light btn-large light-blue width-max">Všechny recenze</a>
+            <div class="center-align">
+                <div class="left-align">
+                    {# Recenze #}
+                    {{ include('fragments/_reviews.html.twig', {reviews: latestReviews, agregateReviewData: agregateReviewData, template: 'index'}) }}
                 </div>
 
-                <div class="row">
-                    <a href="{{ path('review_edit') }}" class="waves-effect waves-light btn-large grey width-max">Napsat recenzi</a>
+                <div class="row hide-on-small-and-down center-align">
+                    <a href="{{ path('reviews') }}" class="waves-effect waves-light btn-large light-blue margin-right15px width200px">Všechny recenze</a>
+
+                    <a href="{{ path('review_edit') }}" class="waves-effect waves-light btn-large grey width200px">Napsat recenzi</a>
+                </div>
+
+                <div class="inline-block hide-on-med-and-up">
+                    <div class="row">
+                        <a href="{{ path('reviews') }}" class="waves-effect waves-light btn-large light-blue width-max">Všechny recenze</a>
+                    </div>
+
+                    <div class="row">
+                        <a href="{{ path('review_edit') }}" class="waves-effect waves-light btn-large grey width-max">Napsat recenzi</a>
+                    </div>
                 </div>
             </div>
         </div>

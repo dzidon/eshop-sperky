@@ -22,52 +22,54 @@
 
     {% set can_manage_users = is_granted('admin_user_management') %}
 
-    {% for review in reviews %}
-        <div class="row">
-            <div class="card white">
-                <div class="card-content black-text">
-                    <span class="card-title">
-                        {% if review.getUser().genderIsSet() %}
-                            {{ review.getUser().getGenderName() }}
+    <div class="row flex-wrap cols-no-border">
+        {% for review in reviews %}
+            <div class="col s12 l6">
+                <div class="card white">
+                    <div class="card-content black-text">
+                        <span class="card-title">
+                            {% if review.getUser().genderIsSet() %}
+                                {{ review.getUser().getGenderName() }}
+                            {% endif %}
+
+                            {# Klikatelné jméno, pokud je oprávněn nějak upravovat ostatní uživatele #}
+                            {{ include('fragments/_fullname_clickable.html.twig', {user: review.getUser(), authorized: can_manage_users}) }}
+                        </span>
+
+                        <div class="amber-text accent-3">
+                            {# Hvězdy #}
+                            {{ include('fragments/_review_stars.html.twig', {stars: rating_to_stars(review.getStars())}) }}
+                        </div>
+
+                        <small class="light">
+                            {{ review.getCreated()|date('d. m. Y H:i:s') }}
+                            {% if review.getCreated() != review.getUpdated() and review.getUpdated() is not null %}
+                                (upraveno: {{ review.getUpdated()|date('d. m. Y H:i:s') }})
+                            {% endif %}
+                        </small>
+
+                        {% if review.getText() is not null %}
+                            <br><br>
+                            <p>{{ review.getText() }}</p>
                         {% endif %}
-
-                        {# Klikatelné jméno, pokud je oprávněn nějak upravovat ostatní uživatele #}
-                        {{ include('fragments/_fullname_clickable.html.twig', {user: review.getUser(), authorized: can_manage_users}) }}
-                    </span>
-
-                    <div class="amber-text accent-3">
-                        {# Hvězdy #}
-                        {{ include('fragments/_review_stars.html.twig', {stars: rating_to_stars(review.getStars())}) }}
                     </div>
 
-                    <small class="light">
-                        {{ review.getCreated()|date('d. m. Y H:i:s') }}
-                        {% if review.getCreated() != review.getUpdated() and review.getUpdated() is not null %}
-                            (upraveno: {{ review.getUpdated()|date('d. m. Y H:i:s') }})
-                        {% endif %}
-                    </small>
+                    {% set can_edit = is_granted('review_edit', review) %}
+                    {% set can_delete = is_granted('review_delete', review) %}
 
-                    {% if review.getText() is not null %}
-                        <br><br>
-                        <p>{{ review.getText() }}</p>
+                    {% if can_edit or can_delete %}
+                        <div class="card-action">
+                            {% if can_edit %}
+                                <a href="{{ path('review_edit', {id: review.getId()}) }}">Upravit</a>
+                            {% endif %}
+
+                            {% if can_delete %}
+                                <a href="{{ path('review_delete', {id: review.getId()}) }}">Smazat</a>
+                            {% endif %}
+                        </div>
                     {% endif %}
                 </div>
-
-                {% set can_edit = is_granted('review_edit', review) %}
-                {% set can_delete = is_granted('review_delete', review) %}
-
-                {% if can_edit or can_delete %}
-                    <div class="card-action">
-                        {% if can_edit %}
-                            <a href="{{ path('review_edit', {id: review.getId()}) }}">Upravit</a>
-                        {% endif %}
-
-                        {% if can_delete %}
-                            <a href="{{ path('review_delete', {id: review.getId()}) }}">Smazat</a>
-                        {% endif %}
-                    </div>
-                {% endif %}
             </div>
-        </div>
-    {% endfor %}
+        {% endfor %}
+    </div>
 {% endif %}
