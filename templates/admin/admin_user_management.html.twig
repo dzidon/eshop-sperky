@@ -24,7 +24,12 @@
                                 {% if user.genderIsSet() %}
                                     {{ user.getGenderName() }}
                                 {% endif %}
+
                                 {{ user.getNameFirst() }} {{ user.getNameLast() }}
+
+                                {% if user.isMuted() %}
+                                    - <span class="red-text">UMLČEN</span>
+                                {% endif %}
                             </span>
                         {% endif %}
                     </a>

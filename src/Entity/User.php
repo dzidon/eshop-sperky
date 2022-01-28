@@ -543,6 +543,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             'E-mail (Z-A)' => 'email'.SortingService::ATTRIBUTE_TAG_DESC,
             'Od nejstaršího' => 'registered'.SortingService::ATTRIBUTE_TAG_ASC,
             'Od nejnovějšího' => 'registered'.SortingService::ATTRIBUTE_TAG_DESC,
+            'Od umlčených' => 'isMuted'.SortingService::ATTRIBUTE_TAG_DESC,
         ];
     }
 }
