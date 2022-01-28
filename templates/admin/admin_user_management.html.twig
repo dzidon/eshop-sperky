@@ -4,27 +4,9 @@
 
     <div class="row">
         <h4>Hledat</h4>
-        {{ form_start(searchForm) }}
-            <div class="row">
-                <div class="input-field col s12 l8">
-                    {{ form_widget(searchForm.vyraz) }}
-                    {{ form_label(searchForm.vyraz) }}
-                    {{ form_help(searchForm.vyraz) }}
-                    {{ form_errors(searchForm.vyraz) }}
-                </div>
-                <div class="input-field col s12 l4">
-                    {{ form_widget(searchForm.razeni) }}
-                    {{ form_label(searchForm.razeni) }}
-                    {{ form_help(searchForm.razeni) }}
-                    {{ form_errors(searchForm.razeni) }}
-                </div>
-            </div>
-            <div class="row center-align">
-                <button class="btn waves-effect waves-light btn-large light-blue" type="submit">
-                    Hledat
-                </button>
-            </div>
-        {{ form_end(searchForm) }}
+
+        {# Formulář - vyhledávací pole, řazení #}
+        {{ include('fragments/forms_unique/_form_search_order.html.twig', {form: searchForm}) }}
     </div>
 
     <div class="row">
