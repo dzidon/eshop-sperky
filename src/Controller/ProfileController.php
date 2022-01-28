@@ -61,7 +61,6 @@ class ProfileController extends AbstractController
             if ($form->isSubmitted() && $form->isValid())
             {
                 $entityManager = $this->getDoctrine()->getManager();
-                $entityManager->persist($user);
                 $entityManager->flush();
 
                 if ($user->getReview() !== null && !$user->fullNameIsSet())
@@ -111,7 +110,6 @@ class ProfileController extends AbstractController
             );
 
             $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->persist($user);
             $entityManager->flush();
 
             $this->addFlash('success', 'Heslo změněno!');
@@ -233,13 +231,15 @@ class ProfileController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid())
         {
-            if($address->getId() !== null)
+            $entityManager = $this->getDoctrine()->getManager();
+            if ($address->getId() === null)
+            {
+                $entityManager->persist($address);
+            }
+            else
             {
                 $address->setUpdated(new \DateTime('now'));
             }
-
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->persist($address);
             $entityManager->flush();
 
             $this->addFlash('success', 'Adresa uložena!');

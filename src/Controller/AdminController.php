@@ -117,7 +117,6 @@ class AdminController extends AbstractController
 
             if ($formCredentials->isSubmitted() && $formCredentials->isValid())
             {
-                $entityManager->persist($userEdited);
                 $entityManager->flush();
 
                 if ($user === $userEdited && $userEdited->getReview() !== null && !$userEdited->fullNameIsSet())
@@ -145,7 +144,6 @@ class AdminController extends AbstractController
 
             if ($formPermissions->isSubmitted() && $formPermissions->isValid())
             {
-                $entityManager->persist($userEdited);
                 $entityManager->flush();
 
                 $this->addFlash('success', 'Oprávnění uživatele uloženy.');
@@ -177,7 +175,6 @@ class AdminController extends AbstractController
             if($formMute->isSubmitted() && $formMute->isValid())
             {
                 $userEdited->setIsMuted( !$userEdited->isMuted() );
-                $entityManager->persist($userEdited);
                 $entityManager->flush();
 
                 if($userEdited->isMuted())

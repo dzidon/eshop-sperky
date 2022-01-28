@@ -137,13 +137,15 @@ class ReviewController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid())
         {
-            if($review->getId() !== null)
+            $entityManager = $this->getDoctrine()->getManager();
+            if ($review->getId() === null)
+            {
+                $entityManager->persist($review);
+            }
+            else
             {
                 $review->setUpdated(new \DateTime('now'));
             }
-
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->persist($review);
             $entityManager->flush();
 
             $this->addFlash('success', 'Recenze uložena!');
