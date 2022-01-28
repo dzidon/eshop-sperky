@@ -115,6 +115,14 @@ class Address
      */
     private $updated;
 
+    public function __construct(User $user)
+    {
+        $now = new \DateTime('now');
+        $this->created = $now;
+        $this->updated = $now;
+        $this->user = $user;
+    }
+
     /**
      * Vrátí název země podle kódu
      *

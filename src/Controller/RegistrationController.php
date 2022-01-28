@@ -49,7 +49,7 @@ class RegistrationController extends AbstractController
             return $this->redirectToRoute('home');
         }
 
-        $user = $this->getDoctrine()->getRepository(User::class)->createNew();
+        $user = new User();
         $form = $this->createForm(RegistrationFormType::class, $user);
         $form->add('submit', SubmitType::class, ['label' => 'Zaregistrovat se']);
         $form->handleRequest($this->request);

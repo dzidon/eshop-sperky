@@ -18,14 +18,4 @@ class PermissionRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Permission::class);
     }
-
-    public function createNew($code, $name, $category): Permission
-    {
-        $permission = new Permission();
-        $permission->setCode($code)
-                   ->setName($name)
-                   ->setCategory($category);
-
-        return $permission;
-    }
 }

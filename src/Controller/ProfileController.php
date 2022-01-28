@@ -223,7 +223,7 @@ class ProfileController extends AbstractController
         }
         else //nezadal id do url, vytvari novou adresu
         {
-            $address = $this->getDoctrine()->getRepository(Address::class)->createNew($user);
+            $address = new Address($user);
             $this->breadcrumbs->setPageTitleByRoute('profile_address', 'new');
         }
 

@@ -21,17 +21,6 @@ class AddressRepository extends ServiceEntityRepository
         parent::__construct($registry, Address::class);
     }
 
-    public function createNew(User $user): Address
-    {
-        $address = new Address();
-        $now = new \DateTime('now');
-        $address->setCreated($now)
-                ->setUpdated($now)
-                ->setUser($user);
-
-        return $address;
-    }
-
     public function getQueryForPagination(User $user): Query
     {
         return $this->createQueryBuilder('a')

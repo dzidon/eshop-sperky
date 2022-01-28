@@ -135,7 +135,7 @@ class SocialAuthenticator extends OAuth2Authenticator
                     $socialNameFirst = $socialUser->getFirstName();
                     $socialNameLast = $socialUser->getLastName();
 
-                    $user = $userRepository->createNew();
+                    $user = new User();
                     $user->setEmail($socialEmail);
                     $user->setNameFirst($socialNameFirst);
                     $user->setNameLast($socialNameLast);

@@ -42,7 +42,10 @@ class RefreshPermissionsCommand extends Command
         foreach(PermissionVoter::PERMISSIONS as $attribute => $data)
         {
             $permissionInDb = $this->entityManager->getRepository(Permission::class)->findOneBy(['code' => $attribute]);
-            $permissionHere = $this->entityManager->getRepository(Permission::class)->createNew($attribute, PermissionVoter::PERMISSIONS[$attribute]['name'], PermissionVoter::PERMISSIONS[$attribute]['category']);
+            $permissionHere = new Permission();
+            $permissionHere->setCode($attribute)
+                           ->setName(PermissionVoter::PERMISSIONS[$attribute]['name'])
+                           ->setCategory(PermissionVoter::PERMISSIONS[$attribute]['category']);
 
             if($permissionInDb === null) //neexistuje opravneni s hledanym kodem
             {

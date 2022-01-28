@@ -127,7 +127,7 @@ class ReviewController extends AbstractController
                 return $this->redirectToRoute('reviews');
             }
 
-            $review = $this->getDoctrine()->getRepository(Review::class)->createNew($user);
+            $review = new Review($user);
             $this->breadcrumbs->addRoute('review_edit', [], '', 'new');
         }
 

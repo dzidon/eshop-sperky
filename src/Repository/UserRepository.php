@@ -28,15 +28,6 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $this->sorting = $sorting;
     }
 
-    public function createNew(): User
-    {
-        $user = new User();
-        $user->setRegistered(new \DateTime('now'))
-             ->setGender(User::GENDER_ID_UNDISCLOSED);
-
-        return $user;
-    }
-
     /**
      * Used to upgrade (rehash) the user's password automatically over time.
      */

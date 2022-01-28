@@ -91,7 +91,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @Assert\Choice(choices={User::GENDER_ID_UNDISCLOSED, User::GENDER_ID_MALE, User::GENDER_ID_FEMALE}, message="Zvolte platné oslovení.")
      * @Assert\NotBlank
      */
-    private $gender;
+    private $gender = User::GENDER_ID_UNDISCLOSED;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
@@ -136,6 +136,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $this->addresses = new ArrayCollection();
         $this->permissions = new ArrayCollection();
+        $this->registered = new \DateTime('now');
     }
 
     public function getId(): ?int
