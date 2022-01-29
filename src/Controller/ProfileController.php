@@ -5,9 +5,8 @@ namespace App\Controller;
 use App\Entity\Address;
 use App\Form\AddressFormType;
 use App\Form\ChangePasswordLoggedInFormType;
+use App\Form\HiddenTrueFormType;
 use App\Form\PersonalInfoFormType;
-use App\Form\AddressDeleteFormType;
-use App\Form\RegistrationVerifyEmailSendAgainType;
 use App\Security\EmailVerifier;
 use App\Service\BreadcrumbsService;
 use App\Service\PaginatorService;
@@ -138,7 +137,7 @@ class ProfileController extends AbstractController
             return $this->redirectToRoute('profile');
         }
 
-        $form = $this->createForm(RegistrationVerifyEmailSendAgainType::class);
+        $form = $this->createForm(HiddenTrueFormType::class, null, ['csrf_token_id' => 'form_verification_email_send_again']);
         $form->add('submit', SubmitType::class, ['label' => 'Poslat znovu', 'attr' => ['class' => 'btn-large light-blue left']]);
         $form->handleRequest($this->request);
 
@@ -276,12 +275,10 @@ class ProfileController extends AbstractController
             throw new AccessDeniedHttpException('Tuto adresu nemůžete smazat.');
         }
 
-        $form = $this->createForm(AddressDeleteFormType::class);
+        $form = $this->createForm(HiddenTrueFormType::class, null, ['csrf_token_id' => 'form_address_delete']);
         $form->add('submit', SubmitType::class, [
             'label' => 'Smazat',
-            'attr' => [
-                'class' => 'btn-large red left',
-            ],
+            'attr' => ['class' => 'btn-large red left'],
         ]);
         $form->handleRequest($this->request);
 

@@ -3,7 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Review;
-use App\Form\ReviewDeleteFormType;
+use App\Form\HiddenTrueFormType;
 use App\Form\ReviewFormType;
 use App\Service\BreadcrumbsService;
 use App\Service\PaginatorService;
@@ -185,7 +185,7 @@ class ReviewController extends AbstractController
             throw $this->createAccessDeniedException();
         }
 
-        $form = $this->createForm(ReviewDeleteFormType::class);
+        $form = $this->createForm(HiddenTrueFormType::class, null, ['csrf_token_id' => 'form_review_delete']);
         $form->add('submit',SubmitType::class, [
             'label' => 'Smazat',
             'attr' => [

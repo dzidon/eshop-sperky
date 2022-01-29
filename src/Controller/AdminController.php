@@ -4,10 +4,9 @@ namespace App\Controller;
 
 use App\Entity\ProductSection;
 use App\Entity\User;
-use App\Form\AdminMuteUserFormType;
 use App\Form\AdminPermissionsFormType;
+use App\Form\HiddenTrueFormType;
 use App\Form\PersonalInfoFormType;
-use App\Form\ProductSectionDeleteFormType;
 use App\Form\ProductSectionFormType;
 use App\Form\SearchTextAndSortFormType;
 use App\Service\BreadcrumbsService;
@@ -164,7 +163,7 @@ class AdminController extends AbstractController
         $formMuteView = null;
         if($this->isGranted('user_block_reviews'))
         {
-            $formMute = $this->createForm(AdminMuteUserFormType::class);
+            $formMute = $this->createForm(HiddenTrueFormType::class, null, ['csrf_token_id' => 'form_admin_mute_user']);
             if($userEdited->isMuted())
             {
                 $formMute->add('submit', SubmitType::class, ['label' => 'Odmlčet', 'attr' => ['class' => 'btn-large green left']]);
@@ -312,12 +311,10 @@ class AdminController extends AbstractController
             throw new NotFoundHttpException('Produktová sekce nenalezena.');
         }
 
-        $form = $this->createForm(ProductSectionDeleteFormType::class);
+        $form = $this->createForm(HiddenTrueFormType::class, null, ['csrf_token_id' => 'form_product_section_delete']);
         $form->add('submit', SubmitType::class, [
             'label' => 'Smazat',
-            'attr' => [
-                'class' => 'btn-large red left',
-            ],
+            'attr' => ['class' => 'btn-large red left'],
         ]);
         $form->handleRequest($this->request);
 
