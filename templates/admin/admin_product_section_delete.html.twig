@@ -1,0 +1,8 @@
+{% extends 'admin/admin_base.html.twig' %}
+
+{% block admin_body %}
+
+    <div class="row">Opravdu si přejete smazat produktovou sekci '{{ productSectionInstance.getName() }}'? Produkty obsažené v sekci budou existovat i nadále. Tato akce je nevratná.</div>
+    {{ form(productSectionDeleteForm) }}
+
+{% endblock %}

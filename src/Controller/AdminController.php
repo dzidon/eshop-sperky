@@ -7,6 +7,8 @@ use App\Entity\User;
 use App\Form\AdminMuteUserFormType;
 use App\Form\AdminPermissionsFormType;
 use App\Form\PersonalInfoFormType;
+use App\Form\ProductSectionDeleteFormType;
+use App\Form\ProductSectionFormType;
 use App\Form\SearchTextAndSortFormType;
 use App\Service\BreadcrumbsService;
 use App\Service\PaginatorService;
@@ -238,6 +240,104 @@ class AdminController extends AbstractController
             'sections' => $sections,
             'breadcrumbs' => $this->breadcrumbs->setPageTitleByRoute('admin_product_sections'),
             'pagination' => $paginatorService->createViewData(),
+        ]);
+    }
+
+    /**
+     * @Route("/produktova-sekce/{id}", name="admin_product_section_edit", requirements={"id"="\d+"})
+     *
+     * @IsGranted("product_section_edit")
+     */
+    public function productSection($id = null): Response
+    {
+        $user = $this->getUser();
+
+        if($id !== null) //zadal id do url, snazi se editovat existujici
+        {
+            $section = $this->getDoctrine()->getRepository(ProductSection::class)->findOneBy(['id' => $id]);
+            if($section === null) //nenaslo to zadnou sekci
+            {
+                throw new NotFoundHttpException('Produktová sekce nenalezena.');
+            }
+            $this->breadcrumbs->setPageTitleByRoute('admin_product_section_edit', 'edit');
+        }
+        else //nezadal id do url, vytvari novou sekci
+        {
+            $section = new ProductSection();
+            $this->breadcrumbs->setPageTitleByRoute('admin_product_section_edit', 'new');
+        }
+
+        $form = $this->createForm(ProductSectionFormType::class, $section);
+        $form->add('submit', SubmitType::class, ['label' => 'Uložit']);
+        $form->handleRequest($this->request);
+
+        if ($form->isSubmitted() && $form->isValid())
+        {
+            $entityManager = $this->getDoctrine()->getManager();
+            if ($section->getId() === null)
+            {
+                $entityManager->persist($section);
+            }
+            else
+            {
+                $section->setUpdated(new \DateTime('now'));
+            }
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Produktová sekce uložena!');
+            $this->logger->info(sprintf("Admin %s (ID: %s) has saved a product section %s (ID: %s).", $user->getUserIdentifier(), $user->getId(), $section->getName(), $section->getId()));
+
+            return $this->redirectToRoute('admin_product_sections');
+        }
+
+        return $this->render('admin/admin_product_section_edit.html.twig', [
+            'productSectionForm' => $form->createView(),
+            'productSectionInstance' => $section,
+            'breadcrumbs' => $this->breadcrumbs,
+        ]);
+    }
+
+    /**
+     * @Route("/produktova-sekce/{id}/smazat", name="admin_product_section_delete", requirements={"id"="\d+"})
+     *
+     * @IsGranted("product_section_delete")
+     */
+    public function productSectionDelete($id): Response
+    {
+        $user = $this->getUser();
+
+        $section = $this->getDoctrine()->getRepository(ProductSection::class)->findOneBy(['id' => $id]);
+        if($section === null) //nenaslo to zadnou sekci
+        {
+            throw new NotFoundHttpException('Produktová sekce nenalezena.');
+        }
+
+        $form = $this->createForm(ProductSectionDeleteFormType::class);
+        $form->add('submit', SubmitType::class, [
+            'label' => 'Smazat',
+            'attr' => [
+                'class' => 'btn-large red left',
+            ],
+        ]);
+        $form->handleRequest($this->request);
+
+        if ($form->isSubmitted() && $form->isValid())
+        {
+            $this->logger->info(sprintf("Admin %s (ID: %s) has deleted a product section %s (ID: %s).", $user->getUserIdentifier(), $user->getId(), $section->getName(), $section->getId()));
+
+            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager->remove($section);
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Produktová sekce smazána!');
+
+            return $this->redirectToRoute('admin_product_sections');
+        }
+
+        return $this->render('admin/admin_product_section_delete.html.twig', [
+            'productSectionDeleteForm' => $form->createView(),
+            'productSectionInstance' => $section,
+            'breadcrumbs' => $this->breadcrumbs->setPageTitleByRoute('admin_product_section_delete'),
         ]);
     }
 }

@@ -4,9 +4,11 @@
 {% set can_delete = is_granted('product_section_delete') %}
 
 {% block admin_subheading_extra %}
+
     {% if can_edit %}
-        <a href="{# {{ path('admin_product_section_edit') }} #} " class="btn-floating btn-medium waves-effect waves-light light-blue"><i class="material-icons">add</i></a>
+        <a href=" {{ path('admin_product_section_edit') }} " class="btn-floating btn-medium waves-effect waves-light light-blue"><i class="material-icons">add</i></a>
     {% endif %}
+
 {% endblock %}
 
 {% block admin_body %}
@@ -35,13 +37,13 @@
                         {% endif %}
 
                         {% if can_delete %}
-                            <a href=" {# {{ path('admin_product_section_delete', {id: section.getId()}) }} #} " class="secondary-content">
+                            <a href=" {{ path('admin_product_section_delete', {id: section.getId()}) }} " class="secondary-content">
                                 <i class="material-icons">delete</i>
                             </a>
                         {% endif %}
 
                         {% if can_edit %}
-                            <a href=" {# {{ path('admin_product_section_edit', {id: section.getId()}) }} #} " class="secondary-content">
+                            <a href=" {{ path('admin_product_section_edit', {id: section.getId()}) }} " class="secondary-content">
                                 <i class="material-icons">create</i>
                             </a>
                         {% endif %}

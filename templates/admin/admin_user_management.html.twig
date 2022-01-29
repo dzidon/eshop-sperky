@@ -20,6 +20,7 @@
                         <strong>
                             {{ user.getEmail() }}
                         </strong>
+
                         {% if user.fullNameIsSet() %}
                             -
                             {% if user.genderIsSet() %}
@@ -28,6 +29,7 @@
 
                             {{ user.getNameFirst() }} {{ user.getNameLast() }}
                         {% endif %}
+
                         {% if user.isMuted() %}
                             - <span class="red-text">UMLČEN</span>
                         {% endif %}

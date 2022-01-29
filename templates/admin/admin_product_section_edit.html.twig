@@ -1,0 +1,26 @@
+{% extends 'admin/admin_base.html.twig' %}
+
+{% block admin_body %}
+
+    {% if productSectionInstance.getId() is not null %}
+        <div class="row">
+            {% if productSectionInstance.getCreated() is not null %}
+                Vytvořeno: {{ productSectionInstance.getCreated()|date('d. m. Y H:i:s') }}
+            {% endif %}
+
+            {% if productSectionInstance.getCreated() != productSectionInstance.getUpdated() and productSectionInstance.getUpdated() is not null %}
+                <br>Upraveno: {{ productSectionInstance.getUpdated()|date('d. m. Y H:i:s') }}
+            {% endif %}
+        </div>
+        <br>
+    {% endif %}
+
+    {{ form(productSectionForm) }}
+
+    {% if productSectionInstance.getId() is not null and is_granted('product_section_delete') %}
+        <div class="row center-align">
+            <a href="{{ path('admin_product_section_delete', {id: productSectionInstance.getId()}) }}">Smazat</a>
+        </div>
+    {% endif %}
+
+{% endblock %}
