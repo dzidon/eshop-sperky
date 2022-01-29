@@ -18,7 +18,7 @@ class AdministrationVoter implements VoterInterface
             'user_edit_credentials', 'user_block_reviews', 'user_set_permissions'
         ],
         self::SECTION_PRODUCT_SECTION_MANAGEMENT => [
-            'product_section_create', 'product_section_edit', 'product_section_delete'
+            'product_section_edit', 'product_section_delete'
         ],
     ];
 

@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\ProductSectionRepository;
+use App\Service\SortingService;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -31,7 +32,24 @@ class ProductSection
      *
      * @Assert\Type("bool")
      */
-    private $hidden = false;
+    private $isHidden = false;
+
+    /**
+     * @ORM\Column(type="datetime")
+     */
+    private $created;
+
+    /**
+     * @ORM\Column(type="datetime")
+     */
+    private $updated;
+
+    public function __construct()
+    {
+        $now = new \DateTime('now');
+        $this->created = $now;
+        $this->updated = $now;
+    }
 
     public function getId(): ?int
     {
@@ -50,15 +68,50 @@ class ProductSection
         return $this;
     }
 
-    public function getHidden(): ?bool
+    public function isHidden(): ?bool
     {
-        return $this->hidden;
+        return $this->isHidden;
     }
 
-    public function setHidden(?bool $hidden): self
+    public function setIsHidden(?bool $isHidden): self
     {
-        $this->hidden = $hidden;
+        $this->isHidden = $isHidden;
 
         return $this;
+    }
+
+    public function getCreated(): ?\DateTimeInterface
+    {
+        return $this->created;
+    }
+
+    public function setCreated(\DateTimeInterface $created): self
+    {
+        $this->created = $created;
+
+        return $this;
+    }
+
+    public function getUpdated(): ?\DateTimeInterface
+    {
+        return $this->updated;
+    }
+
+    public function setUpdated(\DateTimeInterface $updated): self
+    {
+        $this->updated = $updated;
+
+        return $this;
+    }
+
+    public static function getSortData(): array
+    {
+        return [
+            'Název (A-Z)' => 'name'.SortingService::ATTRIBUTE_TAG_ASC,
+            'Název (Z-A)' => 'name'.SortingService::ATTRIBUTE_TAG_DESC,
+            'Od nejstarší' => 'created'.SortingService::ATTRIBUTE_TAG_ASC,
+            'Od nejnovější' => 'created'.SortingService::ATTRIBUTE_TAG_DESC,
+            'Od skrytých' => 'isHidden'.SortingService::ATTRIBUTE_TAG_DESC,
+        ];
     }
 }

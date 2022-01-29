@@ -41,12 +41,8 @@ class PermissionVoter implements VoterInterface
         ],
 
         //sprava produktovych sekci
-        'product_section_create' => [
-            'name' => 'Tvorba produktových sekcí',
-            'category' => self::CATEGORY_PRODUCT_SECTIONS,
-        ],
         'product_section_edit' => [
-            'name' => 'Editace produktových sekcí',
+            'name' => 'Tvorba a editace produktových sekcí',
             'category' => self::CATEGORY_PRODUCT_SECTIONS,
         ],
         'product_section_delete' => [

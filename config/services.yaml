@@ -36,6 +36,11 @@ parameters:
     app_page_title.admin_permission_overview: 'Moje oprávnění'
     app_page_title.admin_user_management: 'Správa uživatelů'
     app_page_title.admin_user_management_specific: 'Uživatel'
+    app_page_title.admin_product_sections: 'Správa produktových sekcí'
+    app_page_title.admin_product_section_edit:
+        new: 'Nová produktová sekce'
+        edit: 'Upravit produktovou sekci'
+    app_page_title.admin_product_section_delete: 'Smazat produktovou sekci'
 
 services:
     # default configuration for services in *this* file

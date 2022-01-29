@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\ProductSection;
 use App\Entity\User;
 use App\Form\AdminMuteUserFormType;
 use App\Form\AdminPermissionsFormType;
@@ -199,6 +200,44 @@ class AdminController extends AbstractController
             'formMute' => $formMuteView,
             'userEdited' => $userEdited,
             'breadcrumbs' => $this->breadcrumbs->setPageTitleByRoute('admin_user_management_specific')->appendToPageTitle( ($userEdited->fullNameIsSet() ? ' ' . $userEdited->getFullName() : '') ),
+        ]);
+    }
+
+    /**
+     * @Route("/produktove-sekce", name="admin_product_sections")
+     *
+     * @IsGranted("admin_product_sections")
+     */
+    public function productSections(FormFactoryInterface $formFactory, PaginatorService $paginatorService): Response
+    {
+        $form = $formFactory->createNamed('', SearchTextAndSortFormType::class, null, ['sort_choices' => ProductSection::getSortData()]);
+        //button je přidáván v šabloně, aby se nezobrazoval v odkazu
+        $form->handleRequest($this->request);
+
+        if ($form->isSubmitted() && $form->isValid())
+        {
+            $queryForPagination = $this->getDoctrine()->getRepository(ProductSection::class)->getQueryForSearchAndPagination($form->get('vyraz')->getData(), $form->get('razeni')->getData());
+        }
+        else
+        {
+            $queryForPagination = $this->getDoctrine()->getRepository(ProductSection::class)->getQueryForSearchAndPagination();
+        }
+
+        $page = (int) $this->request->query->get(PaginatorService::QUERY_PARAMETER_PAGE_NAME, '1');
+        $sections = $paginatorService
+            ->initialize($queryForPagination, 1, $page)
+            ->getCurrentPageObjects();
+
+        if($paginatorService->isPageOutOfBounds($paginatorService->getCurrentPage()))
+        {
+            throw new NotFoundHttpException('Na této stránce nebyly nalezeny žádné sekce.');
+        }
+
+        return $this->render('admin/admin_product_sections.html.twig', [
+            'searchForm' => $form->createView(),
+            'sections' => $sections,
+            'breadcrumbs' => $this->breadcrumbs->setPageTitleByRoute('admin_product_sections'),
+            'pagination' => $paginatorService->createViewData(),
         ]);
     }
 }

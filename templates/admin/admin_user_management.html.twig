@@ -16,23 +16,26 @@
         {% else %}
             <div class="collection">
                 {% for user in users %}
-                    <a href=" {{ path('admin_user_management_specific', {id: user.getId()}) }} " class="collection-item">
-                        {{ user.getEmail() }}
+                    <div class="collection-item">
+                        <strong>
+                            {{ user.getEmail() }}
+                        </strong>
                         {% if user.fullNameIsSet() %}
-                            <span class="black-text">
-                                -
-                                {% if user.genderIsSet() %}
-                                    {{ user.getGenderName() }}
-                                {% endif %}
+                            -
+                            {% if user.genderIsSet() %}
+                                {{ user.getGenderName() }}
+                            {% endif %}
 
-                                {{ user.getNameFirst() }} {{ user.getNameLast() }}
-
-                                {% if user.isMuted() %}
-                                    - <span class="red-text">UMLČEN</span>
-                                {% endif %}
-                            </span>
+                            {{ user.getNameFirst() }} {{ user.getNameLast() }}
                         {% endif %}
-                    </a>
+                        {% if user.isMuted() %}
+                            - <span class="red-text">UMLČEN</span>
+                        {% endif %}
+
+                        <a href=" {{ path('admin_user_management_specific', {id: user.getId()}) }} " class="secondary-content">
+                            <i class="material-icons">create</i>
+                        </a>
+                    </div>
                 {% endfor %}
             </div>
         {% endif %}

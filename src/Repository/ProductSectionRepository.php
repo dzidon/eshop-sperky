@@ -3,7 +3,9 @@
 namespace App\Repository;
 
 use App\Entity\ProductSection;
+use App\Service\SortingService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Query;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -14,47 +16,38 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class ProductSectionRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    private SortingService $sorting;
+
+    public function __construct(ManagerRegistry $registry, SortingService $sorting)
     {
         parent::__construct($registry, ProductSection::class);
+
+        $this->sorting = $sorting;
     }
 
     public function findAllVisible()
     {
         return $this->createQueryBuilder('ps')
-            ->andWhere('ps.hidden = 0')
+            ->andWhere('ps.isHidden = 0')
             ->orderBy('ps.name', 'ASC')
             ->getQuery()
             ->getResult()
         ;
     }
 
-    // /**
-    //  * @return ProductSection[] Returns an array of ProductSection objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    public function getQueryForSearchAndPagination($searchPhrase = null, string $sortAttribute = null): Query
     {
-        return $this->createQueryBuilder('p')
-            ->andWhere('p.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('p.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
-    */
+        $sortData = $this->sorting->createSortData($sortAttribute, ProductSection::getSortData());
 
-    /*
-    public function findOneBySomeField($value): ?ProductSection
-    {
-        return $this->createQueryBuilder('p')
-            ->andWhere('p.exampleField = :val')
-            ->setParameter('val', $value)
+        return $this->createQueryBuilder('ps')
+
+            //podminky
+            ->orWhere('ps.name LIKE :name')
+            ->setParameter('name', '%' . $searchPhrase . '%')
+
+            //razeni
+            ->orderBy('ps.' . $sortData['attribute'], $sortData['order'])
             ->getQuery()
-            ->getOneOrNullResult()
         ;
     }
-    */
 }

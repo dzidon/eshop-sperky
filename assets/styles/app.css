@@ -148,6 +148,10 @@ a.collection-item.active {
     background-color: #03a9f4 !important;
 }
 
+a.secondary-content {
+    color: #03a9f4;
+}
+
 .no-mar-top {
     margin-top: 0;
 }
