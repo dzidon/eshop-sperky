@@ -6,9 +6,11 @@ use App\Repository\ProductSectionRepository;
 use App\Service\SortingService;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * @ORM\Entity(repositoryClass=ProductSectionRepository::class)
+ * @UniqueEntity(fields={"slug"}, message="Už existuje produktová sekce s tímto názvem pro odkaz.")
  */
 class ProductSection
 {
@@ -26,6 +28,14 @@ class ProductSection
      * @Assert\NotBlank
      */
     private $name;
+
+    /**
+     * @ORM\Column(type="string", length=255, unique=true)
+     *
+     * @Assert\Length(max=255, maxMessage="Maximální počet znaků v názvu pro odkaz: {{ limit }}")
+     * @Assert\NotBlank
+     */
+    private $slug;
 
     /**
      * @ORM\Column(type="boolean")
@@ -64,6 +74,18 @@ class ProductSection
     public function setName(?string $name): self
     {
         $this->name = $name;
+
+        return $this;
+    }
+
+    public function getSlug(): ?string
+    {
+        return $this->slug;
+    }
+
+    public function setSlug(?string $slug): self
+    {
+        $this->slug = $slug;
 
         return $this;
     }
