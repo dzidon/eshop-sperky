@@ -45,6 +45,9 @@ class ProductSectionRepository extends ServiceEntityRepository
             ->orWhere('ps.name LIKE :name')
             ->setParameter('name', '%' . $searchPhrase . '%')
 
+            ->orWhere('ps.slug LIKE :slug')
+            ->setParameter('slug', '%' . $searchPhrase . '%')
+
             //razeni
             ->orderBy('ps.' . $sortData['attribute'], $sortData['order'])
             ->getQuery()

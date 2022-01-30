@@ -1,0 +1,26 @@
+{% extends 'admin/admin_base.html.twig' %}
+
+{% block admin_body %}
+
+    {% if productCategoryGroupInstance.getId() is not null %}
+        <div class="row">
+            {% if productCategoryGroupInstance.getCreated() is not null %}
+                Vytvořeno: {{ productCategoryGroupInstance.getCreated()|date('d. m. Y H:i:s') }}
+            {% endif %}
+
+            {% if productCategoryGroupInstance.getCreated() != productCategoryGroupInstance.getUpdated() and productCategoryGroupInstance.getUpdated() is not null %}
+                <br>Upraveno: {{ productCategoryGroupInstance.getUpdated()|date('d. m. Y H:i:s') }}
+            {% endif %}
+        </div>
+        <br>
+    {% endif %}
+
+    {{ form(productCategoryGroupForm) }}
+
+    {% if productCategoryGroupInstance.getId() is not null and is_granted('product_category_delete') %}
+        <div class="row center-align">
+            <a href="{{ path('admin_product_category_delete', {id: productCategoryGroupInstance.getId()}) }}">Smazat</a>
+        </div>
+    {% endif %}
+
+{% endblock %}

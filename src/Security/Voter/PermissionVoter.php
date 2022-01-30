@@ -11,6 +11,7 @@ class PermissionVoter implements VoterInterface
     const CATEGORY_REVIEWS = 'Recenze';
     const CATEGORY_USERS = 'Správa uživatelů';
     const CATEGORY_PRODUCT_SECTIONS = 'Správa produktových sekcí';
+    const CATEGORY_PRODUCT_CATEGORIES = 'Správa produktových kategorií';
 
     /*
      * (!!!) Po úpravě téhle konstanty je nutné vyvolat příkaz 'php bin/console app:refresh-permissions', aby se aktualizoval obsah tabulky 'permission'
@@ -48,6 +49,16 @@ class PermissionVoter implements VoterInterface
         'product_section_delete' => [
             'name' => 'Mazání produktových sekcí',
             'category' => self::CATEGORY_PRODUCT_SECTIONS,
+        ],
+
+        //sprava produktovych kategorii
+        'product_category_edit' => [
+            'name' => 'Tvorba a editace produktových kategorií',
+            'category' => self::CATEGORY_PRODUCT_CATEGORIES,
+        ],
+        'product_category_delete' => [
+            'name' => 'Mazání produktových kategorií',
+            'category' => self::CATEGORY_PRODUCT_CATEGORIES,
         ],
     ];
 

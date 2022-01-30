@@ -41,6 +41,11 @@ parameters:
         new: 'Nová produktová sekce'
         edit: 'Upravit produktovou sekci'
     app_page_title.admin_product_section_delete: 'Smazat produktovou sekci'
+    app_page_title.admin_product_categories: 'Správa produktových kategorií'
+    app_page_title.admin_product_category_edit:
+        new: 'Nová skupina produktových kategorií'
+        edit: 'Upravit skupinu produktových kategorií'
+    app_page_title.admin_product_category_delete: 'Smazat skupinu produktových kategorií'
 
 services:
     # default configuration for services in *this* file

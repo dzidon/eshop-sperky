@@ -1,12 +1,12 @@
 {% extends 'admin/admin_base.html.twig' %}
 
-{% set can_edit = is_granted('product_section_edit') %}
-{% set can_delete = is_granted('product_section_delete') %}
+{% set can_edit = is_granted('product_category_edit') %}
+{% set can_delete = is_granted('product_category_delete') %}
 
 {% block admin_subheading_extra %}
 
     {% if can_edit %}
-        <a href=" {{ path('admin_product_section_edit') }} " class="btn-floating btn-medium waves-effect waves-light light-blue"><i class="material-icons">add</i></a>
+        <a href=" {{ path('admin_product_category_edit') }} " class="btn-floating btn-medium waves-effect waves-light light-blue"><i class="material-icons">add</i></a>
     {% endif %}
 
 {% endblock %}
@@ -23,32 +23,24 @@
     <div class="row">
         <h4>Výsledky hledání</h4>
 
-        {% if sections is empty %}
-            Hledání neodpovídají žádné produktové sekce.
+        {% if categoryGroups is empty %}
+            Hledání neodpovídají žádné skupiny produktových kategorií.
         {% else %}
             <div class="collection">
-                {% for section in sections %}
+                {% for group in categoryGroups %}
                     <div class="collection-item">
                         <strong>
-                            {{ section.getName() }}
+                            {{ group.getName() }}
                         </strong>
 
-                        <em>
-                            /{{ section.getSlug() }}
-                        </em>
-
-                        {% if section.isHidden() %}
-                            - <span class="red-text">SKRYTO</span>
-                        {% endif %}
-
                         {% if can_delete %}
-                            <a href=" {{ path('admin_product_section_delete', {id: section.getId()}) }} " class="secondary-content">
+                            <a href=" {{ path('admin_product_category_delete', {id: group.getId()}) }} " class="secondary-content">
                                 <i class="material-icons">delete</i>
                             </a>
                         {% endif %}
 
                         {% if can_edit %}
-                            <a href=" {{ path('admin_product_section_edit', {id: section.getId()}) }} " class="secondary-content">
+                            <a href=" {{ path('admin_product_category_edit', {id: group.getId()}) }} " class="secondary-content">
                                 <i class="material-icons">create</i>
                             </a>
                         {% endif %}

@@ -11,6 +11,7 @@ class AdministrationVoter implements VoterInterface
     const SECTION_PERMISSION_OVERVIEW = 'admin_permission_overview';
     const SECTION_USER_MANAGEMENT = 'admin_user_management';
     const SECTION_PRODUCT_SECTION_MANAGEMENT = 'admin_product_sections';
+    const SECTION_PRODUCT_CATEGORY_MANAGEMENT = 'admin_product_categories';
 
     const REQUIRED_PERMISSIONS = [
         self::SECTION_PERMISSION_OVERVIEW => '_any',
@@ -19,6 +20,9 @@ class AdministrationVoter implements VoterInterface
         ],
         self::SECTION_PRODUCT_SECTION_MANAGEMENT => [
             'product_section_edit', 'product_section_delete'
+        ],
+        self::SECTION_PRODUCT_CATEGORY_MANAGEMENT => [
+            'product_category_edit', 'product_category_delete'
         ],
     ];
 
