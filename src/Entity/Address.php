@@ -189,7 +189,7 @@ class Address
 
     public function setZip(?string $zip): self
     {
-        $this->zip = $zip;
+        $this->zip = preg_replace('/\s+/', '', $zip);
 
         return $this;
     }
