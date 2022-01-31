@@ -427,8 +427,7 @@ class AdminController extends AbstractController
                 $updatedCategories = array_udiff($categoryGroup->getCategories()->getValues(), $oldCategories,
                     function ($objA, $objB)
                     {
-                        if ($objA->getName() === $objB->getName()) return 0;
-                        else return -1;
+                        return strcmp($objA->getName(), $objB->getName());
                     }
                 );
 
