@@ -402,6 +402,12 @@ class AdminController extends AbstractController
             $this->breadcrumbs->setPageTitleByRoute('admin_product_category_edit', 'new');
         }
 
+        $oldCategories = [];
+        foreach ($categoryGroup->getCategories() as $category)
+        {
+            $oldCategories[] = clone $category;
+        }
+
         $form = $this->createForm(ProductCategoryGroupFormType::class, $categoryGroup);
         $form->add('submit', SubmitType::class, ['label' => 'Uložit']);
         $form->handleRequest($this->request);
@@ -417,7 +423,16 @@ class AdminController extends AbstractController
             {
                 $now = new \DateTime('now');
                 $categoryGroup->setUpdated($now);
-                foreach ($categoryGroup->getCategories() as $category)
+
+                $updatedCategories = array_udiff($categoryGroup->getCategories()->getValues(), $oldCategories,
+                    function ($objA, $objB)
+                    {
+                        if ($objA->getName() === $objB->getName()) return 0;
+                        else return -1;
+                    }
+                );
+
+                foreach ($updatedCategories as $category)
                 {
                     $category->setUpdated($now);
                 }
