@@ -30,7 +30,9 @@ class ProductCategoryGroup
     private $name;
 
     /**
-     * @ORM\OneToMany(targetEntity=ProductCategory::class, mappedBy="productCategoryGroup", orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity=ProductCategory::class, mappedBy="productCategoryGroup", orphanRemoval=true, cascade={"persist"})
+     *
+     * @Assert\Valid
      */
     private $categories;
 

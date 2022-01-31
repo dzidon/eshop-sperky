@@ -81,6 +81,34 @@
     </div>
 {% endblock checkbox_row %}
 
+{# Řádek kolekce #}
+{% block collection_row %}
+    <div>
+        {{ form_label(form) }}
+        {{ form_widget(form) }}
+        {{ form_help(form) }}
+        {{ form_errors(form) }}
+    </div>
+{% endblock collection_row %}
+
+{# Widget kolekce #}
+{%- block collection_widget -%}
+    {% if prototype is defined and not prototype.rendered %}
+        {%- set attr = attr|merge({'data-prototype': form_widget(prototype) }) -%}
+    {% endif %}
+    {{- block('form_widget') -}}
+{%- endblock collection_widget -%}
+
+{# Label kolekce #}
+{% block collection_label %}
+    <div class="row">
+        {{ label }}
+        {% if required %}
+            <span class="required-star">*</span>
+        {% endif %}
+    </div>
+{% endblock collection_label %}
+
 {# Label checkboxu #}
 {% block checkbox_label %}
     <span>
@@ -97,7 +125,7 @@
     <div class="row center-align">
         {{ parent() }}
     </div>
-{% endblock %}
+{% endblock button_widget %}
 
 {# Label radio buttonu #}
 {% block radio_label %}
@@ -116,7 +144,7 @@
         {{ form_help(form) }}
         {{ form_errors(form) }}
     </div>
-{% endblock %}
+{% endblock choice_row %}
 
 {# Konkrétní radio button nebo skupina radio buttonu #}
 {% block choice_widget_expanded %}
@@ -151,7 +179,7 @@
 {% block textarea_widget %}
     {% set attr = attr|merge({class: (attr.class|default('') ~ 'materialize-textarea')|trim}) %}
     {{ parent() }}
-{% endblock %}
+{% endblock textarea_widget %}
 
 {# Klikatelné hodnocení s hvězdami #}
 {% block star_choice_row %}
@@ -163,7 +191,7 @@
         {{ form_help(form) }}
         {{ form_errors(form) }}
     </div>
-{% endblock %}
+{% endblock star_choice_row %}
 
 {# Konkrétní hvězda #}
 {% block star_choice_widget %}

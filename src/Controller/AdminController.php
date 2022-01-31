@@ -415,7 +415,12 @@ class AdminController extends AbstractController
             }
             else
             {
-                $categoryGroup->setUpdated(new \DateTime('now'));
+                $now = new \DateTime('now');
+                $categoryGroup->setUpdated($now);
+                foreach ($categoryGroup->getCategories() as $category)
+                {
+                    $category->setUpdated($now);
+                }
             }
             $entityManager->flush();
 

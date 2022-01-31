@@ -15,7 +15,11 @@
         <br>
     {% endif %}
 
-    {{ form(productCategoryGroupForm) }}
+    {{ form_start(productCategoryGroupForm) }}
+        {{ form_row(productCategoryGroupForm.name) }}
+        {{ form_row(productCategoryGroupForm.categories, { 'attr': {'data-index': productCategoryGroupForm.categories|length > 0 ? productCategoryGroupForm.categories|last.vars.name + 1 : 0} }) }}
+        {{ form_rest(productCategoryGroupForm) }}
+    {{ form_end(productCategoryGroupForm) }}
 
     {% if productCategoryGroupInstance.getId() is not null and is_granted('product_category_delete') %}
         <div class="row center-align">
