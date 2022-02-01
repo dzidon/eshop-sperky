@@ -21,7 +21,7 @@
     </div>
 
     <div class="row">
-        <h4>Výsledky hledání</h4>
+        <h4>Výsledky ({{ pagination.getTotalItems() }})</h4>
 
         {% if sections is empty %}
             Hledání neodpovídají žádné produktové sekce.

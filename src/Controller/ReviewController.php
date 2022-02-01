@@ -46,7 +46,7 @@ class ReviewController extends AbstractController
             ->initialize($queryForPagination, 5, $page)
             ->getCurrentPageObjects();
 
-        if($paginatorService->isPageOutOfBounds($paginatorService->getCurrentPage()))
+        if($paginatorService->isCurrentPageOutOfBounds())
         {
             throw new NotFoundHttpException('Na této stránce nebyly nalezeny žádné recenze.');
         }
@@ -196,13 +196,12 @@ class ReviewController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid())
         {
-            $this->logger->info(sprintf("User %s (ID: %s) has deleted a review (ID: %s).", $user->getUserIdentifier(), $user->getId(), $review->getId()));
-
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->remove($review);
             $entityManager->flush();
 
             $this->addFlash('success', 'Recenze smazána!');
+            $this->logger->info(sprintf("User %s (ID: %s) has deleted a review (ID: %s).", $user->getUserIdentifier(), $user->getId(), $review->getId()));
 
             return $this->redirectToRoute('reviews');
         }

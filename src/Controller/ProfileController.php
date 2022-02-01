@@ -181,7 +181,7 @@ class ProfileController extends AbstractController
             ->initialize($queryForPagination, 5, $page)
             ->getCurrentPageObjects();
 
-        if($paginatorService->isPageOutOfBounds($paginatorService->getCurrentPage()))
+        if($paginatorService->isCurrentPageOutOfBounds())
         {
             throw new NotFoundHttpException('Na této stránce nebyly nalezeny žádné adresy.');
         }

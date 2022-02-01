@@ -34,6 +34,11 @@ class PaginatorService
     private array $currentPageObjects;
 
     /**
+     * @var int Celkový počet úplně všech nalezených prvků
+     */
+    private int $totalItems;
+
+    /**
      * @var array Data pro klikatelné stránkování
      */
     private array $viewData = [];
@@ -65,8 +70,8 @@ class PaginatorService
         $this->setCurrentPageAndSanitize($page);
 
         $paginator = new Paginator($query);
-        $totalItems = count($paginator);
-        $this->pagesCount = ceil($totalItems / $this->pageSize);
+        $this->totalItems = count($paginator);
+        $this->pagesCount = ceil($this->totalItems / $this->pageSize);
 
         $this->currentPageObjects = $paginator->getQuery()
             ->setFirstResult($this->pageSize * ($this->currentPage-1))
@@ -84,6 +89,16 @@ class PaginatorService
     public function getViewData(): array
     {
         return $this->viewData;
+    }
+
+    /**
+     * Vrátí počet úplně všech nalezených prvků
+     *
+     * @return int
+     */
+    public function getTotalItems(): int
+    {
+        return $this->totalItems;
     }
 
     /**
@@ -125,6 +140,16 @@ class PaginatorService
     public function isPageOutOfBounds(int $page): bool
     {
         return (($page > $this->pagesCount && $page !== 1) || $page < 1);
+    }
+
+    /**
+     * Zjistí, jestli je aktuální stránka větší než celkový počet stránek, nebo jestli je aktuální stránka menší než 1
+     *
+     * @return bool
+     */
+    public function isCurrentPageOutOfBounds(): bool
+    {
+        return $this->isPageOutOfBounds( $this->currentPage );
     }
 
     /**

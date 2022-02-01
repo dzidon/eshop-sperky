@@ -81,7 +81,7 @@ class AdminController extends AbstractController
             ->initialize($queryForPagination, 1, $page)
             ->getCurrentPageObjects();
 
-        if($paginatorService->isPageOutOfBounds($paginatorService->getCurrentPage()))
+        if($paginatorService->isCurrentPageOutOfBounds())
         {
             throw new NotFoundHttpException('Na této stránce nebyli nalezeni žádní uživatelé.');
         }
@@ -231,7 +231,7 @@ class AdminController extends AbstractController
             ->initialize($queryForPagination, 1, $page)
             ->getCurrentPageObjects();
 
-        if($paginatorService->isPageOutOfBounds($paginatorService->getCurrentPage()))
+        if($paginatorService->isCurrentPageOutOfBounds())
         {
             throw new NotFoundHttpException('Na této stránce nebyly nalezeny žádné sekce.');
         }
@@ -365,7 +365,7 @@ class AdminController extends AbstractController
             ->initialize($queryForPagination, 1, $page)
             ->getCurrentPageObjects();
 
-        if($paginatorService->isPageOutOfBounds($paginatorService->getCurrentPage()))
+        if($paginatorService->isCurrentPageOutOfBounds())
         {
             throw new NotFoundHttpException('Na této stránce nebyly nalezeny žádné skupiny produktových kategorií.');
         }
