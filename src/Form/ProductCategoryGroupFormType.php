@@ -10,9 +10,17 @@ use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Security\Core\Security;
 
 class ProductCategoryGroupFormType extends AbstractType
 {
+    private Security $security;
+
+    public function __construct(Security $security)
+    {
+        $this->security = $security;
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
@@ -25,7 +33,7 @@ class ProductCategoryGroupFormType extends AbstractType
                 'by_reference' => false,
                 'required' => false,
                 'allow_add' => true,
-                'allow_delete' => true,
+                'allow_delete' => $this->security->isGranted('product_category_delete'),
                 'label' => 'Kategorie',
                 'delete_empty' => function (ProductCategory $category = null) {
                     return $category === null || $category->getName() === null;

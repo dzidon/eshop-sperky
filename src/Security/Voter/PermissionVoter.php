@@ -9,9 +9,9 @@ use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 class PermissionVoter implements VoterInterface
 {
     const CATEGORY_REVIEWS = 'Recenze';
-    const CATEGORY_USERS = 'Správa uživatelů';
-    const CATEGORY_PRODUCT_SECTIONS = 'Správa produktových sekcí';
-    const CATEGORY_PRODUCT_CATEGORIES = 'Správa produktových kategorií';
+    const CATEGORY_USERS = 'Uživatelé';
+    const CATEGORY_PRODUCT_SECTIONS = 'Produktové sekce';
+    const CATEGORY_PRODUCT_CATEGORIES = 'Produktové kategore';
 
     /*
      * (!!!) Po úpravě téhle konstanty je nutné vyvolat příkaz 'php bin/console app:refresh-permissions', aby se aktualizoval obsah tabulky 'permission'

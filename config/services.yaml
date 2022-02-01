@@ -34,14 +34,14 @@ parameters:
     app_page_title.register: 'Registrace'
     app_page_title.login: 'Přihlášení'
     app_page_title.admin_permission_overview: 'Moje oprávnění'
-    app_page_title.admin_user_management: 'Správa uživatelů'
+    app_page_title.admin_user_management: 'Uživatelé'
     app_page_title.admin_user_management_specific: 'Uživatel'
-    app_page_title.admin_product_sections: 'Správa produktových sekcí'
+    app_page_title.admin_product_sections: 'Produktové sekce'
     app_page_title.admin_product_section_edit:
         new: 'Nová produktová sekce'
         edit: 'Upravit produktovou sekci'
     app_page_title.admin_product_section_delete: 'Smazat produktovou sekci'
-    app_page_title.admin_product_categories: 'Správa produktových kategorií'
+    app_page_title.admin_product_categories: 'Produktové kategorie'
     app_page_title.admin_product_category_edit:
         new: 'Nová skupina produktových kategorií'
         edit: 'Upravit skupinu produktových kategorií'
