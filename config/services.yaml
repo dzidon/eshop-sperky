@@ -46,6 +46,12 @@ parameters:
         new: 'Nová skupina produktových kategorií'
         edit: 'Upravit skupinu produktových kategorií'
     app_page_title.admin_product_category_delete: 'Smazat skupinu produktových kategorií'
+    app_page_title.admin_product_options: 'Produktové volby'
+    app_page_title.admin_product_option_edit:
+        new: 'Nová produktová volba'
+        edit: 'Upravit produktovou volbu'
+    app_page_title.admin_product_option_configure: 'Konfigurovat produktovou volbu'
+    app_page_title.admin_product_option_delete: 'Smazat produktovou volbu'
 
 services:
     # default configuration for services in *this* file

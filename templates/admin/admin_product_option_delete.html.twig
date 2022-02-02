@@ -1,0 +1,8 @@
+{% extends 'admin/admin_base.html.twig' %}
+
+{% block admin_body %}
+
+    <div class="row">Opravdu si přejete smazat produktovou volbu '{{ productOptionInstance.getName() }}'? Tato akce je nevratná.</div>
+    {{ form(productOptionDeleteForm) }}
+
+{% endblock %}

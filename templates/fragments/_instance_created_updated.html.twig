@@ -1,0 +1,16 @@
+{% if instance.getId() is not null %}
+    <div class="row">
+        {% if instance.getCreated() is not null %}
+            <div>
+                Vytvořeno: {{ instance.getCreated()|date('d. m. Y H:i:s') }}
+            </div>
+        {% endif %}
+
+        {% if instance.getCreated() != instance.getUpdated() and instance.getUpdated() is not null %}
+            <div>
+                Upraveno: {{ instance.getUpdated()|date('d. m. Y H:i:s') }}
+            </div>
+        {% endif %}
+    </div>
+    <br>
+{% endif %}

@@ -2,18 +2,8 @@
 
 {% block admin_body %}
 
-    {% if productCategoryGroupInstance.getId() is not null %}
-        <div class="row">
-            {% if productCategoryGroupInstance.getCreated() is not null %}
-                Vytvořeno: {{ productCategoryGroupInstance.getCreated()|date('d. m. Y H:i:s') }}
-            {% endif %}
-
-            {% if productCategoryGroupInstance.getCreated() != productCategoryGroupInstance.getUpdated() and productCategoryGroupInstance.getUpdated() is not null %}
-                <br>Upraveno: {{ productCategoryGroupInstance.getUpdated()|date('d. m. Y H:i:s') }}
-            {% endif %}
-        </div>
-        <br>
-    {% endif %}
+    {# Časy vytvoření a aktualizace #}
+    {{ include('fragments/_instance_created_updated.html.twig', {instance: productCategoryGroupInstance}) }}
 
     {{ form_start(productCategoryGroupForm) }}
         {{ form_row(productCategoryGroupForm.name) }}

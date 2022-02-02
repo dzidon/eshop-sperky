@@ -41,9 +41,6 @@ class ProductCategoryGroupFormType extends AbstractType
                 'attr' => [
                     'class' => 'categories',
                 ],
-                'entry_options' => [
-                    'label' => false,
-                ],
             ])
             ->add('addItem', ButtonType::class, [
                 'attr' => [

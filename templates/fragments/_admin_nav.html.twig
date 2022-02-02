@@ -24,4 +24,10 @@
             {{ get_parameter('app_page_title.admin_product_categories') }}
         </a>
     {% endif %}
+
+    {% if is_granted('admin_product_options') %}
+        <a href="{{ path('admin_product_options') }}" class="collection-item {% if route == 'admin_product_options' or route == 'admin_product_option_edit' or route == 'admin_product_option_configure' or route == 'admin_product_option_delete' %} active {% endif %}">
+            {{ get_parameter('app_page_title.admin_product_options') }}
+        </a>
+    {% endif %}
 </div>
