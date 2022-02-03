@@ -20,7 +20,7 @@ class SearchTextAndSortFormType extends AbstractType
             ->add('razeni', ChoiceType::class, [
                 'choices' => $options['sort_choices'],
                 'invalid_message' => 'Zvolte platný atribut řazení.',
-                'label' => 'Seřadit podle',
+                'label' => 'Řazení',
             ])
         ;
     }

@@ -54,9 +54,8 @@ class Review
 
     public function __construct(User $user)
     {
-        $now = new \DateTime('now');
-        $this->created = $now;
-        $this->updated = $now;
+        $this->created = new \DateTime('now');
+        $this->updated = $this->created;
         $this->user = $user;
     }
 

@@ -50,9 +50,8 @@ class ProductCategoryGroup
     {
         $this->categories = new ArrayCollection();
 
-        $now = new \DateTime('now');
-        $this->created = $now;
-        $this->updated = $now;
+        $this->created = new \DateTime('now');
+        $this->updated = $this->created;
     }
 
     public function getId(): ?int

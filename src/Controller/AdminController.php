@@ -404,12 +404,6 @@ class AdminController extends AbstractController
             $this->breadcrumbs->setPageTitleByRoute('admin_product_category_edit', 'new');
         }
 
-        $oldCategories = [];
-        foreach ($categoryGroup->getCategories() as $category)
-        {
-            $oldCategories[] = clone $category;
-        }
-
         $form = $this->createForm(ProductCategoryGroupFormType::class, $categoryGroup);
         $form->add('submit', SubmitType::class, ['label' => 'Uložit']);
         $form->handleRequest($this->request);
@@ -423,19 +417,10 @@ class AdminController extends AbstractController
             }
             else
             {
-                $now = new \DateTime('now');
-                $categoryGroup->setUpdated($now);
-
-                $updatedCategories = array_udiff($categoryGroup->getCategories()->getValues(), $oldCategories,
-                    function ($objA, $objB)
-                    {
-                        return strcmp($objA->getName(), $objB->getName());
-                    }
-                );
-
-                foreach ($updatedCategories as $category)
+                $categoryGroup->setUpdated(new \DateTime('now'));
+                foreach ($categoryGroup->getCategories() as $category)
                 {
-                    $category->setUpdated($now);
+                    $category->setUpdated( $categoryGroup->getUpdated() );
                 }
             }
             $entityManager->flush();
@@ -556,8 +541,7 @@ class AdminController extends AbstractController
             $this->breadcrumbs->setPageTitleByRoute('admin_product_option_edit', 'new');
         }
 
-        $oldType = $option->getType();
-
+        $oldOption = clone $option;
         $form = $this->createForm(ProductOptionFormType::class, $option);
         $form->add('submit', SubmitType::class, ['label' => 'Uložit a pokračovat']);
         $form->handleRequest($this->request);
@@ -571,7 +555,7 @@ class AdminController extends AbstractController
             }
             else
             {
-                if($option->getType() !== $oldType) //došlo ke změně typu při editaci, takže smažeme parametry
+                if ($option->getType() !== $oldOption->getType()) //došlo ke změně typu při editaci, takže smažeme parametry
                 {
                     $option->getParameters()->clear();
                 }
@@ -656,17 +640,8 @@ class AdminController extends AbstractController
         if ($form->isSubmitted() && $form->isValid())
         {
             $entityManager = $this->getDoctrine()->getManager();
-            if ($option->getId() === null)
-            {
-                $entityManager->persist($option);
-            }
-            else
-            {
-                $option->setUpdated(new \DateTime('now'));
-            }
-
             $data = [];
-            if($option->getType() === ProductOption::TYPE_NUMBER)
+            if ($option->getType() === ProductOption::TYPE_NUMBER)
             {
                 $data = [
                     'min' => $form->get('min')->getData(),
@@ -678,6 +653,19 @@ class AdminController extends AbstractController
 
             $option->configure($data)
                    ->setConfiguredIfValid();
+
+            if ($option->getId() === null)
+            {
+                $entityManager->persist($option);
+            }
+            else
+            {
+                $option->setUpdated(new \DateTime('now'));
+                foreach ($option->getParameters() as $parameter)
+                {
+                    $parameter->setUpdated( $option->getUpdated() );
+                }
+            }
             $entityManager->flush();
 
             $this->addFlash('success', 'Produktová volba uložena a nakonfigurována!');

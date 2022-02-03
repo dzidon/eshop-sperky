@@ -56,9 +56,8 @@ class ProductSection
 
     public function __construct()
     {
-        $now = new \DateTime('now');
-        $this->created = $now;
-        $this->updated = $now;
+        $this->created = new \DateTime('now');
+        $this->updated = $this->created;
     }
 
     public function getId(): ?int

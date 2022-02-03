@@ -69,9 +69,8 @@ class ProductOption
 
     public function __construct()
     {
-        $now = new \DateTime('now');
-        $this->created = $now;
-        $this->updated = $now;
+        $this->created = new \DateTime('now');
+        $this->updated = $this->created;
         $this->parameters = new ArrayCollection();
     }
 
@@ -162,9 +161,18 @@ class ProductOption
         }
         else if($this->type === self::TYPE_DROPDOWN)
         {
-            if($this->getParameterByName('item'))
+            $found = 0;
+            foreach ($this->parameters as $parameter)
             {
-                $isValid = true;
+                if($parameter->getName() === 'item')
+                {
+                    $found++;
+                    if($found === 2)
+                    {
+                        $isValid = true;
+                        break;
+                    }
+                }
             }
         }
 
@@ -240,16 +248,14 @@ class ProductOption
                 }
 
                 $parameter->setValue($parameterValue);
-                $parameter->setUpdated($this->getUpdated());
                 $this->addParameter($parameter);
             }
         }
         else if($this->type === self::TYPE_DROPDOWN)
         {
-            foreach ($this->getParameters() as $parameter)
+            foreach ($this->parameters as $parameter)
             {
                 $parameter->setName('item');
-                $parameter->setUpdated($this->getUpdated());
             }
         }
 
