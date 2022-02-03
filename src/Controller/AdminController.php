@@ -556,6 +556,8 @@ class AdminController extends AbstractController
             $this->breadcrumbs->setPageTitleByRoute('admin_product_option_edit', 'new');
         }
 
+        $oldType = $option->getType();
+
         $form = $this->createForm(ProductOptionFormType::class, $option);
         $form->add('submit', SubmitType::class, ['label' => 'Uložit a pokračovat']);
         $form->handleRequest($this->request);
@@ -569,6 +571,10 @@ class AdminController extends AbstractController
             }
             else
             {
+                if($option->getType() !== $oldType) //došlo ke změně typu při editaci, takže smažeme parametry
+                {
+                    $option->getParameters()->clear();
+                }
                 $option->setUpdated(new \DateTime('now'));
             }
             $option->setConfiguredIfValid();
