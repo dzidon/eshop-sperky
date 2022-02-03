@@ -1,0 +1,13 @@
+{% extends 'admin/admin_base.html.twig' %}
+
+{% block admin_body %}
+
+    {{ form(productOptionConfigureForm) }}
+
+    {% if productOptionInstance.getId() is not null and is_granted('product_option_delete') %}
+        <div class="row center-align">
+            <a href="{{ path('admin_product_option_delete', {id: productOptionInstance.getId()}) }}">Smazat</a>
+        </div>
+    {% endif %}
+
+{% endblock %}

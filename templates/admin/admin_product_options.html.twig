@@ -34,6 +34,10 @@
                         </strong>
                         - {{ option.getType() }}
 
+                        {% if not option.isConfigured() %}
+                            - <span class="red-text">NENAKONFIGUROVÁNO</span>
+                        {% endif %}
+
                         {% if can_delete %}
                             <a href=" {{ path('admin_product_option_delete', {id: option.getId()}) }} " class="secondary-content">
                                 <i class="material-icons">delete</i>

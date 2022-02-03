@@ -291,7 +291,6 @@ class ProfileController extends AbstractController
             $entityManager->flush();
 
             $this->addFlash('success', 'Adresa smazána!');
-
             return $this->redirectToRoute('profile_addresses');
         }
 

@@ -11,6 +11,7 @@ use App\Form\HiddenTrueFormType;
 use App\Form\PersonalInfoFormType;
 use App\Form\ProductCategoryGroupFormType;
 use App\Form\ProductOptionFormType;
+use App\Form\ProductOptionParametersFormType;
 use App\Form\ProductSectionFormType;
 use App\Form\SearchTextAndSortFormType;
 use App\Service\BreadcrumbsService;
@@ -331,7 +332,6 @@ class AdminController extends AbstractController
             $entityManager->flush();
 
             $this->addFlash('success', 'Produktová sekce smazána!');
-
             return $this->redirectToRoute('admin_product_sections');
         }
 
@@ -484,7 +484,6 @@ class AdminController extends AbstractController
             $entityManager->flush();
 
             $this->addFlash('success', 'Skupina produktových kategorií smazána!');
-
             return $this->redirectToRoute('admin_product_categories');
         }
 
@@ -517,7 +516,7 @@ class AdminController extends AbstractController
 
         $page = (int) $this->request->query->get(PaginatorService::QUERY_PARAMETER_PAGE_NAME, '1');
         $options = $paginatorService
-            ->initialize($queryForPagination, 1, $page)
+            ->initialize($queryForPagination, 3, $page)
             ->getCurrentPageObjects();
 
         if($paginatorService->isCurrentPageOutOfBounds())
@@ -572,12 +571,13 @@ class AdminController extends AbstractController
             {
                 $option->setUpdated(new \DateTime('now'));
             }
+            $option->setConfiguredIfValid();
             $entityManager->flush();
 
-            $this->addFlash('success', 'Produktová volba uložena!');
+            $this->addFlash('success', 'Produktová volba uložena! Nyní ji nakonfigurujte.');
             $this->logger->info(sprintf("Admin %s (ID: %s) has saved a product option %s (ID: %s).", $user->getUserIdentifier(), $user->getId(), $option->getName(), $option->getId()));
 
-            return $this->redirectToRoute('admin_product_options');
+            return $this->redirectToRoute('admin_product_option_configure', ['id' => $option->getId()]);
         }
 
         return $this->render('admin/admin_product_option_edit.html.twig', [
@@ -599,7 +599,7 @@ class AdminController extends AbstractController
         $option = $this->getDoctrine()->getRepository(ProductOption::class)->findOneBy(['id' => $id]);
         if($option === null) //nenaslo to zadnou volbu
         {
-            throw new NotFoundHttpException('Skupina produktových voleb nenalezena.');
+            throw new NotFoundHttpException('Produktová volba nenalezena.');
         }
 
         $form = $this->createForm(HiddenTrueFormType::class, null, ['csrf_token_id' => 'form_product_option_delete']);
@@ -618,7 +618,6 @@ class AdminController extends AbstractController
             $entityManager->flush();
 
             $this->addFlash('success', 'Produktová volba smazána!');
-
             return $this->redirectToRoute('admin_product_options');
         }
 
@@ -626,6 +625,60 @@ class AdminController extends AbstractController
             'productOptionDeleteForm' => $form->createView(),
             'productOptionInstance' => $option,
             'breadcrumbs' => $this->breadcrumbs->setPageTitleByRoute('admin_product_option_delete'),
+        ]);
+    }
+
+    /**
+     * @Route("/produktova-volba/{id}/konfigurovat", name="admin_product_option_configure", requirements={"id"="\d+"})
+     *
+     * @IsGranted("product_option_edit")
+     */
+    public function productOptionConfigure($id): Response
+    {
+        $user = $this->getUser();
+
+        $option = $this->getDoctrine()->getRepository(ProductOption::class)->findOneBy(['id' => $id]);
+        if($option === null) //nenaslo to zadnou volbu
+        {
+            throw new NotFoundHttpException('Produktová volba nenalezena.');
+        }
+
+        $form = $this->createForm(ProductOptionParametersFormType::class, $option);
+        $form->add('submit', SubmitType::class, ['label' => 'Uložit']);
+        $form->handleRequest($this->request);
+
+        if ($form->isSubmitted() && $form->isValid())
+        {
+            $entityManager = $this->getDoctrine()->getManager();
+
+            $option->setParameterValues([
+                'min' => $form->get('min')->getData(),
+                'max' => $form->get('max')->getData(),
+                'default' => $form->get('default')->getData(),
+                'step' => $form->get('step')->getData(),
+            ]);
+
+            if ($option->getId() === null)
+            {
+                $entityManager->persist($option);
+            }
+            else
+            {
+                $option->setUpdated(new \DateTime('now'));
+            }
+            $option->setConfiguredIfValid();
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Produktová volba uložena!');
+            $this->logger->info(sprintf("Admin %s (ID: %s) has configured a product option %s (ID: %s).", $user->getUserIdentifier(), $user->getId(), $option->getName(), $option->getId()));
+
+            return $this->redirectToRoute('admin_product_options');
+        }
+
+        return $this->render('admin/admin_product_option_configure.html.twig', [
+            'productOptionConfigureForm' => $form->createView(),
+            'productOptionInstance' => $option,
+            'breadcrumbs' => $this->breadcrumbs->setPageTitleByRoute('admin_product_option_configure'),
         ]);
     }
 }

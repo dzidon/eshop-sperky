@@ -53,6 +53,11 @@ class ProductOption
     private $parameters;
 
     /**
+     * @ORM\Column(type="boolean")
+     */
+    private $isConfigured;
+
+    /**
      * @ORM\Column(type="datetime")
      */
     private $created;
@@ -123,6 +128,43 @@ class ProductOption
         return $this;
     }
 
+    public function isConfigured(): ?bool
+    {
+        return $this->isConfigured;
+    }
+
+    public function setConfiguredIfValid(): self
+    {
+        $isValid = false;
+
+        if($this->type === self::TYPE_NUMBER)
+        {
+            $found = [
+                'min' => false,
+                'max' => false,
+                'default' => false,
+                'step' => false,
+            ];
+
+            foreach ($this->parameters as $parameter)
+            {
+                if (isset($found[$parameter->getName()]))
+                {
+                    $found[$parameter->getName()] = true;
+                }
+            }
+
+            $booleans = array_values($found);
+            if(count(array_unique($booleans)) === 1 && $booleans[0] === true)
+            {
+                $isValid = true;
+            }
+        }
+        $this->isConfigured = $isValid;
+
+        return $this;
+    }
+
     /**
      * @return Collection|ProductOptionParameter[]
      */
@@ -153,6 +195,51 @@ class ProductOption
         return $this;
     }
 
+    public function getParameterByName($name): ?ProductOptionParameter
+    {
+        foreach ($this->parameters as $parameter)
+        {
+            if($parameter->getName() === $name)
+            {
+                return $parameter;
+            }
+        }
+
+        return null;
+    }
+
+    public function getParameterValue($name): ?string
+    {
+        $parameter = $this->getParameterByName($name);
+        if($parameter)
+        {
+            return $parameter->getValue();
+        }
+
+        return null;
+    }
+
+    public function setParameterValues(array $data): self
+    {
+        $now = new \DateTime('now');
+
+        foreach ($data as $parameterName => $parameterValue)
+        {
+            $parameter = $this->getParameterByName($parameterName);
+            if(!$parameter)
+            {
+                $parameter = new ProductOptionParameter();
+                $parameter->setName($parameterName);
+            }
+
+            $parameter->setValue($parameterValue);
+            $parameter->setUpdated($now);
+            $this->addParameter($parameter);
+        }
+
+        return $this;
+    }
+
     public static function getSortData(): array
     {
         return [
@@ -162,6 +249,7 @@ class ProductOption
             'Typ (Z-A)' => 'type'.SortingService::ATTRIBUTE_TAG_DESC,
             'Od nejstarší' => 'created'.SortingService::ATTRIBUTE_TAG_ASC,
             'Od nejnovější' => 'created'.SortingService::ATTRIBUTE_TAG_DESC,
+            'Od nenakonfigurovaných' => 'isConfigured'.SortingService::ATTRIBUTE_TAG_ASC,
         ];
     }
 }
