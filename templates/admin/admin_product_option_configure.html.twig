@@ -2,7 +2,14 @@
 
 {% block admin_body %}
 
-    {{ form(productOptionConfigureForm) }}
+    {% if productOptionInstance.getType() == constant('App\\Entity\\ProductOption::TYPE_DROPDOWN') %}
+        {{ form_start(productOptionConfigureForm) }}
+            {{ form_row(productOptionConfigureForm.parameters, { 'attr': {'data-index': productOptionConfigureForm.parameters|length > 0 ? productOptionConfigureForm.parameters|last.vars.name + 1 : 0} }) }}
+            {{ form_rest(productOptionConfigureForm) }}
+        {{ form_end(productOptionConfigureForm) }}
+    {% else %}
+        {{ form(productOptionConfigureForm) }}
+    {% endif %}
 
     {% if productOptionInstance.getId() is not null and is_granted('product_option_delete') %}
         <div class="row center-align">

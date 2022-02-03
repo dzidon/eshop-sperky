@@ -3,7 +3,11 @@
 namespace App\Form\EventSubscriber;
 
 use App\Entity\ProductOption;
+use App\Entity\ProductOptionParameter;
+use App\Form\ProductOptionDropdownFormType;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Form\Extension\Core\Type\ButtonType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -25,7 +29,33 @@ class ProductOptionParametersSubscriber implements EventSubscriberInterface
         $option = $event->getData();
         $form = $event->getForm();
 
-        if ($option->getType() === ProductOption::TYPE_NUMBER)
+        if ($option->getType() === ProductOption::TYPE_DROPDOWN)
+        {
+            $form
+                ->add('parameters', CollectionType::class, [
+                    'entry_type' => ProductOptionDropdownFormType::class,
+                    'by_reference' => false,
+                    'required' => false,
+                    'allow_add' => true,
+                    'allow_delete' => true,
+                    'label' => 'Obsah skládacího menu',
+                    'delete_empty' => function (ProductOptionParameter $parameter = null) {
+                        return $parameter === null || $parameter->getValue() === null;
+                    },
+                    'attr' => [
+                        'class' => 'parameters',
+                    ],
+                ])
+                ->add('addItem', ButtonType::class, [
+                    'attr' => [
+                        'class' => 'btn-medium grey left add_item_link',
+                        'data-collection-holder-class' => 'parameters',
+                    ],
+                    'label' => 'Přidat hodnotu',
+                ])
+            ;
+        }
+        else if ($option->getType() === ProductOption::TYPE_NUMBER)
         {
             $form
                 ->add('min', TextType::class, [

@@ -160,8 +160,15 @@ class ProductOption
                 $isValid = true;
             }
         }
-        $this->isConfigured = $isValid;
+        else if($this->type === self::TYPE_DROPDOWN)
+        {
+            if($this->getParameterByName('item'))
+            {
+                $isValid = true;
+            }
+        }
 
+        $this->isConfigured = $isValid;
         return $this;
     }
 
@@ -219,22 +226,31 @@ class ProductOption
         return null;
     }
 
-    public function setParameterValues(array $data): self
+    public function configure(array $data = []): self
     {
-        $now = new \DateTime('now');
-
-        foreach ($data as $parameterName => $parameterValue)
+        if($this->type === self::TYPE_NUMBER)
         {
-            $parameter = $this->getParameterByName($parameterName);
-            if(!$parameter)
+            foreach ($data as $parameterName => $parameterValue)
             {
-                $parameter = new ProductOptionParameter();
-                $parameter->setName($parameterName);
-            }
+                $parameter = $this->getParameterByName($parameterName);
+                if(!$parameter)
+                {
+                    $parameter = new ProductOptionParameter();
+                    $parameter->setName($parameterName);
+                }
 
-            $parameter->setValue($parameterValue);
-            $parameter->setUpdated($now);
-            $this->addParameter($parameter);
+                $parameter->setValue($parameterValue);
+                $parameter->setUpdated($this->getUpdated());
+                $this->addParameter($parameter);
+            }
+        }
+        else if($this->type === self::TYPE_DROPDOWN)
+        {
+            foreach ($this->getParameters() as $parameter)
+            {
+                $parameter->setName('item');
+                $parameter->setUpdated($this->getUpdated());
+            }
         }
 
         return $this;
@@ -247,9 +263,10 @@ class ProductOption
             'Název (Z-A)' => 'name'.SortingService::ATTRIBUTE_TAG_DESC,
             'Typ (A-Z)' => 'type'.SortingService::ATTRIBUTE_TAG_ASC,
             'Typ (Z-A)' => 'type'.SortingService::ATTRIBUTE_TAG_DESC,
+            'Od nakonfigurovaných' => 'isConfigured'.SortingService::ATTRIBUTE_TAG_DESC,
+            'Od nenakonfigurovaných' => 'isConfigured'.SortingService::ATTRIBUTE_TAG_ASC,
             'Od nejstarší' => 'created'.SortingService::ATTRIBUTE_TAG_ASC,
             'Od nejnovější' => 'created'.SortingService::ATTRIBUTE_TAG_DESC,
-            'Od nenakonfigurovaných' => 'isConfigured'.SortingService::ATTRIBUTE_TAG_ASC,
         ];
     }
 }

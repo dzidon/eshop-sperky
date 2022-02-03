@@ -656,14 +656,6 @@ class AdminController extends AbstractController
         if ($form->isSubmitted() && $form->isValid())
         {
             $entityManager = $this->getDoctrine()->getManager();
-
-            $option->setParameterValues([
-                'min' => $form->get('min')->getData(),
-                'max' => $form->get('max')->getData(),
-                'default' => $form->get('default')->getData(),
-                'step' => $form->get('step')->getData(),
-            ]);
-
             if ($option->getId() === null)
             {
                 $entityManager->persist($option);
@@ -672,10 +664,23 @@ class AdminController extends AbstractController
             {
                 $option->setUpdated(new \DateTime('now'));
             }
-            $option->setConfiguredIfValid();
+
+            $data = [];
+            if($option->getType() === ProductOption::TYPE_NUMBER)
+            {
+                $data = [
+                    'min' => $form->get('min')->getData(),
+                    'max' => $form->get('max')->getData(),
+                    'default' => $form->get('default')->getData(),
+                    'step' => $form->get('step')->getData(),
+                ];
+            }
+
+            $option->configure($data)
+                   ->setConfiguredIfValid();
             $entityManager->flush();
 
-            $this->addFlash('success', 'Produktová volba uložena!');
+            $this->addFlash('success', 'Produktová volba uložena a nakonfigurována!');
             $this->logger->info(sprintf("Admin %s (ID: %s) has configured a product option %s (ID: %s).", $user->getUserIdentifier(), $user->getId(), $option->getName(), $option->getId()));
 
             return $this->redirectToRoute('admin_product_options');
