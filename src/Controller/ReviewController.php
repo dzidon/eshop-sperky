@@ -5,11 +5,13 @@ namespace App\Controller;
 use App\Entity\Review;
 use App\Form\HiddenTrueFormType;
 use App\Form\ReviewFormType;
+use App\Form\SearchTextAndSortFormType;
 use App\Service\BreadcrumbsService;
 use App\Service\PaginatorService;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -38,12 +40,24 @@ class ReviewController extends AbstractController
     /**
      * @Route("/vsechny", name="reviews")
      */
-    public function reviews(PaginatorService $paginatorService): Response
+    public function reviews(FormFactoryInterface $formFactory, PaginatorService $paginatorService): Response
     {
+        $form = $formFactory->createNamed('', SearchTextAndSortFormType::class, null, ['sort_choices' => Review::getSortData()]);
+        //button je přidáván v šabloně, aby se nezobrazoval v odkazu
+        $form->handleRequest($this->request);
+
+        if ($form->isSubmitted() && $form->isValid())
+        {
+            $queryForPagination = $this->getDoctrine()->getRepository(Review::class)->getQueryForSearchAndPagination($form->get('vyraz')->getData(), $form->get('razeni')->getData());
+        }
+        else
+        {
+            $queryForPagination = $this->getDoctrine()->getRepository(Review::class)->getQueryForSearchAndPagination();
+        }
+
         $page = (int) $this->request->query->get(PaginatorService::QUERY_PARAMETER_PAGE_NAME, '1');
-        $queryForPagination = $this->getDoctrine()->getRepository(Review::class)->getQueryForPagination();
         $reviews = $paginatorService
-            ->initialize($queryForPagination, 4, $page)
+            ->initialize($queryForPagination, 8, $page)
             ->getCurrentPageObjects();
 
         if($paginatorService->isCurrentPageOutOfBounds())
@@ -54,6 +68,7 @@ class ReviewController extends AbstractController
         $totalAndAverage = $this->getDoctrine()->getRepository(Review::class)->getTotalAndAverage();
 
         return $this->render('reviews/reviews_overview.html.twig', [
+            'searchForm' => $form->createView(),
             'reviews' => $reviews,
             'agregateReviewData' => $totalAndAverage,
             'breadcrumbs' => $this->breadcrumbs,

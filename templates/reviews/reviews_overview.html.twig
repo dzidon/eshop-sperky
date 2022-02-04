@@ -15,9 +15,16 @@
         {# Flash zprávy #}
         {{ include('fragments/_flash_messages.html.twig') }}
 
+        <div class="row cols-no-border">
+            {# Formulář - vyhledávací pole, řazení #}
+            {{ include('fragments/forms_unique/_form_search_order.html.twig', {form: searchForm}) }}
+        </div>
+
         <div class="section no-pad-top">
+            <h4>Výsledky ({{ pagination.getTotalItems() }})</h4>
+
             {# Recenze #}
-            {{ include('fragments/_reviews.html.twig', {reviews: reviews, agregateReviewData: agregateReviewData, template: 'overview'}) }}
+            {{ include('fragments/_reviews.html.twig', {reviews: reviews, agregateReviewData: agregateReviewData}) }}
 
             {# Pagination #}
             {{ include('fragments/_pagination.html.twig') }}

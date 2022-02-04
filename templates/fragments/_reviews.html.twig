@@ -1,13 +1,7 @@
 {% if reviews is empty %}
-    {% if template == 'index' %}
-        <div class="row center-align">
-            Nebyly nalezeny žádné recenze.
-        </div>
-    {% elseif template == 'overview' %}
-        <div class="row left-align">
-            Nebyly nalezeny žádné recenze. Klikněte na "+" pro napsání nové recenze.
-        </div>
-    {% endif %}
+    <div class="row left-align">
+        Nebyly nalezeny žádné recenze.
+    </div>
 {% else %}
     <div class="row center-align">
         <h3>{{ agregateReviewData.average|number_format(1) }}<span class="grey-text">/5</span></h3>

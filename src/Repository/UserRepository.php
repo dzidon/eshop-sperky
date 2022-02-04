@@ -61,6 +61,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
 
             //razeni
             ->orderBy('u.' . $sortData['attribute'], $sortData['order'])
-            ->getQuery()->setHint(Query::HINT_FORCE_PARTIAL_LOAD, true);
+            ->getQuery()
+            ->setHint(Query::HINT_FORCE_PARTIAL_LOAD, true);
     }
 }

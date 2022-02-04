@@ -26,7 +26,7 @@ class AddressRepository extends ServiceEntityRepository
         $this->sorting = $sorting;
     }
 
-    public function getQueryForPagination(User $user, $searchPhrase = null, string $sortAttribute = null): Query
+    public function getQueryForSearchAndPagination(User $user, $searchPhrase = null, string $sortAttribute = null): Query
     {
         $sortData = $this->sorting->createSortData($sortAttribute, Address::getSortData());
 

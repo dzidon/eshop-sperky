@@ -183,11 +183,11 @@ class ProfileController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid())
         {
-            $queryForPagination = $this->getDoctrine()->getRepository(Address::class)->getQueryForPagination($user, $form->get('vyraz')->getData(), $form->get('razeni')->getData());
+            $queryForPagination = $this->getDoctrine()->getRepository(Address::class)->getQueryForSearchAndPagination($user, $form->get('vyraz')->getData(), $form->get('razeni')->getData());
         }
         else
         {
-            $queryForPagination = $this->getDoctrine()->getRepository(Address::class)->getQueryForPagination($user);
+            $queryForPagination = $this->getDoctrine()->getRepository(Address::class)->getQueryForSearchAndPagination($user);
         }
 
         $page = (int) $this->request->query->get(PaginatorService::QUERY_PARAMETER_PAGE_NAME, '1');

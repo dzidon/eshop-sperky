@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Review;
+use App\Service\SortingService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Query;
 use Doctrine\Persistence\ManagerRegistry;
@@ -15,27 +16,41 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class ReviewRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    private SortingService $sorting;
+
+    public function __construct(ManagerRegistry $registry, SortingService $sorting)
     {
         parent::__construct($registry, Review::class);
+
+        $this->sorting = $sorting;
     }
 
-    public function getQueryForPagination(): Query
+    public function getQueryForSearchAndPagination($searchPhrase = null, string $sortAttribute = null): Query
     {
+        $sortData = $this->sorting->createSortData($sortAttribute, Review::getSortData());
+
         return $this->createQueryBuilder('r')
             ->select('r', 'u')
             ->innerJoin('r.user', 'u')
-            ->orderBy('r.created', 'DESC')
             ->andWhere('u.nameFirst IS NOT NULL')
             ->andWhere('u.nameLast IS NOT NULL')
-            ->andWhere('u.nameLast IS NOT NULL')
             ->andWhere('u.isMuted = 0')
+
+            //vyhledavani
+            ->andWhere('r.stars LIKE :searchPhrase OR
+                        r.text LIKE :searchPhrase OR
+                        CONCAT(u.nameFirst, \' \', u.nameLast) LIKE :searchPhrase OR
+                        u.gender LIKE :searchPhrase')
+            ->setParameter('searchPhrase', '%' . $searchPhrase . '%')
+
+            //razeni
+            ->orderBy('r.' . $sortData['attribute'], $sortData['order'])
             ->getQuery();
     }
 
     public function findLatest(int $count)
     {
-        return $this->getQueryForPagination()
+        return $this->getQueryForSearchAndPagination()
             ->setMaxResults($count)
             ->getResult();
     }
