@@ -5,17 +5,25 @@
 {% endblock %}
 
 {% block profile_body %}
-    {% if addresses is empty %}
-        <div class="row">
-            Nemáte uložené žádné adresy. Klikněte na "+" pro přidání.
-        </div>
-    {% else %}
-        {% for address in addresses %}
-            <div class="row">
+
+    <div class="row">
+        <h4>Hledat</h4>
+
+        {# Formulář - vyhledávací pole, řazení #}
+        {{ include('fragments/forms_unique/_form_search_order.html.twig', {form: searchForm}) }}
+    </div>
+
+    <div class="row">
+        <h4>Výsledky ({{ pagination.getTotalItems() }})</h4>
+
+        {% if addresses is empty %}
+            Hledání neodpovídají žádné adresy.
+        {% else %}
+            {% for address in addresses %}
                 <div class="card white black-text">
                     <div class="card-content">
                         <span class="card-title">{{ address.getAlias() }}</span>
-                        <p>Země: {{ get_country_name(address.getCountry()) }}</p>
+                        <p>Země: {{ address.getCountry() }}</p>
                         <p>Ulice a číslo popisné: {{ address.getStreet() }}</p>
 
                         {% if address.getAdditionalInfo() is not null %}
@@ -38,9 +46,9 @@
                         <a href="{{ path('profile_address_delete', {id: address.getId()}) }}">Smazat</a>
                     </div>
                 </div>
-            </div>
-        {% endfor %}
-    {% endif %}
+            {% endfor %}
+        {% endif %}
+    </div>
 
     {# Pagination #}
     {{ include('fragments/_pagination.html.twig') }}

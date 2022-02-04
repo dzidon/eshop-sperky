@@ -20,7 +20,7 @@ class AddressFormType extends AbstractType
                 'label' => 'Alias',
             ])
             ->add('country', ChoiceType::class, [
-                'choices' => Address::COUNTRY_NAMES,
+                'choices' => Address::COUNTRY_NAMES_DROPDOWN,
                 'label' => 'Země',
             ])
             ->add('street', TextType::class, [

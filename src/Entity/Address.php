@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\AddressRepository;
+use App\Service\SortingService;
 use Doctrine\ORM\Mapping as ORM;
 use App\Validation as AssertCustom;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -13,15 +14,14 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class Address
 {
-    public const COUNTRY_CODE_CZ = 'CS';
-    public const COUNTRY_CODE_SK = 'SK';
-    public const COUNTRY_CODES = [
-        self::COUNTRY_CODE_CZ,
-        self::COUNTRY_CODE_SK,
-    ];
+    public const COUNTRY_NAME_CZ = 'Česká republika';
+    public const COUNTRY_NAME_SK = 'Slovensko';
     public const COUNTRY_NAMES = [
-        'Česká republika' => self::COUNTRY_CODE_CZ,
-        'Slovensko' => self::COUNTRY_CODE_SK,
+        self::COUNTRY_NAME_CZ, self::COUNTRY_NAME_SK
+    ];
+    public const COUNTRY_NAMES_DROPDOWN = [
+        self::COUNTRY_NAME_CZ => self::COUNTRY_NAME_CZ,
+        self::COUNTRY_NAME_SK => self::COUNTRY_NAME_SK,
     ];
 
     /**
@@ -34,7 +34,7 @@ class Address
     /**
      * @ORM\Column(type="string", length=32)
      *
-     * @Assert\Choice(choices=Address::COUNTRY_CODES, message="Zvolte platnou zemi.")
+     * @Assert\Choice(choices=Address::COUNTRY_NAMES, message="Zvolte platnou zemi.")
      * @Assert\NotBlank
      */
     private $country;
@@ -120,24 +120,6 @@ class Address
         $this->created = new \DateTime('now');
         $this->updated = $this->created;
         $this->user = $user;
-    }
-
-    /**
-     * Vrátí název země podle kódu
-     *
-     * @param string $searchedCode
-     * @return string
-     */
-    public static function getCountryNameByCode(string $searchedCode): string
-    {
-        foreach (self::COUNTRY_NAMES as $name => $code)
-        {
-            if($searchedCode === $code)
-            {
-                return $name;
-            }
-        }
-        return 'Nenalezeno';
     }
 
     public function getId(): ?int
@@ -287,5 +269,17 @@ class Address
         $this->updated = $updated;
 
         return $this;
+    }
+
+    public static function getSortData(): array
+    {
+        return [
+            'Alias (A-Z)' => 'alias'.SortingService::ATTRIBUTE_TAG_ASC,
+            'Alias (Z-A)' => 'alias'.SortingService::ATTRIBUTE_TAG_DESC,
+            'Od nejstarší' => 'created'.SortingService::ATTRIBUTE_TAG_ASC,
+            'Od nejnovější' => 'created'.SortingService::ATTRIBUTE_TAG_DESC,
+            'Od naposledy upravené' => 'updated'.SortingService::ATTRIBUTE_TAG_DESC,
+            'Od poprvé upravené' => 'updated'.SortingService::ATTRIBUTE_TAG_ASC,
+        ];
     }
 }

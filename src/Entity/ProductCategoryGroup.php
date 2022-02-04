@@ -132,6 +132,8 @@ class ProductCategoryGroup
             'Název (Z-A)' => 'name'.SortingService::ATTRIBUTE_TAG_DESC,
             'Od nejstarší' => 'created'.SortingService::ATTRIBUTE_TAG_ASC,
             'Od nejnovější' => 'created'.SortingService::ATTRIBUTE_TAG_DESC,
+            'Od naposledy upravené' => 'updated'.SortingService::ATTRIBUTE_TAG_DESC,
+            'Od poprvé upravené' => 'updated'.SortingService::ATTRIBUTE_TAG_ASC,
         ];
     }
 }

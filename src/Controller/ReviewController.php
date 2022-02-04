@@ -43,7 +43,7 @@ class ReviewController extends AbstractController
         $page = (int) $this->request->query->get(PaginatorService::QUERY_PARAMETER_PAGE_NAME, '1');
         $queryForPagination = $this->getDoctrine()->getRepository(Review::class)->getQueryForPagination();
         $reviews = $paginatorService
-            ->initialize($queryForPagination, 5, $page)
+            ->initialize($queryForPagination, 4, $page)
             ->getCurrentPageObjects();
 
         if($paginatorService->isCurrentPageOutOfBounds())

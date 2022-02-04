@@ -132,9 +132,11 @@ class ProductSection
             'Název (Z-A)' => 'name'.SortingService::ATTRIBUTE_TAG_DESC,
             'Odkaz (A-Z)' => 'slug'.SortingService::ATTRIBUTE_TAG_ASC,
             'Odkaz (Z-A)' => 'slug'.SortingService::ATTRIBUTE_TAG_DESC,
+            'Od skrytých' => 'isHidden'.SortingService::ATTRIBUTE_TAG_DESC,
             'Od nejstarší' => 'created'.SortingService::ATTRIBUTE_TAG_ASC,
             'Od nejnovější' => 'created'.SortingService::ATTRIBUTE_TAG_DESC,
-            'Od skrytých' => 'isHidden'.SortingService::ATTRIBUTE_TAG_DESC,
+            'Od naposledy upravené' => 'updated'.SortingService::ATTRIBUTE_TAG_DESC,
+            'Od poprvé upravené' => 'updated'.SortingService::ATTRIBUTE_TAG_ASC,
         ];
     }
 }

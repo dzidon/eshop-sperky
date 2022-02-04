@@ -25,10 +25,10 @@
                         {% if user.fullNameIsSet() %}
                             -
                             {% if user.genderIsSet() %}
-                                {{ user.getGenderName() }}
+                                {{ user.getGender() }}
                             {% endif %}
 
-                            {{ user.getNameFirst() }} {{ user.getNameLast() }}
+                            {{ user.getFullName() }}
                         {% endif %}
 
                         {% if user.isMuted() %}

@@ -19,9 +19,6 @@ use App\Validation\Compound as AssertCompound;
  */
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
-    public const GENDER_ID_UNDISCLOSED = 'U';
-    public const GENDER_ID_MALE = 'M';
-    public const GENDER_ID_FEMALE = 'F';
     public const GENDER_NAME_UNDISCLOSED = 'Neuvádět';
     public const GENDER_NAME_MALE = 'Pan';
     public const GENDER_NAME_FEMALE = 'Paní';
@@ -86,12 +83,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private $registered;
 
     /**
-     * @ORM\Column(type="string", length=1)
+     * @ORM\Column(type="string", length=8)
      *
-     * @Assert\Choice(choices={User::GENDER_ID_UNDISCLOSED, User::GENDER_ID_MALE, User::GENDER_ID_FEMALE}, message="Zvolte platné oslovení.")
+     * @Assert\Choice(choices={User::GENDER_NAME_UNDISCLOSED, User::GENDER_NAME_MALE, User::GENDER_NAME_FEMALE}, message="Zvolte platné oslovení.")
      * @Assert\NotBlank
      */
-    private $gender = User::GENDER_ID_UNDISCLOSED;
+    private $gender = User::GENDER_NAME_UNDISCLOSED;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
@@ -328,28 +325,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->gender;
     }
 
-    /**
-     * Vrací buď 'Neuvádět', 'Muž' nebo 'Žena'
-     *
-     * @return string
-     */
-    public function getGenderName(): string
-    {
-        if($this->gender === self::GENDER_ID_MALE)
-        {
-            return self::GENDER_NAME_MALE;
-        }
-        else if($this->gender === self::GENDER_ID_FEMALE)
-        {
-            return self::GENDER_NAME_FEMALE;
-        }
-
-        return self::GENDER_NAME_UNDISCLOSED;
-    }
-
     public function genderIsSet(): bool
     {
-        if($this->gender === self::GENDER_ID_MALE || $this->gender === self::GENDER_ID_FEMALE)
+        if($this->gender === self::GENDER_NAME_MALE || $this->gender === self::GENDER_NAME_FEMALE)
         {
             return true;
         }
@@ -541,9 +519,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return [
             'E-mail (A-Z)' => 'email'.SortingService::ATTRIBUTE_TAG_ASC,
             'E-mail (Z-A)' => 'email'.SortingService::ATTRIBUTE_TAG_DESC,
+            'Křestní jméno (A-Z)' => 'nameFirst'.SortingService::ATTRIBUTE_TAG_ASC,
+            'Křestní jméno (Z-A)' => 'nameFirst'.SortingService::ATTRIBUTE_TAG_DESC,
+            'Příjmení (A-Z)' => 'nameLast'.SortingService::ATTRIBUTE_TAG_ASC,
+            'Příjmení (Z-A)' => 'nameLast'.SortingService::ATTRIBUTE_TAG_DESC,
+            'Pohlaví' => 'gender'.SortingService::ATTRIBUTE_TAG_DESC,
+            'Od umlčených' => 'isMuted'.SortingService::ATTRIBUTE_TAG_DESC,
             'Od nejstaršího' => 'registered'.SortingService::ATTRIBUTE_TAG_ASC,
             'Od nejnovějšího' => 'registered'.SortingService::ATTRIBUTE_TAG_DESC,
-            'Od umlčených' => 'isMuted'.SortingService::ATTRIBUTE_TAG_DESC,
         ];
     }
 }

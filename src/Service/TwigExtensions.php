@@ -2,7 +2,6 @@
 
 namespace App\Service;
 
-use App\Entity\Address;
 use App\Entity\Review;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
@@ -27,7 +26,6 @@ class TwigExtensions extends AbstractExtension
         return [
             new TwigFunction('get_parameter', [$this, 'getParameter']),
             new TwigFunction('rating_to_stars', [$this, 'ratingToStars']),
-            new TwigFunction('get_country_name', [Address::class, 'getCountryNameByCode']),
         ];
     }
 

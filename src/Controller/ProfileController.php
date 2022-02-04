@@ -7,12 +7,14 @@ use App\Form\AddressFormType;
 use App\Form\ChangePasswordLoggedInFormType;
 use App\Form\HiddenTrueFormType;
 use App\Form\PersonalInfoFormType;
+use App\Form\SearchTextAndSortFormType;
 use App\Security\EmailVerifier;
 use App\Service\BreadcrumbsService;
 use App\Service\PaginatorService;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -167,7 +169,7 @@ class ProfileController extends AbstractController
     /**
      * @Route("/adresy", name="profile_addresses")
      */
-    public function addresses(PaginatorService $paginatorService): Response
+    public function addresses(FormFactoryInterface $formFactory, PaginatorService $paginatorService): Response
     {
         $user = $this->getUser();
         if($this->isUserNotVerified($user, true))
@@ -175,8 +177,20 @@ class ProfileController extends AbstractController
             return $this->redirectToRoute('profile');
         }
 
+        $form = $formFactory->createNamed('', SearchTextAndSortFormType::class, null, ['sort_choices' => Address::getSortData()]);
+        //button je přidáván v šabloně, aby se nezobrazoval v odkazu
+        $form->handleRequest($this->request);
+
+        if ($form->isSubmitted() && $form->isValid())
+        {
+            $queryForPagination = $this->getDoctrine()->getRepository(Address::class)->getQueryForPagination($user, $form->get('vyraz')->getData(), $form->get('razeni')->getData());
+        }
+        else
+        {
+            $queryForPagination = $this->getDoctrine()->getRepository(Address::class)->getQueryForPagination($user);
+        }
+
         $page = (int) $this->request->query->get(PaginatorService::QUERY_PARAMETER_PAGE_NAME, '1');
-        $queryForPagination = $this->getDoctrine()->getRepository(Address::class)->getQueryForPagination($user);
         $addresses = $paginatorService
             ->initialize($queryForPagination, 5, $page)
             ->getCurrentPageObjects();
@@ -187,6 +201,7 @@ class ProfileController extends AbstractController
         }
 
         return $this->render('profile/profile_addresses.html.twig', [
+            'searchForm' => $form->createView(),
             'addresses' => $addresses,
             'breadcrumbs' => $this->breadcrumbs->setPageTitleByRoute('profile_addresses'),
             'pagination' => $paginatorService->createViewData(),

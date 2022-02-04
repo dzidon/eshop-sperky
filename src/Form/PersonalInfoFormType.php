@@ -27,9 +27,9 @@ class PersonalInfoFormType extends AbstractType
         $builder
             ->add('gender', ChoiceType::class, [
                 'choices' => array(
-                    User::GENDER_NAME_UNDISCLOSED => User::GENDER_ID_UNDISCLOSED,
-                    User::GENDER_NAME_MALE => User::GENDER_ID_MALE,
-                    User::GENDER_NAME_FEMALE => User::GENDER_ID_FEMALE,
+                    User::GENDER_NAME_UNDISCLOSED => User::GENDER_NAME_UNDISCLOSED,
+                    User::GENDER_NAME_MALE => User::GENDER_NAME_MALE,
+                    User::GENDER_NAME_FEMALE => User::GENDER_NAME_FEMALE,
                 ),
                 'expanded' => true,
                 'label' => 'Oslovení',

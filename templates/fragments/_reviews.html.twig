@@ -35,7 +35,7 @@
                     <div class="card-content black-text">
                         <span class="card-title">
                             {% if review.getUser().genderIsSet() %}
-                                {{ review.getUser().getGenderName() }}
+                                {{ review.getUser().getGender() }}
                             {% endif %}
 
                             {# Klikatelné jméno, pokud je oprávněn nějak upravovat ostatní uživatele #}
