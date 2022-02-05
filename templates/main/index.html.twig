@@ -56,7 +56,10 @@
                 </div>
             </div>
 
-            <h2>Novinky</h2>
+            <h2>
+                Novinky
+                <a href="  " class="btn-floating btn-medium waves-effect waves-light light-blue"><i class="material-icons">more_horiz</i></a>
+            </h2>
 
             <div class="row flex-wrap cols-no-border">
 
@@ -173,28 +176,43 @@
                 </div>
             </div>
 
-            <h2>Recenze</h2>
+            <h2>
+                Recenze
+                <a href="{{ path('reviews') }}" class="btn-floating btn-medium waves-effect waves-light light-blue"><i class="material-icons">more_horiz</i></a>
+                <a href="{{ path('review_edit') }}" class="btn-floating btn-medium waves-effect waves-light grey"><i class="material-icons">mode_edit</i></a>
+            </h2>
+
+            <div class="row cols-no-border">
+                <div class="col s12">
+                    <div class="card white">
+                        <div class="card-content valign-wrapper">
+                            <div class="col s8 no-padding black-text left-align">
+                                <div>
+                                    <h5 class="no-mar-top">
+                                        <strong>{{ agregateReviewData.average|number_format(1) }}</strong><span class="grey-text">/5</span>
+                                    </h5>
+                                </div>
+
+                                <div class="amber-text accent-3">
+                                    {# Hvězdy #}
+                                    {{ include('fragments/_review_stars.html.twig', {stars: rating_to_stars(agregateReviewData.average)}) }}
+                                </div>
+                            </div>
+
+                            <div class="col s4 no-padding right-align">
+                                <h6 class="margin-0 grey-text no-padding">
+                                    Celkem recenzí: <strong class="black-text">{{ agregateReviewData.total }}</strong>
+                                </h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <div class="center-align">
                 <div class="left-align">
                     {# Recenze #}
-                    {{ include('fragments/_reviews.html.twig', {reviews: latestReviews, agregateReviewData: agregateReviewData}) }}
-                </div>
-
-                <div class="row hide-on-small-and-down center-align">
-                    <a href="{{ path('reviews') }}" class="waves-effect waves-light btn-large light-blue margin-right15px width200px">Všechny recenze</a>
-
-                    <a href="{{ path('review_edit') }}" class="waves-effect waves-light btn-large grey width200px">Napsat recenzi</a>
-                </div>
-
-                <div class="inline-block hide-on-med-and-up">
-                    <div class="row">
-                        <a href="{{ path('reviews') }}" class="waves-effect waves-light btn-large light-blue width-max">Všechny recenze</a>
-                    </div>
-
-                    <div class="row">
-                        <a href="{{ path('review_edit') }}" class="waves-effect waves-light btn-large grey width-max">Napsat recenzi</a>
-                    </div>
+                    {{ include('fragments/_reviews.html.twig', {reviews: latestReviews}) }}
                 </div>
             </div>
         </div>

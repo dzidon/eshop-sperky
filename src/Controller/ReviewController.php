@@ -65,12 +65,9 @@ class ReviewController extends AbstractController
             throw new NotFoundHttpException('Na této stránce nebyly nalezeny žádné recenze.');
         }
 
-        $totalAndAverage = $this->getDoctrine()->getRepository(Review::class)->getTotalAndAverage();
-
         return $this->render('reviews/reviews_overview.html.twig', [
             'searchForm' => $form->createView(),
             'reviews' => $reviews,
-            'agregateReviewData' => $totalAndAverage,
             'breadcrumbs' => $this->breadcrumbs,
             'pagination' => $paginatorService->createViewData(),
         ]);

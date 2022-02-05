@@ -9,7 +9,7 @@
         {# h1 #}
         <h1>
             {{ get_parameter(['app_page_title', app.request.get('_route')]|join('.')) }}
-            <a href="{{ path('review_edit') }}" class="btn-floating btn-medium waves-effect waves-light light-blue"><i class="material-icons">add</i></a>
+            <a href="{{ path('review_edit') }}" class="btn-floating btn-medium waves-effect waves-light light-blue"><i class="material-icons">mode_edit</i></a>
         </h1>
 
         {# Flash zprávy #}
@@ -24,7 +24,7 @@
             <h4>Výsledky ({{ pagination.getTotalItems() }})</h4>
 
             {# Recenze #}
-            {{ include('fragments/_reviews.html.twig', {reviews: reviews, agregateReviewData: agregateReviewData}) }}
+            {{ include('fragments/_reviews.html.twig', {reviews: reviews}) }}
 
             {# Pagination #}
             {{ include('fragments/_pagination.html.twig') }}
