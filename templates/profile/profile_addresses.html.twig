@@ -21,23 +21,68 @@
                 <div class="card white black-text">
                     <div class="card-content">
                         <span class="card-title">{{ address.getAlias() }}</span>
-                        <p>Země: {{ address.getCountry() }}</p>
-                        <p>Ulice a číslo popisné: {{ address.getStreet() }}</p>
+                        <div class="row margin-0">
+                            <div class="col s6 no-padding">Země:</div>
+                            <div class="col s6 no-padding">
+                                <strong>{{ address.getCountry() }}</strong>
+                            </div>
+                        </div>
+
+                        <div class="row margin-0">
+                            <div class="col s6 no-padding">Ulice a č. popisné:</div>
+                            <div class="col s6 no-padding">
+                                <strong>{{ address.getStreet() }}</strong>
+                            </div>
+                        </div>
 
                         {% if address.getAdditionalInfo() is not null %}
-                            <p>Doplněk adresy: {{ address.getAdditionalInfo() }}</p>
+                            <div class="row margin-0">
+                                <div class="col s6 no-padding">Doplněk adresy:</div>
+                                <div class="col s6 no-padding">
+                                    <strong>{{ address.getAdditionalInfo() }}</strong>
+                                </div>
+                            </div>
                         {% endif %}
 
-                        <p>Obec: {{ address.getTown() }}</p>
-                        <p>PSČ: {{ address.getZip() }}</p>
+                        <div class="row margin-0">
+                            <div class="col s6 no-padding">Obec:</div>
+                            <div class="col s6 no-padding">
+                                <strong>{{ address.getTown() }}</strong>
+                            </div>
+                        </div>
+
+                        <div class="row margin-0">
+                            <div class="col s6 no-padding">PSČ:</div>
+                            <div class="col s6 no-padding">
+                                <strong>{{ address.getZip() }}</strong>
+                            </div>
+                        </div>
 
                         {% if address.getCompany() is not null and address.getIc() is not null and address.getDic() is not null %}
                             <br>
 
-                            <p>Název firmy: {{ address.getCompany() }}</p>
-                            <p>IČ: {{ address.getIc() }}</p>
-                            <p>DIČ: {{ address.getDic() }}</p>
+                            <div class="row margin-0">
+                                <div class="col s6 no-padding">Název firmy:</div>
+                                <div class="col s6 no-padding">
+                                    <strong>{{ address.getCompany() }}</strong>
+                                </div>
+                            </div>
+
+                            <div class="row margin-0">
+                                <div class="col s6 no-padding">IČ:</div>
+                                <div class="col s6 no-padding">
+                                    <strong>{{ address.getIc() }}</strong>
+                                </div>
+                            </div>
+
+                            <div class="row margin-0">
+                                <div class="col s6 no-padding">DIČ:</div>
+                                <div class="col s6 no-padding">
+                                    <strong>{{ address.getDic() }}</strong>
+                                </div>
+                            </div>
                         {% endif %}
+
                     </div>
                     <div class="card-action">
                         <a href="{{ path('profile_address', {id: address.getId()}) }}">Upravit</a>

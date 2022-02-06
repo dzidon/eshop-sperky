@@ -182,32 +182,34 @@
                 <a href="{{ path('review_edit') }}" class="btn-floating btn-medium waves-effect waves-light grey"><i class="material-icons">mode_edit</i></a>
             </h2>
 
-            <div class="row cols-no-border">
-                <div class="col s12">
-                    <div class="card white">
-                        <div class="card-content valign-wrapper">
-                            <div class="col s8 no-padding black-text left-align">
-                                <div>
-                                    <h5 class="no-mar-top">
-                                        <strong>{{ agregateReviewData.average|number_format(1) }}</strong><span class="grey-text">/5</span>
-                                    </h5>
+            {% if agregateReviewData.total is not empty %}
+                <div class="row cols-no-border">
+                    <div class="col s12">
+                        <div class="card white">
+                            <div class="card-content valign-wrapper">
+                                <div class="col s8 no-padding black-text left-align">
+                                    <div>
+                                        <h5 class="no-mar-top">
+                                            <strong>{{ agregateReviewData.average|number_format(1) }}</strong><span class="grey-text">/5</span>
+                                        </h5>
+                                    </div>
+
+                                    <div class="amber-text accent-3">
+                                        {# Hvězdy #}
+                                        {{ include('fragments/_review_stars.html.twig', {stars: rating_to_stars(agregateReviewData.average)}) }}
+                                    </div>
                                 </div>
 
-                                <div class="amber-text accent-3">
-                                    {# Hvězdy #}
-                                    {{ include('fragments/_review_stars.html.twig', {stars: rating_to_stars(agregateReviewData.average)}) }}
+                                <div class="col s4 no-padding right-align">
+                                    <h6 class="margin-0 grey-text no-padding">
+                                        Celkem recenzí: <strong class="black-text">{{ agregateReviewData.total }}</strong>
+                                    </h6>
                                 </div>
-                            </div>
-
-                            <div class="col s4 no-padding right-align">
-                                <h6 class="margin-0 grey-text no-padding">
-                                    Celkem recenzí: <strong class="black-text">{{ agregateReviewData.total }}</strong>
-                                </h6>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            {% endif %}
 
             <div class="center-align">
                 <div class="left-align">
