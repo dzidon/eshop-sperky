@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Entity\Interfaces\UpdatableEntityInterface;
 use App\Repository\AddressRepository;
 use App\Service\SortingService;
 use Doctrine\ORM\Mapping as ORM;
@@ -12,7 +13,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @ORM\Entity(repositoryClass=AddressRepository::class)
  * @AssertCustom\AllOrNone(targetAttributes={"company", "ic", "dic"})
  */
-class Address
+class Address implements UpdatableEntityInterface
 {
     public const COUNTRY_NAME_CZ = 'Česká republika';
     public const COUNTRY_NAME_SK = 'Slovensko';

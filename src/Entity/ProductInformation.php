@@ -3,14 +3,14 @@
 namespace App\Entity;
 
 use App\Entity\Interfaces\UpdatableEntityInterface;
-use App\Repository\ProductOptionParameterRepository;
+use App\Repository\ProductInformationRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * @ORM\Entity(repositoryClass=ProductOptionParameterRepository::class)
+ * @ORM\Entity(repositoryClass=ProductInformationRepository::class)
  */
-class ProductOptionParameter implements UpdatableEntityInterface
+class ProductInformation implements UpdatableEntityInterface
 {
     /**
      * @ORM\Id
@@ -21,22 +21,11 @@ class ProductOptionParameter implements UpdatableEntityInterface
 
     /**
      * @ORM\Column(type="string", length=255)
-     */
-    private $name;
-
-    /**
-     * @ORM\Column(type="string", length=255)
      *
-     * @Assert\Length(max=255, maxMessage="Maximální počet znaků v parametru volby: {{ limit }}")
+     * @Assert\Length(max=255, maxMessage="Maximální počet znaků v hodnotě produktové informace: {{ limit }}")
      * @Assert\NotBlank
      */
     private $value;
-
-    /**
-     * @ORM\ManyToOne(targetEntity=ProductOption::class, inversedBy="parameters")
-     * @ORM\JoinColumn(nullable=false)
-     */
-    private $productOption;
 
     /**
      * @ORM\Column(type="datetime")
@@ -48,6 +37,12 @@ class ProductOptionParameter implements UpdatableEntityInterface
      */
     private $updated;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=ProductInformationGroup::class, inversedBy="info")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $productInformationGroup;
+
     public function __construct()
     {
         $this->created = new \DateTime('now');
@@ -57,18 +52,6 @@ class ProductOptionParameter implements UpdatableEntityInterface
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getName(): ?string
-    {
-        return $this->name;
-    }
-
-    public function setName(?string $name): self
-    {
-        $this->name = $name;
-
-        return $this;
     }
 
     public function getValue(): ?string
@@ -107,14 +90,14 @@ class ProductOptionParameter implements UpdatableEntityInterface
         return $this;
     }
 
-    public function getProductOption(): ?ProductOption
+    public function getProductInformationGroup(): ?ProductInformationGroup
     {
-        return $this->productOption;
+        return $this->productInformationGroup;
     }
 
-    public function setProductOption(?ProductOption $productOption): self
+    public function setProductInformationGroup(?ProductInformationGroup $productInformationGroup): self
     {
-        $this->productOption = $productOption;
+        $this->productInformationGroup = $productInformationGroup;
 
         return $this;
     }

@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Entity\Interfaces\UpdatableEntityInterface;
 use App\Repository\ProductOptionRepository;
 use App\Service\SortingService;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -12,7 +13,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * @ORM\Entity(repositoryClass=ProductOptionRepository::class)
  */
-class ProductOption
+class ProductOption implements UpdatableEntityInterface
 {
     public const TYPE_NUMBER = 'number';
     public const TYPE_DROPDOWN = 'dropdown';

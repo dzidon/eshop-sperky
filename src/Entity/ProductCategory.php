@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Entity\Interfaces\UpdatableEntityInterface;
 use App\Repository\ProductCategoryRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -9,7 +10,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * @ORM\Entity(repositoryClass=ProductCategoryRepository::class)
  */
-class ProductCategory
+class ProductCategory implements UpdatableEntityInterface
 {
     /**
      * @ORM\Id

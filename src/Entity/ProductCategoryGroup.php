@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Entity\Interfaces\UpdatableEntityInterface;
 use App\Repository\ProductCategoryGroupRepository;
 use App\Service\SortingService;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -12,7 +13,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * @ORM\Entity(repositoryClass=ProductCategoryGroupRepository::class)
  */
-class ProductCategoryGroup
+class ProductCategoryGroup implements UpdatableEntityInterface
 {
     /**
      * @ORM\Id

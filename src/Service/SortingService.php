@@ -2,6 +2,8 @@
 
 namespace App\Service;
 
+use LogicException;
+
 class SortingService
 {
     public const ATTRIBUTE_TAG_ASC = '-ASC';
@@ -40,6 +42,6 @@ class SortingService
             ];
         }
 
-        throw new \LogicException('Metoda createSortData v SortingService nedokázala vytvořit array potřebný pro řazení. Nejspíše nedostala atribut končící "-ASC", nebo "-DESC".');
+        throw new LogicException('Metoda createSortData v SortingService nedokázala vytvořit array potřebný pro řazení. Nejspíše nedostala atribut končící "-ASC", nebo "-DESC".');
     }
 }

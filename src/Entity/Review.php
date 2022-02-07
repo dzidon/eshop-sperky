@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Entity\Interfaces\UpdatableEntityInterface;
 use App\Repository\ReviewRepository;
 use App\Service\SortingService;
 use Doctrine\ORM\Mapping as ORM;
@@ -10,7 +11,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * @ORM\Entity(repositoryClass=ReviewRepository::class)
  */
-class Review
+class Review implements UpdatableEntityInterface
 {
     public const STAR_VALUES = [5.0,4.0,3.0,2.0,1.0];
     public const STAR_COUNT = 5;

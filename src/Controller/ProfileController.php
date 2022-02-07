@@ -10,6 +10,7 @@ use App\Form\PersonalInfoFormType;
 use App\Form\SearchTextAndSortFormType;
 use App\Security\EmailVerifier;
 use App\Service\BreadcrumbsService;
+use App\Service\EntityUpdatingService;
 use App\Service\PaginatorService;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -211,7 +212,7 @@ class ProfileController extends AbstractController
     /**
      * @Route("/adresa/{id}", name="profile_address", requirements={"id"="\d+"})
      */
-    public function address($id = null): Response
+    public function address(EntityUpdatingService $entityUpdater, $id = null): Response
     {
         $user = $this->getUser();
         if($this->isUserNotVerified($user, true))
@@ -245,16 +246,9 @@ class ProfileController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid())
         {
-            $entityManager = $this->getDoctrine()->getManager();
-            if ($address->getId() === null)
-            {
-                $entityManager->persist($address);
-            }
-            else
-            {
-                $address->setUpdated(new \DateTime('now'));
-            }
-            $entityManager->flush();
+            $entityUpdater->setMainInstance($address)
+                ->mainInstancePersistOrSetUpdated();
+            $this->getDoctrine()->getManager()->flush();
 
             $this->addFlash('success', 'Adresa uložena!');
             $this->logger->info(sprintf("User %s (ID: %s) has saved their address %s (ID: %s).", $user->getUserIdentifier(), $user->getId(), $address->getAlias(), $address->getId()));

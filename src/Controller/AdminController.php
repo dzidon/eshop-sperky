@@ -15,6 +15,7 @@ use App\Form\ProductOptionParametersFormType;
 use App\Form\ProductSectionFormType;
 use App\Form\SearchTextAndSortFormType;
 use App\Service\BreadcrumbsService;
+use App\Service\EntityUpdatingService;
 use App\Service\PaginatorService;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -252,7 +253,7 @@ class AdminController extends AbstractController
      *
      * @IsGranted("product_section_edit")
      */
-    public function productSection($id = null): Response
+    public function productSection(EntityUpdatingService $entityUpdater, $id = null): Response
     {
         $user = $this->getUser();
 
@@ -277,16 +278,9 @@ class AdminController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid())
         {
-            $entityManager = $this->getDoctrine()->getManager();
-            if ($section->getId() === null)
-            {
-                $entityManager->persist($section);
-            }
-            else
-            {
-                $section->setUpdated(new \DateTime('now'));
-            }
-            $entityManager->flush();
+            $entityUpdater->setMainInstance($section)
+                          ->mainInstancePersistOrSetUpdated();
+            $this->getDoctrine()->getManager()->flush();
 
             $this->addFlash('success', 'Produktová sekce uložena!');
             $this->logger->info(sprintf("Admin %s (ID: %s) has saved a product section %s (ID: %s).", $user->getUserIdentifier(), $user->getId(), $section->getName(), $section->getId()));
@@ -385,7 +379,7 @@ class AdminController extends AbstractController
      *
      * @IsGranted("product_category_edit")
      */
-    public function productCategoryGroup($id = null): Response
+    public function productCategoryGroup(EntityUpdatingService $entityUpdater, $id = null): Response
     {
         $user = $this->getUser();
 
@@ -410,20 +404,11 @@ class AdminController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid())
         {
-            $entityManager = $this->getDoctrine()->getManager();
-            if ($categoryGroup->getId() === null)
-            {
-                $entityManager->persist($categoryGroup);
-            }
-            else
-            {
-                $categoryGroup->setUpdated(new \DateTime('now'));
-                foreach ($categoryGroup->getCategories() as $category)
-                {
-                    $category->setUpdated( $categoryGroup->getUpdated() );
-                }
-            }
-            $entityManager->flush();
+            $entityUpdater->setMainInstance($categoryGroup)
+                          ->setCollectionGetters(['getCategories'])
+                          ->mainInstancePersistOrSetUpdated()
+                          ->collectionItemsSetUpdated();
+            $this->getDoctrine()->getManager()->flush();
 
             $this->addFlash('success', 'Skupina produktových kategorií uložena!');
             $this->logger->info(sprintf("Admin %s (ID: %s) has saved a product category group %s (ID: %s).", $user->getUserIdentifier(), $user->getId(), $categoryGroup->getName(), $categoryGroup->getId()));
@@ -522,7 +507,7 @@ class AdminController extends AbstractController
      *
      * @IsGranted("product_option_edit")
      */
-    public function productOption($id = null): Response
+    public function productOption(EntityUpdatingService $entityUpdater, $id = null): Response
     {
         $user = $this->getUser();
 
@@ -548,21 +533,15 @@ class AdminController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid())
         {
-            $entityManager = $this->getDoctrine()->getManager();
-            if ($option->getId() === null)
+            if ($option->getType() !== $oldOption->getType()) //došlo ke změně typu při editaci, takže smažeme parametry
             {
-                $entityManager->persist($option);
+                $option->getParameters()->clear();
             }
-            else
-            {
-                if ($option->getType() !== $oldOption->getType()) //došlo ke změně typu při editaci, takže smažeme parametry
-                {
-                    $option->getParameters()->clear();
-                }
-                $option->setUpdated(new \DateTime('now'));
-            }
+            $entityUpdater->setMainInstance($option)
+                ->mainInstancePersistOrSetUpdated();
+
             $option->setConfiguredIfValid();
-            $entityManager->flush();
+            $this->getDoctrine()->getManager()->flush();
 
             $this->addFlash('success', 'Produktová volba uložena! Nyní ji nakonfigurujte.');
             $this->logger->info(sprintf("Admin %s (ID: %s) has saved a product option %s (ID: %s).", $user->getUserIdentifier(), $user->getId(), $option->getName(), $option->getId()));
@@ -623,10 +602,11 @@ class AdminController extends AbstractController
      *
      * @IsGranted("product_option_edit")
      */
-    public function productOptionConfigure($id): Response
+    public function productOptionConfigure(EntityUpdatingService $entityUpdater, $id): Response
     {
         $user = $this->getUser();
 
+        /** @var ProductOption $option */
         $option = $this->getDoctrine()->getRepository(ProductOption::class)->findOneBy(['id' => $id]);
         if($option === null) //nenaslo to zadnou volbu
         {
@@ -639,7 +619,6 @@ class AdminController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid())
         {
-            $entityManager = $this->getDoctrine()->getManager();
             $data = [];
             if ($option->getType() === ProductOption::TYPE_NUMBER)
             {
@@ -651,22 +630,14 @@ class AdminController extends AbstractController
                 ];
             }
 
+            $entityUpdater->setMainInstance($option)
+                ->setCollectionGetters(['getParameters'])
+                ->mainInstancePersistOrSetUpdated()
+                ->collectionItemsSetUpdated();
+
             $option->configure($data)
                    ->setConfiguredIfValid();
-
-            if ($option->getId() === null)
-            {
-                $entityManager->persist($option);
-            }
-            else
-            {
-                $option->setUpdated(new \DateTime('now'));
-                foreach ($option->getParameters() as $parameter)
-                {
-                    $parameter->setUpdated( $option->getUpdated() );
-                }
-            }
-            $entityManager->flush();
+            $this->getDoctrine()->getManager()->flush();
 
             $this->addFlash('success', 'Produktová volba uložena a nakonfigurována!');
             $this->logger->info(sprintf("Admin %s (ID: %s) has configured a product option %s (ID: %s).", $user->getUserIdentifier(), $user->getId(), $option->getName(), $option->getId()));

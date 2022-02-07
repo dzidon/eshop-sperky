@@ -38,7 +38,7 @@ class ProductOptionParametersSubscriber implements EventSubscriberInterface
                     'required' => false,
                     'allow_add' => true,
                     'allow_delete' => true,
-                    'label' => 'Obsah skládacího menu',
+                    'label' => 'Obsah rozbalovacího seznamu',
                     'delete_empty' => function (ProductOptionParameter $parameter = null) {
                         return $parameter === null || $parameter->getValue() === null;
                     },
