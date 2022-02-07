@@ -15,12 +15,12 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class ProductOption implements UpdatableEntityInterface
 {
-    public const TYPE_NUMBER = 'number';
-    public const TYPE_DROPDOWN = 'dropdown';
+    public const TYPE_NUMBER = 'Číslo';
+    public const TYPE_DROPDOWN = 'Rozbalovací seznam';
     public const TYPES = [self::TYPE_NUMBER, self::TYPE_DROPDOWN];
     public const TYPE_NAMES = [
-        'Číslo (number)' => self::TYPE_NUMBER,
-        'Rozbalovací seznam (dropdown)' => self::TYPE_DROPDOWN,
+        self::TYPE_NUMBER => self::TYPE_NUMBER,
+        self::TYPE_DROPDOWN => self::TYPE_DROPDOWN,
     ];
 
     /**
