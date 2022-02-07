@@ -52,6 +52,11 @@ parameters:
         edit: 'Upravit produktovou volbu'
     app_page_title.admin_product_option_configure: 'Konfigurovat produktovou volbu'
     app_page_title.admin_product_option_delete: 'Smazat produktovou volbu'
+    app_page_title.admin_product_info: 'Produktové informace'
+    app_page_title.admin_product_info_edit:
+        new: 'Nová skupina produktových informací'
+        edit: 'Upravit skupinu produktových informací'
+    app_page_title.admin_product_info_delete: 'Smazat skupinu produktových informací'
 
 services:
     # default configuration for services in *this* file

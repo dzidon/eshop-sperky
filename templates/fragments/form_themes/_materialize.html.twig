@@ -68,6 +68,16 @@
     {% endif %}
 {% endblock form_help %}
 
+{# Řádek pro datum a čas #}
+{% block datetime_row %}
+    <div class="row{% if (not compound or force_error|default(false)) and not valid %} has-error{% endif %}">
+        {{ form_label(form) }}
+        {{ form_widget(form) }}
+        {{ form_help(form) }}
+        {{ form_errors(form) }}
+    </div>
+{% endblock datetime_row %}
+
 {# Řádek checkboxu #}
 {% block checkbox_row %}
     <div class="row {% if not valid %} has-error{% endif %}">

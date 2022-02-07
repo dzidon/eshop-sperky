@@ -46,6 +46,13 @@ class ProductSection implements UpdatableEntityInterface
     private $isHidden = false;
 
     /**
+     * @ORM\Column(type="datetime", nullable=true)
+     *
+     * @Assert\Type("DateTime")
+     */
+    private $availableSince;
+
+    /**
      * @ORM\Column(type="datetime")
      */
     private $created;
@@ -102,6 +109,18 @@ class ProductSection implements UpdatableEntityInterface
         return $this;
     }
 
+    public function getAvailableSince(): ?\DateTimeInterface
+    {
+        return $this->availableSince;
+    }
+
+    public function setAvailableSince(?\DateTimeInterface $availableSince): self
+    {
+        $this->availableSince = $availableSince;
+
+        return $this;
+    }
+
     public function getCreated(): ?\DateTimeInterface
     {
         return $this->created;
@@ -133,7 +152,9 @@ class ProductSection implements UpdatableEntityInterface
             'Název (Z-A)' => 'name'.SortingService::ATTRIBUTE_TAG_DESC,
             'Odkaz (A-Z)' => 'slug'.SortingService::ATTRIBUTE_TAG_ASC,
             'Odkaz (Z-A)' => 'slug'.SortingService::ATTRIBUTE_TAG_DESC,
-            'Od skrytých' => 'isHidden'.SortingService::ATTRIBUTE_TAG_DESC,
+            'Od manuálně skrytých' => 'isHidden'.SortingService::ATTRIBUTE_TAG_DESC,
+            'Od manuálně neskrytých' => 'isHidden'.SortingService::ATTRIBUTE_TAG_ASC,
+            'Od nejpozdějšího datumu dostupnosti' => 'availableSince'.SortingService::ATTRIBUTE_TAG_DESC,
             'Od nejstarší' => 'created'.SortingService::ATTRIBUTE_TAG_ASC,
             'Od nejnovější' => 'created'.SortingService::ATTRIBUTE_TAG_DESC,
             'Od naposledy upravené' => 'updated'.SortingService::ATTRIBUTE_TAG_DESC,

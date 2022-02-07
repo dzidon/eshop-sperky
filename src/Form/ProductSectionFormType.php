@@ -6,6 +6,7 @@ use App\Entity\ProductSection;
 use App\Form\EventSubscriber\SlugSubscriber;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -33,9 +34,15 @@ class ProductSectionFormType extends AbstractType
                 'required' => false,
                 'label' => 'Název v odkazu',
             ])
+            ->add('availableSince', DateTimeType::class, [
+                'required' => false,
+                'widget' => 'single_text',
+                'input' => 'datetime',
+                'label' => 'Zpřístupnit pro uživatele od',
+            ])
             ->add('isHidden', CheckboxType::class, [
                 'required' => false,
-                'label' => 'Skrýt pro uživatele',
+                'label' => 'Manuálně skrýt pro uživatele',
             ])
             ->addEventSubscriber( (new SlugSubscriber($this->slugger))->setGetterForAutoGenerate('getName') )
         ;
