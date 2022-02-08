@@ -26,27 +26,31 @@
         {% else %}
             <div class="collection">
                 {% for option in options %}
-                    <div class="collection-item">
-                        <strong>
-                            {{ option.getName() }}
-                        </strong>
-                        - {{ option.getType() }}
+                    <div class="collection-item valign-wrapper">
+                        <div class="col s9 no-padding">
+                            <strong>
+                                {{ option.getName() }}
+                            </strong>
+                            - {{ option.getType() }}
 
-                        {% if not option.isConfigured() %}
-                            - <span class="red-text">NENAKONFIGUROVÁNO</span>
-                        {% endif %}
+                            {% if not option.isConfigured() %}
+                                - <span class="red-text">NENAKONFIGUROVÁNO</span>
+                            {% endif %}
+                        </div>
 
-                        {% if can_delete %}
-                            <a href=" {{ path('admin_product_option_delete', {id: option.getId()}) }} " class="secondary-content">
-                                <i class="material-icons">delete</i>
-                            </a>
-                        {% endif %}
+                        <div class="col s3 no-padding right-align">
+                            {% if can_edit %}
+                                <a href="{{ path('admin_product_option_edit', {id: option.getId()}) }}">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                            {% endif %}
 
-                        {% if can_edit %}
-                            <a href=" {{ path('admin_product_option_edit', {id: option.getId()}) }} " class="secondary-content">
-                                <i class="material-icons">create</i>
-                            </a>
-                        {% endif %}
+                            {% if can_delete %}
+                                <a href="{{ path('admin_product_option_delete', {id: option.getId()}) }}">
+                                    <i class="fas fa-trash-alt"></i>
+                                </a>
+                            {% endif %}
+                        </div>
                     </div>
                 {% endfor %}
             </div>

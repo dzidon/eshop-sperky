@@ -26,22 +26,26 @@
         {% else %}
             <div class="collection">
                 {% for group in categoryGroups %}
-                    <div class="collection-item">
-                        <strong>
-                            {{ group.getName() }}
-                        </strong>
+                    <div class="collection-item valign-wrapper">
+                        <div class="col s9 no-padding">
+                            <strong>
+                                {{ group.getName() }}
+                            </strong>
+                        </div>
 
-                        {% if can_delete %}
-                            <a href=" {{ path('admin_product_category_delete', {id: group.getId()}) }} " class="secondary-content">
-                                <i class="material-icons">delete</i>
-                            </a>
-                        {% endif %}
+                        <div class="col s3 no-padding right-align">
+                            {% if can_edit %}
+                                <a href="{{ path('admin_product_category_edit', {id: group.getId()}) }}">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                            {% endif %}
 
-                        {% if can_edit %}
-                            <a href=" {{ path('admin_product_category_edit', {id: group.getId()}) }} " class="secondary-content">
-                                <i class="material-icons">create</i>
-                            </a>
-                        {% endif %}
+                            {% if can_delete %}
+                                <a href="{{ path('admin_product_category_delete', {id: group.getId()}) }}">
+                                    <i class="fas fa-trash-alt"></i>
+                                </a>
+                            {% endif %}
+                        </div>
                     </div>
                 {% endfor %}
             </div>
