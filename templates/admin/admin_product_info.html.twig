@@ -1,0 +1,58 @@
+{% extends 'admin/admin_base.html.twig' %}
+
+{% set can_edit = is_granted('product_info_edit') %}
+{% set can_delete = is_granted('product_info_delete') %}
+
+{% block admin_subheading_extra %}
+
+    {% if can_edit %}
+        <a href="{{ path('admin_product_info_edit') }}" class="btn-floating btn-medium waves-effect waves-light light-blue"><i class="material-icons">add</i></a>
+    {% endif %}
+
+{% endblock %}
+
+{% block admin_body %}
+
+    <div class="row">
+        {# Formulář - vyhledávací pole, řazení #}
+        {{ include('fragments/forms_unique/_form_search_order.html.twig', {form: searchForm}) }}
+    </div>
+
+    <div class="row">
+        <h4>Výsledky ({{ pagination.getTotalItems() }})</h4>
+
+        {% if infoGroups is empty %}
+            Hledání neodpovídají žádné skupiny produktových informací.
+        {% else %}
+            <div class="collection">
+                {% for group in infoGroups %}
+                    <div class="collection-item valign-wrapper">
+                        <div class="col s9 no-padding">
+                            <strong>
+                                {{ group.getName() }}
+                            </strong>
+                        </div>
+
+                        <div class="col s3 no-padding right-align">
+                            {% if can_edit %}
+                                <a href="{{ path('admin_product_info_edit', {id: group.getId()}) }}">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                            {% endif %}
+
+                            {% if can_delete %}
+                                <a href="{{ path('admin_product_info_delete', {id: group.getId()}) }}">
+                                    <i class="fas fa-trash-alt"></i>
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
+    {# Pagination #}
+    {{ include('fragments/_pagination.html.twig') }}
+
+{% endblock %}

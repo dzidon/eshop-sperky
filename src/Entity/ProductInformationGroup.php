@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Entity\Interfaces\UpdatableEntityInterface;
 use App\Repository\ProductInformationGroupRepository;
+use App\Service\SortingService;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -124,5 +125,17 @@ class ProductInformationGroup implements UpdatableEntityInterface
         }
 
         return $this;
+    }
+
+    public static function getSortData(): array
+    {
+        return [
+            'Název (A-Z)' => 'name'.SortingService::ATTRIBUTE_TAG_ASC,
+            'Název (Z-A)' => 'name'.SortingService::ATTRIBUTE_TAG_DESC,
+            'Od nejstarší' => 'created'.SortingService::ATTRIBUTE_TAG_ASC,
+            'Od nejnovější' => 'created'.SortingService::ATTRIBUTE_TAG_DESC,
+            'Od naposledy upravené' => 'updated'.SortingService::ATTRIBUTE_TAG_DESC,
+            'Od poprvé upravené' => 'updated'.SortingService::ATTRIBUTE_TAG_ASC,
+        ];
     }
 }

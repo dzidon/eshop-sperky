@@ -3,7 +3,9 @@
 namespace App\Repository;
 
 use App\Entity\ProductInformationGroup;
+use App\Service\SortingService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Query;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -14,37 +16,28 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class ProductInformationGroupRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    private SortingService $sorting;
+
+    public function __construct(ManagerRegistry $registry, SortingService $sorting)
     {
         parent::__construct($registry, ProductInformationGroup::class);
+
+        $this->sorting = $sorting;
     }
 
-    // /**
-    //  * @return ProductInformationGroup[] Returns an array of ProductInformationGroup objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    public function getQueryForSearchAndPagination($searchPhrase = null, string $sortAttribute = null): Query
     {
-        return $this->createQueryBuilder('p')
-            ->andWhere('p.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('p.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
-    */
+        $sortData = $this->sorting->createSortData($sortAttribute, ProductInformationGroup::getSortData());
 
-    /*
-    public function findOneBySomeField($value): ?ProductInformationGroup
-    {
-        return $this->createQueryBuilder('p')
-            ->andWhere('p.exampleField = :val')
-            ->setParameter('val', $value)
+        return $this->createQueryBuilder('pig')
+
+            //podminky
+            ->orWhere('pig.name LIKE :name')
+            ->setParameter('name', '%' . $searchPhrase . '%')
+
+            //razeni
+            ->orderBy('pig.' . $sortData['attribute'], $sortData['order'])
             ->getQuery()
-            ->getOneOrNullResult()
         ;
     }
-    */
 }
