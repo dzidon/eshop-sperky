@@ -8,7 +8,6 @@ use App\Form\RegistrationFormType;
 use App\Security\EmailVerifier;
 use App\Service\BreadcrumbsService;
 use DateTime;
-use Exception;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -71,8 +70,9 @@ class RegistrationController extends AbstractController
                 )
             );
 
-            //pokud neexistuje jiny uzivatel s danym emailem v db, muzeme aktualniho uzivatele ulozit
-            //pokud existuje jiny uzivatel s danym emailem, ktery jeste neni overeny a muze si nechat poslat novy link, posleme mu ho a znovu mu nastavime zadavane heslo
+            // pokud neexistuje jiny uzivatel s danym emailem v db, muzeme aktualniho uzivatele ulozit,
+            // pokud existuje jiny uzivatel s danym emailem, ktery jeste neni overeny a muze si nechat poslat novy link,
+            // posleme mu ho a znovu mu nastavime zadavane heslo
             $entityManager = $this->getDoctrine()->getManager();
             $userForEmailConfirmation = null;
             $now = new DateTime('now');
@@ -101,9 +101,15 @@ class RegistrationController extends AbstractController
             {
                 $this->emailVerifier->sendEmailConfirmation('verify_email', $userForEmailConfirmation);
             }
-            catch (Exception | TransportExceptionInterface $exception)
+            catch (TransportExceptionInterface $exception)
             {
-                $this->logger->error(sprintf("User %s has tried registering, but the following error occurred in sendEmailConfirmation: %s", $user->getUserIdentifier(), $exception->getMessage()));
+                $this->logger->error(sprintf("User %s has tried to register, but the following error occurred in sendEmailConfirmation: %s", $user->getUserIdentifier(), $exception->getMessage()));
+            }
+
+            //uživatel už je ověřený nebo je moc brzo na další ověřovací odkaz
+            if(!$userForEmailConfirmation)
+            {
+                $this->logger->error(sprintf("User %s has tried to register, but this email is already verified or it's too soon for another verification link.", $user->getUserIdentifier()));
             }
 
             $this->addFlash('success', sprintf("Registrace proběhla úspěšně! Pokud zadaný e-mail %s existuje, poslali jsme na něj potvrzovací odkaz, přes který e-mail ověříte. Pokud potvrzovací odkaz nedorazí, zkuste registraci za 10 minut opakovat.", $user->getEmail()));

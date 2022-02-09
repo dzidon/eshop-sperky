@@ -2,7 +2,6 @@
 
 namespace App\Security;
 
-use Exception;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -35,10 +34,12 @@ class EmailVerifier
      * Odešle odkaz na ověření emailu
      *
      * @param string $verifyEmailRouteName
-     * @param null|UserInterface $user
+     * @param null|UserInterface $user Pokud je null, jedná se ověřovací e-mail, který se nikam nepošle, protože
+     *                                 uživatel (útočník?) zkouší zaregistrovat e-mail, který už je ověřený.
+     *                                 Také je možné, že ještě neuplynul čas uvedený v app_email_verify_link_throttle_limit
+     *                                 od posledního odeslaného odkazu.
      *
      * @throws TransportExceptionInterface
-     * @throws Exception
      */
     public function sendEmailConfirmation(string $verifyEmailRouteName, ?UserInterface $user): void
     {
@@ -64,11 +65,7 @@ class EmailVerifier
 
         $email->context($context);
 
-        if($user === null)
-        {
-            throw new Exception("This e-mail is already verified or it's too soon for another verification link.");
-        }
-        else
+        if($user !== null)
         {
             $this->mailer->send($email);
         }

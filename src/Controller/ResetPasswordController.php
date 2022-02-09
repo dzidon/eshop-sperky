@@ -149,10 +149,17 @@ class ResetPasswordController extends AbstractController
             // The session is cleaned up after the password has been changed.
             $this->cleanSessionAfterReset();
 
-            $this->addFlash('success', "Vaše heslo bylo úspěšně změněno.");
             $this->logger->info(sprintf("User %s (ID: %s) has changed their password (via email).", $user->getUserIdentifier(), $user->getId()));
-
-            return $this->redirectToRoute('home');
+            if($this->getUser())
+            {
+                $this->addFlash('success', "Heslo bylo úspěšně změněno.");
+                return $this->redirectToRoute('home');
+            }
+            else
+            {
+                $this->addFlash('success', "Heslo bylo úspěšně změněno. Nyní se s ním můžete přihlásit.");
+                return $this->redirectToRoute('login');
+            }
         }
 
         return $this->render('reset_password/reset.html.twig', [

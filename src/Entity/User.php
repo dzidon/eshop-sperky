@@ -522,6 +522,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             'Příjmení (A-Z)' => 'nameLast'.SortingService::ATTRIBUTE_TAG_ASC,
             'Příjmení (Z-A)' => 'nameLast'.SortingService::ATTRIBUTE_TAG_DESC,
             'Pohlaví' => 'gender'.SortingService::ATTRIBUTE_TAG_DESC,
+            'Od ověřených' => 'isVerified'.SortingService::ATTRIBUTE_TAG_DESC,
+            'Od neověřených' => 'isVerified'.SortingService::ATTRIBUTE_TAG_ASC,
             'Od umlčených' => 'isMuted'.SortingService::ATTRIBUTE_TAG_DESC,
             'Od neumlčených' => 'isMuted'.SortingService::ATTRIBUTE_TAG_ASC,
             'Od nejstaršího' => 'registered'.SortingService::ATTRIBUTE_TAG_ASC,

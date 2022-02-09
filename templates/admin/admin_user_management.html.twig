@@ -31,7 +31,11 @@
                             {% endif %}
 
                             {% if user.isMuted() %}
-                                - <span class="red-text">UMLČEN</span>
+                                - <span class="red-text">UMLČENÝ</span>
+                            {% endif %}
+
+                            {% if not user.isVerified() %}
+                                - <span class="red-text">NEOVĚŘENÝ</span>
                             {% endif %}
                         </div>
 
