@@ -10,3 +10,5 @@ You have already requested a reset password email. Please check your email or tr
 
 We are unable to get all the required data from your social login.: Nepodařilo se nám získat všechna potřebná data z vašeho social loginu. Ujistěte se, že nám při přihlášení sdělujete svůj email. Odpojte vaší aplikaci (Facebook/Google) od našeho webu a zkuste to znovu. Pokud problém přetrvává, kontaktujte nás.
 You already are logged in.: Už jste přihlášen. Pro nové přihlášení se nejdříve odhlašte.
+Invalid credentials.: Neplatné přihlašovací údaje.
+This verification link is invalid.: Tento ověřovací odkaz není platný, možná už vypršel. Zopakujte registraci a pošleme vám nový.

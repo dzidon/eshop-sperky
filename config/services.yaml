@@ -33,6 +33,7 @@ parameters:
     app_page_title.reset_password: 'Obnova hesla'
     app_page_title.register: 'Registrace'
     app_page_title.login: 'Přihlášení'
+    app_page_title.verify_email: 'Ověřit email'
     app_page_title.admin_permission_overview: 'Moje oprávnění'
     app_page_title.admin_user_management: 'Uživatelé'
     app_page_title.admin_user_management_specific: 'Uživatel'

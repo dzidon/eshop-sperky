@@ -21,6 +21,7 @@ security:
             entry_point: App\Security\AuthenticationEntryPoint
             custom_authenticators:
                 - App\Security\LoginFormAuthenticator
+                - App\Security\VerificationFormAuthenticator
                 - App\Security\SocialAuthenticator
             login_throttling:
                 max_attempts: 5

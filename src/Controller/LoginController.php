@@ -2,17 +2,22 @@
 
 namespace App\Controller;
 
+use App\Form\LoginFormType;
 use App\Service\BreadcrumbsService;
 use KnpU\OAuth2ClientBundle\Client\ClientRegistry;
 use KnpU\OAuth2ClientBundle\Client\Provider\FacebookClient;
 use KnpU\OAuth2ClientBundle\Client\Provider\GoogleClient;
+use LogicException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class LoginController extends AbstractController
 {
@@ -26,7 +31,7 @@ class LoginController extends AbstractController
     /**
      * @Route("/prihlaseni", name="login")
      */
-    public function login(Request $request, AuthenticationUtils $authenticationUtils): Response
+    public function login(FormFactoryInterface $formFactory, Request $request, AuthenticationUtils $authenticationUtils, TranslatorInterface $translator): Response
     {
         if ($this->isGranted('IS_AUTHENTICATED_FULLY'))
         {
@@ -34,17 +39,19 @@ class LoginController extends AbstractController
             return $this->redirectToRoute('home');
         }
 
-        // ziska login error, pokud nejaky existuje
         $error = $authenticationUtils->getLastAuthenticationError();
+        if($error)
+        {
+            $this->addFlash('failure', $translator->trans($error->getMessageKey()));
+        }
 
-        // posledni username (email) zadany uzivatelem
-        $lastUsername = $authenticationUtils->getLastUsername();
+        $form = $formFactory->createNamed('', LoginFormType::class, null, ['last_email' => $authenticationUtils->getLastUsername()]);
+        $form->add('submit', SubmitType::class, ['label' => 'Přihlásit se']);
 
         $request->getSession()->remove(Security::LAST_USERNAME);
 
         return $this->render('authentication/login.html.twig', [
-            'lastUsername' => $lastUsername,
-            'error' => $error,
+            'loginForm' => $form->createView(),
             'breadcrumbs' => $this->breadcrumbs->addRoute('home')->addRoute('login'),
         ]);
     }
@@ -79,6 +86,6 @@ class LoginController extends AbstractController
      */
     public function logout(): void
     {
-        throw new \LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');
+        throw new LogicException('Tohle se nikdy nevyhodí, je to tu kvůli firewallu.');
     }
 }

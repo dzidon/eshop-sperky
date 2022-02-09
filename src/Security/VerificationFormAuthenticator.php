@@ -4,6 +4,7 @@ namespace App\Security;
 
 use App\Entity\User;
 use App\Exception\AlreadyAuthenticatedException;
+use App\Exception\VerifyLinkInvalidException;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -20,18 +21,16 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordCredentials;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
-use Symfony\Component\Security\Http\Util\TargetPathTrait;
+use SymfonyCasts\Bundle\VerifyEmail\Exception\VerifyEmailExceptionInterface;
 
 /**
- * Třída LoginFormAuthenticator řeší autentizaci přes přihlašovací formulář (email a heslo).
+ * Třída LoginFormAuthenticator řeší autentizaci přes ověřovací formulář (email, heslo, signature z odkazu).
  *
  * @package App\Security
  */
-class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
+class VerificationFormAuthenticator extends AbstractLoginFormAuthenticator
 {
-    use TargetPathTrait;
-
-    public const LOGIN_ROUTE = 'login';
+    public const VERIFICATION_ROUTE = 'verify_email';
 
     private UrlGeneratorInterface $urlGenerator;
     private LoggerInterface $logger;
@@ -48,9 +47,14 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
         $this->emailVerifier = $emailVerifier;
     }
 
+    public function supports(Request $request): bool
+    {
+        return $request->isMethod('POST') && $request->attributes->get('_route') === self::VERIFICATION_ROUTE;
+    }
+
     public function authenticate(Request $request): PassportInterface
     {
-        if($this->security->isGranted('IS_AUTHENTICATED_FULLY')) //uživatel už je přihlášen úplně
+        if($this->security->isGranted('IS_AUTHENTICATED_REMEMBERED')) //uživatel už je přihlášen
         {
             throw new AlreadyAuthenticatedException();
         }
@@ -62,21 +66,30 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
         $request->getSession()->set(Security::LAST_USERNAME, $email);
 
         return new Passport(
-            new UserBadge($email, function($userIdentifier)
+            new UserBadge($email, function($userIdentifier) use ($request)
             {
                 /** @var User $user */
                 $user = $this->entityManager->getRepository(User::class)->findOneBy(['email' => $userIdentifier]);
 
-                if (!$user || $user->getPassword() === null || !$user->isVerified())
+                if(!$user || $user->getPassword() === null || $user->isVerified())
                 {
                     throw new BadCredentialsException();
+                }
+
+                try
+                {
+                    $this->emailVerifier->handleEmailConfirmation($request, $user);
+                }
+                catch (VerifyEmailExceptionInterface $exception)
+                {
+                    throw new VerifyLinkInvalidException();
                 }
 
                 return $user;
             }),
             new PasswordCredentials($password),
             [
-                new CsrfTokenBadge('form_login', $token),
+                new CsrfTokenBadge('form_verification', $token),
                 new RememberMeBadge(),
             ]
         );
@@ -85,20 +98,21 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
     {
         $user = $token->getUser();
+        $user->setIsVerified(true);
+        $this->entityManager->flush();
 
-        $request->getSession()->getFlashBag()->add('success', 'Přihlášení e-mailem a heslem proběhlo úspěšně.');
-        $this->logger->info(sprintf("User %s (ID: %s) has logged in using email and password.", $user->getUserIdentifier(), $user->getId()));
-
-        if ($targetPath = $this->getTargetPath($request->getSession(), $firewallName))
-        {
-            return new RedirectResponse($targetPath);
-        }
+        $request->getSession()->getFlashBag()->add('success', 'Ověření e-mailu proběhlo úspěšně, byli jste přihlášeni!');
+        $this->logger->info(sprintf("User %s (ID: %s) has verified their email and logged in.", $user->getUserIdentifier(), $user->getId()));
 
         return new RedirectResponse($this->urlGenerator->generate('home'));
     }
 
     protected function getLoginUrl(Request $request): string
     {
-        return $this->urlGenerator->generate(self::LOGIN_ROUTE);
+        return $this->urlGenerator->generate(self::VERIFICATION_ROUTE, [
+            'expires' => $request->query->get('expires', ''),
+            'signature' => $request->query->get('signature', ''),
+            'token' => $request->query->get('token', ''),
+        ]);
     }
 }

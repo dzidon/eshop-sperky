@@ -14,32 +14,7 @@
             {{ include('fragments/_flash_messages.html.twig') }}
 
             <div class="section">
-                <form method="post">
-                    <div class="row">
-                        <div class="input-field">
-                            <input type="email" value="{{ lastUsername }}" name="email" id="inputEmail" required="required" autofocus="autofocus"/>
-                            <label for="inputEmail" class="required">Email:</label>
-
-                            {% if error %}
-                                <span class="helper-text red-text">{{ error.messageKey|trans(error.messageData, 'security') }}</span>
-                            {% endif %}
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="input-field">
-                            <input type="password" id="inputPassword" name="password" required="required"/>
-                            <label for="inputPassword" class="required">Heslo:</label>
-                        </div>
-                    </div>
-
-                    {# <input type="hidden" name="_target_path" value="/account"/> #}
-                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
-
-                    <div class="row center-align">
-                        <button type="submit" class="waves-effect waves-light btn-large light-blue">Přihlásit se</button>
-                    </div>
-                </form>
+                {{ form(loginForm) }}
 
                 <div class="row center-align">
                     {% if not is_authenticated_remembered %}

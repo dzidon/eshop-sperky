@@ -1,0 +1,22 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+
+    {# Breadcrumbs #}
+    {{ include('fragments/_breadcrumbs.html.twig') }}
+
+    <div class="container">
+        <div class="container">
+            {# h1 #}
+            {{ include('fragments/_h1.html.twig', {route: app.request.get('_route')}) }}
+
+            {# Flash zprávy #}
+            {{ include('fragments/_flash_messages.html.twig') }}
+
+            <div class="section">
+                {{ form(verificationForm) }}
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

@@ -2,8 +2,7 @@
 
 namespace App\Security;
 
-use App\Exception\EmailAlreadyVerifiedException;
-use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,14 +22,12 @@ class EmailVerifier
 {
     private VerifyEmailHelperInterface $verifyEmailHelper;
     private MailerInterface $mailer;
-    private EntityManagerInterface $entityManager;
     private ParameterBagInterface $parameterBag;
 
-    public function __construct(VerifyEmailHelperInterface $helper, MailerInterface $mailer, EntityManagerInterface $manager, ParameterBagInterface $parameterBag)
+    public function __construct(VerifyEmailHelperInterface $helper, MailerInterface $mailer, ParameterBagInterface $parameterBag)
     {
         $this->verifyEmailHelper = $helper;
         $this->mailer = $mailer;
-        $this->entityManager = $manager;
         $this->parameterBag = $parameterBag;
     }
 
@@ -38,29 +35,26 @@ class EmailVerifier
      * Odešle odkaz na ověření emailu
      *
      * @param string $verifyEmailRouteName
-     * @param UserInterface $user
-     * @param bool $newUser
+     * @param null|UserInterface $user
      *
      * @throws TransportExceptionInterface
-     * @throws \Exception
+     * @throws Exception
      */
-    public function sendEmailConfirmation(string $verifyEmailRouteName, UserInterface $user, bool $newUser = false): void
+    public function sendEmailConfirmation(string $verifyEmailRouteName, ?UserInterface $user): void
     {
-        if(!$user->canSendAnotherVerifyLink($this->parameterBag->get('app_email_verify_link_throttle_limit')))
-        {
-            throw new \Exception('You can only request one verification link per 10 minutes.');
-        }
+        $usedId = ($user !== null ? $user->getId() : '1');
+        $usedEmail = ($user !== null ? $user->getEmail() : 'fake@email.com');
 
         $email = new TemplatedEmail();
         $email->from(new Address($this->parameterBag->get('app_email_noreply'), $this->parameterBag->get('app_site_name')))
-            ->to($user->getEmail())
+            ->to($usedEmail)
             ->subject('Aktivace účtu')
             ->htmlTemplate('fragments/emails/_verify_account.html.twig');
 
         $signatureComponents = $this->verifyEmailHelper->generateSignature(
             $verifyEmailRouteName,
-            $user->getId(),
-            $user->getEmail()
+            $usedId,
+            $usedEmail
         );
 
         $context = $email->getContext();
@@ -70,13 +64,13 @@ class EmailVerifier
 
         $email->context($context);
 
-        $this->mailer->send($email);
-
-        if(!$newUser)
+        if($user === null)
         {
-            $user->setVerifyLinkLastSent(new \DateTime('now'));
-            $this->entityManager->persist($user);
-            $this->entityManager->flush();
+            throw new Exception("This e-mail is already verified or it's too soon for another verification link.");
+        }
+        else
+        {
+            $this->mailer->send($email);
         }
     }
 
@@ -86,21 +80,10 @@ class EmailVerifier
      * @param Request $request
      * @param UserInterface $user
      *
-     * @throws EmailAlreadyVerifiedException
      * @throws VerifyEmailExceptionInterface
      */
     public function handleEmailConfirmation(Request $request, UserInterface $user): void
     {
-        if($user->isVerified())
-        {
-            throw new EmailAlreadyVerifiedException();
-        }
-
         $this->verifyEmailHelper->validateEmailConfirmation($request->getUri(), $user->getId(), $user->getEmail());
-
-        $user->setIsVerified(true);
-
-        $this->entityManager->persist($user);
-        $this->entityManager->flush();
     }
 }
