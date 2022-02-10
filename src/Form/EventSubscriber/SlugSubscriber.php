@@ -28,6 +28,13 @@ class SlugSubscriber implements EventSubscriberInterface
      */
     private array $gettersForAutoGenerate = [];
 
+    /**
+     * Data navíc vkládaná do slugu v případě automatického generování
+     *
+     * @var array
+     */
+    private array $extraDataForAutoGenerate = [];
+
     public function __construct(SluggerInterface $slugger)
     {
         $this->slugger = $slugger;
@@ -35,7 +42,7 @@ class SlugSubscriber implements EventSubscriberInterface
 
     public static function getSubscribedEvents(): array
     {
-        return [FormEvents::SUBMIT => 'createSlug'];
+        return [FormEvents::SUBMIT => 'submit'];
     }
 
     public function setGettersForAutoGenerate(array $gettersForAutoGenerate): self
@@ -45,7 +52,14 @@ class SlugSubscriber implements EventSubscriberInterface
         return $this;
     }
 
-    public function createSlug(FormEvent $event): void
+    public function setExtraDataForAutoGenerate(array $extraDataForAutoGenerate): self
+    {
+        $this->extraDataForAutoGenerate = $extraDataForAutoGenerate;
+
+        return $this;
+    }
+
+    public function submit(FormEvent $event): void
     {
         $instance = $event->getData();
         if (!$instance)
@@ -56,9 +70,17 @@ class SlugSubscriber implements EventSubscriberInterface
         if ($instance->getSlug() === null)
         {
             $stringToConvert = '';
+
+            //data z instance
             foreach ($this->gettersForAutoGenerate as $getData)
             {
                 $stringToConvert .= $instance->$getData() . ' ';
+            }
+
+            //extra data
+            foreach ($this->extraDataForAutoGenerate as $extraData)
+            {
+                $stringToConvert .= $extraData . ' ';
             }
 
             $slug = strtolower($this->slugger->slug($stringToConvert));

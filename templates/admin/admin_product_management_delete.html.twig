@@ -1,0 +1,8 @@
+{% extends 'admin/admin_base.html.twig' %}
+
+{% block admin_body %}
+
+    <div class="row">Opravdu si přejete smazat produkt '{{ productInstance.getName() }}'? Zároveň dojde ke smazání přiřazených produktových obrázků a produktových informací. Tato akce je nevratná.</div>
+    {{ form(productDeleteForm) }}
+
+{% endblock %}

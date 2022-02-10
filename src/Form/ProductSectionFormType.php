@@ -45,7 +45,8 @@ class ProductSectionFormType extends AbstractType
                 'label' => 'Manuálně skrýt pro uživatele',
             ])
             ->addEventSubscriber(
-                (new SlugSubscriber($this->slugger))->setGettersForAutoGenerate(['getName'])
+                (new SlugSubscriber($this->slugger))
+                    ->setGettersForAutoGenerate(['getName'])
             )
         ;
     }

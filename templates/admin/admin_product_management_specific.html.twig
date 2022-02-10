@@ -1,0 +1,16 @@
+{% extends 'admin/admin_base.html.twig' %}
+
+{% block admin_body %}
+
+    {# Časy vytvoření a aktualizace #}
+    {{ include('fragments/_instance_created_updated.html.twig', {instance: productInstance}) }}
+
+    {{ form(productForm) }}
+
+    {% if productInstance.getId() is not null and is_granted('product_delete') %}
+        <div class="row center-align">
+            <a href="{{ path('admin_product_delete', {id: productInstance.getId()}) }}">Smazat</a>
+        </div>
+    {% endif %}
+
+{% endblock %}

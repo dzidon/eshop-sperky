@@ -37,7 +37,9 @@ class ProductFormType extends AbstractType
                 'label' => 'Název v odkazu',
             ])
             ->addEventSubscriber(
-                (new SlugSubscriber($this->slugger))->setGettersForAutoGenerate(['getName', 'getId'])
+                (new SlugSubscriber($this->slugger))
+                    ->setGettersForAutoGenerate(['getName'])
+                    ->setExtraDataForAutoGenerate([date("HisdmY")])
             )
             ->add('description', TextareaType::class, [
                 'required' => false,
@@ -57,7 +59,7 @@ class ProductFormType extends AbstractType
                 'label' => 'Cena bez DPH v Kč',
             ])
             ->add('vat', ChoiceType::class, [
-                'choices' => Product::VAT_VALUES,
+                'choices' => Product::VAT_NAMES,
                 'label' => 'DPH',
             ])
         ;

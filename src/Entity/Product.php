@@ -13,6 +13,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * @ORM\Entity(repositoryClass=ProductRepository::class)
+ * @ORM\HasLifecycleCallbacks()
  * @UniqueEntity(fields={"slug"}, message="Už existuje produktová sekce s tímto názvem pro odkaz.")
  */
 class Product implements UpdatableEntityInterface
@@ -66,9 +67,6 @@ class Product implements UpdatableEntityInterface
 
     /**
      * @ORM\Column(type="float")
-     *
-     * @Assert\Type("float", message="Musíte zadat číselnou hodnotu.")
-     * @Assert\NotBlank
      */
     private $priceWithVat;
 
@@ -167,6 +165,16 @@ class Product implements UpdatableEntityInterface
     public function setPriceWithVat(float $priceWithVat): self
     {
         $this->priceWithVat = $priceWithVat;
+
+        return $this;
+    }
+
+    /**
+     * @ORM\PreFlush
+     */
+    public function calculatePriceWithVat(): self
+    {
+        $this->priceWithVat = $this->priceWithoutVat * (1 + $this->vat);
 
         return $this;
     }

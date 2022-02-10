@@ -13,6 +13,12 @@
         </a>
     {% endif %}
 
+    {% if is_granted('admin_products') %}
+        <a href="{{ path('admin_products') }}" class="collection-item {% if route == 'admin_products' or route == 'admin_product_edit' or route == 'admin_product_delete' %} active {% endif %}">
+            {{ get_parameter('app_page_title.admin_products') }}
+        </a>
+    {% endif %}
+
     {% if is_granted('admin_product_sections') %}
         <a href="{{ path('admin_product_sections') }}" class="collection-item {% if route == 'admin_product_sections' or route == 'admin_product_section_edit' or route == 'admin_product_section_delete' %} active {% endif %}">
             {{ get_parameter('app_page_title.admin_product_sections') }}
