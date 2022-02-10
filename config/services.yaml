@@ -58,6 +58,11 @@ parameters:
         new: 'Nová skupina produktových informací'
         edit: 'Upravit skupinu produktových informací'
     app_page_title.admin_product_info_delete: 'Smazat skupinu produktových informací'
+    app_page_title.admin_products: 'Produkty'
+    app_page_title.admin_product_edit:
+        new: 'Nový produkt'
+        edit: 'Upravit produkt'
+    app_page_title.admin_product_delete: 'Smazat produkt'
 
 services:
     # default configuration for services in *this* file

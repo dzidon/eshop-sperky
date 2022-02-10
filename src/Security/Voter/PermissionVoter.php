@@ -10,6 +10,7 @@ class PermissionVoter implements VoterInterface
 {
     const CATEGORY_REVIEWS = 'Recenze';
     const CATEGORY_USERS = 'Uživatelé';
+    const CATEGORY_PRODUCTS = 'Produkty';
     const CATEGORY_PRODUCT_SECTIONS = 'Produktové sekce';
     const CATEGORY_PRODUCT_CATEGORIES = 'Produktové kategore';
     const CATEGORY_PRODUCT_OPTIONS = 'Produktové volby';
@@ -81,6 +82,16 @@ class PermissionVoter implements VoterInterface
         'product_info_delete' => [
             'name' => 'Mazání skupin produktových informací',
             'category' => self::CATEGORY_PRODUCT_INFO,
+        ],
+
+        //sprava produktu
+        'product_edit' => [
+            'name' => 'Tvorba a editace produktů',
+            'category' => self::CATEGORY_PRODUCTS,
+        ],
+        'product_delete' => [
+            'name' => 'Mazání produktů',
+            'category' => self::CATEGORY_PRODUCTS,
         ],
     ];
 

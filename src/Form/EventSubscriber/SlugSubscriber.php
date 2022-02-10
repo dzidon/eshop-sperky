@@ -22,11 +22,11 @@ class SlugSubscriber implements EventSubscriberInterface
     private SluggerInterface $slugger;
 
     /**
-     * Getter, který se má použít pro automatické vygenerování slugu, když je slug null
+     * Gettery, které se mají použít pro automatické vygenerování slugu, když je uživatelem zadaný slug null
      *
-     * @var string
+     * @var array
      */
-    private string $getterForAutoGenerate = 'undefined';
+    private array $gettersForAutoGenerate = [];
 
     public function __construct(SluggerInterface $slugger)
     {
@@ -35,32 +35,39 @@ class SlugSubscriber implements EventSubscriberInterface
 
     public static function getSubscribedEvents(): array
     {
-        return [FormEvents::SUBMIT => 'submit'];
+        return [FormEvents::SUBMIT => 'createSlug'];
     }
 
-    public function setGetterForAutoGenerate(string $getterForAutoGenerate): self
+    public function setGettersForAutoGenerate(array $gettersForAutoGenerate): self
     {
-        $this->getterForAutoGenerate = $getterForAutoGenerate;
+        $this->gettersForAutoGenerate = $gettersForAutoGenerate;
 
         return $this;
     }
 
-    public function submit(FormEvent $event): void
+    public function createSlug(FormEvent $event): void
     {
         $instance = $event->getData();
-
         if (!$instance)
         {
             return;
         }
 
-        $getDataForAutoGenerate = $this->getterForAutoGenerate;
-
-        if ($instance->getSlug() === null && $instance->$getDataForAutoGenerate() !== null)
+        if ($instance->getSlug() === null)
         {
-            $instance->setSlug( strtolower($this->slugger->slug($instance->$getDataForAutoGenerate())) );
+            $stringToConvert = '';
+            foreach ($this->gettersForAutoGenerate as $getData)
+            {
+                $stringToConvert .= $instance->$getData() . ' ';
+            }
+
+            $slug = strtolower($this->slugger->slug($stringToConvert));
+            if(mb_strlen($slug, 'utf-8') > 0)
+            {
+                $instance->setSlug($slug);
+            }
         }
-        else if ($instance->getSlug() !== null)
+        else
         {
             $instance->setSlug( strtolower($this->slugger->slug($instance->getSlug())) );
         }

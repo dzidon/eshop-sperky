@@ -5,6 +5,8 @@ namespace App\Entity;
 use App\Entity\Interfaces\UpdatableEntityInterface;
 use App\Repository\ProductSectionRepository;
 use App\Service\SortingService;
+use DateTime;
+use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -41,14 +43,14 @@ class ProductSection implements UpdatableEntityInterface
     /**
      * @ORM\Column(type="boolean")
      *
-     * @Assert\Type("bool")
+     * @Assert\Type("bool", message="Zadávaná hodnota není platná.")
      */
     private $isHidden = false;
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
      *
-     * @Assert\Type("DateTime")
+     * @Assert\Type("DateTime", message="Musíte zadat datum a čas.")
      */
     private $availableSince;
 
@@ -64,7 +66,7 @@ class ProductSection implements UpdatableEntityInterface
 
     public function __construct()
     {
-        $this->created = new \DateTime('now');
+        $this->created = new DateTime('now');
         $this->updated = $this->created;
     }
 
@@ -109,36 +111,36 @@ class ProductSection implements UpdatableEntityInterface
         return $this;
     }
 
-    public function getAvailableSince(): ?\DateTimeInterface
+    public function getAvailableSince(): ?DateTimeInterface
     {
         return $this->availableSince;
     }
 
-    public function setAvailableSince(?\DateTimeInterface $availableSince): self
+    public function setAvailableSince(?DateTimeInterface $availableSince): self
     {
         $this->availableSince = $availableSince;
 
         return $this;
     }
 
-    public function getCreated(): ?\DateTimeInterface
+    public function getCreated(): ?DateTimeInterface
     {
         return $this->created;
     }
 
-    public function setCreated(\DateTimeInterface $created): self
+    public function setCreated(DateTimeInterface $created): self
     {
         $this->created = $created;
 
         return $this;
     }
 
-    public function getUpdated(): ?\DateTimeInterface
+    public function getUpdated(): ?DateTimeInterface
     {
         return $this->updated;
     }
 
-    public function setUpdated(\DateTimeInterface $updated): self
+    public function setUpdated(DateTimeInterface $updated): self
     {
         $this->updated = $updated;
 

@@ -2,17 +2,19 @@
 
 namespace App\Form;
 
-use App\Entity\ProductSection;
+use App\Entity\Product;
 use App\Form\EventSubscriber\SlugSubscriber;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\String\Slugger\SluggerInterface;
 
-class ProductSectionFormType extends AbstractType
+class ProductFormType extends AbstractType
 {
     private SluggerInterface $slugger;
 
@@ -26,13 +28,20 @@ class ProductSectionFormType extends AbstractType
         $builder
             ->add('name', TextType::class, [
                 'attr' => ['autofocus' => 'autofocus'],
-                'help' => 'Pro uživatele přívětivý název, např. "Kvalitní náušnice".',
+                'help' => 'Pro uživatele přívětivý název, např. "Náhrdelník Mateřídouška".',
                 'label' => 'Název',
             ])
             ->add('slug', TextType::class, [
-                'help' => 'Pro odkazy přívětivý název, např. "kvalitni-nausnice". Pole můžete nechat prázdné pro automatické vygenerování z předešlého názvu. Všechny nebezpečné znaky tohoto názvu jsou převedeny na bezpečné.',
+                'help' => 'Pro odkazy přívětivý název, např. "nahrdelnik-materidouska". Pole můžete nechat prázdné pro automatické vygenerování z předešlého názvu. Všechny nebezpečné znaky tohoto názvu jsou převedeny na bezpečné.',
                 'required' => false,
                 'label' => 'Název v odkazu',
+            ])
+            ->addEventSubscriber(
+                (new SlugSubscriber($this->slugger))->setGettersForAutoGenerate(['getName', 'getId'])
+            )
+            ->add('description', TextareaType::class, [
+                'required' => false,
+                'label' => 'Popis',
             ])
             ->add('availableSince', DateTimeType::class, [
                 'required' => false,
@@ -44,19 +53,23 @@ class ProductSectionFormType extends AbstractType
                 'required' => false,
                 'label' => 'Manuálně skrýt pro uživatele',
             ])
-            ->addEventSubscriber(
-                (new SlugSubscriber($this->slugger))->setGettersForAutoGenerate(['getName'])
-            )
+            ->add('priceWithoutVat', TextType::class, [
+                'label' => 'Cena bez DPH v Kč',
+            ])
+            ->add('vat', ChoiceType::class, [
+                'choices' => Product::VAT_VALUES,
+                'label' => 'DPH',
+            ])
         ;
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => ProductSection::class,
+            'data_class' => Product::class,
             'csrf_protection' => true,
             'csrf_field_name' => '_token',
-            'csrf_token_id'   => 'form_product_section',
+            'csrf_token_id'   => 'form_product',
         ]);
     }
 }
