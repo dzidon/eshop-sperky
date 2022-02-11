@@ -56,9 +56,15 @@ class ProductFormType extends AbstractType
                 'label' => 'Manuálně skrýt pro uživatele',
             ])
             ->add('priceWithoutVat', TextType::class, [
+                'attr' => [
+                    'class' => 'js-input-price-without-vat',
+                ],
                 'label' => 'Cena bez DPH v Kč',
             ])
             ->add('vat', ChoiceType::class, [
+                'attr' => [
+                    'class' => 'js-input-vat',
+                ],
                 'choices' => Product::VAT_NAMES,
                 'label' => 'DPH',
             ])

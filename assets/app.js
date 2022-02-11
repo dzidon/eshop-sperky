@@ -14,7 +14,7 @@ $(document).ready(function() {
 
     //dynamicke upravovani pro CollectionType
     document
-        .querySelectorAll('.add_item_link')
+        .querySelectorAll('.js-add-item-link')
         .forEach(btn => {
             btn.addEventListener("click", addFormToCollection)
     });

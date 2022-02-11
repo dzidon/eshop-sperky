@@ -48,7 +48,7 @@ class ProductOptionParametersSubscriber implements EventSubscriberInterface
                 ])
                 ->add('addItem', ButtonType::class, [
                     'attr' => [
-                        'class' => 'btn-medium grey left add_item_link',
+                        'class' => 'btn-medium grey left js-add-item-link',
                         'data-collection-holder-class' => 'parameters',
                     ],
                     'label' => 'Přidat hodnotu',

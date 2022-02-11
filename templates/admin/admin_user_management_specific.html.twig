@@ -8,33 +8,39 @@
     </div>
 
     {% if formCredentials is not null %}
-        <div class="row no-mar-bot">
-            <h4>Osobní údaje</h4>
-        </div>
+        <div class="section no-pad-bot">
+            <div class="row no-mar-bot">
+                <h4>Osobní údaje</h4>
+            </div>
 
-        {{ form(formCredentials) }}
+            {{ form(formCredentials) }}
+        </div>
     {% endif %}
 
     {% if formPermissions is not null %}
-        <div class="row no-mar-bot">
-            <h4>Oprávnění</h4>
-        </div>
+        <div class="section no-pad-bot">
+            <div class="row no-mar-bot">
+                <h4>Oprávnění</h4>
+            </div>
 
-        {{ form(formPermissions) }}
+            {{ form(formPermissions) }}
+        </div>
     {% endif %}
 
     {% if formMute is not null %}
-        <div class="row">
-            <h4>Psaní recenzí</h4>
+        <div class="section no-pad-bot">
+            <div class="row">
+                <h4>Psaní recenzí</h4>
 
-            {% if userEdited.isMuted() %}
-                <div>Tento uživatel nemůže psát recenze.</div>
-            {% else %}
-                <div>Tento uživatel může psát recenze.</div>
-            {% endif %}
+                {% if userEdited.isMuted() %}
+                    <div>Tento uživatel nemůže psát recenze.</div>
+                {% else %}
+                    <div>Tento uživatel může psát recenze.</div>
+                {% endif %}
+            </div>
+
+            {{ form(formMute) }}
         </div>
-
-        {{ form(formMute) }}
     {% endif %}
 
 {% endblock %}
