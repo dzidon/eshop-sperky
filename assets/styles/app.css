@@ -147,6 +147,10 @@ ul.dropdown-content.select-dropdown li span {
     margin-right: 15px;
 }
 
+.margin-right5px {
+    margin-right: 5px;
+}
+
 a.collection-item {
     color: #03a9f4 !important;
 }

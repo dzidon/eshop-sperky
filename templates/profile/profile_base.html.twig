@@ -6,19 +6,21 @@
     {{ include('fragments/_breadcrumbs.html.twig') }}
 
     <div class="container">
-        <h1>Profil</h1>
+        <h1>Váš profil</h1>
 
         <div class="row margin-0">
-            <div class="col s12 m4 l3 no-padding"> {# s12 m7 l8 xl9 #}
-                {# Navigace profilu #}
-                {{ include('fragments/_profile_nav.html.twig') }}
+            <div class="col s12 m4 l3"> {# s12 m7 l8 xl9 #}
+                <div class="row no-padding">
+                    {# Navigace profilu #}
+                    {{ include('fragments/_profile_nav.html.twig') }}
+                </div>
             </div>
             <div class="col s12 m8 l9">
                 <div class="container">
                     {# Flash zprávy #}
                     {{ include('fragments/_flash_messages.html.twig') }}
 
-                    <div class="section">
+                    <div class="section no-pad-top">
                         <div class="row">
                             <h3 class="no-mar-top">
                                 {{ breadcrumbs.getPageTitle() }}

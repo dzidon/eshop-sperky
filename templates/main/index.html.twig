@@ -188,20 +188,20 @@
                         <div class="card white">
                             <div class="card-content valign-wrapper">
                                 <div class="col s8 no-padding black-text left-align">
-                                    <div>
-                                        <h5 class="no-mar-top">
+                                    <div class="valign-wrapper">
+                                        <h6 class="no-mar-bot no-mar-top margin-right5px">
                                             <strong>{{ agregateReviewData.average|number_format(1) }}</strong><span class="grey-text">/5</span>
-                                        </h5>
-                                    </div>
+                                        </h6>
 
-                                    <div class="amber-text accent-3">
-                                        {# Hvězdy #}
-                                        {{ include('fragments/_review_stars.html.twig', {stars: rating_to_stars(agregateReviewData.average)}) }}
+                                        <span class="amber-text accent-3 valign-wrapper">
+                                            {# Hvězdy #}
+                                            {{ include('fragments/_review_stars.html.twig', {stars: rating_to_stars(agregateReviewData.average)}) }}
+                                        </span>
                                     </div>
                                 </div>
 
                                 <div class="col s4 no-padding right-align">
-                                    <h6 class="margin-0 grey-text no-padding">
+                                    <h6 class="margin-0 grey-text">
                                         Celkem recenzí: <strong class="black-text">{{ agregateReviewData.total }}</strong>
                                     </h6>
                                 </div>

@@ -9,16 +9,18 @@
         <h1>Admin</h1>
 
         <div class="row margin-0">
-            <div class="col s12 m4 l3 no-padding">
-                {# Navigace administrace #}
-                {{ include('fragments/_admin_nav.html.twig') }}
+            <div class="col s12 m4 l3">
+                <div class="row no-padding">
+                    {# Navigace administrace #}
+                    {{ include('fragments/_admin_nav.html.twig') }}
+                </div>
             </div>
             <div class="col s12 m8 l9">
                 <div class="container">
                     {# Flash zprávy #}
                     {{ include('fragments/_flash_messages.html.twig') }}
 
-                    <div class="section">
+                    <div class="section no-pad-top">
                         <div class="row">
                             <h3 class="no-mar-top">
                                 {{ breadcrumbs.getPageTitle() }}
