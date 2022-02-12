@@ -34,7 +34,7 @@ class ProductOptionParameter implements UpdatableEntityInterface
 
     /**
      * @ORM\ManyToOne(targetEntity=ProductOption::class, inversedBy="parameters")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
      */
     private $productOption;
 

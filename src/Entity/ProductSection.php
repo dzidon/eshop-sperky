@@ -7,6 +7,8 @@ use App\Repository\ProductSectionRepository;
 use App\Service\SortingService;
 use DateTime;
 use DateTimeInterface;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -55,6 +57,11 @@ class ProductSection implements UpdatableEntityInterface
     private $availableSince;
 
     /**
+     * @ORM\OneToMany(targetEntity=Product::class, mappedBy="section", cascade={"persist"})
+     */
+    private $products;
+
+    /**
      * @ORM\Column(type="datetime")
      */
     private $created;
@@ -68,6 +75,7 @@ class ProductSection implements UpdatableEntityInterface
     {
         $this->created = new DateTime('now');
         $this->updated = $this->created;
+        $this->products = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -119,6 +127,36 @@ class ProductSection implements UpdatableEntityInterface
     public function setAvailableSince(?DateTimeInterface $availableSince): self
     {
         $this->availableSince = $availableSince;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Product[]
+     */
+    public function getProducts(): Collection
+    {
+        return $this->products;
+    }
+
+    public function addProduct(Product $product): self
+    {
+        if (!$this->products->contains($product)) {
+            $this->products[] = $product;
+            $product->setSection($this);
+        }
+
+        return $this;
+    }
+
+    public function removeProduct(Product $product): self
+    {
+        if ($this->products->removeElement($product)) {
+            // set the owning side to null (unless already changed)
+            if ($product->getSection() === $this) {
+                $product->setSection(null);
+            }
+        }
 
         return $this;
     }

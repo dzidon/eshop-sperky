@@ -39,7 +39,7 @@ class ProductInformation implements UpdatableEntityInterface
 
     /**
      * @ORM\ManyToOne(targetEntity=ProductInformationGroup::class, inversedBy="info")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
      */
     private $productInformationGroup;
 

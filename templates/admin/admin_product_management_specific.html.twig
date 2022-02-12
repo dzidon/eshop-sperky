@@ -9,8 +9,15 @@
         {{ form_row(productForm.name) }}
         {{ form_row(productForm.slug) }}
         {{ form_row(productForm.description) }}
-        {{ form_row(productForm.availableSince) }}
-        {{ form_row(productForm.isHidden) }}
+
+        <div class="section no-pad-bot">
+            <div class="row no-mar-bot">
+                <h4>Viditelnost</h4>
+            </div>
+
+            {{ form_row(productForm.availableSince) }}
+            {{ form_row(productForm.isHidden) }}
+        </div>
 
         <div class="section no-pad-bot">
             <div class="row no-mar-bot">
@@ -30,6 +37,15 @@
                 </div>
             </div>
         </div>
+
+        <div class="section no-pad-bot">
+            <div class="row no-mar-bot">
+                <h4>Sekce</h4>
+            </div>
+
+            {{ form_row(productForm.section) }}
+        </div>
+
         {{ form_rest(productForm) }}
     {{ form_end(productForm) }}
 

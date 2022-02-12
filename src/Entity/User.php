@@ -108,12 +108,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private $phoneNumber;
 
     /**
-     * @ORM\OneToMany(targetEntity=Address::class, mappedBy="user", orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity=Address::class, mappedBy="user", cascade={"persist"})
      */
     private $addresses;
 
     /**
-     * @ORM\OneToOne(targetEntity=Review::class, mappedBy="user", cascade={"remove"})
+     * @ORM\OneToOne(targetEntity=Review::class, mappedBy="user")
      */
     private $review;
 

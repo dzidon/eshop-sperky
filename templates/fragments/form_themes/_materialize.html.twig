@@ -81,7 +81,7 @@
 {# Řádek checkboxu #}
 {% block checkbox_row %}
     <div class="row {% if not valid %} has-error{% endif %}">
-        <label>
+        <label class="input-field block">
             {{ form_widget(form, {'attr': {'class': 'filled-in checkbox-light-blue'}}) }}
             {{ form_label(form) }}
             <br>

@@ -40,7 +40,7 @@ class Review implements UpdatableEntityInterface
 
     /**
      * @ORM\OneToOne(targetEntity=User::class, inversedBy="review")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
      */
     private $user;
 

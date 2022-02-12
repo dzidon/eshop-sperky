@@ -3,7 +3,9 @@
 namespace App\Form;
 
 use App\Entity\Product;
+use App\Entity\ProductSection;
 use App\Form\EventSubscriber\SlugSubscriber;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -67,6 +69,13 @@ class ProductFormType extends AbstractType
                 ],
                 'choices' => Product::VAT_NAMES,
                 'label' => 'DPH',
+            ])
+            ->add('section', EntityType::class, [
+                'class' => ProductSection::class,
+                'required' => false,
+                'placeholder' => '-- nezařazeno --',
+                'choice_label' => 'name',
+                'label' => 'Sekce',
             ])
         ;
     }

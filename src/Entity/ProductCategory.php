@@ -29,7 +29,7 @@ class ProductCategory implements UpdatableEntityInterface
 
     /**
      * @ORM\ManyToOne(targetEntity=ProductCategoryGroup::class, inversedBy="categories")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
      */
     private $productCategoryGroup;
 

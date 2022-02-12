@@ -44,8 +44,6 @@ class ProductInformationGroup implements UpdatableEntityInterface
 
     /**
      * @ORM\OneToMany(targetEntity=ProductInformation::class, mappedBy="productInformationGroup", cascade={"persist"})
-     *
-     * @Assert\Valid
      */
     private $info;
 

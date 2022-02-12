@@ -47,7 +47,7 @@ class ProductOption implements UpdatableEntityInterface
     private $type;
 
     /**
-     * @ORM\OneToMany(targetEntity=ProductOptionParameter::class, mappedBy="productOption", orphanRemoval=true, cascade={"persist"})
+     * @ORM\OneToMany(targetEntity=ProductOptionParameter::class, mappedBy="productOption", cascade={"persist"})
      *
      * @Assert\Valid
      */

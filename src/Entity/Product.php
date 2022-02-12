@@ -101,6 +101,12 @@ class Product implements UpdatableEntityInterface
     private $availableSince;
 
     /**
+     * @ORM\ManyToOne(targetEntity=ProductSection::class, inversedBy="products")
+     * @ORM\JoinColumn(onDelete="SET NULL")
+     */
+    private $section;
+
+    /**
      * @ORM\Column(type="datetime")
      */
     private $created;
@@ -223,6 +229,18 @@ class Product implements UpdatableEntityInterface
     public function setAvailableSince(?DateTimeInterface $availableSince): self
     {
         $this->availableSince = $availableSince;
+
+        return $this;
+    }
+
+    public function getSection(): ?ProductSection
+    {
+        return $this->section;
+    }
+
+    public function setSection(?ProductSection $section): self
+    {
+        $this->section = $section;
 
         return $this;
     }
