@@ -198,6 +198,12 @@
     {{ parent() }}
 {% endblock textarea_widget %}
 
+{# Widget textového pole s autocomplete #}
+{% block autocomplete_text_widget %}
+    {% set attr = attr|merge({'data-autocomplete': json_autocomplete }) %}
+    {{ block('form_widget') }}
+{% endblock autocomplete_text_widget %}
+
 {# Klikatelné hodnocení s hvězdami #}
 {% block star_choice_row %}
     <div class="row {% if not valid %} has-error{% endif %}">

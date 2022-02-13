@@ -4,10 +4,13 @@ namespace App\Form;
 
 use App\Entity\Product;
 use App\Entity\ProductCategory;
+use App\Entity\ProductInformationGroup;
 use App\Entity\ProductOption;
 use App\Entity\ProductSection;
 use App\Form\EventSubscriber\SlugSubscriber;
+use App\Form\Type\AutoCompleteTextType;
 use App\Repository\ProductCategoryRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
@@ -22,10 +25,12 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 class ProductFormType extends AbstractType
 {
     private SluggerInterface $slugger;
+    private EntityManagerInterface $entityManager;
 
-    public function __construct(SluggerInterface $slugger)
+    public function __construct(SluggerInterface $slugger, EntityManagerInterface $entityManager)
     {
         $this->slugger = $slugger;
+        $this->entityManager = $entityManager;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -101,6 +106,11 @@ class ProductFormType extends AbstractType
                 'expanded' => true,
                 'required' => false,
                 'label' => false,
+            ])
+            ->add('test', AutoCompleteTextType::class, [
+                'mapped' => false,
+                'data_autocomplete' => $this->entityManager->getRepository(ProductInformationGroup::class)->getArrayOfNames(),
+                'label' => 'Autocomplete',
             ])
         ;
     }

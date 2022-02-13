@@ -3,16 +3,24 @@ require('materialize-css/dist/js/materialize.min');
 
 import './styles/app.css';
 
-
 $(document).ready(function() {
 
-    //materialize
+    // materialize
     $('.sidenav').sidenav();
     $('.parallax').parallax();
     $('select').formSelect();
-    $(".dropdown-trigger").dropdown({ hover: false });
+    $('.dropdown-trigger').dropdown({ hover: false });
 
-    //dynamicke upravovani pro CollectionType
+    // materialize autocomplete
+    $('input.autocomplete').each(function() {
+        $(this).autocomplete({
+            data: JSON.parse(
+                $(this).attr('data-autocomplete')
+            )
+        });
+    });
+
+    // dynamicke vytvareni inputu podle prototypu pro CollectionType
     document
         .querySelectorAll('.js-add-item-link')
         .forEach(btn => {
@@ -21,8 +29,8 @@ $(document).ready(function() {
 });
 
 /*
-* Přidá formulář do CollectionType
-*/
+ * Přidá formulář do CollectionType
+ */
 const addFormToCollection = (e) => {
     const collectionHolder = document.querySelector('.' + e.currentTarget.dataset.collectionHolderClass);
 
