@@ -5,6 +5,8 @@ namespace App\Entity;
 use App\Entity\Interfaces\UpdatableEntityInterface;
 use App\Repository\ProductInformationGroupRepository;
 use App\Service\SortingService;
+use DateTime;
+use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -49,7 +51,7 @@ class ProductInformationGroup implements UpdatableEntityInterface
 
     public function __construct()
     {
-        $this->created = new \DateTime('now');
+        $this->created = new DateTime('now');
         $this->updated = $this->created;
         $this->info = new ArrayCollection();
     }
@@ -71,24 +73,24 @@ class ProductInformationGroup implements UpdatableEntityInterface
         return $this;
     }
 
-    public function getCreated(): ?\DateTimeInterface
+    public function getCreated(): ?DateTimeInterface
     {
         return $this->created;
     }
 
-    public function setCreated(\DateTimeInterface $created): self
+    public function setCreated(DateTimeInterface $created): self
     {
         $this->created = $created;
 
         return $this;
     }
 
-    public function getUpdated(): ?\DateTimeInterface
+    public function getUpdated(): ?DateTimeInterface
     {
         return $this->updated;
     }
 
-    public function setUpdated(\DateTimeInterface $updated): self
+    public function setUpdated(DateTimeInterface $updated): self
     {
         $this->updated = $updated;
 

@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use App\Entity\Interfaces\UpdatableEntityInterface;
 use App\Repository\ProductOptionParameterRepository;
+use DateTime;
+use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -50,7 +52,7 @@ class ProductOptionParameter implements UpdatableEntityInterface
 
     public function __construct()
     {
-        $this->created = new \DateTime('now');
+        $this->created = new DateTime('now');
         $this->updated = $this->created;
     }
 
@@ -83,24 +85,24 @@ class ProductOptionParameter implements UpdatableEntityInterface
         return $this;
     }
 
-    public function getCreated(): ?\DateTimeInterface
+    public function getCreated(): ?DateTimeInterface
     {
         return $this->created;
     }
 
-    public function setCreated(\DateTimeInterface $created): self
+    public function setCreated(DateTimeInterface $created): self
     {
         $this->created = $created;
 
         return $this;
     }
 
-    public function getUpdated(): ?\DateTimeInterface
+    public function getUpdated(): ?DateTimeInterface
     {
         return $this->updated;
     }
 
-    public function setUpdated(\DateTimeInterface $updated): self
+    public function setUpdated(DateTimeInterface $updated): self
     {
         $this->updated = $updated;
 

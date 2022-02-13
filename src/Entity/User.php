@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use App\Repository\UserRepository;
 use App\Service\SortingService;
+use DateTime;
+use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -119,6 +121,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * @ORM\ManyToMany(targetEntity=Permission::class)
+     * @ORM\JoinTable(name="_user_permission")
      */
     private $permissions;
 
@@ -131,7 +134,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $this->addresses = new ArrayCollection();
         $this->permissions = new ArrayCollection();
-        $this->registered = new \DateTime('now');
+        $this->registered = new DateTime('now');
     }
 
     public function getId(): ?int
@@ -270,12 +273,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getVerifyLinkLastSent(): ?\DateTimeInterface
+    public function getVerifyLinkLastSent(): ?DateTimeInterface
     {
         return $this->verifyLinkLastSent;
     }
 
-    public function setVerifyLinkLastSent(\DateTimeInterface $verifyLinkLastSent): self
+    public function setVerifyLinkLastSent(DateTimeInterface $verifyLinkLastSent): self
     {
         $this->verifyLinkLastSent = $verifyLinkLastSent;
 
@@ -295,7 +298,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $date1 = $this->getVerifyLinkLastSent();
         if($date1 !== null)
         {
-            $date2 = new \DateTime( 'now' );
+            $date2 = new DateTime( 'now' );
 
             if(($date2->getTimestamp() - $date1->getTimestamp()) < $minTimeDiffSeconds)
             {
@@ -306,12 +309,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return true;
     }
 
-    public function getRegistered(): ?\DateTimeInterface
+    public function getRegistered(): ?DateTimeInterface
     {
         return $this->registered;
     }
 
-    public function setRegistered(\DateTimeInterface $registered): self
+    public function setRegistered(DateTimeInterface $registered): self
     {
         $this->registered = $registered;
 

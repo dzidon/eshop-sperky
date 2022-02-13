@@ -5,6 +5,8 @@ namespace App\Entity;
 use App\Entity\Interfaces\UpdatableEntityInterface;
 use App\Repository\AddressRepository;
 use App\Service\SortingService;
+use DateTime;
+use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
 use App\Validation as AssertCustom;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -118,7 +120,7 @@ class Address implements UpdatableEntityInterface
 
     public function __construct(User $user)
     {
-        $this->created = new \DateTime('now');
+        $this->created = new DateTime('now');
         $this->updated = $this->created;
         $this->user = $user;
     }
@@ -248,24 +250,24 @@ class Address implements UpdatableEntityInterface
         return $this;
     }
 
-    public function getCreated(): ?\DateTimeInterface
+    public function getCreated(): ?DateTimeInterface
     {
         return $this->created;
     }
 
-    public function setCreated(\DateTimeInterface $created): self
+    public function setCreated(DateTimeInterface $created): self
     {
         $this->created = $created;
 
         return $this;
     }
 
-    public function getUpdated(): ?\DateTimeInterface
+    public function getUpdated(): ?DateTimeInterface
     {
         return $this->updated;
     }
 
-    public function setUpdated(\DateTimeInterface $updated): self
+    public function setUpdated(DateTimeInterface $updated): self
     {
         $this->updated = $updated;
 

@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use App\Entity\Interfaces\UpdatableEntityInterface;
 use App\Repository\ProductCategoryRepository;
+use DateTime;
+use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -20,7 +22,7 @@ class ProductCategory implements UpdatableEntityInterface
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, nullable=true)
      *
      * @Assert\Length(max=255, maxMessage="Maximální počet znaků v názvu kategorie: {{ limit }}")
      * @Assert\NotBlank
@@ -45,7 +47,7 @@ class ProductCategory implements UpdatableEntityInterface
 
     public function __construct()
     {
-        $this->created = new \DateTime('now');
+        $this->created = new DateTime('now');
         $this->updated = $this->created;
     }
 
@@ -66,7 +68,7 @@ class ProductCategory implements UpdatableEntityInterface
         return $this;
     }
 
-    public function getProductCategoryGroup(): ?ProductCategoryGroup
+    public function getProductCategoryGroup(): ProductCategoryGroup
     {
         return $this->productCategoryGroup;
     }
@@ -78,24 +80,24 @@ class ProductCategory implements UpdatableEntityInterface
         return $this;
     }
 
-    public function getCreated(): ?\DateTimeInterface
+    public function getCreated(): ?DateTimeInterface
     {
         return $this->created;
     }
 
-    public function setCreated(\DateTimeInterface $created): self
+    public function setCreated(DateTimeInterface $created): self
     {
         $this->created = $created;
 
         return $this;
     }
 
-    public function getUpdated(): ?\DateTimeInterface
+    public function getUpdated(): ?DateTimeInterface
     {
         return $this->updated;
     }
 
-    public function setUpdated(\DateTimeInterface $updated): self
+    public function setUpdated(DateTimeInterface $updated): self
     {
         $this->updated = $updated;
 

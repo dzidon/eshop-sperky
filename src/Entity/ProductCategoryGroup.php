@@ -5,6 +5,8 @@ namespace App\Entity;
 use App\Entity\Interfaces\UpdatableEntityInterface;
 use App\Repository\ProductCategoryGroupRepository;
 use App\Service\SortingService;
+use DateTime;
+use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -31,7 +33,7 @@ class ProductCategoryGroup implements UpdatableEntityInterface
     private $name;
 
     /**
-     * @ORM\OneToMany(targetEntity=ProductCategory::class, mappedBy="productCategoryGroup", cascade={"persist"})
+     * @ORM\OneToMany(targetEntity=ProductCategory::class, mappedBy="productCategoryGroup", orphanRemoval=true, cascade={"persist"})
      *
      * @Assert\Valid
      */
@@ -51,7 +53,7 @@ class ProductCategoryGroup implements UpdatableEntityInterface
     {
         $this->categories = new ArrayCollection();
 
-        $this->created = new \DateTime('now');
+        $this->created = new DateTime('now');
         $this->updated = $this->created;
     }
 
@@ -102,24 +104,24 @@ class ProductCategoryGroup implements UpdatableEntityInterface
         return $this;
     }
 
-    public function getCreated(): ?\DateTimeInterface
+    public function getCreated(): ?DateTimeInterface
     {
         return $this->created;
     }
 
-    public function setCreated(\DateTimeInterface $created): self
+    public function setCreated(DateTimeInterface $created): self
     {
         $this->created = $created;
 
         return $this;
     }
 
-    public function getUpdated(): ?\DateTimeInterface
+    public function getUpdated(): ?DateTimeInterface
     {
         return $this->updated;
     }
 
-    public function setUpdated(\DateTimeInterface $updated): self
+    public function setUpdated(DateTimeInterface $updated): self
     {
         $this->updated = $updated;
 

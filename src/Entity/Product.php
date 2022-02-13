@@ -7,6 +7,8 @@ use App\Repository\ProductRepository;
 use App\Service\SortingService;
 use DateTime;
 use DateTimeInterface;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -101,10 +103,22 @@ class Product implements UpdatableEntityInterface
     private $availableSince;
 
     /**
-     * @ORM\ManyToOne(targetEntity=ProductSection::class, inversedBy="products")
+     * @ORM\ManyToOne(targetEntity=ProductSection::class)
      * @ORM\JoinColumn(onDelete="SET NULL")
      */
     private $section;
+
+    /**
+     * @ORM\ManyToMany(targetEntity=ProductCategory::class)
+     * @ORM\JoinTable(name="_product_category")
+     */
+    private $categories;
+
+    /**
+     * @ORM\ManyToMany(targetEntity=ProductOption::class)
+     * @ORM\JoinTable(name="_product_option")
+     */
+    private $options;
 
     /**
      * @ORM\Column(type="datetime")
@@ -120,6 +134,8 @@ class Product implements UpdatableEntityInterface
     {
         $this->created = new DateTime('now');
         $this->updated = $this->created;
+        $this->options = new ArrayCollection();
+        $this->categories = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -241,6 +257,54 @@ class Product implements UpdatableEntityInterface
     public function setSection(?ProductSection $section): self
     {
         $this->section = $section;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|ProductCategory[]
+     */
+    public function getCategories(): Collection
+    {
+        return $this->categories;
+    }
+
+    public function addCategory(ProductCategory $category): self
+    {
+        if (!$this->categories->contains($category)) {
+            $this->categories[] = $category;
+        }
+
+        return $this;
+    }
+
+    public function removeCategory(ProductCategory $category): self
+    {
+        $this->categories->removeElement($category);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|ProductOption[]
+     */
+    public function getOptions(): Collection
+    {
+        return $this->options;
+    }
+
+    public function addOption(ProductOption $option): self
+    {
+        if (!$this->options->contains($option)) {
+            $this->options[] = $option;
+        }
+
+        return $this;
+    }
+
+    public function removeOption(ProductOption $option): self
+    {
+        $this->options->removeElement($option);
 
         return $this;
     }

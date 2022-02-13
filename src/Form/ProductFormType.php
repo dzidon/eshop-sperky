@@ -3,8 +3,11 @@
 namespace App\Form;
 
 use App\Entity\Product;
+use App\Entity\ProductCategory;
+use App\Entity\ProductOption;
 use App\Entity\ProductSection;
 use App\Form\EventSubscriber\SlugSubscriber;
+use App\Repository\ProductCategoryRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
@@ -76,6 +79,28 @@ class ProductFormType extends AbstractType
                 'placeholder' => '-- nezařazeno --',
                 'choice_label' => 'name',
                 'label' => 'Sekce',
+            ])
+            ->add('categories', EntityType::class, [
+                'class' => ProductCategory::class,
+                'choice_label' => 'name',
+                'query_builder' => function (ProductCategoryRepository $er) {
+                    return $er->qbFindAllAndFetchGroups();
+                },
+                'group_by' => function(ProductCategory $category) {
+                    return $category->getProductCategoryGroup()->getName();
+                },
+                'multiple' => true,
+                'expanded' => true,
+                'required' => false,
+                'label' => false,
+            ])
+            ->add('options', EntityType::class, [
+                'class' => ProductOption::class,
+                'choice_label' => 'name',
+                'multiple' => true,
+                'expanded' => true,
+                'required' => false,
+                'label' => false,
             ])
         ;
     }

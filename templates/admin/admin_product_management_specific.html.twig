@@ -26,7 +26,9 @@
 
             {{ form_row(productForm.priceWithoutVat) }}
             {{ form_row(productForm.vat) }}
+        </div>
 
+        <div class="section no-pad-bot">
             <div class="row">
                 <div>
                     DPH: <strong class="js-output-amount-vat">0</strong> Kč
@@ -44,6 +46,22 @@
             </div>
 
             {{ form_row(productForm.section) }}
+        </div>
+
+        <div class="section no-pad-bot">
+            <div class="row no-mar-bot">
+                <h4>Kategorie</h4>
+            </div>
+
+            {{ form_row(productForm.categories) }}
+        </div>
+
+        <div class="section no-pad-bot">
+            <div class="row no-mar-bot">
+                <h4>Volby</h4>
+            </div>
+
+            {{ form_row(productForm.options) }}
         </div>
 
         {{ form_rest(productForm) }}
