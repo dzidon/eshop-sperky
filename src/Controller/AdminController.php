@@ -19,8 +19,10 @@ use App\Form\ProductOptionParametersFormType;
 use App\Form\ProductSectionFormType;
 use App\Form\SearchTextAndSortFormType;
 use App\Service\BreadcrumbsService;
+use App\Service\EntityCollectionService;
 use App\Service\EntityUpdatingService;
 use App\Service\PaginatorService;
+use Doctrine\Common\Collections\ArrayCollection;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -825,13 +827,13 @@ class AdminController extends AbstractController
      *
      * @IsGranted("product_edit")
      */
-    public function product(EntityUpdatingService $entityUpdater, $id = null): Response
+    public function product(EntityUpdatingService $entityUpdater, EntityCollectionService $entityCollectionManager, $id = null): Response
     {
         $user = $this->getUser();
 
         if($id !== null) //zadal id do url, snazi se editovat existujici
         {
-            $product = $this->getDoctrine()->getRepository(Product::class)->findOneBy(['id' => $id]);
+            $product = $this->getDoctrine()->getRepository(Product::class)->findOneByIdAndFetchEverything($id);
             if($product === null) //nenaslo to zadny produkt
             {
                 throw new NotFoundHttpException('Produkt nenalezen.');
@@ -844,14 +846,28 @@ class AdminController extends AbstractController
             $this->breadcrumbs->setPageTitleByRoute('admin_product_edit', 'new');
         }
 
+        $entityCollectionManager->loadCollections([
+            ['type' => 'old', 'name' => 'info', 'collection' => $product->getInfo()]
+        ]);
+        
         $form = $this->createForm(ProductFormType::class, $product);
         $form->add('submit', SubmitType::class, ['label' => 'Uložit']);
         $form->handleRequest($this->request);
 
         if ($form->isSubmitted() && $form->isValid())
         {
-            $entityUpdater->setMainInstance($product)
-                ->mainInstancePersistOrSetUpdated();
+            $entityUpdater
+                ->setMainInstance($product)
+                ->setCollectionGetters(['getInfo'])
+                ->mainInstancePersistOrSetUpdated()
+                ->collectionItemsSetUpdated();
+
+            $entityCollectionManager
+                ->loadCollections([
+                    ['type' => 'new', 'name' => 'info', 'collection' => $product->getInfo()]
+                ])
+                ->removeElementsMissingFromNewCollection();
+
             $this->getDoctrine()->getManager()->flush();
 
             $this->addFlash('success', 'Produkt uložen!');

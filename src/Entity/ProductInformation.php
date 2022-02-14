@@ -30,6 +30,18 @@ class ProductInformation implements UpdatableEntityInterface
     private $value;
 
     /**
+     * @ORM\ManyToOne(targetEntity=ProductInformationGroup::class, inversedBy="info")
+     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
+     */
+    private $productInformationGroup;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Product::class, inversedBy="info")
+     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
+     */
+    private $product;
+
+    /**
      * @ORM\Column(type="datetime")
      */
     private $created;
@@ -38,12 +50,6 @@ class ProductInformation implements UpdatableEntityInterface
      * @ORM\Column(type="datetime")
      */
     private $updated;
-
-    /**
-     * @ORM\ManyToOne(targetEntity=ProductInformationGroup::class, inversedBy="info")
-     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
-     */
-    private $productInformationGroup;
 
     public function __construct()
     {
@@ -100,6 +106,18 @@ class ProductInformation implements UpdatableEntityInterface
     public function setProductInformationGroup(?ProductInformationGroup $productInformationGroup): self
     {
         $this->productInformationGroup = $productInformationGroup;
+
+        return $this;
+    }
+
+    public function getProduct(): ?Product
+    {
+        return $this->product;
+    }
+
+    public function setProduct(?Product $product): self
+    {
+        $this->product = $product;
 
         return $this;
     }

@@ -31,9 +31,9 @@ $(document).ready(function() {
 /*
  * Přidá formulář do CollectionType
  */
-const addFormToCollection = (e) => {
+const addFormToCollection = (e) =>
+{
     const collectionHolder = document.querySelector('.' + e.currentTarget.dataset.collectionHolderClass);
-
     const item = document.createElement('li');
 
     item.innerHTML = collectionHolder
@@ -42,9 +42,15 @@ const addFormToCollection = (e) => {
         .replace(
             /__name__/g,
             collectionHolder.dataset.index
-        );
+        )
+    ;
 
     collectionHolder.appendChild(item.firstElementChild);
-
     collectionHolder.dataset.index++;
+
+    const reloadSelect = collectionHolder.dataset.reloadSelect;
+    if(reloadSelect) {
+        const elements = collectionHolder.lastElementChild.querySelectorAll('select');
+        M.FormSelect.init(elements);
+    }
 };

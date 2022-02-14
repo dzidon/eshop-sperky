@@ -64,6 +64,14 @@
             {{ form_row(productForm.options) }}
         </div>
 
+        <div class="section no-pad-bot">
+            <div class="row no-mar-bot">
+                <h4>Informace</h4>
+            </div>
+
+            {{ form_row(productForm.info, { 'attr': {'data-index': productForm.info|length > 0 ? productForm.info|last.vars.name + 1 : 0} }) }}
+        </div>
+
         {{ form_rest(productForm) }}
     {{ form_end(productForm) }}
 

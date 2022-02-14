@@ -121,6 +121,11 @@ class Product implements UpdatableEntityInterface
     private $options;
 
     /**
+     * @ORM\OneToMany(targetEntity=ProductInformation::class, mappedBy="product", cascade={"persist"})
+     */
+    private $info;
+
+    /**
      * @ORM\Column(type="datetime")
      */
     private $created;
@@ -134,8 +139,10 @@ class Product implements UpdatableEntityInterface
     {
         $this->created = new DateTime('now');
         $this->updated = $this->created;
+
         $this->options = new ArrayCollection();
         $this->categories = new ArrayCollection();
+        $this->info = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -305,6 +312,36 @@ class Product implements UpdatableEntityInterface
     public function removeOption(ProductOption $option): self
     {
         $this->options->removeElement($option);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|ProductInformation[]
+     */
+    public function getInfo(): Collection
+    {
+        return $this->info;
+    }
+
+    public function addInfo(ProductInformation $info): self
+    {
+        if (!$this->info->contains($info)) {
+            $this->info[] = $info;
+            $info->setProduct($this);
+        }
+
+        return $this;
+    }
+
+    public function removeInfo(ProductInformation $info): self
+    {
+        if ($this->info->removeElement($info)) {
+            // set the owning side to null (unless already changed)
+            if ($info->getProduct() === $this) {
+                $info->setProduct(null);
+            }
+        }
 
         return $this;
     }

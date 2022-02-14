@@ -25,6 +25,23 @@ class ProductRepository extends ServiceEntityRepository
         $this->sorting = $sorting;
     }
 
+    public function findOneByIdAndFetchEverything($id)
+    {
+        return $this->createQueryBuilder('p')
+            ->select("p, ps, pc, po, pi, pig")
+            ->leftJoin('p.section', 'ps')
+            ->leftJoin('p.categories', 'pc')
+            ->leftJoin('pc.productCategoryGroup', 'pcg')
+            ->leftJoin('p.options', 'po')
+            ->leftJoin('p.info', 'pi')
+            ->leftJoin('pi.productInformationGroup', 'pig')
+            ->andWhere('p.id = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
+
     public function getQueryForSearchAndPagination(bool $inAdmin, $searchPhrase = null, string $sortAttribute = null): Query
     {
         if($inAdmin)

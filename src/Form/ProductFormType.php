@@ -4,17 +4,18 @@ namespace App\Form;
 
 use App\Entity\Product;
 use App\Entity\ProductCategory;
-use App\Entity\ProductInformationGroup;
+use App\Entity\ProductInformation;
 use App\Entity\ProductOption;
 use App\Entity\ProductSection;
 use App\Form\EventSubscriber\SlugSubscriber;
-use App\Form\Type\AutoCompleteTextType;
 use App\Repository\ProductCategoryRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -107,11 +108,36 @@ class ProductFormType extends AbstractType
                 'required' => false,
                 'label' => false,
             ])
-            ->add('test', AutoCompleteTextType::class, [
+            ->add('info', CollectionType::class, [
+                'entry_type' => ProductInformationFormType::class,
+                'by_reference' => false,
+                'required' => false,
+                'allow_add' => true,
+                'allow_delete' => true,
+                'delete_empty' => function (ProductInformation $information = null) {
+                    return $information === null || $information->getValue() === null;
+                },
+                'label' => false,
+                'attr' => [
+                    'class' => 'info',
+                    'data-reload-select' => true,
+                ],
+            ])
+            ->add('addItem', ButtonType::class, [
+                'attr' => [
+                    'class' => 'btn-medium grey left js-add-item-link',
+                    'data-collection-holder-class' => 'info',
+                ],
+                'label' => 'Přidat informaci',
+            ])
+
+
+
+            /*->add('test', AutoCompleteTextType::class, [
                 'mapped' => false,
                 'data_autocomplete' => $this->entityManager->getRepository(ProductInformationGroup::class)->getArrayOfNames(),
                 'label' => 'Autocomplete',
-            ])
+            ])*/
         ;
     }
 
