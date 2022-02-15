@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\User;
 
 use App\Entity\Address;
 use App\Form\AddressFormType;
@@ -49,36 +49,28 @@ class ProfileController extends AbstractController
     public function overview(): Response
     {
         $user = $this->getUser();
-        $formView = null;
 
-        if($user->isVerified())
+        $form = $this->createForm(PersonalInfoFormType::class, $user);
+        $form->add('submit', SubmitType::class, ['label' => 'Uložit']);
+        $form->handleRequest($this->request);
+
+        if ($form->isSubmitted() && $form->isValid())
         {
-            $form = $this->createForm(PersonalInfoFormType::class, $user);
-            $form->add('submit', SubmitType::class, ['label' => 'Uložit']);
-            $form->handleRequest($this->request);
+            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager->flush();
 
-            if ($form->isSubmitted() && $form->isValid())
+            if ($user->getReview() !== null && !$user->fullNameIsSet())
             {
-                $entityManager = $this->getDoctrine()->getManager();
-                $entityManager->flush();
-
-                if ($user->getReview() !== null && !$user->fullNameIsSet())
-                {
-                    $this->addFlash('warning', 'Vaše recenze se nebude zobrazovat, dokud nebudete mít nastavené křestní jméno a příjmení zároveň.');
-                }
-                $this->addFlash('success', 'Osobní údaje uloženy!');
-                $this->logger->info(sprintf("User %s (ID: %s) has changed their personal information.", $user->getUserIdentifier(), $user->getId()));
-
-                return $this->redirectToRoute('profile');
+                $this->addFlash('warning', 'Vaše recenze se nebude zobrazovat, dokud nebudete mít nastavené křestní jméno a příjmení zároveň.');
             }
+            $this->addFlash('success', 'Osobní údaje uloženy!');
+            $this->logger->info(sprintf("User %s (ID: %s) has changed their personal information.", $user->getUserIdentifier(), $user->getId()));
 
-            $formView = $form->createView();
+            return $this->redirectToRoute('profile');
         }
 
-        $this->isUserNotVerified($user, false);
-
         return $this->render('profile/profile_overview.html.twig', [
-            'personalDataForm' => $formView,
+            'personalDataForm' => $form->createView(),
             'breadcrumbs' => $this->breadcrumbs->setPageTitleByRoute('profile'),
         ]);
     }
@@ -91,7 +83,7 @@ class ProfileController extends AbstractController
         $user = $this->getUser();
         if ($user->getPassword() === null)
         {
-            $this->addFlash('failure', 'Na tomto účtu nemáte nastavené heslo, takže si ho musíte změnit přes email.');
+            $this->addFlash('warning', 'Na tomto účtu nemáte nastavené heslo, takže si ho musíte změnit přes email.');
             return $this->redirectToRoute('forgot_password_request');
         }
 
@@ -116,8 +108,6 @@ class ProfileController extends AbstractController
 
             return $this->redirectToRoute('profile_change_password');
         }
-
-        $this->isUserNotVerified($user, false);
 
         return $this->render('profile/profile_change_password.html.twig', [
             'changeForm' => $form->createView(),
@@ -169,10 +159,6 @@ class ProfileController extends AbstractController
     public function addresses(FormFactoryInterface $formFactory, PaginatorService $paginatorService): Response
     {
         $user = $this->getUser();
-        if($this->isUserNotVerified($user, true))
-        {
-            return $this->redirectToRoute('profile');
-        }
 
         $form = $formFactory->createNamed('', SearchTextAndSortFormType::class, null, ['sort_choices' => Address::getSortData()]);
         //button je přidáván v šabloně, aby se nezobrazoval v odkazu
@@ -211,10 +197,6 @@ class ProfileController extends AbstractController
     public function address(EntityUpdatingService $entityUpdater, $id = null): Response
     {
         $user = $this->getUser();
-        if($this->isUserNotVerified($user, true))
-        {
-            return $this->redirectToRoute('profile');
-        }
 
         if($id !== null) //zadal id do url, snazi se editovat existujici
         {
@@ -265,10 +247,6 @@ class ProfileController extends AbstractController
     public function addressDelete($id): Response
     {
         $user = $this->getUser();
-        if($this->isUserNotVerified($user, true))
-        {
-            return $this->redirectToRoute('profile');
-        }
 
         $address = $this->getDoctrine()->getRepository(Address::class)->findOneBy(['id' => $id]);
         if($address === null) //nenaslo to zadnou adresu
@@ -306,7 +284,7 @@ class ProfileController extends AbstractController
         ]);
     }
 
-    private function isUserNotVerified($user, bool $restrictAccess): bool
+    /*private function isUserNotVerified($user, bool $restrictAccess): bool
     {
         if (!$user->isVerified())
         {
@@ -327,5 +305,5 @@ class ProfileController extends AbstractController
             return true;
         }
         return false;
-    }
+    }*/
 }

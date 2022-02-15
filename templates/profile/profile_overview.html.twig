@@ -7,8 +7,6 @@
         Datum registrace: {{ app.user.registered|date('d. m. Y H:i:s') }}<br>
     </div>
 
-    {% if personalDataForm is not null %}
-        {{ form(personalDataForm) }}
-    {% endif %}
+    {{ form(personalDataForm) }}
 
 {% endblock %}

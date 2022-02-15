@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\User;
 
 use App\Entity\Review;
 use App\Form\HiddenTrueFormType;
@@ -116,12 +116,6 @@ class ReviewController extends AbstractController
         }
         else //nezadal id do url
         {
-            if (!$user->isVerified())
-            {
-                $this->addFlash('failure', 'Nemáte ověřený účet.');
-                return $this->redirectToRoute('reviews');
-            }
-
             if (!$user->fullNameIsSet())
             {
                 $this->addFlash('failure', 'Musíte mít nastavené jméno a příjmení.');
