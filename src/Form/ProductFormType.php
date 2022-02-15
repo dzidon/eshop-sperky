@@ -131,8 +131,6 @@ class ProductFormType extends AbstractType
                 'label' => 'Přidat informaci',
             ])
 
-
-
             /*->add('test', AutoCompleteTextType::class, [
                 'mapped' => false,
                 'data_autocomplete' => $this->entityManager->getRepository(ProductInformationGroup::class)->getArrayOfNames(),

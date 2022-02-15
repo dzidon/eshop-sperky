@@ -1,21 +1,53 @@
 {% set route = app.request.get('_route') %}
 
-<div class="collection">
-    <a href="{{ path('profile') }}" class="collection-item {% if route == 'profile' %} active {% endif %}">
-        {{ get_parameter('app_page_title.profile') }}
-    </a>
+{% set items = {
+    0: {
+        'path': path('profile'),
+        'isActive': route == 'profile',
+        'title': get_parameter('app_page_title.profile'),
+    },
+    1: {
+        'path': path('profile_addresses'),
+        'isActive': route == 'profile_addresses' or route == 'profile_address' or route == 'profile_address_delete',
+        'title': get_parameter('app_page_title.profile_addresses'),
+    },
+    2: {
+        'path': path('profile_change_password'),
+        'isActive': route == 'profile_change_password',
+        'title': get_parameter('app_page_title.profile_change_password'),
+    },
+}
+%}
 
-    <a href="{{ path('profile_change_password') }}" class="collection-item {% if route == 'profile_change_password' %} active {% endif %}">
-        {{ get_parameter('app_page_title.profile_change_password') }}
-    </a>
+<div class="collection with-header hide-on-med-and-down">
+    <div class="collection-header grey lighten-4 valign-wrapper">
+        <i class="material-icons margin-right15px">menu</i>
+        <strong>Menu</strong>
+    </div>
 
-    {% if app.user.isVerified == true %}
-        <a href="{{ path('profile_addresses') }}" class="collection-item {% if route == 'profile_addresses' or route == 'profile_address' or route == 'profile_address_delete' %} active {% endif %}">
-            {{ get_parameter('app_page_title.profile_addresses') }}
+    {% for item in items %}
+        <a href="{{ item.path }}" class="collection-item {% if item.isActive %} active {% endif %}">
+            {{ item.title }}
         </a>
-    {% else %}
-        <a href="{{ path('profile_verify') }}" class="collection-item {% if route == 'profile_verify' %} active {% endif %}">
-            {{ get_parameter('app_page_title.profile_verify') }}
-        </a>
-    {% endif %}
+    {% endfor %}
 </div>
+
+<ul class="collapsible hide-on-large-only hide-on-extra-large-only">
+    <li>
+        <div class="collapsible-header grey lighten-4">
+            <i class="material-icons">menu</i>
+            <strong>
+                <a>Menu</a>
+            </strong>
+        </div>
+        <div class="collapsible-body no-padding">
+            <div class="collection">
+                {% for item in items %}
+                    <a href="{{ item.path }}" class="collection-item {% if item.isActive %} active {% endif %}">
+                        {{ item.title }}
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+    </li>
+</ul>

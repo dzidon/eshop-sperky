@@ -1,45 +1,84 @@
 {% set route = app.request.get('_route') %}
 
-<div class="collection">
-    {% if can_enter_admin %} {# proměnná nastavovaná v base.html.twig #}
-        <a href="{{ path('admin_permission_overview') }}" class="collection-item {% if route == 'admin_permission_overview' %} active {% endif %}">
-            {{ get_parameter('app_page_title.admin_permission_overview') }}
-        </a>
-    {% endif %}
+{% set items = {
+    0: {
+        'granted': can_enter_admin,
+        'path': path('admin_permission_overview'),
+        'isActive': route == 'admin_permission_overview',
+        'title': get_parameter('app_page_title.admin_permission_overview'),
+    },
+    1: {
+        'granted': is_granted('admin_user_management'),
+        'path': path('admin_user_management'),
+        'isActive': route == 'admin_user_management' or route == 'admin_user_management_specific',
+        'title': get_parameter('app_page_title.admin_user_management'),
+    },
+    2: {
+        'granted': is_granted('admin_products'),
+        'path': path('admin_products'),
+        'isActive': route == 'admin_products' or route == 'admin_product_edit' or route == 'admin_product_delete',
+        'title': get_parameter('app_page_title.admin_products'),
+    },
+    3: {
+        'granted': is_granted('admin_product_sections'),
+        'path': path('admin_product_sections'),
+        'isActive': route == 'admin_product_sections' or route == 'admin_product_section_edit' or route == 'admin_product_section_delete',
+        'title': get_parameter('app_page_title.admin_product_sections'),
+    },
+    4: {
+        'granted': is_granted('admin_product_categories'),
+        'path': path('admin_product_categories'),
+        'isActive': route == 'admin_product_categories' or route == 'admin_product_category_edit' or route == 'admin_product_category_delete',
+        'title': get_parameter('app_page_title.admin_product_categories'),
+    },
+    5: {
+        'granted': is_granted('admin_product_options'),
+        'path': path('admin_product_options'),
+        'isActive': route == 'admin_product_options' or route == 'admin_product_option_edit' or route == 'admin_product_option_configure' or route == 'admin_product_option_delete',
+        'title': get_parameter('app_page_title.admin_product_options'),
+    },
+    6: {
+        'granted': is_granted('admin_product_info'),
+        'path': path('admin_product_info'),
+        'isActive': route == 'admin_product_info' or route == 'admin_product_info_edit' or route == 'admin_product_info_delete',
+        'title': get_parameter('app_page_title.admin_product_info'),
+    },
+}
+%}
 
-    {% if is_granted('admin_user_management') %}
-        <a href="{{ path('admin_user_management') }}" class="collection-item {% if route == 'admin_user_management' or route == 'admin_user_management_specific' %} active {% endif %}">
-            {{ get_parameter('app_page_title.admin_user_management') }}
-        </a>
-    {% endif %}
+<div class="collection with-header hide-on-med-and-down">
+    <div class="collection-header grey lighten-4 valign-wrapper">
+        <i class="material-icons margin-right15px">menu</i>
+        <strong>Menu</strong>
+    </div>
 
-    {% if is_granted('admin_products') %}
-        <a href="{{ path('admin_products') }}" class="collection-item {% if route == 'admin_products' or route == 'admin_product_edit' or route == 'admin_product_delete' %} active {% endif %}">
-            {{ get_parameter('app_page_title.admin_products') }}
-        </a>
-    {% endif %}
-
-    {% if is_granted('admin_product_sections') %}
-        <a href="{{ path('admin_product_sections') }}" class="collection-item {% if route == 'admin_product_sections' or route == 'admin_product_section_edit' or route == 'admin_product_section_delete' %} active {% endif %}">
-            {{ get_parameter('app_page_title.admin_product_sections') }}
-        </a>
-    {% endif %}
-
-    {% if is_granted('admin_product_categories') %}
-        <a href="{{ path('admin_product_categories') }}" class="collection-item {% if route == 'admin_product_categories' or route == 'admin_product_category_edit' or route == 'admin_product_category_delete' %} active {% endif %}">
-            {{ get_parameter('app_page_title.admin_product_categories') }}
-        </a>
-    {% endif %}
-
-    {% if is_granted('admin_product_options') %}
-        <a href="{{ path('admin_product_options') }}" class="collection-item {% if route == 'admin_product_options' or route == 'admin_product_option_edit' or route == 'admin_product_option_configure' or route == 'admin_product_option_delete' %} active {% endif %}">
-            {{ get_parameter('app_page_title.admin_product_options') }}
-        </a>
-    {% endif %}
-
-    {% if is_granted('admin_product_info') %}
-        <a href="{{ path('admin_product_info') }}" class="collection-item {% if route == 'admin_product_info' or route == 'admin_product_info_edit' or route == 'admin_product_info_delete' %} active {% endif %}">
-            {{ get_parameter('app_page_title.admin_product_info') }}
-        </a>
-    {% endif %}
+    {% for item in items %}
+        {% if item.granted %}
+            <a href="{{ item.path }}" class="collection-item {% if item.isActive %} active {% endif %}">
+                {{ item.title }}
+            </a>
+        {% endif %}
+    {% endfor %}
 </div>
+
+<ul class="collapsible hide-on-large-only hide-on-extra-large-only">
+    <li>
+        <div class="collapsible-header grey lighten-4">
+            <i class="material-icons">menu</i>
+            <strong>
+                <a>Menu</a>
+            </strong>
+        </div>
+        <div class="collapsible-body no-padding">
+            <div class="collection">
+                {% for item in items %}
+                    {% if item.granted %}
+                        <a href="{{ item.path }}" class="collection-item {% if item.isActive %} active {% endif %}">
+                            {{ item.title }}
+                        </a>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    </li>
+</ul>

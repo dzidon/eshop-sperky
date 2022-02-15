@@ -9,31 +9,30 @@
         <h1>Admin</h1>
 
         <div class="row margin-0">
-            <div class="col s12 m4 l3">
+            <div class="col s12 l3">
                 <div class="row no-padding">
                     {# Navigace administrace #}
                     {{ include('fragments/_admin_nav.html.twig') }}
                 </div>
             </div>
-            <div class="col s12 m8 l9">
-                <div class="container">
-                    {# Flash zprávy #}
-                    {{ include('fragments/_flash_messages.html.twig') }}
 
-                    <div class="section no-pad-top">
-                        <div class="row">
-                            <h3 class="no-mar-top">
-                                {{ breadcrumbs.getPageTitle() }}
-                                {% block admin_subheading_extra %}
+            <div class="col s12 l8 offset-l1 offset-xl1">
+                {# Flash zprávy #}
+                {{ include('fragments/_flash_messages.html.twig') }}
 
-                                {% endblock %}
-                            </h3>
-                        </div>
+                <div class="section no-pad-top">
+                    <div class="row">
+                        <h3 class="no-mar-top">
+                            {{ breadcrumbs.getPageTitle() }}
+                            {% block admin_subheading_extra %}
 
-                        {% block admin_body %}
-
-                        {% endblock %}
+                            {% endblock %}
+                        </h3>
                     </div>
+
+                    {% block admin_body %}
+
+                    {% endblock %}
                 </div>
             </div>
         </div>

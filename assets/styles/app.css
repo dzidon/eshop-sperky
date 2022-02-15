@@ -129,7 +129,7 @@ ul.dropdown-content.select-dropdown li span {
 /*
     Obsah dropdownu (např. autocomplete)
 */
-.dropdown-content li>a, .dropdown-content li>span {
+.dropdown-content li>span {
     color: #03a9f4;
 }
 

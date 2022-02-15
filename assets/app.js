@@ -8,6 +8,7 @@ $(document).ready(function() {
     // materialize
     $('.sidenav').sidenav();
     $('.parallax').parallax();
+    $('.collapsible').collapsible();
     $('select').formSelect();
     $('.dropdown-trigger').dropdown({ hover: false });
 

@@ -22,7 +22,6 @@ use App\Service\BreadcrumbsService;
 use App\Service\EntityCollectionService;
 use App\Service\EntityUpdatingService;
 use App\Service\PaginatorService;
-use Doctrine\Common\Collections\ArrayCollection;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
