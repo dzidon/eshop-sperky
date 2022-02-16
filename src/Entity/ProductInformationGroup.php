@@ -27,7 +27,7 @@ class ProductInformationGroup
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, unique=true)
      *
      * @Assert\Length(max=255, maxMessage="Maximální počet znaků v názvu skupiny produktových informací: {{ limit }}")
      * @Assert\NotBlank

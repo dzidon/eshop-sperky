@@ -25,6 +25,18 @@ class ProductCategoryGroupRepository extends ServiceEntityRepository
         $this->sorting = $sorting;
     }
 
+    public function findOneByIdAndFetchCategories($id)
+    {
+        return $this->createQueryBuilder('pcg')
+            ->select("pcg, pc")
+            ->leftJoin('pcg.categories', 'pc')
+            ->andWhere('pcg.id = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
+
     public function getQueryForSearchAndPagination($searchPhrase = null, string $sortAttribute = null): Query
     {
         $sortData = $this->sorting->createSortData($sortAttribute, ProductCategoryGroup::getSortData());

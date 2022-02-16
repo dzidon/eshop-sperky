@@ -1,7 +1,8 @@
 import 'materialize-css/dist/css/materialize.min.css';
 require('materialize-css/dist/js/materialize.min');
-
 import './styles/app.css';
+
+const autocompleteMaxElements = 5;
 
 $(document).ready(function() {
 
@@ -9,6 +10,7 @@ $(document).ready(function() {
     $('.sidenav').sidenav();
     $('.parallax').parallax();
     $('.collapsible').collapsible();
+    $('.tabs').tabs();
     $('select').formSelect();
     $('.dropdown-trigger').dropdown({ hover: false });
 
@@ -17,7 +19,8 @@ $(document).ready(function() {
         $(this).autocomplete({
             data: JSON.parse(
                 $(this).attr('data-autocomplete')
-            )
+            ),
+            limit: autocompleteMaxElements
         });
     });
 
@@ -51,7 +54,21 @@ const addFormToCollection = (e) =>
 
     const reloadSelect = collectionHolder.dataset.reloadSelect;
     if(reloadSelect) {
-        const elements = collectionHolder.lastElementChild.querySelectorAll('select');
-        M.FormSelect.init(elements);
+        const element = collectionHolder.lastElementChild.querySelectorAll('select');
+        M.FormSelect.init(element);
+    }
+
+    const reloadAutocomplete = collectionHolder.dataset.reloadAutocomplete;
+    if(reloadAutocomplete) {
+        const element = collectionHolder.lastElementChild.querySelectorAll('input.autocomplete');
+
+        $(element).each(function() {
+            $(this).autocomplete({
+                data: JSON.parse(
+                    $(this).attr('data-autocomplete')
+                ),
+                limit: autocompleteMaxElements
+            });
+        });
     }
 };

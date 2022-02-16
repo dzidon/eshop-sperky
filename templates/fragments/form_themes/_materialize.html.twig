@@ -124,6 +124,17 @@
     </div>
 {% endblock collection_label %}
 
+{# Error kolekce #}
+{% block collection_errors %}
+    {% if errors|length > 0 %}
+        <div class="row">
+            {% for error in errors %}
+                <span class="helper-text red-text">{{ error.message }}</span>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endblock collection_errors %}
+
 {# Label checkboxu #}
 {% block checkbox_label %}
     <span>

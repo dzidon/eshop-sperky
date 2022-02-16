@@ -9,11 +9,18 @@ use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use App\Validation as AssertCustom;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * @ORM\Entity(repositoryClass=ProductCategoryGroupRepository::class)
  * @ORM\HasLifecycleCallbacks()
+ * @UniqueEntity(fields={"name"}, message="Už existuje skupina kategorií s tímto názvem.")
+ * @AssertCustom\UniqueEntitiesInCollection(
+ *     fieldsOfChildren={"name"},
+ *     collectionName="categories",
+ *     message="Všechny kategorie obsažené ve skupině musejí mít unikátní názvy.")
  */
 class ProductCategoryGroup
 {
@@ -25,7 +32,7 @@ class ProductCategoryGroup
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, unique=true)
      *
      * @Assert\Length(max=255, maxMessage="Maximální počet znaků v názvu skupiny kategorií: {{ limit }}")
      * @Assert\NotBlank

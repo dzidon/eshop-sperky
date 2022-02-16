@@ -32,6 +32,7 @@ class ProductCategoryGroupFormType extends AbstractType
                 'entry_type' => ProductCategoryFormType::class,
                 'by_reference' => false,
                 'required' => false,
+                'error_bubbling' => false,
                 'allow_add' => true,
                 'allow_delete' => $this->security->isGranted('product_category_delete'),
                 'label' => 'Kategorie',

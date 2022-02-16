@@ -8,10 +8,10 @@ use App\Entity\ProductInformation;
 use App\Entity\ProductOption;
 use App\Entity\ProductSection;
 use App\Form\EventSubscriber\EntityCollectionRemovalSubscriber;
+use App\Form\EventSubscriber\ProductInformationSubscriber;
 use App\Form\EventSubscriber\SlugSubscriber;
 use App\Repository\ProductCategoryRepository;
 use App\Service\EntityCollectionService;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ButtonType;
@@ -23,18 +23,19 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Security\Core\Security;
 use Symfony\Component\String\Slugger\SluggerInterface;
 
 class ProductFormType extends AbstractType
 {
+    private Security $security;
     private SluggerInterface $slugger;
-    private EntityManagerInterface $entityManager;
     private EntityCollectionService $entityCollectionService;
 
-    public function __construct(SluggerInterface $slugger, EntityManagerInterface $entityManager, EntityCollectionService $entityCollectionService)
+    public function __construct(Security $security, SluggerInterface $slugger, EntityCollectionService $entityCollectionService)
     {
+        $this->security = $security;
         $this->slugger = $slugger;
-        $this->entityManager = $entityManager;
         $this->entityCollectionService = $entityCollectionService;
     }
 
@@ -116,7 +117,7 @@ class ProductFormType extends AbstractType
                 'delete_empty' => function (ProductInformation $information = null) {
                     return $information === null || $information->getValue() === null;
                 },
-                'label' => false,
+                'label' => 'Výběr z již existujících skupin informací',
                 'attr' => [
                     'class' => 'info',
                     'data-reload-select' => true,
@@ -130,6 +131,9 @@ class ProductFormType extends AbstractType
                 'label' => 'Přidat informaci',
             ])
             ->addEventSubscriber(
+                new ProductInformationSubscriber($this->security)
+            )
+            ->addEventSubscriber(
                 (new SlugSubscriber($this->slugger))
                     ->setGettersForAutoGenerate(['getName'])
                     ->setExtraDataForAutoGenerate([date("HisdmY")])
@@ -138,12 +142,6 @@ class ProductFormType extends AbstractType
                 (new EntityCollectionRemovalSubscriber($this->entityCollectionService))
                     ->setCollectionGetters(['getInfo'])
             )
-
-            /*->add('test', AutoCompleteTextType::class, [
-                'mapped' => false,
-                'data_autocomplete' => $this->entityManager->getRepository(ProductInformationGroup::class)->getArrayOfNames(),
-                'label' => 'Autocomplete',
-            ])*/
         ;
     }
 

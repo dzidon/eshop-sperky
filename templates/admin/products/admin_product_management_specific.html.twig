@@ -70,6 +70,12 @@
             </div>
 
             {{ form_row(productForm.info, { 'attr': {'data-index': productForm.info|length > 0 ? productForm.info|last.vars.name + 1 : 0} }) }}
+            {{ form_row(productForm.addItem) }}
+
+            {% if productForm.infoNew is not null %}
+                {{ form_row(productForm.infoNew, { 'attr': {'data-index': productForm.infoNew|length > 0 ? productForm.infoNew|last.vars.name + 1 : 0} }) }}
+                {{ form_row(productForm.addItemNew) }}
+            {% endif %}
         </div>
 
         {{ form_rest(productForm) }}

@@ -87,7 +87,7 @@ class ProductCategoryController extends AbstractController
 
         if($id !== null) //zadal id do url, snazi se editovat existujici
         {
-            $categoryGroup = $this->getDoctrine()->getRepository(ProductCategoryGroup::class)->findOneBy(['id' => $id]);
+            $categoryGroup = $this->getDoctrine()->getRepository(ProductCategoryGroup::class)->findOneByIdAndFetchCategories($id);
             if($categoryGroup === null) //nenaslo to zadnou skupinu
             {
                 throw new NotFoundHttpException('Skupina produktových sekcí nenalezena.');

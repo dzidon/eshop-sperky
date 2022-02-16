@@ -134,6 +134,21 @@ ul.dropdown-content.select-dropdown li span {
 }
 
 /*
+    Tabs
+ */
+.tabs .tab a, .tabs .tab a:hover, .tabs .tab a.active {
+    color: #03a9f4;
+}
+
+.tabs .tab a:focus, .tabs .tab a:focus.active {
+    background-color: #efefef;
+}
+
+.tabs .indicator {
+    background-color: #03a9f4;
+}
+
+/*
     Pagination
 */
 .pagination li.active {
