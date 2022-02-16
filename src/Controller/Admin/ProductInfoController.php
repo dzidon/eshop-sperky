@@ -7,7 +7,6 @@ use App\Form\HiddenTrueFormType;
 use App\Form\ProductInformationGroupFormType;
 use App\Form\SearchTextAndSortFormType;
 use App\Service\BreadcrumbsService;
-use App\Service\EntityUpdatingService;
 use App\Service\PaginatorService;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -82,7 +81,7 @@ class ProductInfoController extends AbstractController
      *
      * @IsGranted("product_info_edit")
      */
-    public function productInfoGroup(EntityUpdatingService $entityUpdater, $id = null): Response
+    public function productInfoGroup($id = null): Response
     {
         $user = $this->getUser();
 
@@ -107,9 +106,9 @@ class ProductInfoController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid())
         {
-            $entityUpdater->setMainInstance($infoGroup)
-                ->mainInstancePersistOrSetUpdated();
-            $this->getDoctrine()->getManager()->flush();
+            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager->persist($infoGroup);
+            $entityManager->flush();
 
             $this->addFlash('success', 'Skupina produktových informací uložena!');
             $this->logger->info(sprintf("Admin %s (ID: %s) has saved a product information group %s (ID: %s).", $user->getUserIdentifier(), $user->getId(), $infoGroup->getName(), $infoGroup->getId()));

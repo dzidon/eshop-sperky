@@ -7,8 +7,10 @@ use App\Entity\ProductCategory;
 use App\Entity\ProductInformation;
 use App\Entity\ProductOption;
 use App\Entity\ProductSection;
+use App\Form\EventSubscriber\EntityCollectionRemovalSubscriber;
 use App\Form\EventSubscriber\SlugSubscriber;
 use App\Repository\ProductCategoryRepository;
+use App\Service\EntityCollectionService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
@@ -27,11 +29,13 @@ class ProductFormType extends AbstractType
 {
     private SluggerInterface $slugger;
     private EntityManagerInterface $entityManager;
+    private EntityCollectionService $entityCollectionService;
 
-    public function __construct(SluggerInterface $slugger, EntityManagerInterface $entityManager)
+    public function __construct(SluggerInterface $slugger, EntityManagerInterface $entityManager, EntityCollectionService $entityCollectionService)
     {
         $this->slugger = $slugger;
         $this->entityManager = $entityManager;
+        $this->entityCollectionService = $entityCollectionService;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -47,11 +51,6 @@ class ProductFormType extends AbstractType
                 'required' => false,
                 'label' => 'Název v odkazu',
             ])
-            ->addEventSubscriber(
-                (new SlugSubscriber($this->slugger))
-                    ->setGettersForAutoGenerate(['getName'])
-                    ->setExtraDataForAutoGenerate([date("HisdmY")])
-            )
             ->add('description', TextareaType::class, [
                 'required' => false,
                 'label' => 'Popis',
@@ -130,6 +129,15 @@ class ProductFormType extends AbstractType
                 ],
                 'label' => 'Přidat informaci',
             ])
+            ->addEventSubscriber(
+                (new SlugSubscriber($this->slugger))
+                    ->setGettersForAutoGenerate(['getName'])
+                    ->setExtraDataForAutoGenerate([date("HisdmY")])
+            )
+            ->addEventSubscriber(
+                (new EntityCollectionRemovalSubscriber($this->entityCollectionService))
+                    ->setCollectionGetters(['getInfo'])
+            )
 
             /*->add('test', AutoCompleteTextType::class, [
                 'mapped' => false,

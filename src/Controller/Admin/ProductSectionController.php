@@ -7,7 +7,6 @@ use App\Form\HiddenTrueFormType;
 use App\Form\ProductSectionFormType;
 use App\Form\SearchTextAndSortFormType;
 use App\Service\BreadcrumbsService;
-use App\Service\EntityUpdatingService;
 use App\Service\PaginatorService;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -82,7 +81,7 @@ class ProductSectionController extends AbstractController
      *
      * @IsGranted("product_section_edit")
      */
-    public function productSection(EntityUpdatingService $entityUpdater, $id = null): Response
+    public function productSection($id = null): Response
     {
         $user = $this->getUser();
 
@@ -107,9 +106,9 @@ class ProductSectionController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid())
         {
-            $entityUpdater->setMainInstance($section)
-                ->mainInstancePersistOrSetUpdated();
-            $this->getDoctrine()->getManager()->flush();
+            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager->persist($section);
+            $entityManager->flush();
 
             $this->addFlash('success', 'Produktová sekce uložena!');
             $this->logger->info(sprintf("Admin %s (ID: %s) has saved a product section %s (ID: %s).", $user->getUserIdentifier(), $user->getId(), $section->getName(), $section->getId()));

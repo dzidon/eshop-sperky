@@ -8,7 +8,6 @@ use App\Form\ProductFormType;
 use App\Form\SearchTextAndSortFormType;
 use App\Service\BreadcrumbsService;
 use App\Service\EntityCollectionService;
-use App\Service\EntityUpdatingService;
 use App\Service\PaginatorService;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -83,7 +82,7 @@ class ProductController extends AbstractController
      *
      * @IsGranted("product_edit")
      */
-    public function product(EntityUpdatingService $entityUpdater, EntityCollectionService $entityCollectionManager, $id = null): Response
+    public function product(EntityCollectionService $entityCollectionManager, $id = null): Response
     {
         $user = $this->getUser();
 
@@ -102,29 +101,15 @@ class ProductController extends AbstractController
             $this->breadcrumbs->setPageTitleByRoute('admin_product_edit', 'new');
         }
 
-        $entityCollectionManager->loadCollections([
-            ['type' => 'old', 'name' => 'info', 'collection' => $product->getInfo()]
-        ]);
-
         $form = $this->createForm(ProductFormType::class, $product);
         $form->add('submit', SubmitType::class, ['label' => 'Uložit']);
         $form->handleRequest($this->request);
 
         if ($form->isSubmitted() && $form->isValid())
         {
-            $entityUpdater
-                ->setMainInstance($product)
-                ->setCollectionGetters(['getInfo'])
-                ->mainInstancePersistOrSetUpdated()
-                ->collectionItemsSetUpdated();
-
-            $entityCollectionManager
-                ->loadCollections([
-                    ['type' => 'new', 'name' => 'info', 'collection' => $product->getInfo()]
-                ])
-                ->removeElementsMissingFromNewCollection();
-
-            $this->getDoctrine()->getManager()->flush();
+            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager->persist($product);
+            $entityManager->flush();
 
             $this->addFlash('success', 'Produkt uložen!');
             $this->logger->info(sprintf("Admin %s (ID: %s) has saved a product %s (ID: %s).", $user->getUserIdentifier(), $user->getId(), $product->getName(), $product->getId()));

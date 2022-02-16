@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use App\Entity\Interfaces\UpdatableEntityInterface;
 use App\Repository\ProductInformationRepository;
 use DateTime;
 use DateTimeInterface;
@@ -11,8 +10,9 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=ProductInformationRepository::class)
+ * @ORM\HasLifecycleCallbacks()
  */
-class ProductInformation implements UpdatableEntityInterface
+class ProductInformation
 {
     /**
      * @ORM\Id
@@ -74,6 +74,30 @@ class ProductInformation implements UpdatableEntityInterface
         return $this;
     }
 
+    public function getProductInformationGroup(): ?ProductInformationGroup
+    {
+        return $this->productInformationGroup;
+    }
+
+    public function setProductInformationGroup(?ProductInformationGroup $productInformationGroup): self
+    {
+        $this->productInformationGroup = $productInformationGroup;
+
+        return $this;
+    }
+
+    public function getProduct(): ?Product
+    {
+        return $this->product;
+    }
+
+    public function setProduct(?Product $product): self
+    {
+        $this->product = $product;
+
+        return $this;
+    }
+
     public function getCreated(): ?DateTimeInterface
     {
         return $this->created;
@@ -98,27 +122,11 @@ class ProductInformation implements UpdatableEntityInterface
         return $this;
     }
 
-    public function getProductInformationGroup(): ?ProductInformationGroup
+    /**
+     * @ORM\PreUpdate
+     */
+    public function setUpdatedNow(): void
     {
-        return $this->productInformationGroup;
-    }
-
-    public function setProductInformationGroup(?ProductInformationGroup $productInformationGroup): self
-    {
-        $this->productInformationGroup = $productInformationGroup;
-
-        return $this;
-    }
-
-    public function getProduct(): ?Product
-    {
-        return $this->product;
-    }
-
-    public function setProduct(?Product $product): self
-    {
-        $this->product = $product;
-
-        return $this;
+        $this->updated = new DateTime('now');
     }
 }

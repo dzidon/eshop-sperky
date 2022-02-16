@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use App\Entity\Interfaces\UpdatableEntityInterface;
 use App\Repository\ProductSectionRepository;
 use App\Service\SortingService;
 use DateTime;
@@ -13,9 +12,10 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * @ORM\Entity(repositoryClass=ProductSectionRepository::class)
+ * @ORM\HasLifecycleCallbacks()
  * @UniqueEntity(fields={"slug"}, message="Už existuje produktová sekce s tímto názvem pro odkaz.")
  */
-class ProductSection implements UpdatableEntityInterface
+class ProductSection
 {
     /**
      * @ORM\Id
@@ -145,6 +145,14 @@ class ProductSection implements UpdatableEntityInterface
         $this->updated = $updated;
 
         return $this;
+    }
+
+    /**
+     * @ORM\PreUpdate
+     */
+    public function setUpdatedNow(): void
+    {
+        $this->updated = new DateTime('now');
     }
 
     public static function getSortData(): array

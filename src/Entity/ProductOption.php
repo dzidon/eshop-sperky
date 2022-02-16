@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use App\Entity\Interfaces\UpdatableEntityInterface;
 use App\Repository\ProductOptionRepository;
 use App\Service\SortingService;
 use DateTime;
@@ -14,8 +13,9 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=ProductOptionRepository::class)
+ * @ORM\HasLifecycleCallbacks()
  */
-class ProductOption implements UpdatableEntityInterface
+class ProductOption
 {
     public const TYPE_NUMBER = 'Číslo';
     public const TYPE_DROPDOWN = 'Rozbalovací seznam';
@@ -130,14 +130,25 @@ class ProductOption implements UpdatableEntityInterface
         return $this;
     }
 
+    /**
+     * @ORM\PreUpdate
+     */
+    public function setUpdatedNow(): void
+    {
+        $this->updated = new DateTime('now');
+    }
+
     public function isConfigured(): ?bool
     {
         return $this->isConfigured;
     }
 
-    public function setConfiguredIfValid(): self
+    /**
+     * @ORM\PreFlush
+     */
+    public function setConfiguredIfValid(): void
     {
-        $isValid = false;
+        $this->isConfigured = false;
 
         if($this->type === self::TYPE_NUMBER)
         {
@@ -159,7 +170,7 @@ class ProductOption implements UpdatableEntityInterface
             $booleans = array_values($found);
             if(count(array_unique($booleans)) === 1 && $booleans[0] === true)
             {
-                $isValid = true;
+                $this->isConfigured = true;
             }
         }
         else if($this->type === self::TYPE_DROPDOWN)
@@ -172,15 +183,12 @@ class ProductOption implements UpdatableEntityInterface
                     $found++;
                     if($found === 2)
                     {
-                        $isValid = true;
+                        $this->isConfigured = true;
                         break;
                     }
                 }
             }
         }
-
-        $this->isConfigured = $isValid;
-        return $this;
     }
 
     /**

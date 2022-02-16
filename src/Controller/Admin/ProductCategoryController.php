@@ -7,7 +7,6 @@ use App\Form\HiddenTrueFormType;
 use App\Form\ProductCategoryGroupFormType;
 use App\Form\SearchTextAndSortFormType;
 use App\Service\BreadcrumbsService;
-use App\Service\EntityUpdatingService;
 use App\Service\PaginatorService;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -82,7 +81,7 @@ class ProductCategoryController extends AbstractController
      *
      * @IsGranted("product_category_edit")
      */
-    public function productCategoryGroup(EntityUpdatingService $entityUpdater, $id = null): Response
+    public function productCategoryGroup($id = null): Response
     {
         $user = $this->getUser();
 
@@ -107,11 +106,9 @@ class ProductCategoryController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid())
         {
-            $entityUpdater->setMainInstance($categoryGroup)
-                ->setCollectionGetters(['getCategories'])
-                ->mainInstancePersistOrSetUpdated()
-                ->collectionItemsSetUpdated();
-            $this->getDoctrine()->getManager()->flush();
+            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager->persist($categoryGroup);
+            $entityManager->flush();
 
             $this->addFlash('success', 'Skupina produktových kategorií uložena!');
             $this->logger->info(sprintf("Admin %s (ID: %s) has saved a product category group %s (ID: %s).", $user->getUserIdentifier(), $user->getId(), $categoryGroup->getName(), $categoryGroup->getId()));

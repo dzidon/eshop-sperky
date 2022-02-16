@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use App\Entity\Interfaces\UpdatableEntityInterface;
 use App\Repository\ReviewRepository;
 use App\Service\SortingService;
 use DateTime;
@@ -12,8 +11,9 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=ReviewRepository::class)
+ * @ORM\HasLifecycleCallbacks()
  */
-class Review implements UpdatableEntityInterface
+class Review
 {
     public const STAR_VALUES = [5.0,4.0,3.0,2.0,1.0];
     public const STAR_COUNT = 5;
@@ -126,6 +126,14 @@ class Review implements UpdatableEntityInterface
         $this->updated = $updated;
 
         return $this;
+    }
+
+    /**
+     * @ORM\PreUpdate
+     */
+    public function setUpdatedNow(): void
+    {
+        $this->updated = new DateTime('now');
     }
 
     public static function getSortData(): array

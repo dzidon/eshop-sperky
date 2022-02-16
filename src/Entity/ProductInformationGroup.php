@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use App\Entity\Interfaces\UpdatableEntityInterface;
 use App\Repository\ProductInformationGroupRepository;
 use App\Service\SortingService;
 use DateTime;
@@ -15,9 +14,10 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * @ORM\Entity(repositoryClass=ProductInformationGroupRepository::class)
+ * @ORM\HasLifecycleCallbacks()
  * @UniqueEntity(fields={"name"}, message="Už existuje skupina produktových informací s tímto názvem.")
  */
-class ProductInformationGroup implements UpdatableEntityInterface
+class ProductInformationGroup
 {
     /**
      * @ORM\Id
@@ -73,30 +73,6 @@ class ProductInformationGroup implements UpdatableEntityInterface
         return $this;
     }
 
-    public function getCreated(): ?DateTimeInterface
-    {
-        return $this->created;
-    }
-
-    public function setCreated(DateTimeInterface $created): self
-    {
-        $this->created = $created;
-
-        return $this;
-    }
-
-    public function getUpdated(): ?DateTimeInterface
-    {
-        return $this->updated;
-    }
-
-    public function setUpdated(DateTimeInterface $updated): self
-    {
-        $this->updated = $updated;
-
-        return $this;
-    }
-
     /**
      * @return Collection|ProductInformation[]
      */
@@ -125,6 +101,38 @@ class ProductInformationGroup implements UpdatableEntityInterface
         }
 
         return $this;
+    }
+
+    public function getCreated(): ?DateTimeInterface
+    {
+        return $this->created;
+    }
+
+    public function setCreated(DateTimeInterface $created): self
+    {
+        $this->created = $created;
+
+        return $this;
+    }
+
+    public function getUpdated(): ?DateTimeInterface
+    {
+        return $this->updated;
+    }
+
+    public function setUpdated(DateTimeInterface $updated): self
+    {
+        $this->updated = $updated;
+
+        return $this;
+    }
+
+    /**
+     * @ORM\PreUpdate
+     */
+    public function setUpdatedNow(): void
+    {
+        $this->updated = new DateTime('now');
     }
 
     public static function getSortData(): array

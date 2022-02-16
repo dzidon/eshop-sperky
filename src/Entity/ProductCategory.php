@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use App\Entity\Interfaces\UpdatableEntityInterface;
 use App\Repository\ProductCategoryRepository;
 use DateTime;
 use DateTimeInterface;
@@ -11,8 +10,9 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=ProductCategoryRepository::class)
+ * @ORM\HasLifecycleCallbacks()
  */
-class ProductCategory implements UpdatableEntityInterface
+class ProductCategory
 {
     /**
      * @ORM\Id
@@ -102,5 +102,13 @@ class ProductCategory implements UpdatableEntityInterface
         $this->updated = $updated;
 
         return $this;
+    }
+
+    /**
+     * @ORM\PreUpdate
+     */
+    public function setUpdatedNow(): void
+    {
+        $this->updated = new DateTime('now');
     }
 }

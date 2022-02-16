@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use App\Entity\Interfaces\UpdatableEntityInterface;
 use App\Repository\AddressRepository;
 use App\Service\SortingService;
 use DateTime;
@@ -13,9 +12,10 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=AddressRepository::class)
+ * @ORM\HasLifecycleCallbacks()
  * @AssertCustom\AllOrNone(targetAttributes={"company", "ic", "dic"})
  */
-class Address implements UpdatableEntityInterface
+class Address
 {
     public const COUNTRY_NAME_CZ = 'Česká republika';
     public const COUNTRY_NAME_SK = 'Slovensko';
@@ -272,6 +272,14 @@ class Address implements UpdatableEntityInterface
         $this->updated = $updated;
 
         return $this;
+    }
+
+    /**
+     * @ORM\PreUpdate
+     */
+    public function setUpdatedNow(): void
+    {
+        $this->updated = new DateTime('now');
     }
 
     public static function getSortData(): array

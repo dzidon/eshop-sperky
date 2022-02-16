@@ -11,9 +11,6 @@ class EntityCollectionService
 {
     private array $collections;
 
-    /**
-     * @var EntityManagerInterface
-     */
     private EntityManagerInterface $entityManager;
 
     public function __construct(EntityManagerInterface $entityManager)
@@ -61,13 +58,13 @@ class EntityCollectionService
         return $this;
     }
 
-    public function removeElementsMissingFromNewCollection(): self
+    public function removeElementsMissingFromNewCollections(): self
     {
         foreach ($this->collections as $collectionPair)
         {
             if(!isset($collectionPair['old']) || !isset($collectionPair['new']))
             {
-                throw new LogicException('V EntityCollectionService::removeElementsMissingFromNewCollection chybí v jednom páru kolekcí buď old nebo new.');
+                throw new LogicException('V EntityCollectionService::removeElementsMissingFromNewCollection chybí v jednom páru kolekcí buď stará nebo nová kolekce.');
             }
 
             foreach ($collectionPair['old'] as $element)

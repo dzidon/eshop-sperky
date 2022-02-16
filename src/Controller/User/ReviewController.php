@@ -7,7 +7,6 @@ use App\Form\HiddenTrueFormType;
 use App\Form\ReviewFormType;
 use App\Form\SearchTextAndSortFormType;
 use App\Service\BreadcrumbsService;
-use App\Service\EntityUpdatingService;
 use App\Service\PaginatorService;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -79,7 +78,7 @@ class ReviewController extends AbstractController
      *
      * @IsGranted("IS_AUTHENTICATED_REMEMBERED")
      */
-    public function reviewEdit(EntityUpdatingService $entityUpdater, $id = null): Response
+    public function reviewEdit($id = null): Response
     {
         $user = $this->getUser();
 
@@ -144,9 +143,9 @@ class ReviewController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid())
         {
-            $entityUpdater->setMainInstance($review)
-                ->mainInstancePersistOrSetUpdated();
-            $this->getDoctrine()->getManager()->flush();
+            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager->persist($review);
+            $entityManager->flush();
 
             $this->addFlash('success', 'Recenze uložena!');
             $this->logger->info(sprintf("User %s (ID: %s) has saved a review (ID: %s).", $user->getUserIdentifier(), $user->getId(), $review->getId()));

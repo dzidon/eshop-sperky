@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use App\Entity\Interfaces\UpdatableEntityInterface;
 use App\Repository\ProductOptionParameterRepository;
 use DateTime;
 use DateTimeInterface;
@@ -11,8 +10,9 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=ProductOptionParameterRepository::class)
+ * @ORM\HasLifecycleCallbacks()
  */
-class ProductOptionParameter implements UpdatableEntityInterface
+class ProductOptionParameter
 {
     /**
      * @ORM\Id
@@ -107,6 +107,14 @@ class ProductOptionParameter implements UpdatableEntityInterface
         $this->updated = $updated;
 
         return $this;
+    }
+
+    /**
+     * @ORM\PreUpdate
+     */
+    public function setUpdatedNow(): void
+    {
+        $this->updated = new DateTime('now');
     }
 
     public function getProductOption(): ?ProductOption

@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use App\Entity\Interfaces\UpdatableEntityInterface;
 use App\Repository\ProductRepository;
 use App\Service\SortingService;
 use DateTime;
@@ -18,7 +17,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  * @ORM\HasLifecycleCallbacks()
  * @UniqueEntity(fields={"slug"}, message="Už existuje produktová sekce s tímto názvem pro odkaz.")
  */
-class Product implements UpdatableEntityInterface
+class Product
 {
     public const VAT_NONE = 0.0;
     public const VAT_BASIC = 0.21;
@@ -62,7 +61,7 @@ class Product implements UpdatableEntityInterface
     /**
      * @ORM\Column(type="float")
      *
-     * @Assert\Type("float", message="Musíte zadat číselnou hodnotu.")
+     * @Assert\Type("numeric", message="Musíte zadat číselnou hodnotu.")
      * @Assert\NotBlank
      */
     private $priceWithoutVat;
@@ -75,7 +74,7 @@ class Product implements UpdatableEntityInterface
     /**
      * @ORM\Column(type="float")
      *
-     * @Assert\Type("float", message="Musíte zadat číselnou hodnotu.")
+     * @Assert\Type("numeric", message="Musíte zadat číselnou hodnotu.")
      * @Assert\Choice(choices=Product::VAT_VALUES, message="Zvolte platnou hodnotu DPH.")
      * @Assert\NotBlank
      */
@@ -179,7 +178,7 @@ class Product implements UpdatableEntityInterface
         return $this->priceWithoutVat;
     }
 
-    public function setPriceWithoutVat(float $priceWithoutVat): self
+    public function setPriceWithoutVat($priceWithoutVat): self
     {
         $this->priceWithoutVat = $priceWithoutVat;
 
@@ -368,6 +367,14 @@ class Product implements UpdatableEntityInterface
         $this->updated = $updated;
 
         return $this;
+    }
+
+    /**
+     * @ORM\PreUpdate
+     */
+    public function setUpdatedNow(): void
+    {
+        $this->updated = new DateTime('now');
     }
 
     public static function getSortData(): array

@@ -8,7 +8,6 @@ use App\Form\ProductOptionFormType;
 use App\Form\ProductOptionParametersFormType;
 use App\Form\SearchTextAndSortFormType;
 use App\Service\BreadcrumbsService;
-use App\Service\EntityUpdatingService;
 use App\Service\PaginatorService;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -83,13 +82,12 @@ class ProductOptionController extends AbstractController
      *
      * @IsGranted("product_option_edit")
      */
-    public function productOption(EntityUpdatingService $entityUpdater, $id = null): Response
+    public function productOption($id = null): Response
     {
         $user = $this->getUser();
 
         if($id !== null) //zadal id do url, snazi se editovat existujici
         {
-            /** @var ProductOption $option */
             $option = $this->getDoctrine()->getRepository(ProductOption::class)->findOneBy(['id' => $id]);
             if($option === null) //nenaslo to zadnou volbu
             {
@@ -110,15 +108,14 @@ class ProductOptionController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid())
         {
-            if ($option->getType() !== $oldOption->getType()) //došlo ke změně typu při editaci, takže smažeme parametry
+            if ($option->getType() !== $oldOption->getType())
             {
                 $option->getParameters()->clear();
             }
-            $entityUpdater->setMainInstance($option)
-                ->mainInstancePersistOrSetUpdated();
 
-            $option->setConfiguredIfValid();
-            $this->getDoctrine()->getManager()->flush();
+            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager->persist($option);
+            $entityManager->flush();
 
             $this->addFlash('success', 'Produktová volba uložena! Nyní ji nakonfigurujte.');
             $this->logger->info(sprintf("Admin %s (ID: %s) has saved a product option %s (ID: %s).", $user->getUserIdentifier(), $user->getId(), $option->getName(), $option->getId()));
@@ -142,7 +139,6 @@ class ProductOptionController extends AbstractController
     {
         $user = $this->getUser();
 
-        /** @var ProductOption $option */
         $option = $this->getDoctrine()->getRepository(ProductOption::class)->findOneBy(['id' => $id]);
         if($option === null) //nenaslo to zadnou volbu
         {
@@ -180,11 +176,10 @@ class ProductOptionController extends AbstractController
      *
      * @IsGranted("product_option_edit")
      */
-    public function productOptionConfigure(EntityUpdatingService $entityUpdater, $id): Response
+    public function productOptionConfigure($id): Response
     {
         $user = $this->getUser();
 
-        /** @var ProductOption $option */
         $option = $this->getDoctrine()->getRepository(ProductOption::class)->findOneBy(['id' => $id]);
         if($option === null) //nenaslo to zadnou volbu
         {
@@ -207,16 +202,11 @@ class ProductOptionController extends AbstractController
                     'step' => $form->get('step')->getData(),
                 ];
             }
+            $option->configure($data);
 
-            $entityUpdater
-                ->setMainInstance($option)
-                ->setCollectionGetters(['getParameters'])
-                ->mainInstancePersistOrSetUpdated()
-                ->collectionItemsSetUpdated();
-            $option
-                ->configure($data)
-                ->setConfiguredIfValid();
-            $this->getDoctrine()->getManager()->flush();
+            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager->persist($option);
+            $entityManager->flush();
 
             $this->addFlash('success', 'Produktová volba uložena a nakonfigurována!');
             $this->logger->info(sprintf("Admin %s (ID: %s) has configured a product option %s (ID: %s).", $user->getUserIdentifier(), $user->getId(), $option->getName(), $option->getId()));

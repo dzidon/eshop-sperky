@@ -9,7 +9,6 @@ use App\Form\HiddenTrueFormType;
 use App\Form\PersonalInfoFormType;
 use App\Form\SearchTextAndSortFormType;
 use App\Service\BreadcrumbsService;
-use App\Service\EntityUpdatingService;
 use App\Service\PaginatorService;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -194,7 +193,7 @@ class ProfileController extends AbstractController
     /**
      * @Route("/adresa/{id}", name="profile_address", requirements={"id"="\d+"})
      */
-    public function address(EntityUpdatingService $entityUpdater, $id = null): Response
+    public function address($id = null): Response
     {
         $user = $this->getUser();
 
@@ -224,9 +223,9 @@ class ProfileController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid())
         {
-            $entityUpdater->setMainInstance($address)
-                ->mainInstancePersistOrSetUpdated();
-            $this->getDoctrine()->getManager()->flush();
+            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager->persist($address);
+            $entityManager->flush();
 
             $this->addFlash('success', 'Adresa uložena!');
             $this->logger->info(sprintf("User %s (ID: %s) has saved their address %s (ID: %s).", $user->getUserIdentifier(), $user->getId(), $address->getAlias(), $address->getId()));

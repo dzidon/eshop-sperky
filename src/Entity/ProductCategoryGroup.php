@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use App\Entity\Interfaces\UpdatableEntityInterface;
 use App\Repository\ProductCategoryGroupRepository;
 use App\Service\SortingService;
 use DateTime;
@@ -14,8 +13,9 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=ProductCategoryGroupRepository::class)
+ * @ORM\HasLifecycleCallbacks()
  */
-class ProductCategoryGroup implements UpdatableEntityInterface
+class ProductCategoryGroup
 {
     /**
      * @ORM\Id
@@ -126,6 +126,14 @@ class ProductCategoryGroup implements UpdatableEntityInterface
         $this->updated = $updated;
 
         return $this;
+    }
+
+    /**
+     * @ORM\PreUpdate
+     */
+    public function setUpdatedNow(): void
+    {
+        $this->updated = new DateTime('now');
     }
 
     public static function getSortData(): array
