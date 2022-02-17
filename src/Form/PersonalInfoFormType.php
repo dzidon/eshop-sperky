@@ -11,15 +11,14 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Misd\PhoneNumberBundle\Form\Type\PhoneNumberType;
-use Symfony\Component\Security\Core\Security;
 
 class PersonalInfoFormType extends AbstractType
 {
-    private Security $security;
+    private AddPrivacyFieldSubscriber $privacyFieldSubscriber;
 
-    public function __construct(Security $security)
+    public function __construct(AddPrivacyFieldSubscriber $privacyFieldSubscriber)
     {
-        $this->security = $security;
+        $this->privacyFieldSubscriber = $privacyFieldSubscriber;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -48,7 +47,7 @@ class PersonalInfoFormType extends AbstractType
                 'format' => PhoneNumberFormat::INTERNATIONAL,
                 'label' => 'Telefon',
             ])
-            ->addEventSubscriber(new AddPrivacyFieldSubscriber($this->security))
+            ->addEventSubscriber($this->privacyFieldSubscriber)
         ;
     }
 

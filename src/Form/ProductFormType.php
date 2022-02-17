@@ -7,11 +7,11 @@ use App\Entity\ProductCategory;
 use App\Entity\ProductInformation;
 use App\Entity\ProductOption;
 use App\Entity\ProductSection;
+use App\Form\EventSubscriber\EntityCollectionAdditionSubscriber;
 use App\Form\EventSubscriber\EntityCollectionRemovalSubscriber;
 use App\Form\EventSubscriber\ProductInformationSubscriber;
 use App\Form\EventSubscriber\SlugSubscriber;
 use App\Repository\ProductCategoryRepository;
-use App\Service\EntityCollectionService;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ButtonType;
@@ -23,20 +23,22 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Security\Core\Security;
-use Symfony\Component\String\Slugger\SluggerInterface;
 
 class ProductFormType extends AbstractType
 {
-    private Security $security;
-    private SluggerInterface $slugger;
-    private EntityCollectionService $entityCollectionService;
+    private ProductInformationSubscriber $productInformationSubscriber;
+    private SlugSubscriber $slugSubscriber;
+    private EntityCollectionRemovalSubscriber $collectionRemovalSubscriber;
+    private EntityCollectionAdditionSubscriber $collectionAdditionSubscriber;
 
-    public function __construct(Security $security, SluggerInterface $slugger, EntityCollectionService $entityCollectionService)
+    public function __construct(ProductInformationSubscriber $productInformationSubscriber, SlugSubscriber $slugSubscriber, EntityCollectionRemovalSubscriber $collectionRemovalSubscriber, EntityCollectionAdditionSubscriber $collectionAdditionSubscriber)
     {
-        $this->security = $security;
-        $this->slugger = $slugger;
-        $this->entityCollectionService = $entityCollectionService;
+        $this->productInformationSubscriber = $productInformationSubscriber;
+        $this->collectionRemovalSubscriber = $collectionRemovalSubscriber->setCollectionGetters(['getInfo']);
+        $this->collectionAdditionSubscriber = $collectionAdditionSubscriber->addFieldNameAndAdder('infoNew', 'addInfo');
+        $this->slugSubscriber = $slugSubscriber
+                                    ->setGettersForAutoGenerate(['getName'])
+                                    ->setExtraDataForAutoGenerate([date("HisdmY")]);
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -130,18 +132,10 @@ class ProductFormType extends AbstractType
                 ],
                 'label' => 'Přidat informaci',
             ])
-            ->addEventSubscriber(
-                new ProductInformationSubscriber($this->security)
-            )
-            ->addEventSubscriber(
-                (new SlugSubscriber($this->slugger))
-                    ->setGettersForAutoGenerate(['getName'])
-                    ->setExtraDataForAutoGenerate([date("HisdmY")])
-            )
-            ->addEventSubscriber(
-                (new EntityCollectionRemovalSubscriber($this->entityCollectionService))
-                    ->setCollectionGetters(['getInfo'])
-            )
+            ->addEventSubscriber($this->slugSubscriber)
+            ->addEventSubscriber($this->productInformationSubscriber)
+            ->addEventSubscriber($this->collectionRemovalSubscriber)
+            ->addEventSubscriber($this->collectionAdditionSubscriber)
         ;
     }
 

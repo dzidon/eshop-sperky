@@ -75,7 +75,7 @@ main {
 /*
     Input, Textarea
 */
-.input-field input:focus + label, .materialize-textarea:focus:not([readonly]) + label {
+.input-field input:focus ~ label, .materialize-textarea:focus:not([readonly]) ~ label {
     color: #03a9f4 !important;
 }
 

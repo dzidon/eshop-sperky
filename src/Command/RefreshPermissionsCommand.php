@@ -50,7 +50,6 @@ class RefreshPermissionsCommand extends Command
             if($permissionInDb === null) //neexistuje opravneni s hledanym kodem
             {
                 $this->entityManager->persist($permissionHere);
-                $this->entityManager->flush();
 
                 $stats['created'][] = $permissionHere->getCode();
             }
@@ -58,11 +57,11 @@ class RefreshPermissionsCommand extends Command
             {
                 $permissionInDb->setName( $permissionHere->getName() );
                 $permissionInDb->setCategory( $permissionHere->getCategory() );
-                $this->entityManager->flush();
 
                 $stats['updated'][] = $permissionInDb->getCode();
             }
         }
+        $this->entityManager->flush();
 
         $numberOfCreated = count($stats['created']);
         $numberOfUpdated = count($stats['updated']);

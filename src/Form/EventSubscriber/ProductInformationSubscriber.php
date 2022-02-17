@@ -2,6 +2,7 @@
 
 namespace App\Form\EventSubscriber;
 
+use App\Entity\ProductInformation;
 use App\Form\ProductInformationNewFormType;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\Extension\Core\Type\ButtonType;
@@ -37,6 +38,10 @@ class ProductInformationSubscriber implements EventSubscriberInterface
                     'by_reference' => false,
                     'required' => false,
                     'allow_add' => true,
+                    'allow_delete' => true,
+                    'delete_empty' => function (ProductInformation $info = null) {
+                        return $info === null || $info->getValue() === null || $info->getProductInformationGroup() === null;
+                    },
                     'label' => 'Také můžete přidat novou skupinu informací',
                     'attr' => [
                         'class' => 'infoNew',

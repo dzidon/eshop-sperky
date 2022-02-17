@@ -10,15 +10,14 @@ use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\String\Slugger\SluggerInterface;
 
 class ProductSectionFormType extends AbstractType
 {
-    private SluggerInterface $slugger;
+    private SlugSubscriber $slugSubscriber;
 
-    public function __construct(SluggerInterface $slugger)
+    public function __construct(SlugSubscriber $slugSubscriber)
     {
-        $this->slugger = $slugger;
+        $this->slugSubscriber = $slugSubscriber->setGettersForAutoGenerate(['getName']);
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -44,10 +43,7 @@ class ProductSectionFormType extends AbstractType
                 'required' => false,
                 'label' => 'Manuálně skrýt pro uživatele',
             ])
-            ->addEventSubscriber(
-                (new SlugSubscriber($this->slugger))
-                    ->setGettersForAutoGenerate(['getName'])
-            )
+            ->addEventSubscriber($this->slugSubscriber)
         ;
     }
 

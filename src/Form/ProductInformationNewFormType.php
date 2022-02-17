@@ -4,6 +4,7 @@ namespace App\Form;
 
 use App\Entity\ProductInformation;
 use App\Entity\ProductInformationGroup;
+use App\Form\DataTransformer\ProductInformationGroupToNameTransformer;
 use App\Form\Type\AutoCompleteTextType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\AbstractType;
@@ -14,23 +15,29 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class ProductInformationNewFormType extends AbstractType
 {
     private EntityManagerInterface $entityManager;
+    private ProductInformationGroupToNameTransformer $informationGroupToNameTransformer;
 
-    public function __construct(EntityManagerInterface $entityManager)
+    public function __construct(EntityManagerInterface $entityManager, ProductInformationGroupToNameTransformer $informationGroupToNameTransformer)
     {
         $this->entityManager = $entityManager;
+        $this->informationGroupToNameTransformer = $informationGroupToNameTransformer;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('groupName', AutoCompleteTextType::class, [
-                'mapped' => false,
+            ->add('productInformationGroup', AutoCompleteTextType::class, [
                 'data_autocomplete' => $this->entityManager->getRepository(ProductInformationGroup::class)->getArrayOfNames(),
                 'label' => 'Název skupiny produktových informací',
             ])
             ->add('value', TextType::class, [
                 'label' => 'Hodnota',
             ])
+        ;
+
+        $builder
+            ->get('productInformationGroup')
+                ->addModelTransformer($this->informationGroupToNameTransformer)
         ;
     }
 

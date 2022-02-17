@@ -30,7 +30,7 @@ class ProductInformation
     private $value;
 
     /**
-     * @ORM\ManyToOne(targetEntity=ProductInformationGroup::class, inversedBy="info")
+     * @ORM\ManyToOne(targetEntity=ProductInformationGroup::class, inversedBy="info", cascade={"persist"})
      * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
      */
     private $productInformationGroup;

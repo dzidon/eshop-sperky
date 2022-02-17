@@ -10,9 +10,16 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ProductOptionParametersFormType extends AbstractType
 {
+    private ProductOptionParametersSubscriber $optionParametersSubscriber;
+
+    public function __construct(ProductOptionParametersSubscriber $optionParametersSubscriber)
+    {
+        $this->optionParametersSubscriber = $optionParametersSubscriber;
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder->addEventSubscriber(new ProductOptionParametersSubscriber());
+        $builder->addEventSubscriber($this->optionParametersSubscriber);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

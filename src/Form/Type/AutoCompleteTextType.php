@@ -17,7 +17,7 @@ class AutoCompleteTextType extends AbstractType
             'data_autocomplete' => [],
             'attr' => [
                 'class' => 'autocomplete',
-                'autocomplete' => false,
+                'autocomplete' => "off",
             ],
         ]);
 
