@@ -11,6 +11,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\Valid;
 
 class ProductInformationNewFormType extends AbstractType
 {
@@ -28,6 +29,9 @@ class ProductInformationNewFormType extends AbstractType
         $builder
             ->add('productInformationGroup', AutoCompleteTextType::class, [
                 'data_autocomplete' => $this->entityManager->getRepository(ProductInformationGroup::class)->getArrayOfNames(),
+                'constraints' => [
+                    new Valid(),
+                ],
                 'label' => 'Název skupiny produktových informací',
             ])
             ->add('value', TextType::class, [

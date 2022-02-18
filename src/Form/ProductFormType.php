@@ -119,7 +119,7 @@ class ProductFormType extends AbstractType
                 'delete_empty' => function (ProductInformation $information = null) {
                     return $information === null || $information->getValue() === null;
                 },
-                'label' => 'Výběr z již existujících skupin informací',
+                'label' => false,
                 'attr' => [
                     'class' => 'info',
                     'data-reload-select' => true,

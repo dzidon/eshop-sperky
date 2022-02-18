@@ -72,9 +72,11 @@
 {% block datetime_row %}
     <div class="row{% if (not compound or force_error|default(false)) and not valid %} has-error{% endif %}">
         {{ form_label(form) }}
-        {{ form_widget(form) }}
-        {{ form_help(form) }}
-        {{ form_errors(form) }}
+        <div class="input-field no-mar-top">
+            {{ form_widget(form) }}
+            {{ form_help(form) }}
+            {{ form_errors(form) }}
+        </div>
     </div>
 {% endblock datetime_row %}
 
@@ -163,14 +165,16 @@
 {# Radio buttony #}
 {% block choice_row %}
     <div class="row {% if not valid %} has-error{% endif %}">
-        {% if label is not same as(false)  %}
-            <div class="radio-label">
-                {{ form_label(form) }}
-            </div>
-        {% endif %}
-        {{ form_widget(form) }}
-        {{ form_help(form) }}
-        {{ form_errors(form) }}
+        <div class="input-field margin-0">
+            {% if label is not same as(false)  %}
+                <div class="radio-label">
+                    {{ form_label(form) }}
+                </div>
+            {% endif %}
+            {{ form_widget(form) }}
+            {{ form_help(form) }}
+            {{ form_errors(form) }}
+        </div>
     </div>
 {% endblock choice_row %}
 

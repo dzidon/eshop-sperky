@@ -69,12 +69,41 @@
                 <h4>Informace</h4>
             </div>
 
-            {{ form_row(productForm.info, { 'attr': {'data-index': productForm.info|length > 0 ? productForm.info|last.vars.name + 1 : 0} }) }}
-            {{ form_row(productForm.addItem) }}
+            {% if productForm.infoNew is defined %}
+                <div class="row">
+                    <ul class="tabs">
+                        <li class="tab col s6">
+                            <a href="#tab1">
+                                Přidat z existujících skupin
+                                {% if productForm.info.vars.valid is not same as(true) %}
+                                    <i class="fas fa-exclamation-circle red-text"></i>
+                                {% endif %}
+                            </a>
+                        </li>
+                        <li class="tab col s6">
+                            <a href="#tab2">
+                                Přidat nové skupiny
+                                {% if productForm.infoNew.vars.valid is not same as(true) %}
+                                    <i class="fas fa-exclamation-circle red-text"></i>
+                                {% endif %}
+                            </a>
+                        </li>
+                    </ul>
+                </div>
 
-            {% if productForm.infoNew is not null %}
-                {{ form_row(productForm.infoNew, { 'attr': {'data-index': productForm.infoNew|length > 0 ? productForm.infoNew|last.vars.name + 1 : 0} }) }}
-                {{ form_row(productForm.addItemNew) }}
+                <div class="row">
+                    <div id="tab1" class="col s12">
+                        {{ form_row(productForm.info, { 'attr': {'data-index': productForm.info|length > 0 ? productForm.info|last.vars.name + 1 : 0} }) }}
+                        {{ form_row(productForm.addItem) }}
+                    </div>
+                    <div id="tab2" class="col s12">
+                        {{ form_row(productForm.infoNew, { 'attr': {'data-index': productForm.infoNew|length > 0 ? productForm.infoNew|last.vars.name + 1 : 0} }) }}
+                        {{ form_row(productForm.addItemNew) }}
+                    </div>
+                </div>
+            {% else %}
+                {{ form_row(productForm.info, { 'attr': {'data-index': productForm.info|length > 0 ? productForm.info|last.vars.name + 1 : 0} }) }}
+                {{ form_row(productForm.addItem) }}
             {% endif %}
         </div>
 

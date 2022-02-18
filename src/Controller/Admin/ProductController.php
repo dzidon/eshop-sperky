@@ -7,7 +7,6 @@ use App\Form\HiddenTrueFormType;
 use App\Form\ProductFormType;
 use App\Form\SearchTextAndSortFormType;
 use App\Service\BreadcrumbsService;
-use App\Service\EntityCollectionService;
 use App\Service\PaginatorService;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -82,7 +81,7 @@ class ProductController extends AbstractController
      *
      * @IsGranted("product_edit")
      */
-    public function product(EntityCollectionService $entityCollectionManager, $id = null): Response
+    public function product($id = null): Response
     {
         $user = $this->getUser();
 

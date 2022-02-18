@@ -10,6 +10,7 @@ use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Security\Core\Security;
+use Symfony\Component\Validator\Constraints\Valid;
 
 class ProductInformationSubscriber implements EventSubscriberInterface
 {
@@ -42,11 +43,16 @@ class ProductInformationSubscriber implements EventSubscriberInterface
                     'delete_empty' => function (ProductInformation $info = null) {
                         return $info === null || $info->getValue() === null || $info->getProductInformationGroup() === null;
                     },
-                    'label' => 'Také můžete přidat novou skupinu informací',
+                    'entry_options' => [
+                        'constraints' => [
+                            new Valid(),
+                        ],
+                    ],
                     'attr' => [
                         'class' => 'infoNew',
                         'data-reload-autocomplete' => true,
                     ],
+                    'label' => false,
                 ])
                 ->add('addItemNew', ButtonType::class, [
                     'attr' => [

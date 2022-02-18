@@ -121,6 +121,8 @@ class Product
 
     /**
      * @ORM\OneToMany(targetEntity=ProductInformation::class, mappedBy="product", cascade={"persist"})
+     *
+     * @Assert\Valid
      */
     private $info;
 
