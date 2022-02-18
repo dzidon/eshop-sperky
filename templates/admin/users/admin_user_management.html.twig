@@ -16,7 +16,7 @@
             <div class="collection">
                 {% for user in users %}
                     <div class="collection-item valign-wrapper">
-                        <div class="col s9 no-padding">
+                        <div class="col s9 no-padding left-align">
                             <strong>
                                 {{ user.getEmail() }}
                             </strong>
@@ -40,9 +40,11 @@
                         </div>
 
                         <div class="col s3 no-padding right-align">
-                            <a href="{{ path('admin_user_management_specific', {id: user.getId()}) }}">
-                                <i class="fas fa-edit"></i>
-                            </a>
+                            {% if user is not same as(userAdmin) or userAdminCanEditThemself %}
+                                <a href="{{ path('admin_user_management_specific', {id: user.getId()}) }}">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                            {% endif %}
                         </div>
                     </div>
                 {% endfor %}

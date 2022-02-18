@@ -15,6 +15,7 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -71,7 +72,9 @@ class UserController extends AbstractController
 
         return $this->render('admin/users/admin_user_management.html.twig', [
             'searchForm' => $form->createView(),
+            'userAdmin' => $this->getUser(),
             'users' => $users,
+            'userAdminCanEditThemself' => $this->getParameter('kernel.environment') === 'dev',
             'breadcrumbs' => $this->breadcrumbs->setPageTitleByRoute('admin_user_management'),
             'pagination' => $paginatorService->createViewData(),
         ]);
@@ -87,9 +90,17 @@ class UserController extends AbstractController
         $entityManager = $this->getDoctrine()->getManager();
         $user = $this->getUser();
         $userEdited = $this->getDoctrine()->getRepository(User::class)->findOneBy(['id' => $id]);
-        if($userEdited === null) //nenaslo to zadneho uzivatele
+
+        //nenaslo to zadneho uzivatele
+        if($userEdited === null)
         {
             throw new NotFoundHttpException('Uzivatel nenalezen.');
+        }
+
+        //admin nemuze editovat sam sebe mimo dev
+        if($this->getParameter('kernel.environment') !== 'dev' && $user === $userEdited)
+        {
+            throw new AccessDeniedHttpException('Nemůžete editovat sami sebe.');
         }
 
         /*
