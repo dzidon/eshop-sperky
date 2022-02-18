@@ -75,16 +75,16 @@
                         <li class="tab col s6">
                             <a href="#tab1">
                                 Přidat z existujících skupin
-                                {% if productForm.info.vars.valid is not same as(true) %}
-                                    <i class="fas fa-exclamation-circle red-text"></i>
+                                {% if productForm.info.vars.valid is same as(false) %}
+                                    <i class="fas fa-exclamation-circle form-error red-text"></i>
                                 {% endif %}
                             </a>
                         </li>
                         <li class="tab col s6">
                             <a href="#tab2">
                                 Přidat nové skupiny
-                                {% if productForm.infoNew.vars.valid is not same as(true) %}
-                                    <i class="fas fa-exclamation-circle red-text"></i>
+                                {% if productForm.infoNew.vars.valid is same as(false) %}
+                                    <i class="fas fa-exclamation-circle form-error red-text"></i>
                                 {% endif %}
                             </a>
                         </li>

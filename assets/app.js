@@ -30,6 +30,17 @@ $(document).ready(function() {
         .forEach(btn => {
             btn.addEventListener("click", addFormToCollection)
     });
+
+    // scroll prvniho erroru na obrazovku
+    const firstError = document.getElementsByClassName('form-error')[0];
+    if(firstError)
+    {
+        firstError.scrollIntoView({
+            behavior: 'auto',
+            block: 'center',
+            inline: 'center'
+        });
+    }
 });
 
 /*
