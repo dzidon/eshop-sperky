@@ -192,18 +192,6 @@ class ProductOptionController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid())
         {
-            $data = [];
-            if ($option->getType() === ProductOption::TYPE_NUMBER)
-            {
-                $data = [
-                    'min' => $form->get('min')->getData(),
-                    'max' => $form->get('max')->getData(),
-                    'default' => $form->get('default')->getData(),
-                    'step' => $form->get('step')->getData(),
-                ];
-            }
-            $option->configure($data);
-
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($option);
             $entityManager->flush();

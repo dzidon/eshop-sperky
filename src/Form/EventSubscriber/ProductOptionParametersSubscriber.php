@@ -26,7 +26,10 @@ class ProductOptionParametersSubscriber implements EventSubscriberInterface
 {
     public static function getSubscribedEvents(): array
     {
-        return [FormEvents::PRE_SET_DATA => 'preSetData'];
+        return [
+            FormEvents::PRE_SET_DATA => 'preSetData',
+            FormEvents::POST_SUBMIT => 'postSubmit',
+        ];
     }
 
     public function preSetData(FormEvent $event): void
@@ -124,6 +127,32 @@ class ProductOptionParametersSubscriber implements EventSubscriberInterface
                     'label' => 'Číselná změna',
                 ])
             ;
+        }
+    }
+
+    public function postSubmit(FormEvent $event): void
+    {
+        $form = $event->getForm();
+        if ($form->isSubmitted() && $form->isValid())
+        {
+            /** @var ProductOption $option */
+            $option = $event->getData();
+            if (!$option)
+            {
+                return;
+            }
+
+            $data = [];
+            if ($option->getType() === ProductOption::TYPE_NUMBER)
+            {
+                $data = [
+                    'min' => $form->get('min')->getData(),
+                    'max' => $form->get('max')->getData(),
+                    'default' => $form->get('default')->getData(),
+                    'step' => $form->get('step')->getData(),
+                ];
+            }
+            $option->configure($data);
         }
     }
 }
