@@ -17,6 +17,11 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Type;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
+/**
+ * Subscriber řešící formulář pro konfiguraci produktové volby
+ *
+ * @package App\Form\EventSubscriber
+ */
 class ProductOptionParametersSubscriber implements EventSubscriberInterface
 {
     public static function getSubscribedEvents(): array

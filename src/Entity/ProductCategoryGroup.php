@@ -16,8 +16,9 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 /**
  * @ORM\Entity(repositoryClass=ProductCategoryGroupRepository::class)
  * @ORM\HasLifecycleCallbacks()
- * @UniqueEntity(fields={"name"}, message="Už existuje skupina kategorií s tímto názvem.")
+ * @UniqueEntity(groups={"creation"}, fields={"name"}, message="Už existuje skupina kategorií s tímto názvem.")
  * @AssertCustom\UniqueEntitiesInCollection(
+ *     groups={"creation"},
  *     fieldsOfChildren={"name"},
  *     collectionName="categories",
  *     message="Všechny kategorie obsažené ve skupině musejí mít unikátní názvy.")
@@ -58,10 +59,10 @@ class ProductCategoryGroup
 
     public function __construct()
     {
-        $this->categories = new ArrayCollection();
-
         $this->created = new DateTime('now');
         $this->updated = $this->created;
+
+        $this->categories = new ArrayCollection();
     }
 
     public function getId(): ?int

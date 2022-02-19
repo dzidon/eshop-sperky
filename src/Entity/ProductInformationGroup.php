@@ -53,6 +53,7 @@ class ProductInformationGroup
     {
         $this->created = new DateTime('now');
         $this->updated = $this->created;
+
         $this->info = new ArrayCollection();
     }
 

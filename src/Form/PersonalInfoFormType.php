@@ -3,7 +3,7 @@
 namespace App\Form;
 
 use App\Entity\User;
-use App\Form\EventSubscriber\AddPrivacyFieldSubscriber;
+use App\Form\Type\AgreePrivacyType;
 use libphonenumber\PhoneNumberFormat;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -14,13 +14,6 @@ use Misd\PhoneNumberBundle\Form\Type\PhoneNumberType;
 
 class PersonalInfoFormType extends AbstractType
 {
-    private AddPrivacyFieldSubscriber $privacyFieldSubscriber;
-
-    public function __construct(AddPrivacyFieldSubscriber $privacyFieldSubscriber)
-    {
-        $this->privacyFieldSubscriber = $privacyFieldSubscriber;
-    }
-
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
@@ -47,7 +40,9 @@ class PersonalInfoFormType extends AbstractType
                 'format' => PhoneNumberFormat::INTERNATIONAL,
                 'label' => 'Telefon',
             ])
-            ->addEventSubscriber($this->privacyFieldSubscriber)
+            ->add('agreePrivacy', AgreePrivacyType::class, [
+                'label' => 'Souhlasím se zpracováním osobních údajů',
+            ])
         ;
     }
 

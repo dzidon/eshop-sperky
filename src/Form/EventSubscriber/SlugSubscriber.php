@@ -45,6 +45,12 @@ class SlugSubscriber implements EventSubscriberInterface
         return [FormEvents::SUBMIT => 'submit'];
     }
 
+    /**
+     * Nastaví gettery, které se mají použít pro automatické vygenerování slugu, když je uživatelem zadaný slug null
+     *
+     * @param array $gettersForAutoGenerate
+     * @return $this
+     */
     public function setGettersForAutoGenerate(array $gettersForAutoGenerate): self
     {
         $this->gettersForAutoGenerate = $gettersForAutoGenerate;
@@ -52,6 +58,12 @@ class SlugSubscriber implements EventSubscriberInterface
         return $this;
     }
 
+    /**
+     * Nastaví data navíc vkládaná do slugu v případě automatického generování
+     *
+     * @param array $extraDataForAutoGenerate
+     * @return $this
+     */
     public function setExtraDataForAutoGenerate(array $extraDataForAutoGenerate): self
     {
         $this->extraDataForAutoGenerate = $extraDataForAutoGenerate;

@@ -108,7 +108,7 @@ class Product
     private $section;
 
     /**
-     * @ORM\ManyToMany(targetEntity=ProductCategory::class)
+     * @ORM\ManyToMany(targetEntity=ProductCategory::class, cascade={"persist"})
      * @ORM\JoinTable(name="_product_category")
      */
     private $categories;

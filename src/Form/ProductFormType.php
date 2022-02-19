@@ -7,8 +7,8 @@ use App\Entity\ProductCategory;
 use App\Entity\ProductInformation;
 use App\Entity\ProductOption;
 use App\Entity\ProductSection;
-use App\Form\EventSubscriber\EntityCollectionAdditionSubscriber;
 use App\Form\EventSubscriber\EntityCollectionRemovalSubscriber;
+use App\Form\EventSubscriber\ProductCategorySubscriber;
 use App\Form\EventSubscriber\ProductInformationSubscriber;
 use App\Form\EventSubscriber\SlugSubscriber;
 use App\Repository\ProductCategoryRepository;
@@ -27,18 +27,23 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class ProductFormType extends AbstractType
 {
     private ProductInformationSubscriber $productInformationSubscriber;
+    private ProductCategorySubscriber $productCategorySubscriber;
     private SlugSubscriber $slugSubscriber;
     private EntityCollectionRemovalSubscriber $collectionRemovalSubscriber;
-    private EntityCollectionAdditionSubscriber $collectionAdditionSubscriber;
 
-    public function __construct(ProductInformationSubscriber $productInformationSubscriber, SlugSubscriber $slugSubscriber, EntityCollectionRemovalSubscriber $collectionRemovalSubscriber, EntityCollectionAdditionSubscriber $collectionAdditionSubscriber)
+    public function __construct(ProductInformationSubscriber $productInformationSubscriber, ProductCategorySubscriber $productCategorySubscriber, SlugSubscriber $slugSubscriber, EntityCollectionRemovalSubscriber $collectionRemovalSubscriber)
     {
         $this->productInformationSubscriber = $productInformationSubscriber;
-        $this->collectionRemovalSubscriber = $collectionRemovalSubscriber->setCollectionGetters(['getInfo']);
-        $this->collectionAdditionSubscriber = $collectionAdditionSubscriber->addFieldNameAndAdder('infoNew', 'addInfo');
-        $this->slugSubscriber = $slugSubscriber
-                                    ->setGettersForAutoGenerate(['getName'])
-                                    ->setExtraDataForAutoGenerate([date("HisdmY")]);
+        $this->productCategorySubscriber = $productCategorySubscriber;
+
+        $this->slugSubscriber = $slugSubscriber;
+        $this->slugSubscriber
+            ->setGettersForAutoGenerate(['getName'])
+            ->setExtraDataForAutoGenerate([date("HisdmY")]);
+
+        $this->collectionRemovalSubscriber = $collectionRemovalSubscriber;
+        $this->collectionRemovalSubscriber
+            ->addCollectionGetter('getInfo');
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -125,7 +130,7 @@ class ProductFormType extends AbstractType
                     'data-reload-select' => true,
                 ],
             ])
-            ->add('addItem', ButtonType::class, [
+            ->add('addItemInfo', ButtonType::class, [
                 'attr' => [
                     'class' => 'btn-medium grey left js-add-item-link',
                     'data-collection-holder-class' => 'info',
@@ -134,8 +139,8 @@ class ProductFormType extends AbstractType
             ])
             ->addEventSubscriber($this->slugSubscriber)
             ->addEventSubscriber($this->productInformationSubscriber)
+            ->addEventSubscriber($this->productCategorySubscriber)
             ->addEventSubscriber($this->collectionRemovalSubscriber)
-            ->addEventSubscriber($this->collectionAdditionSubscriber)
         ;
     }
 

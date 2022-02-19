@@ -60,6 +60,7 @@ class ProductCategoryGroupFormType extends AbstractType
             'csrf_protection' => true,
             'csrf_field_name' => '_token',
             'csrf_token_id'   => 'form_product_category_group',
+            'validation_groups' => ['Default', 'creation'],
         ]);
     }
 }

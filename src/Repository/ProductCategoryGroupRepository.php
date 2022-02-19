@@ -37,6 +37,18 @@ class ProductCategoryGroupRepository extends ServiceEntityRepository
         ;
     }
 
+    public function findOneByNameAndFetchCategories($name)
+    {
+        return $this->createQueryBuilder('pcg')
+            ->select("pcg, pc")
+            ->leftJoin('pcg.categories', 'pc')
+            ->andWhere('pcg.name = :name')
+            ->setParameter('name', $name)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
+
     public function getQueryForSearchAndPagination($searchPhrase = null, string $sortAttribute = null): Query
     {
         $sortData = $this->sorting->createSortData($sortAttribute, ProductCategoryGroup::getSortData());
@@ -51,5 +63,14 @@ class ProductCategoryGroupRepository extends ServiceEntityRepository
             ->orderBy('pcg.' . $sortData['attribute'], $sortData['order'])
             ->getQuery()
         ;
+    }
+
+    public function getArrayOfNames(): array
+    {
+        $arrayOfAllData = $this->createQueryBuilder('pcg', 'pcg.name')
+            ->getQuery()
+            ->getArrayResult();
+
+        return array_keys($arrayOfAllData); // chceme jen názvy, ty jsou v klíčích
     }
 }

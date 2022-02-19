@@ -74,6 +74,7 @@ class ProductOption
     {
         $this->created = new DateTime('now');
         $this->updated = $this->created;
+
         $this->parameters = new ArrayCollection();
     }
 

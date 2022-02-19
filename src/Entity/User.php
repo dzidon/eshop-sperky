@@ -132,9 +132,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function __construct()
     {
+        $this->registered = new DateTime('now');
+
         $this->addresses = new ArrayCollection();
         $this->permissions = new ArrayCollection();
-        $this->registered = new DateTime('now');
     }
 
     public function getId(): ?int

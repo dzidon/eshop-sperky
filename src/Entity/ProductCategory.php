@@ -30,7 +30,7 @@ class ProductCategory
     private $name;
 
     /**
-     * @ORM\ManyToOne(targetEntity=ProductCategoryGroup::class, inversedBy="categories")
+     * @ORM\ManyToOne(targetEntity=ProductCategoryGroup::class, inversedBy="categories", cascade={"persist"})
      * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
      */
     private $productCategoryGroup;
@@ -68,7 +68,7 @@ class ProductCategory
         return $this;
     }
 
-    public function getProductCategoryGroup(): ProductCategoryGroup
+    public function getProductCategoryGroup(): ?ProductCategoryGroup
     {
         return $this->productCategoryGroup;
     }
