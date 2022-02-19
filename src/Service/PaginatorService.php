@@ -6,6 +6,11 @@ use Doctrine\ORM\Query;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Symfony\Component\HttpFoundation\RequestStack;
 
+/**
+ * Třída řešící stránkování
+ *
+ * @package App\Service
+ */
 class PaginatorService
 {
     public const QUERY_PARAMETER_PAGE_NAME = 'stranka';

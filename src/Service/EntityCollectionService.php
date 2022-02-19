@@ -7,8 +7,20 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManagerInterface;
 use LogicException;
 
+/**
+ * Třída umožňující sledovat rozdíly v kolekci entity například před odesláním formuláře a po odeslání formuláře.
+ * Se změnou v kolekci jde následně nějak naložit, například je možné odstranit chybějící entity z databáze.
+ * Dá se použít v kombinaci s CollectionType.
+ *
+ * @package App\Service
+ */
 class EntityCollectionService
 {
+    /**
+     * Obsahuje stará data kolekcí a nová data kolekcí
+     *
+     * @var array
+     */
     private array $collections;
 
     private EntityManagerInterface $entityManager;
@@ -18,6 +30,13 @@ class EntityCollectionService
         $this->entityManager = $entityManager;
     }
 
+    /**
+     * Načte stará data dané kolekce
+     *
+     * @param string $name Nějaký název této kolekce, který je uložen v klíči arraye collections
+     * @param Collection $collection
+     * @return $this
+     */
     private function loadOldCollection(string $name, Collection $collection): self
     {
         $this->collections[$name]['old'] = new ArrayCollection();
@@ -29,6 +48,13 @@ class EntityCollectionService
         return $this;
     }
 
+    /**
+     * Načte nová data dané kolekce
+     *
+     * @param string $name Nějaký název této kolekce, který je uložen v klíči arraye collections
+     * @param Collection $collection
+     * @return $this
+     */
     private function loadNewCollection(string $name, Collection $collection): self
     {
         $this->collections[$name]['new'] = $collection;
@@ -36,6 +62,15 @@ class EntityCollectionService
         return $this;
     }
 
+    /**
+     * Načte stará nebo nová data jedné nebo více kolekcí.
+     *
+     * @param array $data Načítání starých dat -> ['type' => 'old', 'name' => 'jmeno...', 'collection' => $collection]
+     *                    Načítání nových dat  -> ['type' => 'new', 'name' => 'jmeno...', 'collection' => $collection]
+     *
+     *                    $collection musí být typu Doctrine\Common\Collections\Collection
+     * @return $this
+     */
     public function loadCollections(array $data): self
     {
         foreach ($data as $collectionData)
@@ -58,6 +93,11 @@ class EntityCollectionService
         return $this;
     }
 
+    /**
+     * Smaže entity, které chybí v nových kolekcích
+     *
+     * @return $this
+     */
     public function removeElementsMissingFromNewCollections(): self
     {
         foreach ($this->collections as $collectionPair)

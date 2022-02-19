@@ -4,6 +4,11 @@ namespace App\Service;
 
 use LogicException;
 
+/**
+ * Třída pomáhající při řazení v DQL
+ *
+ * @package App\Service
+ */
 class SortingService
 {
     public const ATTRIBUTE_TAG_ASC = '-ASC';
