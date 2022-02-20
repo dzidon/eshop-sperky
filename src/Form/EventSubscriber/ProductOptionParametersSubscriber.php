@@ -137,22 +137,20 @@ class ProductOptionParametersSubscriber implements EventSubscriberInterface
         {
             /** @var ProductOption $option */
             $option = $event->getData();
-            if (!$option)
+            if ($option)
             {
-                return;
+                $data = [];
+                if ($option->getType() === ProductOption::TYPE_NUMBER)
+                {
+                    $data = [
+                        'min' => $form->get('min')->getData(),
+                        'max' => $form->get('max')->getData(),
+                        'default' => $form->get('default')->getData(),
+                        'step' => $form->get('step')->getData(),
+                    ];
+                }
+                $option->configure($data);
             }
-
-            $data = [];
-            if ($option->getType() === ProductOption::TYPE_NUMBER)
-            {
-                $data = [
-                    'min' => $form->get('min')->getData(),
-                    'max' => $form->get('max')->getData(),
-                    'default' => $form->get('default')->getData(),
-                    'step' => $form->get('step')->getData(),
-                ];
-            }
-            $option->configure($data);
         }
     }
 }

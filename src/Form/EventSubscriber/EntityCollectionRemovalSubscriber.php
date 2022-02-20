@@ -55,38 +55,34 @@ class EntityCollectionRemovalSubscriber implements EventSubscriberInterface
     public function postSetData(FormEvent $event): void
     {
         $instance = $event->getData();
-        if (!$instance)
+        if ($instance)
         {
-            return;
-        }
-
-        foreach ($this->collectionGetters as $getElements)
-        {
-            $this->entityCollectionService->loadCollections([
-                ['type' => 'old', 'name' => $getElements, 'collection' => $instance->$getElements()]
-            ]);
+            foreach ($this->collectionGetters as $getElements)
+            {
+                $this->entityCollectionService->loadCollections([
+                    ['type' => 'old', 'name' => $getElements, 'collection' => $instance->$getElements()]
+                ]);
+            }
         }
     }
 
     public function postSubmit(FormEvent $event): void
     {
         $instance = $event->getData();
-        if (!$instance)
+        if ($instance)
         {
-            return;
-        }
-
-        $form = $event->getForm();
-        if($form->isSubmitted() && $form->isValid())
-        {
-            foreach ($this->collectionGetters as $getElements)
+            $form = $event->getForm();
+            if($form->isSubmitted() && $form->isValid())
             {
-                $this->entityCollectionService->loadCollections([
-                    ['type' => 'new', 'name' => $getElements, 'collection' => $instance->$getElements()]
-                ]);
-            }
+                foreach ($this->collectionGetters as $getElements)
+                {
+                    $this->entityCollectionService->loadCollections([
+                        ['type' => 'new', 'name' => $getElements, 'collection' => $instance->$getElements()]
+                    ]);
+                }
 
-            $this->entityCollectionService->removeElementsMissingFromNewCollections();
+                $this->entityCollectionService->removeElementsMissingFromNewCollections();
+            }
         }
     }
 }

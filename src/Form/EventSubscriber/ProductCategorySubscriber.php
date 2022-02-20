@@ -91,69 +91,67 @@ class ProductCategorySubscriber implements EventSubscriberInterface
             {
                 /** @var Product $product */
                 $product = $event->getData();
-                if (!$product)
+                if ($product)
                 {
-                    return;
-                }
-
-                foreach ($form->get('categoriesNew')->getData() as $input)
-                {
-                    /** @var ProductCategoryGroup $inputCategoryGroup */
-                    $inputCategoryGroup = $input['categoryGroup'];
-
-                    /** @var ProductCategory $inputCategory */
-                    $inputCategory = $input['category'];
-
-                    $targetCategoryGroup = null;
-
-                    // Prohledáme kategorie produktu. Možná už k produktu existuje kategorie se skupinou, která má zadávaný název (a ještě možná není v DB).
-                    if($targetCategoryGroup === null)
+                    foreach ($form->get('categoriesNew')->getData() as $input)
                     {
-                        foreach ($product->getCategories() as $category)
+                        /** @var ProductCategoryGroup $inputCategoryGroup */
+                        $inputCategoryGroup = $input['categoryGroup'];
+
+                        /** @var ProductCategory $inputCategory */
+                        $inputCategory = $input['category'];
+
+                        $targetCategoryGroup = null;
+
+                        // Prohledáme kategorie produktu. Možná už k produktu existuje kategorie se skupinou, která má zadávaný název (a ještě možná není v DB).
+                        if($targetCategoryGroup === null)
                         {
-                            $categoryGroup = $category->getProductCategoryGroup();
-                            if($categoryGroup->getName() === $inputCategoryGroup->getName())
+                            foreach ($product->getCategories() as $category)
                             {
-                                $targetCategoryGroup = $categoryGroup;
-                                break;
-                            }
-                        }
-                    }
-
-                    // Nenašlo to nic v kolekci produktu, ještě ale může existovat v DB.
-                    if($targetCategoryGroup === null)
-                    {
-                        $targetCategoryGroup = $this->entityManager->getRepository(ProductCategoryGroup::class)->findOneByNameAndFetchCategories($inputCategoryGroup->getName());
-                    }
-
-                    // Našlo to nějakou skupinu buď u produktu nebo v db
-                    if ($targetCategoryGroup !== null)
-                    {
-                        $targetCategory = $inputCategory;
-
-                        // Kategorie se zadávaným jménem už mozná existuje v nalezené skupině.
-                        foreach ($targetCategoryGroup->getCategories() as $category)
-                        {
-                            if($category->getName() === $inputCategory->getName())
-                            {
-                                $targetCategory = $category;
-                                break;
+                                $categoryGroup = $category->getProductCategoryGroup();
+                                if($categoryGroup->getName() === $inputCategoryGroup->getName())
+                                {
+                                    $targetCategoryGroup = $categoryGroup;
+                                    break;
+                                }
                             }
                         }
 
-                        // Pokud kategorie se zadávaným jménem ještě neexistuje v nalezené skupině, přidáme ji tam.
-                        // Pokud už kategorie v nalezené skupině existuje, pouze se připojí k produktu.
-                        if($targetCategory === $inputCategory)
+                        // Nenašlo to nic v kolekci produktu, ještě ale může existovat v DB.
+                        if($targetCategoryGroup === null)
                         {
-                            $targetCategoryGroup->addCategory($targetCategory);
+                            $targetCategoryGroup = $this->entityManager->getRepository(ProductCategoryGroup::class)->findOneByNameAndFetchCategories($inputCategoryGroup->getName());
                         }
-                        $product->addCategory($targetCategory);
-                    }
-                    else // Žádná skupina se zadávaným jménem neexistuje, vytváříme novou.
-                    {
-                        $targetCategoryGroup = $inputCategoryGroup;
-                        $targetCategoryGroup->addCategory($inputCategory);
-                        $product->addCategory($inputCategory);
+
+                        // Našlo to nějakou skupinu buď u produktu nebo v db
+                        if ($targetCategoryGroup !== null)
+                        {
+                            $targetCategory = $inputCategory;
+
+                            // Kategorie se zadávaným jménem už mozná existuje v nalezené skupině.
+                            foreach ($targetCategoryGroup->getCategories() as $category)
+                            {
+                                if($category->getName() === $inputCategory->getName())
+                                {
+                                    $targetCategory = $category;
+                                    break;
+                                }
+                            }
+
+                            // Pokud kategorie se zadávaným jménem ještě neexistuje v nalezené skupině, přidáme ji tam.
+                            // Pokud už kategorie v nalezené skupině existuje, pouze se připojí k produktu.
+                            if($targetCategory === $inputCategory)
+                            {
+                                $targetCategoryGroup->addCategory($targetCategory);
+                            }
+                            $product->addCategory($targetCategory);
+                        }
+                        else // Žádná skupina se zadávaným jménem neexistuje, vytváříme novou.
+                        {
+                            $targetCategoryGroup = $inputCategoryGroup;
+                            $targetCategoryGroup->addCategory($inputCategory);
+                            $product->addCategory($inputCategory);
+                        }
                     }
                 }
             }

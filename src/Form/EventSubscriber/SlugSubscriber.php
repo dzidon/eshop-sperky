@@ -74,38 +74,37 @@ class SlugSubscriber implements EventSubscriberInterface
     public function submit(FormEvent $event): void
     {
         $instance = $event->getData();
-        if (!$instance)
+        if ($instance)
         {
-            return;
-        }
-
-        if ($instance->getSlug() === null)
-        {
-            $stringToConvert = '';
-
-            //data z instance
-            foreach ($this->gettersForAutoGenerate as $getData)
+            if ($instance->getSlug() === null)
             {
-                $stringToConvert .= $instance->$getData() . ' ';
+                $stringToConvert = '';
+
+                // Data z instance
+                foreach ($this->gettersForAutoGenerate as $getData)
+                {
+                    $stringToConvert .= $instance->$getData() . ' ';
+                }
+
+                // Extra data
+                foreach ($this->extraDataForAutoGenerate as $extraData)
+                {
+                    $stringToConvert .= $extraData . ' ';
+                }
+
+                // Vytvoření slugu
+                $slug = strtolower($this->slugger->slug($stringToConvert));
+                if(mb_strlen($slug, 'utf-8') > 0)
+                {
+                    $instance->setSlug($slug);
+                }
+            }
+            else
+            {
+                $instance->setSlug( strtolower($this->slugger->slug($instance->getSlug())) );
             }
 
-            //extra data
-            foreach ($this->extraDataForAutoGenerate as $extraData)
-            {
-                $stringToConvert .= $extraData . ' ';
-            }
-
-            $slug = strtolower($this->slugger->slug($stringToConvert));
-            if(mb_strlen($slug, 'utf-8') > 0)
-            {
-                $instance->setSlug($slug);
-            }
+            $event->setData($instance);
         }
-        else
-        {
-            $instance->setSlug( strtolower($this->slugger->slug($instance->getSlug())) );
-        }
-
-        $event->setData($instance);
     }
 }

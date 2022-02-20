@@ -101,18 +101,12 @@ class ProductOptionController extends AbstractController
             $this->breadcrumbs->setPageTitleByRoute('admin_product_option_edit', 'new');
         }
 
-        $oldOption = clone $option;
         $form = $this->createForm(ProductOptionFormType::class, $option);
         $form->add('submit', SubmitType::class, ['label' => 'Uložit a pokračovat']);
         $form->handleRequest($this->request);
 
         if ($form->isSubmitted() && $form->isValid())
         {
-            if ($option->getType() !== $oldOption->getType())
-            {
-                $option->getParameters()->clear();
-            }
-
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($option);
             $entityManager->flush();

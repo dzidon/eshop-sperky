@@ -86,19 +86,17 @@ class ProductInformationSubscriber implements EventSubscriberInterface
             {
                 /** @var Product $product */
                 $product = $event->getData();
-                if (!$product)
+                if ($product)
                 {
-                    return;
-                }
-
-                $infoNew = $form->get('infoNew')->getData();
-                if ($infoNew !== null)
-                {
-                    foreach ($infoNew as $objectToBeAdded)
+                    $infoNew = $form->get('infoNew')->getData();
+                    if ($infoNew !== null)
                     {
-                        if($objectToBeAdded !== null)
+                        foreach ($infoNew as $objectToBeAdded)
                         {
-                            $product->addInfo($objectToBeAdded);
+                            if($objectToBeAdded !== null)
+                            {
+                                $product->addInfo($objectToBeAdded);
+                            }
                         }
                     }
                 }
