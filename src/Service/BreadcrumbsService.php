@@ -29,9 +29,10 @@ class BreadcrumbsService
      * @param array $parameters
      * @param string $title
      * @param string $variation
+     * @param string $titleAppend
      * @return $this
      */
-    public function addRoute(string $route, array $parameters = [], string $title = '', string $variation = ''): self
+    public function addRoute(string $route, array $parameters = [], string $title = '', string $variation = '', string $titleAppend = ''): self
     {
         if(mb_strlen($title, 'utf-8') === 0)
         {
@@ -41,6 +42,11 @@ class BreadcrumbsService
                 $title = $title[$variation];
             }
             $title = (string) $title;
+        }
+
+        if(mb_strlen($titleAppend, 'utf-8') > 0)
+        {
+            $title .= $titleAppend;
         }
 
         $this->breadcrumbsData[] = ['route' => $route, 'title' => $title, 'parameters' => $parameters];

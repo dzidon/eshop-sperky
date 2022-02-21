@@ -35,7 +35,10 @@ class ProductInfoController extends AbstractController
         $this->breadcrumbs = $breadcrumbs;
         $this->request = $requestStack->getCurrentRequest();
 
-        $this->breadcrumbs->addRoute('home')->addRoute('admin_permission_overview', [], MainController::ADMIN_TITLE);
+        $this->breadcrumbs
+            ->addRoute('home')
+            ->addRoute('admin_permission_overview', [], MainController::ADMIN_TITLE)
+            ->addRoute('admin_product_info');
     }
 
     /**
@@ -71,7 +74,7 @@ class ProductInfoController extends AbstractController
         return $this->render('admin/product_info/admin_product_info.html.twig', [
             'searchForm' => $form->createView(),
             'infoGroups' => $infoGroups,
-            'breadcrumbs' => $this->breadcrumbs->setPageTitleByRoute('admin_product_info'),
+            'breadcrumbs' => $this->breadcrumbs,
             'pagination' => $paginatorService->createViewData(),
         ]);
     }
@@ -92,12 +95,13 @@ class ProductInfoController extends AbstractController
             {
                 throw new NotFoundHttpException('Skupina produktových informaci nenalezena.');
             }
-            $this->breadcrumbs->setPageTitleByRoute('admin_product_info_edit', 'edit');
+
+            $this->breadcrumbs->addRoute('admin_product_info_edit', ['id' => $infoGroup->getId()],'', 'edit');
         }
         else //nezadal id do url, vytvari novou skupinu
         {
             $infoGroup = new ProductInformationGroup();
-            $this->breadcrumbs->setPageTitleByRoute('admin_product_info_edit', 'new');
+            $this->breadcrumbs->addRoute('admin_product_info_edit', ['id' => null],'', 'new');
         }
 
         $form = $this->createForm(ProductInformationGroupFormType::class, $infoGroup);
@@ -160,7 +164,7 @@ class ProductInfoController extends AbstractController
         return $this->render('admin/product_info/admin_product_info_delete.html.twig', [
             'productInfoGroupDeleteForm' => $form->createView(),
             'productInfoGroupInstance' => $infoGroup,
-            'breadcrumbs' => $this->breadcrumbs->setPageTitleByRoute('admin_product_info_delete'),
+            'breadcrumbs' => $this->breadcrumbs->addRoute('admin_product_info_delete', ['id' => $infoGroup->getId()]),
         ]);
     }
 }

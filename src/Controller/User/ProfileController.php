@@ -110,7 +110,7 @@ class ProfileController extends AbstractController
 
         return $this->render('profile/profile_change_password.html.twig', [
             'changeForm' => $form->createView(),
-            'breadcrumbs' => $this->breadcrumbs->setPageTitleByRoute('profile_change_password'),
+            'breadcrumbs' => $this->breadcrumbs->addRoute('profile_change_password'),
         ]);
     }
 
@@ -148,7 +148,7 @@ class ProfileController extends AbstractController
 
         return $this->render('profile/profile_verify.html.twig', [
             'sendAgainForm' => $form->createView(),
-            'breadcrumbs' => $this->breadcrumbs->setPageTitleByRoute('profile_verify'),
+            'breadcrumbs' => $this->breadcrumbs->addRoute('profile_verify'),
         ]);
     }*/
 
@@ -185,7 +185,7 @@ class ProfileController extends AbstractController
         return $this->render('profile/profile_addresses.html.twig', [
             'searchForm' => $form->createView(),
             'addresses' => $addresses,
-            'breadcrumbs' => $this->breadcrumbs->setPageTitleByRoute('profile_addresses'),
+            'breadcrumbs' => $this->breadcrumbs->addRoute('profile_addresses'),
             'pagination' => $paginatorService->createViewData(),
         ]);
     }
@@ -196,6 +196,7 @@ class ProfileController extends AbstractController
     public function address($id = null): Response
     {
         $user = $this->getUser();
+        $this->breadcrumbs->addRoute('profile_addresses');
 
         if($id !== null) //zadal id do url, snazi se editovat existujici
         {
@@ -209,12 +210,12 @@ class ProfileController extends AbstractController
                 throw new AccessDeniedHttpException('Tuto adresu nemůžete editovat.');
             }
 
-            $this->breadcrumbs->setPageTitleByRoute('profile_address', 'edit');
+            $this->breadcrumbs->addRoute('profile_address', ['id' => $address->getId()],'', 'edit');
         }
         else //nezadal id do url, vytvari novou adresu
         {
             $address = new Address($user);
-            $this->breadcrumbs->setPageTitleByRoute('profile_address', 'new');
+            $this->breadcrumbs->addRoute('profile_address', ['id' => null],'', 'new');
         }
 
         $form = $this->createForm(AddressFormType::class, $address);
@@ -279,7 +280,7 @@ class ProfileController extends AbstractController
         return $this->render('profile/profile_address_delete.html.twig', [
             'addressDeleteForm' => $form->createView(),
             'addressInstance' => $address,
-            'breadcrumbs' => $this->breadcrumbs->setPageTitleByRoute('profile_address_delete'),
+            'breadcrumbs' => $this->breadcrumbs->addRoute('profile_addresses')->addRoute('profile_address_delete', ['id' => $address->getId()]),
         ]);
     }
 

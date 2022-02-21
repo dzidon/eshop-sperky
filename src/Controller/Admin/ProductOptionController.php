@@ -36,7 +36,10 @@ class ProductOptionController extends AbstractController
         $this->breadcrumbs = $breadcrumbs;
         $this->request = $requestStack->getCurrentRequest();
 
-        $this->breadcrumbs->addRoute('home')->addRoute('admin_permission_overview', [], MainController::ADMIN_TITLE);
+        $this->breadcrumbs
+            ->addRoute('home')
+            ->addRoute('admin_permission_overview', [], MainController::ADMIN_TITLE)
+            ->addRoute('admin_product_options');
     }
 
     /**
@@ -72,7 +75,7 @@ class ProductOptionController extends AbstractController
         return $this->render('admin/product_options/admin_product_options.html.twig', [
             'searchForm' => $form->createView(),
             'options' => $options,
-            'breadcrumbs' => $this->breadcrumbs->setPageTitleByRoute('admin_product_options'),
+            'breadcrumbs' => $this->breadcrumbs,
             'pagination' => $paginatorService->createViewData(),
         ]);
     }
@@ -93,12 +96,13 @@ class ProductOptionController extends AbstractController
             {
                 throw new NotFoundHttpException('Produktová volba nenalezena.');
             }
-            $this->breadcrumbs->setPageTitleByRoute('admin_product_option_edit', 'edit');
+
+            $this->breadcrumbs->addRoute('admin_product_option_edit', ['id' => $option->getId()],'', 'edit');
         }
         else //nezadal id do url, vytvari novou volbu
         {
             $option = new ProductOption();
-            $this->breadcrumbs->setPageTitleByRoute('admin_product_option_edit', 'new');
+            $this->breadcrumbs->addRoute('admin_product_option_edit', ['id' => null],'', 'new');
         }
 
         $form = $this->createForm(ProductOptionFormType::class, $option);
@@ -161,7 +165,7 @@ class ProductOptionController extends AbstractController
         return $this->render('admin/product_options/admin_product_option_delete.html.twig', [
             'productOptionDeleteForm' => $form->createView(),
             'productOptionInstance' => $option,
-            'breadcrumbs' => $this->breadcrumbs->setPageTitleByRoute('admin_product_option_delete'),
+            'breadcrumbs' => $this->breadcrumbs->addRoute('admin_product_option_delete', ['id' => $option->getId()]),
         ]);
     }
 
@@ -199,7 +203,9 @@ class ProductOptionController extends AbstractController
         return $this->render('admin/product_options/admin_product_option_configure.html.twig', [
             'productOptionConfigureForm' => $form->createView(),
             'productOptionInstance' => $option,
-            'breadcrumbs' => $this->breadcrumbs->setPageTitleByRoute('admin_product_option_configure'),
+            'breadcrumbs' => $this->breadcrumbs
+                ->addRoute('admin_product_option_edit', ['id' => $option->getId()],'', 'edit')
+                ->addRoute('admin_product_option_configure', ['id' => $option->getId()]),
         ]);
     }
 }

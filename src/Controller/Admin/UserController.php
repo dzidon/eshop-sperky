@@ -37,7 +37,10 @@ class UserController extends AbstractController
         $this->breadcrumbs = $breadcrumbs;
         $this->request = $requestStack->getCurrentRequest();
 
-        $this->breadcrumbs->addRoute('home')->addRoute('admin_permission_overview', [], MainController::ADMIN_TITLE);
+        $this->breadcrumbs
+            ->addRoute('home')
+            ->addRoute('admin_permission_overview', [], MainController::ADMIN_TITLE)
+            ->addRoute('admin_user_management');
     }
 
     /**
@@ -75,7 +78,7 @@ class UserController extends AbstractController
             'userAdmin' => $this->getUser(),
             'users' => $users,
             'userAdminCanEditThemself' => $this->getParameter('kernel.environment') === 'dev',
-            'breadcrumbs' => $this->breadcrumbs->setPageTitleByRoute('admin_user_management'),
+            'breadcrumbs' => $this->breadcrumbs,
             'pagination' => $paginatorService->createViewData(),
         ]);
     }
@@ -196,7 +199,8 @@ class UserController extends AbstractController
             'formPermissions' => $formPermissionsView,
             'formMute' => $formMuteView,
             'userEdited' => $userEdited,
-            'breadcrumbs' => $this->breadcrumbs->setPageTitleByRoute('admin_user_management_specific')->appendToPageTitle( ($userEdited->fullNameIsSet() ? ' ' . $userEdited->getFullName() : '') ),
+            'breadcrumbs' => $this->breadcrumbs
+                ->addRoute('admin_user_management_specific', ['id' => $userEdited], '', '', ($userEdited->fullNameIsSet() ? ' ' . $userEdited->getFullName() : ''))
         ]);
     }
 }

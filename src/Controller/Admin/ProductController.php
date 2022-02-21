@@ -35,7 +35,10 @@ class ProductController extends AbstractController
         $this->breadcrumbs = $breadcrumbs;
         $this->request = $requestStack->getCurrentRequest();
 
-        $this->breadcrumbs->addRoute('home')->addRoute('admin_permission_overview', [], MainController::ADMIN_TITLE);
+        $this->breadcrumbs
+            ->addRoute('home')
+            ->addRoute('admin_permission_overview', [], MainController::ADMIN_TITLE)
+            ->addRoute('admin_products');
     }
 
     /**
@@ -71,7 +74,7 @@ class ProductController extends AbstractController
         return $this->render('admin/products/admin_product_management.html.twig', [
             'searchForm' => $form->createView(),
             'products' => $products,
-            'breadcrumbs' => $this->breadcrumbs->setPageTitleByRoute('admin_products'),
+            'breadcrumbs' => $this->breadcrumbs,
             'pagination' => $paginatorService->createViewData(),
         ]);
     }
@@ -92,12 +95,13 @@ class ProductController extends AbstractController
             {
                 throw new NotFoundHttpException('Produkt nenalezen.');
             }
-            $this->breadcrumbs->setPageTitleByRoute('admin_product_edit', 'edit');
+
+            $this->breadcrumbs->addRoute('admin_product_edit', ['id' => $product->getId()],'', 'edit');
         }
         else //nezadal id do url, vytvari novy produkt
         {
             $product = new Product();
-            $this->breadcrumbs->setPageTitleByRoute('admin_product_edit', 'new');
+            $this->breadcrumbs->addRoute('admin_product_edit', ['id' => null],'', 'new');
         }
 
         $form = $this->createForm(ProductFormType::class, $product);
@@ -160,7 +164,7 @@ class ProductController extends AbstractController
         return $this->render('admin/products/admin_product_management_delete.html.twig', [
             'productDeleteForm' => $form->createView(),
             'productInstance' => $product,
-            'breadcrumbs' => $this->breadcrumbs->setPageTitleByRoute('admin_product_delete'),
+            'breadcrumbs' => $this->breadcrumbs->addRoute('admin_product_delete', ['id' => $product->getId()]),
         ]);
     }
 }

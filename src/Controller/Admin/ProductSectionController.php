@@ -35,7 +35,11 @@ class ProductSectionController extends AbstractController
         $this->breadcrumbs = $breadcrumbs;
         $this->request = $requestStack->getCurrentRequest();
 
-        $this->breadcrumbs->addRoute('home')->addRoute('admin_permission_overview', [], MainController::ADMIN_TITLE);
+        $this->breadcrumbs
+            ->addRoute('home')
+            ->addRoute('admin_permission_overview', [], MainController::ADMIN_TITLE)
+            ->addRoute('admin_product_sections')
+        ;
     }
 
     /**
@@ -71,7 +75,7 @@ class ProductSectionController extends AbstractController
         return $this->render('admin/product_sections/admin_product_sections.html.twig', [
             'searchForm' => $form->createView(),
             'sections' => $sections,
-            'breadcrumbs' => $this->breadcrumbs->setPageTitleByRoute('admin_product_sections'),
+            'breadcrumbs' => $this->breadcrumbs,
             'pagination' => $paginatorService->createViewData(),
         ]);
     }
@@ -92,12 +96,13 @@ class ProductSectionController extends AbstractController
             {
                 throw new NotFoundHttpException('Produktová sekce nenalezena.');
             }
-            $this->breadcrumbs->setPageTitleByRoute('admin_product_section_edit', 'edit');
+
+            $this->breadcrumbs->addRoute('admin_product_section_edit', ['id' => $section->getId()],'', 'edit');
         }
         else //nezadal id do url, vytvari novou sekci
         {
             $section = new ProductSection();
-            $this->breadcrumbs->setPageTitleByRoute('admin_product_section_edit', 'new');
+            $this->breadcrumbs->addRoute('admin_product_section_edit', ['id' => null],'', 'new');
         }
 
         $form = $this->createForm(ProductSectionFormType::class, $section);
@@ -160,7 +165,7 @@ class ProductSectionController extends AbstractController
         return $this->render('admin/product_sections/admin_product_section_delete.html.twig', [
             'productSectionDeleteForm' => $form->createView(),
             'productSectionInstance' => $section,
-            'breadcrumbs' => $this->breadcrumbs->setPageTitleByRoute('admin_product_section_delete'),
+            'breadcrumbs' => $this->breadcrumbs->addRoute('admin_product_section_delete', ['id' => $section->getId()]),
         ]);
     }
 }

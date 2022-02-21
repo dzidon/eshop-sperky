@@ -35,7 +35,10 @@ class ProductCategoryController extends AbstractController
         $this->breadcrumbs = $breadcrumbs;
         $this->request = $requestStack->getCurrentRequest();
 
-        $this->breadcrumbs->addRoute('home')->addRoute('admin_permission_overview', [], MainController::ADMIN_TITLE);
+        $this->breadcrumbs
+            ->addRoute('home')
+            ->addRoute('admin_permission_overview', [], MainController::ADMIN_TITLE)
+            ->addRoute('admin_product_categories');
     }
 
     /**
@@ -71,7 +74,7 @@ class ProductCategoryController extends AbstractController
         return $this->render('admin/product_categories/admin_product_categories.html.twig', [
             'searchForm' => $form->createView(),
             'categoryGroups' => $categoryGroups,
-            'breadcrumbs' => $this->breadcrumbs->setPageTitleByRoute('admin_product_categories'),
+            'breadcrumbs' => $this->breadcrumbs,
             'pagination' => $paginatorService->createViewData(),
         ]);
     }
@@ -92,12 +95,13 @@ class ProductCategoryController extends AbstractController
             {
                 throw new NotFoundHttpException('Skupina produktových sekcí nenalezena.');
             }
-            $this->breadcrumbs->setPageTitleByRoute('admin_product_category_edit', 'edit');
+
+            $this->breadcrumbs->addRoute('admin_product_category_edit', ['id' => $categoryGroup->getId()],'', 'edit');
         }
         else //nezadal id do url, vytvari novou skupinu
         {
             $categoryGroup = new ProductCategoryGroup();
-            $this->breadcrumbs->setPageTitleByRoute('admin_product_category_edit', 'new');
+            $this->breadcrumbs->addRoute('admin_product_category_edit', ['id' => null],'', 'new');
         }
 
         $form = $this->createForm(ProductCategoryGroupFormType::class, $categoryGroup);
@@ -160,7 +164,7 @@ class ProductCategoryController extends AbstractController
         return $this->render('admin/product_categories/admin_product_category_delete.html.twig', [
             'productCategoryGroupDeleteForm' => $form->createView(),
             'productCategoryGroupInstance' => $categoryGroup,
-            'breadcrumbs' => $this->breadcrumbs->setPageTitleByRoute('admin_product_category_delete'),
+            'breadcrumbs' => $this->breadcrumbs->addRoute('admin_product_category_delete', ['id' => $categoryGroup->getId()]),
         ]);
     }
 }
