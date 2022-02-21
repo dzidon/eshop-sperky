@@ -29,7 +29,7 @@ parameters:
     app_page_title.review_delete: 'Smazat recenzi'
     app_page_title.forgot_password_request: 'Obnova hesla'
     app_page_title.check_email: 'Potvrzení obnovy hesla'
-    app_page_title.reset_password: 'Obnova hesla'
+    app_page_title.reset_password: 'Nové heslo'
     app_page_title.register: 'Registrace'
     app_page_title.login: 'Přihlášení'
     app_page_title.verify_email: 'Ověřit email'

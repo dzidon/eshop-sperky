@@ -3,6 +3,7 @@
 namespace App\Form;
 
 use App\Entity\User;
+use App\Form\EventSubscriber\PasswordHashSubscriber;
 use App\Form\Type\AgreeTermsType;
 use App\Form\Type\PasswordRepeatedType;
 use EWZ\Bundle\RecaptchaBundle\Form\Type\EWZRecaptchaType;
@@ -14,6 +15,13 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class RegistrationFormType extends AbstractType
 {
+    private PasswordHashSubscriber $passwordHashSubscriber;
+
+    public function __construct(PasswordHashSubscriber $passwordHashSubscriber)
+    {
+        $this->passwordHashSubscriber = $passwordHashSubscriber;
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
@@ -39,6 +47,7 @@ class RegistrationFormType extends AbstractType
                 ],
                 'label' => false,
             ])
+            ->addEventSubscriber($this->passwordHashSubscriber)
         ;
     }
 

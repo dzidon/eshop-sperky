@@ -16,7 +16,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use SymfonyCasts\Bundle\ResetPassword\Controller\ResetPasswordControllerTrait;
@@ -39,8 +38,11 @@ class ResetPasswordController extends AbstractController
     {
         $this->resetPasswordHelper = $resetPasswordHelper;
         $this->logger = $logger;
-        $this->breadcrumbs = $breadcrumbs;
         $this->request = $requestStack->getCurrentRequest();
+        $this->breadcrumbs = $breadcrumbs
+            ->addRoute('home')
+            ->addRoute('login')
+            ->addRoute('forgot_password_request');
     }
 
     /**
@@ -66,7 +68,7 @@ class ResetPasswordController extends AbstractController
 
         return $this->render('reset_password/request.html.twig', [
             'requestForm' => $form->createView(),
-            'breadcrumbs' => $this->breadcrumbs->addRoute('home')->addRoute('login')->addRoute('forgot_password_request'),
+            'breadcrumbs' => $this->breadcrumbs,
         ]);
     }
 
@@ -77,8 +79,6 @@ class ResetPasswordController extends AbstractController
      */
     public function checkEmail(): Response
     {
-        // Generate a fake token if the user does not exist or someone hit this page directly.
-        // This prevents exposing whether or not a user was found with the given email address or not
         if (null === ($resetToken = $this->getTokenObjectFromSession()))
         {
             $resetToken = $this->resetPasswordHelper->generateFakeResetToken();
@@ -86,7 +86,7 @@ class ResetPasswordController extends AbstractController
 
         return $this->render('reset_password/check_email.html.twig', [
             'resetToken' => $resetToken,
-            'breadcrumbs' => $this->breadcrumbs->addRoute('home')->addRoute('login')->addRoute('forgot_password_request')->addRoute('check_email'),
+            'breadcrumbs' => $this->breadcrumbs->addRoute('check_email'),
         ]);
     }
 
@@ -95,14 +95,11 @@ class ResetPasswordController extends AbstractController
      *
      * @Route("/zpracovani/{token}", name="reset_password")
      */
-    public function reset(UserPasswordHasherInterface $userPasswordHasherInterface, TranslatorInterface $translator, string $token = null): Response
+    public function reset(TranslatorInterface $translator, string $token = null): Response
     {
         if ($token)
         {
-            // We store the token in session and remove it from the URL, to avoid the URL being
-            // loaded in a browser and potentially leaking the token to 3rd party JavaScript.
             $this->storeTokenInSession($token);
-
             return $this->redirectToRoute('reset_password');
         }
 
@@ -123,30 +120,19 @@ class ResetPasswordController extends AbstractController
             return $this->redirectToRoute('forgot_password_request');
         }
 
-        // The token is valid; allow the user to change their password.
         $form = $this->createForm(ChangePasswordFormType::class, $user);
         $form->add('submit', SubmitType::class, ['label' => 'Změnit']);
         $form->handleRequest($this->request);
 
         if ($form->isSubmitted() && $form->isValid())
         {
-            // A password reset token should be used only once, remove it.
             $this->resetPasswordHelper->removeResetRequest($token);
-
-            // Encode(hash) the plain password, and set it.
-            $encodedPassword = $userPasswordHasherInterface->hashPassword(
-                $user,
-                $user->getPlainPassword(),
-            );
-
-            $user->setPassword($encodedPassword);
             $user->setIsVerified(true);
 
             $em = $this->getDoctrine()->getManager();
             $em->persist($user);
             $em->flush();
 
-            // The session is cleaned up after the password has been changed.
             $this->cleanSessionAfterReset();
 
             $this->logger->info(sprintf("User %s (ID: %s) has changed their password (via email).", $user->getUserIdentifier(), $user->getId()));
@@ -164,7 +150,7 @@ class ResetPasswordController extends AbstractController
 
         return $this->render('reset_password/reset.html.twig', [
             'resetForm' => $form->createView(),
-            'breadcrumbs' => $this->breadcrumbs->addRoute('home')->addRoute('login')->addRoute('reset_password'),
+            'breadcrumbs' => $this->breadcrumbs->addRoute('reset_password'),
         ]);
     }
 
@@ -174,7 +160,6 @@ class ResetPasswordController extends AbstractController
             'email' => $emailFormData,
         ]);
 
-        // Do not reveal whether a user account was found or not.
         if (!$user)
         {
             return $this->redirectToRoute('check_email');
@@ -186,10 +171,6 @@ class ResetPasswordController extends AbstractController
         }
         catch (ResetPasswordExceptionInterface $e)
         {
-            // If you want to tell the user why a reset email was not sent, uncomment
-            // the lines below and change the redirect to 'app_forgot_password_request'.
-            // Caution: This may reveal if a user is registered or not.
-            //
             // $this->addFlash('reset_password_error', sprintf(
             //     'There was a problem handling your password reset request - %s',
             //     $e->getReason()
@@ -217,9 +198,7 @@ class ResetPasswordController extends AbstractController
             $this->logger->error(sprintf("Someone has requested a password reset email for %s (ID: %s), but the following error occurred in send: %s", $user->getUserIdentifier(), $user->getId(), $exception->getMessage()));
         }
 
-        // Store the token object in session for retrieval in check-email route.
         $this->setTokenObjectInSession($resetToken);
-
         $this->logger->info(sprintf("Someone has requested a password reset for %s (ID: %s)", $user->getUserIdentifier(), $user->getId()));
 
         return $this->redirectToRoute('check_email');

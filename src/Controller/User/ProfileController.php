@@ -18,7 +18,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
@@ -77,7 +76,7 @@ class ProfileController extends AbstractController
     /**
      * @Route("/zmena-hesla", name="profile_change_password")
      */
-    public function passwordChange(UserPasswordHasherInterface $userPasswordHasherInterface): Response
+    public function passwordChange(): Response
     {
         $user = $this->getUser();
         if ($user->getPassword() === null)
@@ -92,13 +91,6 @@ class ProfileController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid())
         {
-            $user->setPassword(
-                $userPasswordHasherInterface->hashPassword(
-                    $user,
-                    $user->getPlainPassword()
-                )
-            );
-
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->flush();
 

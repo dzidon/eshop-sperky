@@ -150,6 +150,7 @@ class ProductOptionParametersSubscriber implements EventSubscriberInterface
                     ];
                 }
                 $option->configure($data);
+                $event->setData($option);
             }
         }
     }

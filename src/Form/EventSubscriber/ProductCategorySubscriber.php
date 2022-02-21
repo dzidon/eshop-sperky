@@ -153,6 +153,7 @@ class ProductCategorySubscriber implements EventSubscriberInterface
                             $product->addCategory($inputCategory);
                         }
                     }
+                    $event->setData($product);
                 }
             }
         }

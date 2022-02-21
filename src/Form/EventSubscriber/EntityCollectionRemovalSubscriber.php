@@ -82,6 +82,7 @@ class EntityCollectionRemovalSubscriber implements EventSubscriberInterface
                 }
 
                 $this->entityCollectionService->removeElementsMissingFromNewCollections();
+                $event->setData($instance);
             }
         }
     }

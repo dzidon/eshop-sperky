@@ -98,6 +98,7 @@ class ProductInformationSubscriber implements EventSubscriberInterface
                                 $product->addInfo($objectToBeAdded);
                             }
                         }
+                        $event->setData($product);
                     }
                 }
             }

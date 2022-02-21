@@ -17,7 +17,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -44,7 +43,7 @@ class RegistrationController extends AbstractController
     /**
      * @Route("/registrace", name="register")
      */
-    public function register(UserPasswordHasherInterface $userPasswordHasherInterface, ParameterBagInterface $parameterBag): Response
+    public function register(ParameterBagInterface $parameterBag): Response
     {
         if ($this->getUser())
         {
@@ -61,14 +60,6 @@ class RegistrationController extends AbstractController
         {
             //možná už existuje uživatel s daným emailem
             $existingUser = $this->getDoctrine()->getRepository(User::class)->findOneBy(['email' => $user->getEmail()]);
-
-            // zasifrovani hesla
-            $user->setPassword(
-            $userPasswordHasherInterface->hashPassword(
-                    $user,
-                    $user->getPlainPassword(),
-                )
-            );
 
             // pokud neexistuje jiny uzivatel s danym emailem v db, muzeme aktualniho uzivatele ulozit,
             // pokud existuje jiny uzivatel s danym emailem, ktery jeste neni overeny a muze si nechat poslat novy link,

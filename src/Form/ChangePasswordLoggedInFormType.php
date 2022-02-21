@@ -3,6 +3,7 @@
 namespace App\Form;
 
 use App\Entity\User;
+use App\Form\EventSubscriber\PasswordHashSubscriber;
 use App\Form\Type\PasswordRepeatedType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
@@ -13,6 +14,13 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class ChangePasswordLoggedInFormType extends AbstractType
 {
+    private PasswordHashSubscriber $passwordHashSubscriber;
+
+    public function __construct(PasswordHashSubscriber $passwordHashSubscriber)
+    {
+        $this->passwordHashSubscriber = $passwordHashSubscriber;
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
@@ -31,6 +39,7 @@ class ChangePasswordLoggedInFormType extends AbstractType
                 'label' => 'Aktuální heslo',
             ])
             ->add('plainPassword', PasswordRepeatedType::class)
+            ->addEventSubscriber($this->passwordHashSubscriber)
         ;
     }
 

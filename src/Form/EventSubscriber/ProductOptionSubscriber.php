@@ -46,6 +46,7 @@ class ProductOptionSubscriber implements EventSubscriberInterface
                 if ($option->getType() !== $this->oldOption->getType())
                 {
                     $option->getParameters()->clear();
+                    $event->setData($option);
                 }
             }
         }
