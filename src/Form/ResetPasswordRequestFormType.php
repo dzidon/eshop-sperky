@@ -2,30 +2,34 @@
 
 namespace App\Form;
 
-use App\Validation\Compound\EmailRequirements;
+use App\Entity\User;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Security\Core\Security;
 
 class ResetPasswordRequestFormType extends AbstractType
 {
+    private string $defaultEmail = '';
+
+    public function __construct(Security $security)
+    {
+        $user = $security->getUser();
+        if($user)
+        {
+            $this->defaultEmail = $user->getEmail();
+        }
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('email', EmailType::class, [
-                'attr' => ['autocomplete' => 'email',
-                           'autofocus' => 'autofocus'],
-                'constraints' => [
-                    new EmailRequirements(),
-                    new NotBlank([
-                        'message' => 'Zadejte email.',
-                    ]),
-                ],
-                'data' => $options['email_empty_data'],
+                'attr' => ['autofocus' => 'autofocus'],
+                'data' => $this->defaultEmail,
                 'label' => 'Email',
-                'help' => 'Zadejte e-mail, na který jste zaregistrovali svůj účet a my vám na něj pošleme odkaz pro resetování hesla.',
+                'help' => 'Zadejte e-mail, přes který jste zaregistrovali svůj účet a my vám na něj pošleme odkaz pro resetování hesla.',
             ])
         ;
     }
@@ -33,12 +37,11 @@ class ResetPasswordRequestFormType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'csrf_protection' => true,
-            'csrf_field_name' => '_token',
-            'csrf_token_id'   => 'form_password_reset_email',
-            'email_empty_data' => '',
+            'data_class'        => User::class,
+            'csrf_protection'   => true,
+            'csrf_field_name'   => '_token',
+            'csrf_token_id'     => 'form_password_reset_email',
+            'validation_groups' => ['validateEmail'],
         ]);
-
-        $resolver->setAllowedTypes('email_empty_data', 'string');
     }
 }

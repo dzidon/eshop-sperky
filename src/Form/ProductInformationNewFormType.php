@@ -41,7 +41,7 @@ class ProductInformationNewFormType extends AbstractType
 
         $builder
             ->get('productInformationGroup')
-                ->addModelTransformer($this->informationGroupToNameTransformer)
+            ->addModelTransformer($this->informationGroupToNameTransformer)
         ;
     }
 

@@ -52,16 +52,15 @@ class ResetPasswordController extends AbstractController
      */
     public function request(MailerInterface $mailer): Response
     {
-        $form = $this->createForm(ResetPasswordRequestFormType::class, null, ['email_empty_data' => ($this->getUser() === null ? '' : $this->getUser()->getUserIdentifier()) ]);
-        $form->add('submit', SubmitType::class, [
-            'label' => 'Poslat odkaz',
-        ]);
+        $userForEmailValidation = new User();
+        $form = $this->createForm(ResetPasswordRequestFormType::class, $userForEmailValidation);
+        $form->add('submit', SubmitType::class, ['label' => 'Poslat odkaz']);
         $form->handleRequest($this->request);
 
         if ($form->isSubmitted() && $form->isValid())
         {
             return $this->processSendingPasswordResetEmail(
-                $form->get('email')->getData(),
+                $userForEmailValidation->getEmail(),
                 $mailer
             );
         }

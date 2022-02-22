@@ -33,8 +33,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @ORM\Column(type="string", length=180, unique=true)
      *
-     * @AssertCompound\EmailRequirements
-     * @Assert\NotBlank
+     * @AssertCompound\EmailRequirements(groups={"validateEmail"})
+     * @Assert\NotBlank(groups={"validateEmail"})
      */
     private $email;
 

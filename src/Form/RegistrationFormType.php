@@ -58,7 +58,7 @@ class RegistrationFormType extends AbstractType
             'csrf_protection' => true,
             'csrf_field_name' => '_token',
             'csrf_token_id'   => 'form_registration',
-            'validation_groups' => ['Default', 'validateNewPassword'],
+            'validation_groups' => ['Default', 'validateNewPassword', 'validateEmail'],
         ]);
     }
 }
