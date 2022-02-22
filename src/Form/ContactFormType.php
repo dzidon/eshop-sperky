@@ -3,6 +3,7 @@
 namespace App\Form;
 
 use App\Entity\Detached\ContactEmail;
+use App\Form\EventSubscriber\ContactSubscriber;
 use EWZ\Bundle\RecaptchaBundle\Form\Type\EWZRecaptchaType;
 use EWZ\Bundle\RecaptchaBundle\Validator\Constraints\IsTrue as RecaptchaTrue;
 use Symfony\Component\Form\AbstractType;
@@ -14,6 +15,13 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ContactFormType extends AbstractType
 {
+    private ContactSubscriber $contactSubscriber;
+
+    public function __construct(ContactSubscriber $contactSubscriber)
+    {
+        $this->contactSubscriber = $contactSubscriber;
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
@@ -34,6 +42,7 @@ class ContactFormType extends AbstractType
                 ],
                 'label' => false,
             ])
+            ->addEventSubscriber($this->contactSubscriber)
         ;
     }
 
