@@ -2,9 +2,11 @@
 
 namespace App\Controller\User;
 
+use App\Entity\Detached\ContactEmail;
 use App\Entity\Review;
 use App\Form\ContactFormType;
 use App\Service\BreadcrumbsService;
+use App\Service\ContactEmailService;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -12,9 +14,6 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
-use Symfony\Component\Mailer\MailerInterface;
-use Symfony\Component\Mime\Address;
-use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Annotation\Route;
 
 class MainController extends AbstractController
@@ -46,37 +45,30 @@ class MainController extends AbstractController
     /**
      * @Route("/kontakt", name="contact")
      */
-    public function contact(Request $request, LoggerInterface $logger, MailerInterface $mailer): Response
+    public function contact(Request $request, LoggerInterface $logger, ContactEmailService $contactEmailService): Response
     {
-        $form = $this->createForm(ContactFormType::class, null, ['email_empty_data' => ($this->getUser() === null ? '' : $this->getUser()->getUserIdentifier()) ]);
+        $emailData = new ContactEmail();
+        $form = $this->createForm(ContactFormType::class, $emailData);
         $form->add('submit', SubmitType::class, ['label' => 'Odeslat']);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid())
         {
-            $senderEmail = $form->get('email')->getData();
-            $recipientEmail = $this->parameterBag->get('app_site_email');
-            $subject = $form->get('subject')->getData();
-            $text = $form->get('text')->getData();
-
-            $email = new Email();
-            $email->from(new Address($senderEmail))
-                ->to($recipientEmail)
-                ->subject($subject)
-                ->text($text);
-
             try
             {
-                $mailer->send($email);
+                $contactEmailService
+                    ->initialize($emailData)
+                    ->send();
+
                 $this->addFlash('success', 'E-mail odeslán, brzy se ozveme!');
-                $logger->info(sprintf("Someone has sent a contact email as %s.", $senderEmail));
+                $logger->info(sprintf("Someone has sent a contact email with a subject '%s' from %s.", $contactEmailService->getSubject(), $contactEmailService->getSenderEmail()));
 
                 return $this->redirectToRoute('contact');
             }
             catch (TransportExceptionInterface $exception)
             {
                 $this->addFlash('failure', 'E-mail se nepodařilo odeslat, zkuste to znovu.');
-                $logger->error(sprintf("Someone has tried to send a contact email as %s, but the following error occurred in send: %s", $senderEmail, $exception->getMessage()));
+                $logger->error(sprintf("Someone has tried to send a contact email from %s, but the following error occurred in send: %s", $contactEmailService->getSenderEmail(), $exception->getMessage()));
             }
         }
 
