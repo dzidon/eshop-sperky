@@ -19,6 +19,7 @@ use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -63,11 +64,21 @@ class ProductFormType extends AbstractType
                 'required' => false,
                 'label' => 'Popis',
             ])
+            ->add('inventory', IntegerType::class, [
+                'attr' => [
+                    'min' => 1
+                ],
+                'label' => 'Počet kusů na skladě',
+            ])
             ->add('availableSince', DateTimeType::class, [
                 'required' => false,
                 'widget' => 'single_text',
                 'input' => 'datetime',
                 'label' => 'Zpřístupnit pro uživatele od',
+            ])
+            ->add('hideWhenSoldOut', CheckboxType::class, [
+                'required' => false,
+                'label' => 'Skrýt pro uživatele po vyprodání',
             ])
             ->add('isHidden', CheckboxType::class, [
                 'required' => false,

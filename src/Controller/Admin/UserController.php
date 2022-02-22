@@ -199,8 +199,7 @@ class UserController extends AbstractController
             'formPermissions' => $formPermissionsView,
             'formMute' => $formMuteView,
             'userEdited' => $userEdited,
-            'breadcrumbs' => $this->breadcrumbs
-                ->addRoute('admin_user_management_specific', ['id' => $userEdited], '', '', ($userEdited->fullNameIsSet() ? ' ' . $userEdited->getFullName() : ''))
+            'breadcrumbs' => $this->breadcrumbs->addRoute('admin_user_management_specific', ['id' => $userEdited], '', '', ($userEdited->fullNameIsSet() ? $userEdited->getFullName() : ''))
         ]);
     }
 }

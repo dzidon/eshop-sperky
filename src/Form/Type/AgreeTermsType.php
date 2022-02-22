@@ -13,6 +13,7 @@ class AgreeTermsType extends AbstractType
     {
         $resolver->setDefaults([
             'mapped' => false,
+            'block_prefix' => 'terms_checkbox',
             'constraints' => [
                 new IsTrue([
                     'message' => 'Musíte souhlasit s podmínkami používání.',

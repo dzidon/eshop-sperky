@@ -95,6 +95,13 @@ class Product
     private $isHidden = false;
 
     /**
+     * @ORM\Column(type="boolean")
+     *
+     * @Assert\Type("bool", message="Zadávaná hodnota není platná.")
+     */
+    private $hideWhenSoldOut = false;
+
+    /**
      * @ORM\Column(type="datetime", nullable=true)
      *
      * @Assert\Type("DateTime", message="Musíte zadat datum a čas.")
@@ -125,6 +132,15 @@ class Product
      * @Assert\Valid
      */
     private $info;
+
+    /**
+     * @ORM\Column(type="integer")
+     *
+     * @Assert\Type("integer", message="Musíte zadat číselnou hodnotu.")
+     * @Assert\GreaterThanOrEqual(1)
+     * @Assert\NotBlank
+     */
+    private $inventory;
 
     /**
      * @ORM\Column(type="datetime")
@@ -245,6 +261,18 @@ class Product
         return $this;
     }
 
+    public function isHideWhenSoldOut(): ?bool
+    {
+        return $this->hideWhenSoldOut;
+    }
+
+    public function setHideWhenSoldOut(?bool $hideWhenSoldOut): self
+    {
+        $this->hideWhenSoldOut = $hideWhenSoldOut;
+
+        return $this;
+    }
+
     public function getAvailableSince(): ?DateTimeInterface
     {
         return $this->availableSince;
@@ -343,6 +371,18 @@ class Product
                 $info->setProduct(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getInventory(): ?int
+    {
+        return $this->inventory;
+    }
+
+    public function setInventory(?int $inventory): self
+    {
+        $this->inventory = $inventory;
 
         return $this;
     }

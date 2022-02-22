@@ -13,6 +13,7 @@ class AgreePrivacyType extends AbstractType
     {
         $resolver->setDefaults([
             'mapped' => false,
+            'block_prefix' => 'privacy_checkbox',
             'constraints' => [
                 new IsTrue([
                     'message' => 'Musíte souhlasit se zpracováním osobních údajů.',

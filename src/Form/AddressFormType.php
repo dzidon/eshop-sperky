@@ -48,9 +48,7 @@ class AddressFormType extends AbstractType
                 'required' => false,
                 'label' => 'DIČ',
             ])
-            ->add('agreePrivacy', AgreePrivacyType::class, [
-                'label' => 'Souhlasím se zpracováním osobních údajů',
-            ])
+            ->add('agreePrivacy', AgreePrivacyType::class)
         ;
     }
 

@@ -46,7 +46,7 @@ class BreadcrumbsService
 
         if(mb_strlen($titleAppend, 'utf-8') > 0)
         {
-            $title .= $titleAppend;
+            $title .= ' ' . $titleAppend;
         }
 
         $this->breadcrumbsData[] = ['route' => $route, 'title' => $title, 'parameters' => $parameters];

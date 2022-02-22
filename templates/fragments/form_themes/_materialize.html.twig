@@ -147,6 +147,26 @@
     </span>
 {% endblock checkbox_label %}
 
+{# Label checkboxu na podmínky používání #}
+{% block terms_checkbox_label %}
+    <span>
+        Souhlasím s <a href="#"> podmínkami používání</a>
+        {% if required %}
+            <span class="required-star">*</span>
+        {% endif %}
+    </span>
+{% endblock terms_checkbox_label %}
+
+{# Label checkboxu na zpracování osobních údajů #}
+{% block privacy_checkbox_label %}
+    <span>
+        Souhlasím se <a href="#"> zpracováním osobních údajů</a>
+        {% if required %}
+            <span class="required-star">*</span>
+        {% endif %}
+    </span>
+{% endblock privacy_checkbox_label %}
+
 {# Tlačítko #}
 {% block button_widget -%}
     {% set attr = attr|merge({class: (attr.class|default('btn-large light-blue') ~ ' waves-effect waves-light btn')|trim}) %}

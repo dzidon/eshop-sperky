@@ -4,6 +4,7 @@ namespace App\Form;
 
 use App\Entity\User;
 use App\Form\EventSubscriber\PasswordHashSubscriber;
+use App\Form\Type\AgreePrivacyType;
 use App\Form\Type\AgreeTermsType;
 use App\Form\Type\PasswordRepeatedType;
 use EWZ\Bundle\RecaptchaBundle\Form\Type\EWZRecaptchaType;
@@ -37,9 +38,8 @@ class RegistrationFormType extends AbstractType
                     'label' => 'Heslo znovu'
                 ],
             ])
-            ->add('agreeTerms', AgreeTermsType::class, [
-                'label' => 'Souhlasím s podmínkami používání',
-            ])
+            ->add('agreePrivacy', AgreePrivacyType::class)
+            ->add('agreeTerms', AgreeTermsType::class)
             ->add('recaptcha', EWZRecaptchaType::class, [
                 'mapped' => false,
                 'constraints' => [
