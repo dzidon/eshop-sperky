@@ -2,20 +2,17 @@
 
 namespace App\Form\EventSubscriber;
 
+use App\Entity\Detached\ProductOptionNumberParameters;
 use App\Entity\ProductOption;
 use App\Entity\ProductOptionParameter;
 use App\Form\ProductOptionDropdownFormType;
+use App\Form\ProductOptionNumberFormType;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Validator\Constraints\Callback;
-use Symfony\Component\Validator\Constraints\GreaterThan;
-use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Constraints\Type;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Symfony\Component\Validator\Constraints\Valid;
 
 /**
  * Subscriber řešící formulář pro konfiguraci produktové volby
@@ -34,6 +31,7 @@ class ProductOptionParametersSubscriber implements EventSubscriberInterface
 
     public function preSetData(FormEvent $event): void
     {
+        /** @var ProductOption $option */
         $option = $event->getData();
         $form = $event->getForm();
 
@@ -66,65 +64,18 @@ class ProductOptionParametersSubscriber implements EventSubscriberInterface
         else if ($option->getType() === ProductOption::TYPE_NUMBER)
         {
             $form
-                ->add('min', TextType::class, [
+                ->add('parametersNumeric', ProductOptionNumberFormType::class, [
+                    'empty_parameter_values' => [
+                        'min' => $option->getParameterValue('min'),
+                        'max' => $option->getParameterValue('max'),
+                        'default' => $option->getParameterValue('default'),
+                        'step' => $option->getParameterValue('step'),
+                    ],
                     'constraints' => [
-                        new NotBlank(),
-                        new Type('numeric', 'Musíte zadat číselnou hodnotu.'),
-                        new Callback([
-                            'callback' => function ($value, ExecutionContextInterface $context) use ($form)
-                            {
-                                if($value >= $form->get('max')->getData())
-                                {
-                                    $context->buildViolation('Minimální číslo musí být menší než maximální číslo.')
-                                        ->atPath('min')
-                                        ->addViolation();
-                                }
-                            }
-                        ]),
+                        new Valid(),
                     ],
                     'mapped' => false,
-                    'data' => $option->getParameterValue('min'),
-                    'label' => 'Minimální povolené číslo',
-                ])
-                ->add('max', TextType::class, [
-                    'constraints' => [
-                        new NotBlank(),
-                        new Type('numeric', 'Musíte zadat číselnou hodnotu.'),
-                    ],
-                    'mapped' => false,
-                    'data' => $option->getParameterValue('max'),
-                    'label' => 'Maximální povolené číslo',
-                ])
-                ->add('default', TextType::class, [
-                    'constraints' => [
-                        new NotBlank(),
-                        new Type('numeric', 'Musíte zadat číselnou hodnotu.'),
-                        new Callback([
-                            'callback' => function ($value, ExecutionContextInterface $context) use ($form)
-                            {
-                                if($value < $form->get('min')->getData() || $value > $form->get('max')->getData())
-                                {
-                                    $context->buildViolation('Výchozí číslo musí být mezi minimálním a maximálním číslem.')
-                                        ->atPath('default')
-                                        ->addViolation();
-                                }
-                            }
-                        ]),
-                    ],
-                    'mapped' => false,
-                    'data' => $option->getParameterValue('default'),
-                    'label' => 'Výchozí číslo',
-                ])
-                ->add('step', TextType::class, [
-                    'constraints' => [
-                        new NotBlank(),
-                        new Type('numeric', 'Musíte zadat číselnou hodnotu.'),
-                        new GreaterThan(0),
-                    ],
-                    'mapped' => false,
-                    'data' => $option->getParameterValue('step'),
-                    'help' => 'O kolik se má změnit číslo, když uživatel klikne na šipku pro zvětšení/zmenšení?',
-                    'label' => 'Číselná změna',
+                    'label' => false,
                 ])
             ;
         }
@@ -140,15 +91,20 @@ class ProductOptionParametersSubscriber implements EventSubscriberInterface
             if ($option)
             {
                 $data = [];
+
                 if ($option->getType() === ProductOption::TYPE_NUMBER)
                 {
+                    /** @var ProductOptionNumberParameters $parametersNumeric */
+                    $parametersNumeric = $form->get('parametersNumeric')->getData();
+
                     $data = [
-                        'min' => $form->get('min')->getData(),
-                        'max' => $form->get('max')->getData(),
-                        'default' => $form->get('default')->getData(),
-                        'step' => $form->get('step')->getData(),
+                        'min' => $parametersNumeric->getMin(),
+                        'max' => $parametersNumeric->getMax(),
+                        'default' => $parametersNumeric->getDefault(),
+                        'step' => $parametersNumeric->getStep(),
                     ];
                 }
+
                 $option->configure($data);
                 $event->setData($option);
             }

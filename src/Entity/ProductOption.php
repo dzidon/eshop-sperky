@@ -162,32 +162,24 @@ class ProductOption
 
             foreach ($this->parameters as $parameter)
             {
-                if (isset($found[$parameter->getName()]))
+                $parameterName = $parameter->getName();
+                if (isset($found[$parameterName]))
                 {
-                    $found[$parameter->getName()] = true;
+                    $found[$parameterName] = true;
                 }
             }
 
             $booleans = array_values($found);
-            if(count(array_unique($booleans)) === 1 && $booleans[0] === true)
+            if(count(array_unique($booleans)) === 1 && $booleans[0] === true) //všechny parametry jsou nastaveny
             {
                 $this->isConfigured = true;
             }
         }
         else if($this->type === self::TYPE_DROPDOWN)
         {
-            $found = 0;
-            foreach ($this->parameters as $parameter)
+            if($this->getParameterByName('item'))
             {
-                if($parameter->getName() === 'item')
-                {
-                    $found++;
-                    if($found === 2)
-                    {
-                        $this->isConfigured = true;
-                        break;
-                    }
-                }
+                $this->isConfigured = true;
             }
         }
     }

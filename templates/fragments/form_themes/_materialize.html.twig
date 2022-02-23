@@ -2,7 +2,7 @@
 
 {# Řádek formuláře #}
 {% block form_row %}
-    <div class="row{% if (not compound or force_error|default(false)) and not valid %} has-error{% endif %}">
+    <div class="{% if not compound %}row{% endif %} {% if (not compound or force_error|default(false)) and not valid %} has-error{% endif %}">
         <div class="input-field">
             {{ form_widget(form) }}
             {{ form_label(form) }}
