@@ -2,36 +2,29 @@
 
 namespace App\Entity\Detached;
 
+use App\Validation\Compound as AssertCompound;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class ProductOptionNumberParameters
 {
     /**
-     * @Assert\Length(max=255, maxMessage="Maximální počet znaků v minimálním čísle: {{ limit }}")
-     * @Assert\Type("numeric", message="Musíte zadat číselnou hodnotu.")
-     * @Assert\NotBlank
+     * @AssertCompound\ProductOptionParameterNumberRequirements
      */
     private $min;
 
     /**
-     * @Assert\Length(max=255, maxMessage="Maximální počet znaků v maximálním čísle: {{ limit }}")
-     * @Assert\Type("numeric", message="Musíte zadat číselnou hodnotu.")
-     * @Assert\NotBlank
+     * @AssertCompound\ProductOptionParameterNumberRequirements
      */
     private $max;
 
     /**
-     * @Assert\Length(max=255, maxMessage="Maximální počet znaků ve výchozí hodnotě: {{ limit }}")
-     * @Assert\Type("numeric", message="Musíte zadat číselnou hodnotu.")
-     * @Assert\NotBlank
+     * @AssertCompound\ProductOptionParameterNumberRequirements
      */
     private $default;
 
     /**
-     * @Assert\Length(max=255, maxMessage="Maximální počet znaků v číselné změně: {{ limit }}")
-     * @Assert\Type("numeric", message="Musíte zadat číselnou hodnotu.")
-     * @Assert\NotBlank
+     * @AssertCompound\ProductOptionParameterNumberRequirements
      */
     private $step;
 

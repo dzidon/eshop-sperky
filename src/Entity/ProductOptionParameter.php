@@ -6,6 +6,7 @@ use App\Repository\ProductOptionParameterRepository;
 use DateTime;
 use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
+use App\Validation\Compound as AssertCompound;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -29,8 +30,7 @@ class ProductOptionParameter
     /**
      * @ORM\Column(type="string", length=255)
      *
-     * @Assert\Length(max=255, maxMessage="Maximální počet znaků v parametru volby: {{ limit }}")
-     * @Assert\NotBlank
+     * @AssertCompound\ProductOptionParameterRequirements
      */
     private $value;
 
