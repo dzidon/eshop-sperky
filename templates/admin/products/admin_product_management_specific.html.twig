@@ -142,6 +142,15 @@
             {{ form_row(productForm.options) }}
         </div>
 
+        <div class="section no-pad-bot">
+            <div class="row no-mar-bot">
+                <h4>Obrázky</h4>
+            </div>
+
+            {{ form_row(productForm.images, { 'attr': {'data-index': productForm.images|length > 0 ? productForm.images|last.vars.name + 1 : 0} }) }}
+            {{ form_row(productForm.addItemImage) }}
+        </div>
+
         {{ form_rest(productForm) }}
     {{ form_end(productForm) }}
 

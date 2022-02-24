@@ -239,6 +239,18 @@
     {{ block('form_widget') }}
 {% endblock autocomplete_text_widget %}
 
+{# Nahrávání souboru #}
+{% block vich_image_row %}
+    <div class="row {% if not valid %} has-error{% endif %}">
+        <div class="input-field">
+            {{ form_label(form) }}
+            {{ form_widget(form) }}
+            {{ form_help(form) }}
+            {{ form_errors(form) }}
+        </div>
+    </div>
+{% endblock %}
+
 {# Klikatelné hodnocení s hvězdami #}
 {% block star_choice_row %}
     <div class="row {% if not valid %} has-error{% endif %}">

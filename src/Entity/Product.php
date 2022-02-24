@@ -109,6 +109,15 @@ class Product
     private $availableSince;
 
     /**
+     * @ORM\Column(type="integer")
+     *
+     * @Assert\Type("integer", message="Musíte zadat číselnou hodnotu.")
+     * @Assert\GreaterThanOrEqual(1)
+     * @Assert\NotBlank
+     */
+    private $inventory;
+
+    /**
      * @ORM\ManyToOne(targetEntity=ProductSection::class)
      * @ORM\JoinColumn(onDelete="SET NULL")
      */
@@ -134,13 +143,11 @@ class Product
     private $info;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\OneToMany(targetEntity=ProductImage::class, mappedBy="product", orphanRemoval=true, cascade={"persist"})
      *
-     * @Assert\Type("integer", message="Musíte zadat číselnou hodnotu.")
-     * @Assert\GreaterThanOrEqual(1)
-     * @Assert\NotBlank
+     * @Assert\Valid
      */
-    private $inventory;
+    private $images;
 
     /**
      * @ORM\Column(type="datetime")
@@ -160,6 +167,7 @@ class Product
         $this->options = new ArrayCollection();
         $this->categories = new ArrayCollection();
         $this->info = new ArrayCollection();
+        $this->images = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -285,6 +293,18 @@ class Product
         return $this;
     }
 
+    public function getInventory(): ?int
+    {
+        return $this->inventory;
+    }
+
+    public function setInventory(?int $inventory): self
+    {
+        $this->inventory = $inventory;
+
+        return $this;
+    }
+
     public function getSection(): ?ProductSection
     {
         return $this->section;
@@ -375,14 +395,32 @@ class Product
         return $this;
     }
 
-    public function getInventory(): ?int
+    /**
+     * @return Collection|ProductImage[]
+     */
+    public function getImages(): Collection
     {
-        return $this->inventory;
+        return $this->images;
     }
 
-    public function setInventory(?int $inventory): self
+    public function addImage(ProductImage $image): self
     {
-        $this->inventory = $inventory;
+        if (!$this->images->contains($image)) {
+            $this->images[] = $image;
+            $image->setProduct($this);
+        }
+
+        return $this;
+    }
+
+    public function removeImage(ProductImage $image): self
+    {
+        if ($this->images->removeElement($image)) {
+            // set the owning side to null (unless already changed)
+            if ($image->getProduct() === $this) {
+                $image->setProduct(null);
+            }
+        }
 
         return $this;
     }

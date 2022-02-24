@@ -4,6 +4,7 @@ namespace App\Form;
 
 use App\Entity\Product;
 use App\Entity\ProductCategory;
+use App\Entity\ProductImage;
 use App\Entity\ProductInformation;
 use App\Entity\ProductOption;
 use App\Entity\ProductSection;
@@ -147,6 +148,27 @@ class ProductFormType extends AbstractType
                     'data-collection-holder-class' => 'info',
                 ],
                 'label' => 'Přidat informaci',
+            ])
+            ->add('images', CollectionType::class, [
+                'entry_type' => ProductImageFormType::class,
+                'by_reference' => false,
+                'required' => false,
+                'allow_add' => true,
+                'allow_delete' => true,
+                'delete_empty' => function (ProductImage $image = null) {
+                    return $image === null || $image->getPriority() === null || $image->getFile() === null;
+                },
+                'label' => false,
+                'attr' => [
+                    'class' => 'images',
+                ],
+            ])
+            ->add('addItemImage', ButtonType::class, [
+                'attr' => [
+                    'class' => 'btn-medium grey left js-add-item-link',
+                    'data-collection-holder-class' => 'images',
+                ],
+                'label' => 'Přidat obrázek',
             ])
             ->addEventSubscriber($this->slugSubscriber)
             ->addEventSubscriber($this->productInformationSubscriber)
