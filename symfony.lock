@@ -730,7 +730,7 @@
         "version": "v3.3.3"
     },
     "vich/uploader-bundle": {
-        "version": "1.19",
+        "version": "1.18",
         "recipe": {
             "repo": "github.com/symfony/recipes-contrib",
             "branch": "master",

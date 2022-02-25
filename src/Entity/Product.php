@@ -143,7 +143,7 @@ class Product
     private $info;
 
     /**
-     * @ORM\OneToMany(targetEntity=ProductImage::class, mappedBy="product", orphanRemoval=true, cascade={"persist"})
+     * @ORM\OneToMany(targetEntity=ProductImage::class, mappedBy="product", orphanRemoval=true, cascade={"persist", "remove"})
      *
      * @Assert\Valid
      */
@@ -204,7 +204,7 @@ class Product
         return $this->priceWithoutVat;
     }
 
-    public function setPriceWithoutVat($priceWithoutVat): self
+    public function setPriceWithoutVat(?float $priceWithoutVat): self
     {
         $this->priceWithoutVat = $priceWithoutVat;
 

@@ -12,6 +12,7 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
 /**
  * @ORM\Entity(repositoryClass=ProductImageRepository::class)
+ * @ORM\HasLifecycleCallbacks()
  * @Vich\Uploadable
  */
 class ProductImage
@@ -27,12 +28,11 @@ class ProductImage
      * @ORM\Column(type="float")
      *
      * @Assert\Type("numeric", message="Musíte zadat číselnou hodnotu.")
-     * @Assert\NotBlank
      */
     private $priority;
 
     /**
-     * @Vich\UploadableField(mapping="product_image", fileNameProperty="name", size="size")
+     * @Vich\UploadableField(mapping="product_images", fileNameProperty="name", size="size")
      *
      * @Assert\File(
      *     mimeTypes = {"image/jpeg", "image/png"},
@@ -65,6 +65,8 @@ class ProductImage
      * @ORM\Column(type="datetime")
      */
     private $updated;
+
+    private bool $markedForRemoval = false;
 
     public function __construct()
     {
@@ -104,10 +106,9 @@ class ProductImage
 
     public function setFile(?File $file = null): void
     {
-        $this->file = $file;
-
-        if (null !== $file)
+        if ($file !== null)
         {
+            $this->file = $file;
             $this->updated = new DateTime('now');
         }
     }
@@ -167,5 +168,26 @@ class ProductImage
     public function setUpdatedNow(): void
     {
         $this->updated = new DateTime('now');
+    }
+
+    /**
+     * @ORM\PreFlush
+     */
+    public function setZeroPriorityIfNull(): void
+    {
+        if($this->priority === null)
+        {
+            $this->priority = 0;
+        }
+    }
+
+    public function isMarkedForRemoval(): bool
+    {
+        return $this->markedForRemoval;
+    }
+
+    public function setMarkedForRemoval(bool $markedForRemoval): void
+    {
+        $this->markedForRemoval = $markedForRemoval;
     }
 }

@@ -21,6 +21,7 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -85,10 +86,11 @@ class ProductFormType extends AbstractType
                 'required' => false,
                 'label' => 'Manuálně skrýt pro uživatele',
             ])
-            ->add('priceWithoutVat', TextType::class, [
+            ->add('priceWithoutVat', NumberType::class, [
                 'attr' => [
                     'class' => 'js-input-price-without-vat',
                 ],
+                'invalid_message' => 'Musíte zadat číselnou hodnotu.',
                 'label' => 'Cena bez DPH v Kč',
             ])
             ->add('vat', ChoiceType::class, [
@@ -156,7 +158,7 @@ class ProductFormType extends AbstractType
                 'allow_add' => true,
                 'allow_delete' => true,
                 'delete_empty' => function (ProductImage $image = null) {
-                    return $image === null || $image->getPriority() === null || $image->getFile() === null;
+                    return $image === null || $image->getFile() === null || $image->isMarkedForRemoval();
                 },
                 'label' => false,
                 'attr' => [
