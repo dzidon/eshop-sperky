@@ -37,6 +37,7 @@ class ProductImage
      * @Assert\File(
      *     mimeTypes = {"image/jpeg", "image/png"},
      *     mimeTypesMessage = "Můžete nahrávat pouze následující formáty: PNG, JPG, JPEG, JPE.")
+     * @Assert\NotBlank
      */
     private $file;
 

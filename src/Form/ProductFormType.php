@@ -158,7 +158,7 @@ class ProductFormType extends AbstractType
                 'allow_add' => true,
                 'allow_delete' => true,
                 'delete_empty' => function (ProductImage $image = null) {
-                    return $image === null || $image->getFile() === null || $image->isMarkedForRemoval();
+                    return $image === null || $image->isMarkedForRemoval();
                 },
                 'label' => false,
                 'attr' => [

@@ -3,8 +3,8 @@
 namespace App\Form;
 
 use App\Entity\ProductImage;
-use App\Form\EventSubscriber\EntityMarkForRemovalSubscriber;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -12,13 +12,6 @@ use Vich\UploaderBundle\Form\Type\VichImageType;
 
 class ProductImageFormType extends AbstractType
 {
-    private EntityMarkForRemovalSubscriber $entityMarkForRemovalSubscriber;
-
-    public function __construct(EntityMarkForRemovalSubscriber $entityMarkForRemovalSubscriber)
-    {
-        $this->entityMarkForRemovalSubscriber = $entityMarkForRemovalSubscriber;
-    }
-
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
@@ -35,7 +28,9 @@ class ProductImageFormType extends AbstractType
                 'invalid_message' => 'Musíte zadat číselnou hodnotu.',
                 'label' => 'Priorita',
             ])
-            ->addEventSubscriber($this->entityMarkForRemovalSubscriber)
+            ->add('markedForRemoval', CheckboxType::class, [
+                'label' => 'Smazat'
+            ])
         ;
     }
 

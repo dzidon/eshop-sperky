@@ -11,6 +11,7 @@ $(document).ready(function() {
     $('.parallax').parallax();
     $('.collapsible').collapsible();
     $('.tabs').tabs();
+    $('.materialboxed').materialbox();
     $('select').formSelect();
     $('.dropdown-trigger').dropdown({ hover: false });
 
@@ -63,14 +64,18 @@ const addFormToCollection = (e) =>
     collectionHolder.appendChild(item.firstElementChild);
     collectionHolder.dataset.index++;
 
+    // Možná chceme reloadnout dropdown (kvůli tomu jak funguje Materialize)
     const reloadSelect = collectionHolder.dataset.reloadSelect;
-    if(reloadSelect) {
+    if(reloadSelect)
+    {
         const element = collectionHolder.lastElementChild.querySelectorAll('select');
         M.FormSelect.init(element);
     }
 
+    // Možná chceme reloadnout dropdown (kvůli tomu jak funguje Materialize)
     const reloadAutocomplete = collectionHolder.dataset.reloadAutocomplete;
-    if(reloadAutocomplete) {
+    if(reloadAutocomplete)
+    {
         const element = collectionHolder.lastElementChild.querySelectorAll('input.autocomplete');
 
         $(element).each(function() {
