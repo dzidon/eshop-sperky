@@ -28,7 +28,7 @@ class ProductRepository extends ServiceEntityRepository
     public function findOneByIdAndFetchEverything($id)
     {
         return $this->createQueryBuilder('p')
-            ->select("p, ps, pc, po, pi, pig, pimg")
+            ->select('p, ps, pc, po, pi, pig, pimg')
             ->leftJoin('p.section', 'ps')
             ->leftJoin('p.categories', 'pc')
             ->leftJoin('pc.productCategoryGroup', 'pcg')
@@ -45,13 +45,14 @@ class ProductRepository extends ServiceEntityRepository
 
     public function getQueryForSearchAndPagination(bool $inAdmin, $searchPhrase = null, string $sortAttribute = null): Query
     {
+        $queryBuilder = $this->createQueryBuilder('p');
+
         if($inAdmin)
         {
             $sortData = $this->sorting->createSortData($sortAttribute, Product::getSortData()['admin']);
 
-            return $this->createQueryBuilder('p')
-
-                //vyhledavani
+            $queryBuilder
+                // vyhledavani
                 ->andWhere('p.name LIKE :searchPhrase OR
                             p.slug LIKE :searchPhrase OR
                             p.priceWithoutVat LIKE :searchPhrase OR
@@ -60,11 +61,12 @@ class ProductRepository extends ServiceEntityRepository
                             p.description LIKE :searchPhrase')
                 ->setParameter('searchPhrase', '%' . $searchPhrase . '%')
 
-                //razeni
+                // razeni
                 ->orderBy('p.' . $sortData['attribute'], $sortData['order'])
-                ->getQuery()
             ;
         }
         //else
+
+        return $queryBuilder->getQuery();
     }
 }

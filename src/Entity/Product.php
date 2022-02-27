@@ -150,6 +150,11 @@ class Product
     private $images;
 
     /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $mainImageName;
+
+    /**
      * @ORM\Column(type="datetime")
      */
     private $created;
@@ -238,6 +243,11 @@ class Product
         return $this->vat;
     }
 
+    public function getVatReadable(): string
+    {
+        return ($this->vat * 100) . ' %';
+    }
+
     public function setVat(float $vat): self
     {
         $this->vat = $vat;
@@ -281,6 +291,18 @@ class Product
         return $this;
     }
 
+    public function isVisible(): bool
+    {
+        if($this->isHidden
+           || ($this->availableSince !== null && $this->availableSince > (new DateTime('now')))
+           || ($this->hideWhenSoldOut && $this->inventory <= 0))
+        {
+            return false;
+        }
+
+        return true;
+    }
+
     public function getAvailableSince(): ?DateTimeInterface
     {
         return $this->availableSince;
@@ -303,6 +325,11 @@ class Product
         $this->inventory = $inventory;
 
         return $this;
+    }
+
+    public function isInStock(): bool
+    {
+        return $this->inventory > 0;
     }
 
     public function getSection(): ?ProductSection
@@ -425,6 +452,18 @@ class Product
         return $this;
     }
 
+    public function getMainImageName(): ?string
+    {
+        return $this->mainImageName;
+    }
+
+    public function setMainImageName(?string $mainImageName): self
+    {
+        $this->mainImageName = $mainImageName;
+
+        return $this;
+    }
+
     public function getCreated(): ?DateTimeInterface
     {
         return $this->created;
@@ -457,10 +496,32 @@ class Product
         $this->updated = new DateTime('now');
     }
 
+    /**
+     * @ORM\PreFlush
+     */
+    public function determineMainImageName(): void
+    {
+        $this->mainImageName = null;
+        $greatestPriority = null;
+
+        foreach ($this->images as $image)
+        {
+            $imagePriority = $image->getPriority();
+
+            if($greatestPriority === null || $imagePriority > $greatestPriority)
+            {
+                $greatestPriority = $imagePriority;
+                $this->mainImageName = $image->getName();
+            }
+        }
+    }
+
     public static function getSortData(): array
     {
         return [
             'admin' => [
+                'Od nejnovějších' => 'created'.SortingService::ATTRIBUTE_TAG_DESC,
+                'Od nejstarších' => 'created'.SortingService::ATTRIBUTE_TAG_ASC,
                 'Název (A-Z)' => 'name'.SortingService::ATTRIBUTE_TAG_ASC,
                 'Název (Z-A)' => 'name'.SortingService::ATTRIBUTE_TAG_DESC,
                 'Odkaz (A-Z)' => 'slug'.SortingService::ATTRIBUTE_TAG_ASC,
@@ -471,21 +532,18 @@ class Product
                 'Cena s DPH (sestupně)' => 'priceWithVat'.SortingService::ATTRIBUTE_TAG_DESC,
                 'DPH (vzestupně)' => 'vat'.SortingService::ATTRIBUTE_TAG_ASC,
                 'DPH (sestupně)' => 'vat'.SortingService::ATTRIBUTE_TAG_DESC,
-                'Od manuálně skrytých' => 'isHidden'.SortingService::ATTRIBUTE_TAG_DESC,
-                'Od manuálně neskrytých' => 'isHidden'.SortingService::ATTRIBUTE_TAG_ASC,
-                'Od nejpozdějšího datumu dostupnosti' => 'availableSince'.SortingService::ATTRIBUTE_TAG_DESC,
-                'Od nejstaršího' => 'created'.SortingService::ATTRIBUTE_TAG_ASC,
-                'Od nejnovějšího' => 'created'.SortingService::ATTRIBUTE_TAG_DESC,
-                'Od naposledy upraveného' => 'updated'.SortingService::ATTRIBUTE_TAG_DESC,
-                'Od poprvé upraveného' => 'updated'.SortingService::ATTRIBUTE_TAG_ASC,
+                'Ks skladem (vzestupně)' => 'inventory'.SortingService::ATTRIBUTE_TAG_ASC,
+                'Ks skladem (sestupně)' => 'inventory'.SortingService::ATTRIBUTE_TAG_DESC,
             ],
             'catalog' => [
+                'Od nejnovějších' => 'created'.SortingService::ATTRIBUTE_TAG_DESC,
+                'Od nejstarších' => 'created'.SortingService::ATTRIBUTE_TAG_ASC,
                 'Název (A-Z)' => 'name'.SortingService::ATTRIBUTE_TAG_ASC,
                 'Název (Z-A)' => 'name'.SortingService::ATTRIBUTE_TAG_DESC,
                 'Cena (vzestupně)' => 'priceWithVat'.SortingService::ATTRIBUTE_TAG_ASC,
                 'Cena (sestupně)' => 'priceWithVat'.SortingService::ATTRIBUTE_TAG_DESC,
-                'Od nejstaršího' => 'created'.SortingService::ATTRIBUTE_TAG_ASC,
-                'Od nejnovějšího' => 'created'.SortingService::ATTRIBUTE_TAG_DESC,
+                'Ks skladem (vzestupně)' => 'inventory'.SortingService::ATTRIBUTE_TAG_ASC,
+                'Ks skladem (sestupně)' => 'inventory'.SortingService::ATTRIBUTE_TAG_DESC,
             ],
         ];
     }

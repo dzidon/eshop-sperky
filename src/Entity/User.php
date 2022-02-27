@@ -519,6 +519,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public static function getSortData(): array
     {
         return [
+            'Od nejnovějších' => 'registered'.SortingService::ATTRIBUTE_TAG_DESC,
+            'Od nejstarších' => 'registered'.SortingService::ATTRIBUTE_TAG_ASC,
             'E-mail (A-Z)' => 'email'.SortingService::ATTRIBUTE_TAG_ASC,
             'E-mail (Z-A)' => 'email'.SortingService::ATTRIBUTE_TAG_DESC,
             'Křestní jméno (A-Z)' => 'nameFirst'.SortingService::ATTRIBUTE_TAG_ASC,
@@ -531,8 +533,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             'Od neověřených' => 'isVerified'.SortingService::ATTRIBUTE_TAG_ASC,
             'Od umlčených' => 'isMuted'.SortingService::ATTRIBUTE_TAG_DESC,
             'Od neumlčených' => 'isMuted'.SortingService::ATTRIBUTE_TAG_ASC,
-            'Od nejstaršího' => 'registered'.SortingService::ATTRIBUTE_TAG_ASC,
-            'Od nejnovějšího' => 'registered'.SortingService::ATTRIBUTE_TAG_DESC,
         ];
     }
 }

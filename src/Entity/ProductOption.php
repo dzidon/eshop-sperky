@@ -269,16 +269,14 @@ class ProductOption
     public static function getSortData(): array
     {
         return [
+            'Od nejnovějších' => 'created'.SortingService::ATTRIBUTE_TAG_DESC,
+            'Od nejstarších' => 'created'.SortingService::ATTRIBUTE_TAG_ASC,
             'Název (A-Z)' => 'name'.SortingService::ATTRIBUTE_TAG_ASC,
             'Název (Z-A)' => 'name'.SortingService::ATTRIBUTE_TAG_DESC,
             'Typ (A-Z)' => 'type'.SortingService::ATTRIBUTE_TAG_ASC,
             'Typ (Z-A)' => 'type'.SortingService::ATTRIBUTE_TAG_DESC,
             'Od nakonfigurovaných' => 'isConfigured'.SortingService::ATTRIBUTE_TAG_DESC,
             'Od nenakonfigurovaných' => 'isConfigured'.SortingService::ATTRIBUTE_TAG_ASC,
-            'Od nejstarší' => 'created'.SortingService::ATTRIBUTE_TAG_ASC,
-            'Od nejnovější' => 'created'.SortingService::ATTRIBUTE_TAG_DESC,
-            'Od naposledy upravené' => 'updated'.SortingService::ATTRIBUTE_TAG_DESC,
-            'Od poprvé upravené' => 'updated'.SortingService::ATTRIBUTE_TAG_ASC,
         ];
     }
 }

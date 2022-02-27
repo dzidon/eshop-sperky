@@ -17,6 +17,13 @@ framework:
     php_errors:
         log: true
 
+    assets:
+        packages:
+            images:
+                base_path: images/
+            product_images:
+                base_path: images/products/
+
 when@test:
     framework:
         test: true

@@ -123,6 +123,16 @@ class ProductSection
         return $this;
     }
 
+    public function isVisible(): bool
+    {
+        if($this->isHidden || ($this->availableSince !== null && $this->availableSince > (new DateTime('now'))))
+        {
+            return false;
+        }
+
+        return true;
+    }
+
     public function getCreated(): ?DateTimeInterface
     {
         return $this->created;
@@ -158,17 +168,12 @@ class ProductSection
     public static function getSortData(): array
     {
         return [
+            'Od nejnovějších' => 'created'.SortingService::ATTRIBUTE_TAG_DESC,
+            'Od nejstarších' => 'created'.SortingService::ATTRIBUTE_TAG_ASC,
             'Název (A-Z)' => 'name'.SortingService::ATTRIBUTE_TAG_ASC,
             'Název (Z-A)' => 'name'.SortingService::ATTRIBUTE_TAG_DESC,
             'Odkaz (A-Z)' => 'slug'.SortingService::ATTRIBUTE_TAG_ASC,
             'Odkaz (Z-A)' => 'slug'.SortingService::ATTRIBUTE_TAG_DESC,
-            'Od manuálně skrytých' => 'isHidden'.SortingService::ATTRIBUTE_TAG_DESC,
-            'Od manuálně neskrytých' => 'isHidden'.SortingService::ATTRIBUTE_TAG_ASC,
-            'Od nejpozdějšího datumu dostupnosti' => 'availableSince'.SortingService::ATTRIBUTE_TAG_DESC,
-            'Od nejstarší' => 'created'.SortingService::ATTRIBUTE_TAG_ASC,
-            'Od nejnovější' => 'created'.SortingService::ATTRIBUTE_TAG_DESC,
-            'Od naposledy upravené' => 'updated'.SortingService::ATTRIBUTE_TAG_DESC,
-            'Od poprvé upravené' => 'updated'.SortingService::ATTRIBUTE_TAG_ASC,
         ];
     }
 }

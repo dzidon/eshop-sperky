@@ -4,6 +4,7 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
+    app_vat_payer: false
     app_site_name: 'Šperky'
     app_site_phone: '+420 123 456 789'
     app_site_email: 'demo@localhost.com'
@@ -33,6 +34,8 @@ parameters:
     app_page_title.register: 'Registrace'
     app_page_title.login: 'Přihlášení'
     app_page_title.verify_email: 'Ověřit email'
+    app_page_title.products: 'Všechny produkty'
+    app_page_title.product: 'Produkt'
     app_page_title.admin_permission_overview: 'Moje oprávnění'
     app_page_title.admin_user_management: 'Uživatelé'
     app_page_title.admin_user_management_specific: 'Uživatel'

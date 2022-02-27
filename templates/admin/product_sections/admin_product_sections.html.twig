@@ -36,12 +36,8 @@
                                 {{ section.getSlug() }}
                             </em>
 
-                            {% if section.isHidden() %}
+                            {% if not section.isVisible() %}
                                 - <span class="red-text">SKRYTO</span>
-                            {% endif %}
-
-                            {% if section.getAvailableSince() is not null %}
-                                - <span class="{% if date() < section.getAvailableSince() %} orange-text {% else %} green-text {% endif %}">DOSTUPNÉ OD {{ section.getAvailableSince()|date('d. m. Y H:i:s') }}</span>
                             {% endif %}
                         </div>
 

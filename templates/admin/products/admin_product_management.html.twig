@@ -21,35 +21,10 @@
     <div class="row">
         <h4>Výsledky ({{ pagination.getTotalItems() }})</h4>
 
-        {% if products is empty %}
-            Hledání neodpovídají žádné produkty.
-        {% else %}
-            <div class="collection">
-                {% for product in products %}
-                    <div class="collection-item valign-wrapper">
-                        <div class="col s9 no-padding">
-                            <strong>
-                                {{ product.getName() }}
-                            </strong>
-                        </div>
-
-                        <div class="col s3 no-padding right-align">
-                            {% if can_edit %}
-                                <a href="{{ path('admin_product_edit', {id: product.getId()}) }}">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-                            {% endif %}
-
-                            {% if can_delete %}
-                                <a href="{{ path('admin_product_delete', {id: product.getId()}) }}">
-                                    <i class="fas fa-trash-alt"></i>
-                                </a>
-                            {% endif %}
-                        </div>
-                    </div>
-                {% endfor %}
-            </div>
-        {% endif %}
+        <div class="row no-mar-bot">
+            {# Produkty #}
+            {{ include('fragments/_products.html.twig', {products: products, admin: true, can_edit: can_edit, can_delete: can_delete}) }}
+        </div>
     </div>
 
     {# Pagination #}

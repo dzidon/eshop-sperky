@@ -3,6 +3,7 @@ twig:
     form_themes:
         - 'fragments/form_themes/_materialize.html.twig'
     globals:
+        vat_payer: '%app_vat_payer%'
         site_name: '%app_site_name%'
         site_phone: '%app_site_phone%'
         site_email: '%app_site_email%'

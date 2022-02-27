@@ -1,0 +1,86 @@
+<div class="col s12">
+    {% if products is empty %}
+        Nebyly nalezeny žádné produkty.
+    {% else %}
+        <div class="row flex-wrap">
+            {% for product in products %}
+                <div class="col s6 l4 margin-0">
+                    <div class="card">
+                        {# Obrázek #}
+                        <a href="#" class="card-image waves-effect waves-block waves-light">
+                            <img alt="Obrázek produktu" src="{% if product.getMainImageName() %} {{ asset(product.getMainImageName(), 'product_images') }}  {% else %} {{ asset('no-image.png', 'images') }} {% endif %}">
+                        </a>
+
+                        {# Obsah #}
+                        <div class="card-content">
+                            <a href="#">
+                                <h6 class="product-title">{{ product.getName() }}</h6>
+                            </a>
+
+                            <p class="bold">
+                                {{ product.getPriceWithVat() }} CZK
+                                {% if vat_payer %}
+                                    vč. DPH
+                                {% endif %}
+                            </p>
+
+                            {% if product.isInStock() %}
+                                <p class="green-text">Skladem {{ product.getInventory() }} ks</p>
+                            {% else %}
+                                <p class="red-text">Není skladem</p>
+                            {% endif %}
+
+                            {% if admin %}
+                                <br>
+                                <p>
+                                    <em>{{ product.getSlug() }}</em>
+                                </p>
+                                <p>
+                                    DPH:
+                                    <em>{{ product.getVat() }}</em>
+                                </p>
+                                <p>
+                                    Cena bez DPH:
+                                    <em>{{ product.getPriceWithoutVat() }} CZK</em>
+                                </p>
+
+                                {% if not product.isVisible() %}
+                                    <p class="red-text">SKRYTO</p>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+
+                        {# Dolní část - tlačítka #}
+                        {% if admin %}
+                            <div class="card-action">
+                                {% if can_edit %}
+                                    <a href="{{ path('admin_product_edit', {id: product.getId()}) }}">
+                                        Upravit
+                                    </a>
+                                {% endif %}
+
+                                {% if can_delete %}
+                                    <a href="{{ path('admin_product_delete', {id: product.getId()}) }}" class="margin-0">
+                                        Smazat
+                                    </a>
+                                {% endif %}
+                            </div>
+                        {% else %}
+                            <div class="card-action bold">
+                                <div class="center-align">
+                                    <a href="#" class="hide-on-med-and-up margin-0">
+                                        <i class="material-icons small">add_shopping_cart</i>
+                                    </a>
+                                </div>
+                                <a href="#" class="hide-on-small-only valign-wrapper">
+                                    <i class="material-icons">add_shopping_cart</i>
+                                    &nbsp;&nbsp;Do košíku
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>

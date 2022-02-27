@@ -139,10 +139,8 @@ class Review
     public static function getSortData(): array
     {
         return [
-            'Od nejnovější' => 'created'.SortingService::ATTRIBUTE_TAG_DESC,
-            'Od nejstarší' => 'created'.SortingService::ATTRIBUTE_TAG_ASC,
-            'Od naposledy upravené' => 'updated'.SortingService::ATTRIBUTE_TAG_DESC,
-            'Od poprvé upravené' => 'updated'.SortingService::ATTRIBUTE_TAG_ASC,
+            'Od nejnovějších' => 'created'.SortingService::ATTRIBUTE_TAG_DESC,
+            'Od nejstarších' => 'created'.SortingService::ATTRIBUTE_TAG_ASC,
             'Počet hvězd (vzestupně)' => 'stars'.SortingService::ATTRIBUTE_TAG_ASC,
             'Počet hvězd (sestupně)' => 'stars'.SortingService::ATTRIBUTE_TAG_DESC,
         ];

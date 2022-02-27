@@ -285,12 +285,10 @@ class Address
     public static function getSortData(): array
     {
         return [
+            'Od nejnovějších' => 'created'.SortingService::ATTRIBUTE_TAG_DESC,
+            'Od nejstarších' => 'created'.SortingService::ATTRIBUTE_TAG_ASC,
             'Alias (A-Z)' => 'alias'.SortingService::ATTRIBUTE_TAG_ASC,
             'Alias (Z-A)' => 'alias'.SortingService::ATTRIBUTE_TAG_DESC,
-            'Od nejstarší' => 'created'.SortingService::ATTRIBUTE_TAG_ASC,
-            'Od nejnovější' => 'created'.SortingService::ATTRIBUTE_TAG_DESC,
-            'Od naposledy upravené' => 'updated'.SortingService::ATTRIBUTE_TAG_DESC,
-            'Od poprvé upravené' => 'updated'.SortingService::ATTRIBUTE_TAG_ASC,
         ];
     }
 }
