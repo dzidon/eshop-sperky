@@ -90,7 +90,7 @@ class ProductController extends AbstractController
 
         if($id !== null) //zadal id do url, snazi se editovat existujici
         {
-            $product = $this->getDoctrine()->getRepository(Product::class)->findOneByIdAndFetchEverything($id);
+            $product = $this->getDoctrine()->getRepository(Product::class)->findOneByIdAndFetchEverything(['id' => $id]);
             if($product === null) //nenaslo to zadny produkt
             {
                 throw new NotFoundHttpException('Produkt nenalezen.');

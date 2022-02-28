@@ -25,9 +25,9 @@ class ProductRepository extends ServiceEntityRepository
         $this->sorting = $sorting;
     }
 
-    public function findOneByIdAndFetchEverything($id)
+    public function findOneByIdAndFetchEverything(array $criteria)
     {
-        return $this->createQueryBuilder('p')
+        $qb = $this->createQueryBuilder('p')
             ->select('p, ps, pc, po, pi, pig, pimg')
             ->leftJoin('p.section', 'ps')
             ->leftJoin('p.categories', 'pc')
@@ -35,12 +35,14 @@ class ProductRepository extends ServiceEntityRepository
             ->leftJoin('p.options', 'po')
             ->leftJoin('p.info', 'pi')
             ->leftJoin('pi.productInformationGroup', 'pig')
-            ->leftJoin('p.images', 'pimg')
-            ->andWhere('p.id = :id')
-            ->setParameter('id', $id)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
+            ->leftJoin('p.images', 'pimg');
+
+        foreach ($criteria as $name => $value)
+        {
+            $qb->andWhere("p.$name = :$name")->setParameter($name, $value);
+        }
+
+        return $qb->getQuery()->getOneOrNullResult();
     }
 
     public function getQueryForSearchAndPagination(bool $inAdmin, $searchPhrase = null, string $sortAttribute = null): Query
