@@ -28,7 +28,8 @@ class IcValidator extends ConstraintValidator
 
         if (!preg_match('/^\d{8}$/', $value))
         {
-            $this->context->buildViolation($constraint->message)
+            $this->context
+                ->buildViolation($constraint->message)
                 ->addViolation();
         }
     }

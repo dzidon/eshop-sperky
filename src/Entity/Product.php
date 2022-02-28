@@ -9,6 +9,7 @@ use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use App\Validation as AssertCustom;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
@@ -76,6 +77,7 @@ class Product
      *
      * @Assert\Type("numeric", message="Musíte zadat číselnou hodnotu.")
      * @Assert\Choice(choices=Product::VAT_VALUES, message="Zvolte platnou hodnotu DPH.")
+     * @AssertCustom\Vat
      * @Assert\NotBlank
      */
     private $vat;

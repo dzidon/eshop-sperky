@@ -33,7 +33,8 @@ class AllOrNoneValidator extends ConstraintValidator
             {
                 if($showError)
                 {
-                    $this->context->buildViolation($constraint->message)
+                    $this->context
+                        ->buildViolation($constraint->message)
                         ->atPath($attributeName)
                         ->addViolation();
                 }

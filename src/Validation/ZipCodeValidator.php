@@ -28,7 +28,8 @@ class ZipCodeValidator extends ConstraintValidator
 
         if (!preg_match('/^\d{5}$/', $value))
         {
-            $this->context->buildViolation($constraint->message)
+            $this->context
+                ->buildViolation($constraint->message)
                 ->addViolation();
         }
     }

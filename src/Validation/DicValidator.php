@@ -28,7 +28,8 @@ class DicValidator extends ConstraintValidator
 
         if (!preg_match('/^((CZ|SK)(\d{8,10}))?$/', $value))
         {
-            $this->context->buildViolation($constraint->message)
+            $this->context
+                ->buildViolation($constraint->message)
                 ->addViolation();
         }
     }

@@ -66,7 +66,8 @@ class UniqueEntitiesInCollectionValidator extends ConstraintValidator
 
                 if ($occurencesForGetters[$getValue][$value] >= 2)
                 {
-                    $this->context->buildViolation($constraint->message)
+                    $this->context
+                        ->buildViolation($constraint->message)
                         ->atPath($collectionName)
                         ->addViolation();
 
