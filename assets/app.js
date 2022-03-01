@@ -25,6 +25,13 @@ $(document).ready(function() {
         });
     });
 
+    //
+    const productImageLarge = $('#product-image-large');
+    $('.product-image-small-link').click(function(e) {
+        const src = $(this).children("img:first").attr('src');
+        productImageLarge.attr('src', src);
+    });
+
     // dynamicke vytvareni inputu podle prototypu pro CollectionType
     document
         .querySelectorAll('.js-add-item-link')

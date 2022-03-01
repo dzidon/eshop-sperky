@@ -20,6 +20,8 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  */
 class Product
 {
+    public const DESCRIPTION_SHORT_LENGTH = 300;
+
     public const VAT_NONE = 0.0;
     public const VAT_BASIC = 0.21;
     public const VAT_LOWER_1 = 0.15;
@@ -267,6 +269,26 @@ class Product
         $this->description = $description;
 
         return $this;
+    }
+
+    public function getShortDescription(): ?string
+    {
+        if($this->description === null)
+        {
+            return null;
+        }
+
+        return substr($this->description, 0, self::DESCRIPTION_SHORT_LENGTH);
+    }
+
+    public function isDescriptionLong(): bool
+    {
+        if($this->description === null)
+        {
+            return false;
+        }
+
+        return mb_strlen($this->description, 'utf-8') > self::DESCRIPTION_SHORT_LENGTH;
     }
 
     public function isHidden(): ?bool

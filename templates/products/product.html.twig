@@ -6,12 +6,59 @@
     {{ include('fragments/_breadcrumbs.html.twig') }}
 
     <div class="container">
-
         {# Flash zprávy #}
         {{ include('fragments/_flash_messages.html.twig') }}
 
-        <h1>{{ productInstance.getName() }}</h1>
+        <div class="col s12">
+            <h1>{{ productInstance.getName() }}</h1>
+            <div class="row">
+                <div class="col s12 l6">
+                    <div class="section">
+                        {% set hasImages = productInstance.getImages()|length > 0 %}
+                        {% if hasImages %}
+                            <img src="{{ asset(productInstance.getMainImageName(), 'product_images') }}" class="materialboxed responsive-img" id="product-image-large" alt="Obrázek produktu">
+                        {% else %}
+                            <img src="{{ asset('no-image.png', 'images') }}" id="product-image-large" alt="Obrázek produktu">
+                        {% endif %}
+                    </div>
 
+                    {% if hasImages %}
+                        <div class="row flex-wrap">
+                            {% for image in productInstance.getImages() %}
+                                <div class="col s3 margin-0 valign-wrapper">
+                                    <a href="#" class="product-image-small-link">
+                                        <img src="{{ asset(image.getName(), 'product_images') }}" class="responsive-img" alt="Obrázek produktu">
+                                    </a>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="col s12 l6">
+                    {% if productInstance.getDescription() is not same as(null) %}
+                        <div class="section product-description">
+                            {{ productInstance.getShortDescription() }}
+                            {% if productInstance.isDescriptionLong() %}
+                                ...
+                                <strong>
+                                    <a href="#full-description">(Celý popis)</a>
+                                </strong>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if productInstance.getDescription() is not same as(null) %}
+                <div class="row" id="full-description">
+                    <div class="col s12">
+                        <h3>Popis</h3>
+                        <p>{{ productInstance.getDescription() }}</p>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
     </div>
 
 {% endblock %}

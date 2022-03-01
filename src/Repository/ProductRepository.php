@@ -35,7 +35,8 @@ class ProductRepository extends ServiceEntityRepository
             ->leftJoin('p.options', 'po')
             ->leftJoin('p.info', 'pi')
             ->leftJoin('pi.productInformationGroup', 'pig')
-            ->leftJoin('p.images', 'pimg');
+            ->leftJoin('p.images', 'pimg')
+            ->orderBy('pimg.priority', 'DESC');
 
         foreach ($criteria as $name => $value)
         {

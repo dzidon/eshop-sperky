@@ -6,13 +6,13 @@
     {{ include('fragments/_breadcrumbs.html.twig') }}
 
     <div class="container">
+        {# h1 #}
+        {{ include('fragments/_h1.html.twig', {route: app.request.get('_route')}) }}
+
+        {# Flash zprávy #}
+        {{ include('fragments/_flash_messages.html.twig') }}
+
         <div class="section">
-            {# h1 #}
-            {{ include('fragments/_h1.html.twig', {route: app.request.get('_route')}) }}
-
-            {# Flash zprávy #}
-            {{ include('fragments/_flash_messages.html.twig') }}
-
             <div class="row margin-0">
                 <div class="col s12 l6">
                     <div class="row">
