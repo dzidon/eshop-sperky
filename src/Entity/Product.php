@@ -20,7 +20,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  */
 class Product
 {
-    public const DESCRIPTION_SHORT_LENGTH = 300;
+    public const DESCRIPTION_SHORT_LENGTH = 250;
 
     public const VAT_NONE = 0.0;
     public const VAT_BASIC = 0.21;
@@ -392,6 +392,17 @@ class Product
         return $this;
     }
 
+    public function getCategoryNamesGrouped(): array
+    {
+        $categoriesGrouped = array();
+        foreach ($this->categories as $category)
+        {
+            $categoriesGrouped[$category->getProductCategoryGroup()->getName()][] = $category->getName();
+        }
+
+        return $categoriesGrouped;
+    }
+
     /**
      * @return Collection|ProductOption[]
      */
@@ -444,6 +455,17 @@ class Product
         }
 
         return $this;
+    }
+
+    public function getInfoValuesGrouped(): array
+    {
+        $infoGrouped = array();
+        foreach ($this->info as $info)
+        {
+            $infoGrouped[$info->getProductInformationGroup()->getName()][] = $info->getValue();
+        }
+
+        return $infoGrouped;
     }
 
     /**

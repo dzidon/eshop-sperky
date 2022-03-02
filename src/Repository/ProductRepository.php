@@ -28,7 +28,7 @@ class ProductRepository extends ServiceEntityRepository
     public function findOneByIdAndFetchEverything(array $criteria)
     {
         $qb = $this->createQueryBuilder('p')
-            ->select('p, ps, pc, po, pi, pig, pimg')
+            ->select('p, ps, pc, pcg, po, pi, pig, pimg')
             ->leftJoin('p.section', 'ps')
             ->leftJoin('p.categories', 'pc')
             ->leftJoin('pc.productCategoryGroup', 'pcg')

@@ -25,11 +25,19 @@ $(document).ready(function() {
         });
     });
 
-    //
+    // obrázky na stránce produktu
+    $('.black-and-white-img:first').removeClass('black-and-white-img');
+
     const productImageLarge = $('#product-image-large');
     $('.product-image-small-link').click(function(e) {
-        const src = $(this).children("img:first").attr('src');
+        e.preventDefault()
+
+        const clickedImage = $(this).children("img:first");
+        const src = clickedImage.attr('src');
         productImageLarge.attr('src', src);
+
+        $('.product-image-small-link').find('img').addClass('black-and-white-img');
+        clickedImage.removeClass('black-and-white-img');
     });
 
     // dynamicke vytvareni inputu podle prototypu pro CollectionType

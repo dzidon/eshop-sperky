@@ -198,6 +198,34 @@ a.secondary-content {
     line-height: 1.5;
 }
 
+.black-and-white-img {
+    -webkit-filter: grayscale(100%);
+    filter: grayscale(100%);
+}
+
+.h1-fontsize {
+    font-size: 4.2rem;
+}
+
+.h2-fontsize {
+    font-size: 3.56rem;
+}
+
+.h3-fontsize {
+    font-size: 2.92rem;
+}
+
+.h4-fontsize {
+    font-size: 2.28rem;
+}
+
+.h5-fontsize {
+    font-size: 1.64rem;
+}
+
+.h6-fontsize {
+    font-size: 1.15rem;
+}
 
 /*
     ======== RATING ========
