@@ -20,7 +20,7 @@
                             {% if hasImages %}
                                 <img src="{{ asset(productInstance.getMainImageName(), 'product_images') }}" class="materialboxed responsive-img" id="product-image-large" alt="Obrázek produktu">
                             {% else %}
-                                <img src="{{ asset('no-image.png', 'images') }}" id="product-image-large" alt="Obrázek produktu">
+                                <img src="{{ asset('no-image.png', 'images') }}" class="responsive-img" id="product-image-large" alt="Obrázek produktu">
                             {% endif %}
                         </div>
                     </div>
@@ -80,7 +80,7 @@
                         </div>
                     {% endif %}
 
-                    {% if productInstance.getCategories() is not same as(null) %}
+                    {% if productInstance.getCategoryNamesGrouped()|length > 0 %}
                         <div class="row">
                             {% for categoryGroupName, categoryNames in productInstance.getCategoryNamesGrouped() %}
                                 <div class="row margin-0">
@@ -88,7 +88,7 @@
                                         <span class="bold">{{ categoryGroupName }}:</span>
                                     </div>
                                     <div class="col s4 m3">
-                                        {{ categoryNames|join(', ') }}
+                                        <span>{{ categoryNames|join(', ') }}</span>
                                     </div>
                                 </div>
                             {% endfor %}
@@ -101,12 +101,12 @@
                 <div class="row" id="full-description">
                     <div class="col s12 l9">
                         <h4>Popis</h4>
-                        <p>{{ productInstance.getDescription() }}</p>
+                        <span>{{ productInstance.getDescription() }}</span>
                     </div>
                 </div>
             {% endif %}
 
-            {% if productInstance.getInfo() is not same as(null) %}
+            {% if productInstance.getInfoValuesGrouped()|length > 0 %}
                 <div class="row">
                     <div class="col s12">
                         <h4>Další informace</h4>
@@ -118,10 +118,21 @@
                                 <span class="bold">{{ infoGroupName }}:</span>
                             </div>
                             <div class="col s4 m3 l2">
-                                {{ infoValues|join(', ') }}
+                                <span>{{ infoValues|join(', ') }}</span>
                             </div>
                         </div>
                     {% endfor %}
+                </div>
+            {% endif %}
+
+            {% if relatedProducts is not same as(null) %}
+                <div class="row">
+                    <div class="col s12">
+                        <h4>Související produkty</h4>
+                    </div>
+
+                    {# Produkty #}
+                    {{ include('fragments/_products.html.twig', {products: relatedProducts, admin: false, large: true, can_edit: false, can_delete: false}) }}
                 </div>
             {% endif %}
         </div>

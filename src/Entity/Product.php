@@ -116,7 +116,7 @@ class Product
      * @ORM\Column(type="integer")
      *
      * @Assert\Type("integer", message="Musíte zadat číselnou hodnotu.")
-     * @Assert\GreaterThanOrEqual(1)
+     * @Assert\GreaterThanOrEqual(0)
      * @Assert\NotBlank
      */
     private $inventory;

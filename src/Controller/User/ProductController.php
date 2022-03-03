@@ -12,7 +12,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Entity;
 
 class ProductController extends AbstractController
 {
@@ -55,20 +54,27 @@ class ProductController extends AbstractController
     public function product(string $slug): Response
     {
         /** @var Product $product */
-        $product = $this->getDoctrine()->getRepository(Product::class)->findOneByIdAndFetchEverything(['slug' => $slug]);
+        $product = $this->getDoctrine()->getRepository(Product::class)->findOneAndFetchEverything(['slug' => $slug]);
         if($product === null || !$product->isVisible())
         {
             throw new NotFoundHttpException('Produkt nenalezen.');
         }
 
+        $relatedProducts = null;
+        if($product->getSection() !== null)
+        {
+            $relatedProducts = $this->getDoctrine()->getRepository(Product::class)->findRelated($product, 4);
+        }
+
         $section = $product->getSection();
         $sectionData = [
-            'slug' => ($section !== null ? $section->getSlug() : null),
+            'slug'  => ($section !== null ? $section->getSlug() : null),
             'title' => ($section !== null ? $section->getName() : 'Všechny produkty'),
         ];
 
         return $this->render('products/product.html.twig', [
             'productInstance' => $product,
+            'relatedProducts' => $relatedProducts,
             'breadcrumbs' => $this->breadcrumbs
                 ->addRoute('products', ['slug' => $sectionData['slug']], $sectionData['title'])
                 ->addRoute('product', ['slug' => $product->getSlug()], $product->getName()),

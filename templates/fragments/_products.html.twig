@@ -4,16 +4,16 @@
     {% else %}
         <div class="row flex-wrap">
             {% for product in products %}
-                <div class="col s6 l4 margin-0">
+                <div class="col s6 l4 {% if large %}xl3{% endif %} margin-0">
                     <div class="card">
                         {# Obrázek #}
-                        <a href="#" class="card-image waves-effect waves-block waves-light">
+                        <a href="{{ path('product', {slug: product.getSlug()}) }}" class="card-image waves-effect waves-block waves-light">
                             <img alt="Obrázek produktu" src="{% if product.getMainImageName() %} {{ asset(product.getMainImageName(), 'product_images') }}  {% else %} {{ asset('no-image.png', 'images') }} {% endif %}">
                         </a>
 
                         {# Obsah #}
                         <div class="card-content">
-                            <a href="#">
+                            <a href="{{ path('product', {slug: product.getSlug()}) }}">
                                 <h6 class="product-title">{{ product.getName() }}</h6>
                             </a>
 

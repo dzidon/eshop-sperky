@@ -68,7 +68,7 @@ class ProductFormType extends AbstractType
             ])
             ->add('inventory', IntegerType::class, [
                 'attr' => [
-                    'min' => 1
+                    'min' => 0
                 ],
                 'label' => 'Počet kusů na skladě',
             ])
