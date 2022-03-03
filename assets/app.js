@@ -25,6 +25,17 @@ $(document).ready(function() {
         });
     });
 
+    // smooth scroll na celý popis po kliknutí na odkaz "(Celý popis)"
+    $("#full-description-link").click(function(e) {
+        e.preventDefault();
+        const target = document.getElementById('full-description');
+        target.scrollIntoView({
+            behavior: 'auto',
+            block: 'center',
+            inline: 'center'
+        });
+    });
+
     // obrázky na stránce produktu
     $('.black-and-white-img:first').removeClass('black-and-white-img');
 

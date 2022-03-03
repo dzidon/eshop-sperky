@@ -73,7 +73,7 @@
                                 {% if productInstance.isDescriptionLong() %}
                                     ...
                                     <strong>
-                                        <a href="#full-description">(Celý popis)</a>
+                                        <a href="#full-description" id="full-description-link">(Celý popis)</a>
                                     </strong>
                                 {% endif %}
                             </div>
@@ -98,9 +98,9 @@
             </div>
 
             {% if productInstance.getDescription() is not same as(null) %}
-                <div class="row" id="full-description">
+                <div class="row">
                     <div class="col s12 l9">
-                        <h4>Popis</h4>
+                        <h4 id="full-description">Popis</h4>
                         <span>{{ productInstance.getDescription() }}</span>
                     </div>
                 </div>
