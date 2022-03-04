@@ -2,11 +2,17 @@
 
 namespace App\Controller\User;
 
+use App\Entity\Detached\ProductCatalogFilter;
 use App\Entity\Product;
 use App\Entity\ProductSection;
+use App\Form\CartInsertFormType;
+use App\Form\ProductCatalogFilterFormType;
 use App\Service\BreadcrumbsService;
+use App\Service\PaginatorService;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -31,7 +37,7 @@ class ProductController extends AbstractController
     /**
      * @Route("/produkty/{slug}", name="products")
      */
-    public function products(string $slug = null): Response
+    public function products(string $slug = null, FormFactoryInterface $formFactory, PaginatorService $paginatorService): Response
     {
         $section = null;
         if($slug)
@@ -41,11 +47,44 @@ class ProductController extends AbstractController
             {
                 throw new NotFoundHttpException('Sekce nenalezena.');
             }
+
+            $this->breadcrumbs->addRoute('products', [], $section->getName());
+        }
+        else
+        {
+            $this->breadcrumbs->addRoute('products', [], 'Všechny produkty');
         }
 
-        $this->breadcrumbs->addRoute('products');
+        $filterData = new ProductCatalogFilter();
+        $form = $formFactory->createNamed('', ProductCatalogFilterFormType::class, $filterData);
+        //button je přidáván v šabloně, aby se nezobrazoval v odkazu
+        $form->handleRequest($this->request);
 
-        return new Response("todo");
+        if ($form->isSubmitted() && $form->isValid())
+        {
+            $queryForPagination = $this->getDoctrine()->getRepository(Product::class)->getQueryForSearchAndPagination($inAdmin = false, $filterData->getSearchPhrase(), $filterData->getSortBy(), $filterData->getPriceMin(), $filterData->getPriceMax(), $section);
+        }
+        else
+        {
+            $queryForPagination = $this->getDoctrine()->getRepository(Product::class)->getQueryForSearchAndPagination($inAdmin = false);
+        }
+
+        $products = $paginatorService
+            ->initialize($queryForPagination, 1)
+            ->addAttributesToPathParameters(['slug'])
+            ->getCurrentPageObjects();
+
+        if($paginatorService->isCurrentPageOutOfBounds())
+        {
+            throw new NotFoundHttpException('Na této stránce nebyly nalezeny žádné produkty.');
+        }
+
+        return $this->render('products/catalog.html.twig', [
+            'filterForm' => $form->createView(),
+            'products' => $products,
+            'breadcrumbs' => $this->breadcrumbs,
+            'pagination' => $paginatorService->createViewData(),
+        ]);
     }
 
     /**
@@ -59,6 +98,9 @@ class ProductController extends AbstractController
         {
             throw new NotFoundHttpException('Produkt nenalezen.');
         }
+
+        $form = $this->createForm(CartInsertFormType::class);
+        $form->add('submit', SubmitType::class, ['label' => 'Do košíku']);
 
         $relatedProducts = null;
         if($product->getSection() !== null)
@@ -75,6 +117,7 @@ class ProductController extends AbstractController
         return $this->render('products/product.html.twig', [
             'productInstance' => $product,
             'relatedProducts' => $relatedProducts,
+            'cartInsertForm' => $form->createView(),
             'breadcrumbs' => $this->breadcrumbs
                 ->addRoute('products', ['slug' => $sectionData['slug']], $sectionData['title'])
                 ->addRoute('product', ['slug' => $product->getSlug()], $product->getName()),

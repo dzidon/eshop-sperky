@@ -28,7 +28,7 @@
                     {% if hasImages %}
                         <div class="row flex-wrap">
                             {% for image in productInstance.getImages() %}
-                                <div class="col s2 margin-0 valign-wrapper">
+                                <div class="col s2 margin-0">
                                     <a href="" class="product-image-small-link">
                                         <img src="{{ asset(image.getName(), 'product_images') }}" class="responsive-img black-and-white-img" alt="Obrázek produktu">
                                     </a>
@@ -44,7 +44,7 @@
                     <div class="row">
                         <div class="col s12">
                             <h4 class="no-mar-top">
-                                {{ productInstance.getPriceWithVat() }} CZK
+                                {{ productInstance.getPriceWithVat() }} Kč
                                 {% if vat_payer %}
                                     vč. DPH
                                 {% endif %}
@@ -79,6 +79,13 @@
                             </div>
                         </div>
                     {% endif %}
+
+                    <div class="row">
+                        <div class="col s12">
+                            <span class="bold">ID produktu: </span>
+                            <span>{{ productInstance.getId() }}</span>
+                        </div>
+                    </div>
 
                     {% if productInstance.getCategoryNamesGrouped()|length > 0 %}
                         <div class="row">

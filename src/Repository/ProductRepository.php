@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Product;
+use App\Entity\ProductSection;
 use App\Service\SortingService;
 use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -39,7 +40,10 @@ class ProductRepository extends ServiceEntityRepository
             ->leftJoin('p.info', 'pi')
             ->leftJoin('pi.productInformationGroup', 'pig')
             ->leftJoin('p.images', 'pimg')
-            ->orderBy('pimg.priority', 'DESC');
+            ->addOrderBy('pimg.priority', 'DESC')
+            ->addOrderBy('pc.name', 'ASC')
+            ->addOrderBy('pcg.name', 'ASC')
+            ->addOrderBy('pig.name', 'ASC');
 
         foreach ($criteria as $name => $value)
         {
@@ -80,29 +84,54 @@ class ProductRepository extends ServiceEntityRepository
         return $products;
     }
 
-    public function getQueryForSearchAndPagination(bool $inAdmin, $searchPhrase = null, string $sortAttribute = null): Query
+    public function getQueryForSearchAndPagination(bool $inAdmin, string $searchPhrase = null, string $sortAttribute = null, float $priceMin = null, float $priceMax = null, ProductSection $section = null): Query
     {
         $queryBuilder = $this->createQueryBuilder('p');
 
         if($inAdmin)
         {
-            $sortData = $this->sorting->createSortData($sortAttribute, Product::getSortData()['admin']);
-
+            $sortData = $this->sorting->createSortData($sortAttribute, Product::getSortDataForAdmin());
             $queryBuilder
                 // vyhledavani
-                ->andWhere('p.name LIKE :searchPhrase OR
-                            p.slug LIKE :searchPhrase OR
-                            p.priceWithoutVat LIKE :searchPhrase OR
-                            p.priceWithVat LIKE :searchPhrase OR
-                            p.vat LIKE :searchPhrase OR
-                            p.description LIKE :searchPhrase')
-                ->setParameter('searchPhrase', '%' . $searchPhrase . '%')
-
-                // razeni
-                ->orderBy('p.' . $sortData['attribute'], $sortData['order'])
+                ->andWhere('p.id LIKE :searchPhrase OR
+                            p.name LIKE :searchPhrase OR
+                            p.slug LIKE :searchPhrase')
             ;
         }
-        //else
+        else
+        {
+            $sortData = $this->sorting->createSortData($sortAttribute, Product::getSortDataForCatalog());
+            $queryBuilder
+                // vyhledavani
+                ->andWhere('p.id LIKE :searchPhrase OR
+                            p.name LIKE :searchPhrase')
+            ;
+
+            if($priceMin)
+            {
+                $queryBuilder
+                    ->andWhere('p.priceWithVat >= :priceMin')
+                    ->setParameter('priceMin', $priceMin);
+            }
+
+            if($priceMax)
+            {
+                $queryBuilder
+                    ->andWhere('p.priceWithVat <= :priceMax')
+                    ->setParameter('priceMax', $priceMax);
+            }
+
+            if($section)
+            {
+                $queryBuilder
+                    ->andWhere('p.section = :section')
+                    ->setParameter('section', $section);
+            }
+        }
+
+        $queryBuilder
+            ->setParameter('searchPhrase', '%' . $searchPhrase . '%')
+            ->orderBy('p.' . $sortData['attribute'], $sortData['order']);
 
         return $queryBuilder->getQuery();
     }

@@ -18,7 +18,7 @@
                             </a>
 
                             <p class="bold">
-                                {{ product.getPriceWithVat() }} CZK
+                                {{ product.getPriceWithVat() }} Kč
                                 {% if vat_payer %}
                                     vč. DPH
                                 {% endif %}
@@ -41,7 +41,7 @@
                                 </p>
                                 <p>
                                     Cena bez DPH:
-                                    <em>{{ product.getPriceWithoutVat() }} CZK</em>
+                                    <em>{{ product.getPriceWithoutVat() }} Kč</em>
                                 </p>
 
                                 {% if not product.isVisible() %}

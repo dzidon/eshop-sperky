@@ -1,0 +1,55 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+
+    {# Breadcrumbs #}
+    {{ include('fragments/_breadcrumbs.html.twig') }}
+
+    <div class="container">
+        <h1>{{ breadcrumbs.getPageTitle() }} ({{ pagination.getTotalItems() }})</h1>
+
+        <div class="row margin-0">
+            <div class="col s12 l3">
+                <div class="row no-padding">
+                    <div class="collection with-header hide-on-med-and-down">
+                        <div class="collection-header grey lighten-4 valign-wrapper">
+                            <i class="material-icons margin-right15px">menu</i>
+                            <strong>Filtr</strong>
+                        </div>
+
+                        <div class="collection-item">
+                            a
+                        </div>
+
+                        <div class="collection-header grey lighten-4 valign-wrapper">
+                            <i class="material-icons margin-right15px">menu</i>
+                            <strong>Filtr</strong>
+                        </div>
+
+                        <div class="collection-item">
+                            a
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col s12 l8 offset-l1 offset-xl1">
+                {# Flash zprávy #}
+                {{ include('fragments/_flash_messages.html.twig') }}
+
+                <div class="section no-pad-top">
+                    <div class="row">
+                        <div class="row no-mar-bot">
+                            {# Produkty #}
+                            {{ include('fragments/_products.html.twig', {products: products, admin: false, large: false, can_edit: false, can_delete: false}) }}
+                        </div>
+                    </div>
+
+                    {# Pagination #}
+                    {{ include('fragments/_pagination.html.twig') }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

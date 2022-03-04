@@ -562,35 +562,37 @@ class Product
         }
     }
 
-    public static function getSortData(): array
+    public static function getSortDataForAdmin(): array
     {
         return [
-            'admin' => [
-                'Od nejnovějších' => 'created'.SortingService::ATTRIBUTE_TAG_DESC,
-                'Od nejstarších' => 'created'.SortingService::ATTRIBUTE_TAG_ASC,
-                'Název (A-Z)' => 'name'.SortingService::ATTRIBUTE_TAG_ASC,
-                'Název (Z-A)' => 'name'.SortingService::ATTRIBUTE_TAG_DESC,
-                'Odkaz (A-Z)' => 'slug'.SortingService::ATTRIBUTE_TAG_ASC,
-                'Odkaz (Z-A)' => 'slug'.SortingService::ATTRIBUTE_TAG_DESC,
-                'Cena bez DPH (vzestupně)' => 'priceWithoutVat'.SortingService::ATTRIBUTE_TAG_ASC,
-                'Cena bez DPH (sestupně)' => 'priceWithoutVat'.SortingService::ATTRIBUTE_TAG_DESC,
-                'Cena s DPH (vzestupně)' => 'priceWithVat'.SortingService::ATTRIBUTE_TAG_ASC,
-                'Cena s DPH (sestupně)' => 'priceWithVat'.SortingService::ATTRIBUTE_TAG_DESC,
-                'DPH (vzestupně)' => 'vat'.SortingService::ATTRIBUTE_TAG_ASC,
-                'DPH (sestupně)' => 'vat'.SortingService::ATTRIBUTE_TAG_DESC,
-                'Ks skladem (vzestupně)' => 'inventory'.SortingService::ATTRIBUTE_TAG_ASC,
-                'Ks skladem (sestupně)' => 'inventory'.SortingService::ATTRIBUTE_TAG_DESC,
-            ],
-            'catalog' => [
-                'Od nejnovějších' => 'created'.SortingService::ATTRIBUTE_TAG_DESC,
-                'Od nejstarších' => 'created'.SortingService::ATTRIBUTE_TAG_ASC,
-                'Název (A-Z)' => 'name'.SortingService::ATTRIBUTE_TAG_ASC,
-                'Název (Z-A)' => 'name'.SortingService::ATTRIBUTE_TAG_DESC,
-                'Cena (vzestupně)' => 'priceWithVat'.SortingService::ATTRIBUTE_TAG_ASC,
-                'Cena (sestupně)' => 'priceWithVat'.SortingService::ATTRIBUTE_TAG_DESC,
-                'Ks skladem (vzestupně)' => 'inventory'.SortingService::ATTRIBUTE_TAG_ASC,
-                'Ks skladem (sestupně)' => 'inventory'.SortingService::ATTRIBUTE_TAG_DESC,
-            ],
+            'Od nejnovějších' => 'created'.SortingService::ATTRIBUTE_TAG_DESC,
+            'Od nejstarších' => 'created'.SortingService::ATTRIBUTE_TAG_ASC,
+            'Název (A-Z)' => 'name'.SortingService::ATTRIBUTE_TAG_ASC,
+            'Název (Z-A)' => 'name'.SortingService::ATTRIBUTE_TAG_DESC,
+            'Odkaz (A-Z)' => 'slug'.SortingService::ATTRIBUTE_TAG_ASC,
+            'Odkaz (Z-A)' => 'slug'.SortingService::ATTRIBUTE_TAG_DESC,
+            'Cena bez DPH (vzestupně)' => 'priceWithoutVat'.SortingService::ATTRIBUTE_TAG_ASC,
+            'Cena bez DPH (sestupně)' => 'priceWithoutVat'.SortingService::ATTRIBUTE_TAG_DESC,
+            'Cena s DPH (vzestupně)' => 'priceWithVat'.SortingService::ATTRIBUTE_TAG_ASC,
+            'Cena s DPH (sestupně)' => 'priceWithVat'.SortingService::ATTRIBUTE_TAG_DESC,
+            'DPH (vzestupně)' => 'vat'.SortingService::ATTRIBUTE_TAG_ASC,
+            'DPH (sestupně)' => 'vat'.SortingService::ATTRIBUTE_TAG_DESC,
+            'Ks skladem (vzestupně)' => 'inventory'.SortingService::ATTRIBUTE_TAG_ASC,
+            'Ks skladem (sestupně)' => 'inventory'.SortingService::ATTRIBUTE_TAG_DESC,
+        ];
+    }
+
+    public static function getSortDataForCatalog(): array
+    {
+        return [
+            'Od nejnovějších' => 'created'.SortingService::ATTRIBUTE_TAG_DESC,
+            'Od nejstarších' => 'created'.SortingService::ATTRIBUTE_TAG_ASC,
+            'Název (A-Z)' => 'name'.SortingService::ATTRIBUTE_TAG_ASC,
+            'Název (Z-A)' => 'name'.SortingService::ATTRIBUTE_TAG_DESC,
+            'Cena (vzestupně)' => 'priceWithVat'.SortingService::ATTRIBUTE_TAG_ASC,
+            'Cena (sestupně)' => 'priceWithVat'.SortingService::ATTRIBUTE_TAG_DESC,
+            'Ks skladem (vzestupně)' => 'inventory'.SortingService::ATTRIBUTE_TAG_ASC,
+            'Ks skladem (sestupně)' => 'inventory'.SortingService::ATTRIBUTE_TAG_DESC,
         ];
     }
 }

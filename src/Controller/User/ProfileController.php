@@ -164,9 +164,8 @@ class ProfileController extends AbstractController
             $queryForPagination = $this->getDoctrine()->getRepository(Address::class)->getQueryForSearchAndPagination($user);
         }
 
-        $page = (int) $this->request->query->get(PaginatorService::QUERY_PARAMETER_PAGE_NAME, '1');
         $addresses = $paginatorService
-            ->initialize($queryForPagination, 5, $page)
+            ->initialize($queryForPagination, 5)
             ->getCurrentPageObjects();
 
         if($paginatorService->isCurrentPageOutOfBounds())

@@ -48,7 +48,7 @@ class ProductController extends AbstractController
      */
     public function products(FormFactoryInterface $formFactory, PaginatorService $paginatorService): Response
     {
-        $form = $formFactory->createNamed('', SearchTextAndSortFormType::class, null, ['sort_choices' => Product::getSortData()['admin']]);
+        $form = $formFactory->createNamed('', SearchTextAndSortFormType::class, null, ['sort_choices' => Product::getSortDataForAdmin()]);
         //button je přidáván v šabloně, aby se nezobrazoval v odkazu
         $form->handleRequest($this->request);
 
@@ -61,9 +61,8 @@ class ProductController extends AbstractController
             $queryForPagination = $this->getDoctrine()->getRepository(Product::class)->getQueryForSearchAndPagination($inAdmin = true);
         }
 
-        $page = (int) $this->request->query->get(PaginatorService::QUERY_PARAMETER_PAGE_NAME, '1');
         $products = $paginatorService
-            ->initialize($queryForPagination, 1, $page)
+            ->initialize($queryForPagination, 1)
             ->getCurrentPageObjects();
 
         if($paginatorService->isCurrentPageOutOfBounds())

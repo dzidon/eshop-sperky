@@ -61,9 +61,8 @@ class ProductInfoController extends AbstractController
             $queryForPagination = $this->getDoctrine()->getRepository(ProductInformationGroup::class)->getQueryForSearchAndPagination();
         }
 
-        $page = (int) $this->request->query->get(PaginatorService::QUERY_PARAMETER_PAGE_NAME, '1');
         $infoGroups = $paginatorService
-            ->initialize($queryForPagination, 1, $page)
+            ->initialize($queryForPagination, 1)
             ->getCurrentPageObjects();
 
         if($paginatorService->isCurrentPageOutOfBounds())

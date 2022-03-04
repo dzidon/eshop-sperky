@@ -49,15 +49,27 @@ class PaginatorService
     private array $viewData = [];
 
     /**
-     * Parametry GET požadavku
+     * Parametry požadavku, primárně GET, jdou do nich ale i přimíchat atributy pomocí addAttributesToPathParameters
      *
      * @var array
      */
     private array $queryParameters;
 
+    /**
+     * Všechny atributy požadavku
+     *
+     * @var array
+     */
+    private array $queryAttributes;
+
     public function __construct(RequestStack $requestStack)
     {
-        $this->queryParameters = $requestStack->getCurrentRequest()->query->all();
+        $request = $requestStack->getCurrentRequest();
+        $this->queryParameters = $request->query->all();
+        $this->queryAttributes = $request->attributes->all();
+
+        $page = (int) $request->query->get(PaginatorService::QUERY_PARAMETER_PAGE_NAME, '1');
+        $this->setCurrentPageAndSanitize($page);
     }
 
     /**
@@ -66,14 +78,11 @@ class PaginatorService
      *
      * @param Query $query
      * @param int $pageSize
-     * @param int $page
      * @return $this
      */
-    public function initialize(Query $query, int $pageSize, int $page): self
+    public function initialize(Query $query, int $pageSize): self
     {
         $this->pageSize = $pageSize;
-        $this->setCurrentPageAndSanitize($page);
-
         $paginator = new Paginator($query);
         $this->totalItems = count($paginator);
         $this->pagesCount = ceil($this->totalItems / $this->pageSize);
@@ -134,6 +143,29 @@ class PaginatorService
     public function getCurrentPage(): int
     {
         return $this->currentPage;
+    }
+
+    /**
+     * Do parametrů odkazů přimíchá hodnoty požadovaných atributů
+     *
+     * @param array $attributes
+     * @return $this
+     */
+    public function addAttributesToPathParameters(array $attributes): self
+    {
+        foreach ($attributes as $wantedAttributeKey)
+        {
+            foreach($this->queryAttributes as $existingAttributeKey => $existingAttributeValue)
+            {
+                if($wantedAttributeKey === $existingAttributeKey)
+                {
+                    $this->queryParameters[$existingAttributeKey] = $existingAttributeValue;
+                    break;
+                }
+            }
+        }
+
+        return $this;
     }
 
     /**
