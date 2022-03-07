@@ -280,3 +280,6 @@ a.secondary-content {
 .noUi-target.noUi-horizontal .noUi-tooltip {
     background-color: #03a9f4;
 }
+[disabled] .noUi-handle {
+    background-color: gray;
+}

@@ -65,9 +65,19 @@ class ProductRepository extends ServiceEntityRepository
                 ->setParameter('section', $section);
         }
 
-        return $queryBuilder
+        $priceData = $queryBuilder
             ->getQuery()
             ->getScalarResult()[0];
+
+        foreach ($priceData as $key => &$value)
+        {
+            if($value === null)
+            {
+                $value = 0;
+            }
+        }
+
+        return $priceData;
     }
 
     public function findRelated(Product $product, int $quantity)

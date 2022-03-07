@@ -54,7 +54,7 @@ class ProductCategoryController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid())
         {
-            $queryForPagination = $this->getDoctrine()->getRepository(ProductCategoryGroup::class)->getQueryForSearchAndPagination($form->get('vyraz')->getData(), $form->get('razeni')->getData());
+            $queryForPagination = $this->getDoctrine()->getRepository(ProductCategoryGroup::class)->getQueryForSearchAndPagination($form->get('searchPhrase')->getData(), $form->get('sortBy')->getData());
         }
         else
         {

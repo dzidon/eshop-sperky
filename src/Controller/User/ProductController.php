@@ -75,7 +75,7 @@ class ProductController extends AbstractController
         }
 
         $products = $paginatorService
-            ->initialize($queryForPagination, 1)
+            ->initialize($queryForPagination, 2)
             ->addAttributesToPathParameters(['slug'])
             ->getCurrentPageObjects();
 

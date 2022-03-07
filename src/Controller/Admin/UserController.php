@@ -56,7 +56,7 @@ class UserController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid())
         {
-            $queryForPagination = $this->getDoctrine()->getRepository(User::class)->getQueryForSearchAndPagination($form->get('vyraz')->getData(), $form->get('razeni')->getData());
+            $queryForPagination = $this->getDoctrine()->getRepository(User::class)->getQueryForSearchAndPagination($form->get('searchPhrase')->getData(), $form->get('sortBy')->getData());
         }
         else
         {
