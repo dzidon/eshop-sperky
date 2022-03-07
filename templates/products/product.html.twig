@@ -29,7 +29,7 @@
                         <div class="row flex-wrap">
                             {% for image in productInstance.getImages() %}
                                 <div class="col s2 margin-0">
-                                    <a href="" class="product-image-small-link">
+                                    <a href="javascript:void(0);" class="product-image-small-link">
                                         <img src="{{ asset(image.getName(), 'product_images') }}" class="responsive-img black-and-white-img" alt="Obrázek produktu">
                                     </a>
                                 </div>
@@ -39,7 +39,12 @@
                 </div>
 
                 <div class="col s12 l6 offset-l1">
-                    <h1 class="h3-fontsize no-mar-top">{{ productInstance.getName() }}</h1>
+                    <h1 class="h3-fontsize no-mar-top">
+                        {{ productInstance.getName() }}
+                        {% if is_granted('product_edit') %}
+                            <a href="{{ path('admin_product_edit', {id: productInstance.getId()}) }}" class="btn-floating btn-medium waves-effect waves-light light-blue"><i class="material-icons">mode_edit</i></a>
+                        {% endif %}
+                    </h1>
 
                     <div class="row">
                         <div class="col s12">
@@ -73,7 +78,7 @@
                                 {% if productInstance.isDescriptionLong() %}
                                     ...
                                     <strong>
-                                        <a href="#full-description" id="full-description-link">(Celý popis)</a>
+                                        <a href="javascript:void(0);" id="full-description-link">(Celý popis)</a>
                                     </strong>
                                 {% endif %}
                             </div>
@@ -83,7 +88,7 @@
                     <div class="row">
                         <div class="col s12">
                             <span class="bold">ID produktu: </span>
-                            <span>{{ productInstance.getId() }}</span>
+                            {{ productInstance.getId() }}
                         </div>
                     </div>
 
@@ -95,7 +100,7 @@
                                         <span class="bold">{{ categoryGroupName }}:</span>
                                     </div>
                                     <div class="col s4 m3">
-                                        <span>{{ categoryNames|join(', ') }}</span>
+                                        {{ categoryNames|join(', ') }}
                                     </div>
                                 </div>
                             {% endfor %}
@@ -108,7 +113,7 @@
                 <div class="row">
                     <div class="col s12 l9">
                         <h4 id="full-description">Popis</h4>
-                        <span>{{ productInstance.getDescription() }}</span>
+                        {{ productInstance.getDescription() }}
                     </div>
                 </div>
             {% endif %}
@@ -125,14 +130,14 @@
                                 <span class="bold">{{ infoGroupName }}:</span>
                             </div>
                             <div class="col s4 m3 l2">
-                                <span>{{ infoValues|join(', ') }}</span>
+                                {{ infoValues|join(', ') }}
                             </div>
                         </div>
                     {% endfor %}
                 </div>
             {% endif %}
 
-            {% if relatedProducts is not same as(null) %}
+            {% if relatedProducts|length > 0 %}
                 <div class="row">
                     <div class="col s12">
                         <h4>Související produkty</h4>
@@ -145,4 +150,9 @@
         </div>
     </div>
 
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {{ encore_entry_script_tags('productPage') }}
 {% endblock %}

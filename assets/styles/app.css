@@ -255,10 +255,28 @@ a.secondary-content {
     opacity: 1 !important;
 }
 
-.rating > input:checked ~ label:before{
-    opacity:1;
+.rating > input:checked ~ label:before {
+    opacity: 1;
 }
 
-.rating:hover > input:checked ~ label:before{
+.rating:hover > input:checked ~ label:before {
     opacity: 0.4;
+}
+
+/*
+    ======== NoUiSlider ========
+*/
+
+.catalog-price-slider {
+    margin-top: 30px;
+}
+
+.noUi-connect {
+    background: #03a9f4;
+}
+.noUi-horizontal .noUi-handle, .noUi-vertical .noUi-handle {
+    background: #03a9f4;
+}
+.noUi-target.noUi-horizontal .noUi-tooltip {
+    background-color: #03a9f4;
 }

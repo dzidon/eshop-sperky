@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 class PaginatorService
 {
-    public const QUERY_PARAMETER_PAGE_NAME = 'stranka';
+    public const QUERY_PARAMETER_PAGE_NAME = 'page';
 
     private const VIEW_INNER_PAGES = 5;
     private const VIEW_INNER_CENTER = 3;

@@ -22,6 +22,8 @@ Encore
      */
     .addEntry('app', './assets/app.js')
     .addEntry('productVatCalculator', './assets/productVatCalculator.js')
+    .addEntry('productFilter', './assets/productFilter.js')
+    .addEntry('productPage', './assets/productPage.js')
 
     // enables the Symfony UX Stimulus bridge (used in assets/bootstrap.js)
     //.enableStimulusBridge('./assets/controllers.json')

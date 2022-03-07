@@ -13,16 +13,13 @@ class SearchTextAndSortFormType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('vyraz', TextType::class, [
+            ->add('searchPhrase', TextType::class, [
                 'required' => false,
                 'label' => 'Hledat...',
             ])
-            ->add('razeni', ChoiceType::class, [
+            ->add('sortBy', ChoiceType::class, [
                 'choices' => $options['sort_choices'],
                 'invalid_message' => 'Zvolte platný atribut řazení.',
-                'attr' => [
-                    'onchange' => 'this.form.submit()',
-                ],
                 'label' => 'Řazení',
             ])
         ;

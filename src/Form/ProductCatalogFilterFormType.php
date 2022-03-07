@@ -18,17 +18,26 @@ class ProductCatalogFilterFormType extends AbstractType
         $builder
             ->add('searchPhrase', TextType::class, [
                 'required' => false,
-                'label' => 'Hledat',
+                'property_path' => 'searchPhrase',
+                'label' => 'Hledat název nebo ID produktu',
             ])
             ->add('sortBy', ChoiceType::class, [
                 'choices' => Product::getSortDataForCatalog(),
                 'label' => 'Řazení',
             ])
             ->add('priceMin', NumberType::class, [
+                'attr' => [
+                    'data-price-min' => $options['price_min'],
+                ],
+                'required' => false,
                 'invalid_message' => 'Musíte zadat číselnou hodnotu.',
                 'label' => 'Od',
             ])
             ->add('priceMax', NumberType::class, [
+                'attr' => [
+                    'data-price-max' => $options['price_max'],
+                ],
+                'required' => false,
                 'invalid_message' => 'Musíte zadat číselnou hodnotu.',
                 'label' => 'Do',
             ])
@@ -39,9 +48,16 @@ class ProductCatalogFilterFormType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => ProductCatalogFilter::class,
-            'csrf_protection' => true,
+            'csrf_protection' => false,
             'csrf_field_name' => '_token',
             'csrf_token_id'   => 'form_product_catalog_filter',
+            'method' => 'GET',
+            'allow_extra_fields' => true,
+            'price_min' => 0,
+            'price_max' => 0,
         ]);
+
+        $resolver->setAllowedTypes('price_min', 'numeric');
+        $resolver->setAllowedTypes('price_max', 'numeric');
     }
 }

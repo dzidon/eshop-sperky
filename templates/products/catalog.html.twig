@@ -6,50 +6,93 @@
     {{ include('fragments/_breadcrumbs.html.twig') }}
 
     <div class="container">
-        <h1>{{ breadcrumbs.getPageTitle() }} ({{ pagination.getTotalItems() }})</h1>
+        <h1>{{ breadcrumbs.getPageTitle() }}</h1>
 
-        <div class="row margin-0">
-            <div class="col s12 l3">
-                <div class="row no-padding">
-                    <div class="collection with-header hide-on-med-and-down">
-                        <div class="collection-header grey lighten-4 valign-wrapper">
-                            <i class="material-icons margin-right15px">menu</i>
-                            <strong>Filtr</strong>
-                        </div>
+        {# Flash zprávy #}
+        {{ include('fragments/_flash_messages.html.twig') }}
 
-                        <div class="collection-item">
-                            a
-                        </div>
+        {{ form_start(filterForm) }}
+            <div class="row no-mar-bot">
+                Nalezeno produktů: {{ pagination.getTotalItems() }}
+            </div>
 
-                        <div class="collection-header grey lighten-4 valign-wrapper">
-                            <i class="material-icons margin-right15px">menu</i>
-                            <strong>Filtr</strong>
-                        </div>
+            <div class="row margin-0">
+                <div class="col s12 l3">
+                    <div class="row no-padding">
+                        <div class="collection with-header hide-on-med-and-down">
+                            <div class="collection-header grey lighten-4 valign-wrapper">
+                                <i class="material-icons margin-right15px">monetization_on</i>
+                                <strong>Cena (Kč)</strong>
+                            </div>
 
-                        <div class="collection-item">
-                            a
+                            <div class="collection-item no-padding">
+                                <div class="col s12">
+                                    <div class="col s10 offset-s1">
+                                        <div class="section">
+                                            <div id="catalog-price-slider" class="catalog-price-slider"></div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col s10 offset-s1">
+                                        <div class="col s5">
+                                            {{ form_row(filterForm.priceMin) }}
+                                        </div>
+                                        <div class="col s5 offset-s2">
+                                            {{ form_row(filterForm.priceMax) }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="col s12 l8 offset-l1 offset-xl1">
-                {# Flash zprávy #}
-                {{ include('fragments/_flash_messages.html.twig') }}
+                <div class="col s12 l8 offset-l1 offset-xl1">
+                    <div class="section no-pad-top">
+                        <div class="row">
+                            <div class="row no-mar-bot">
+                                <div class="col s12">
+                                    <div class="row no-mar-bot">
+                                        <div class="input-field col s12 l6">
+                                            {{ form_widget(filterForm.searchPhrase) }}
+                                            {{ form_label(filterForm.searchPhrase) }}
+                                            {{ form_help(filterForm.searchPhrase) }}
+                                            {{ form_errors(filterForm.searchPhrase) }}
+                                        </div>
+                                        <div class="input-field col s12 l4">
+                                            {{ form_widget(filterForm.sortBy) }}
+                                            {{ form_label(filterForm.sortBy) }}
+                                            {{ form_help(filterForm.sortBy) }}
+                                            {{ form_errors(filterForm.sortBy) }}
+                                        </div>
+                                        <div class="input-field col s12 l2">
+                                            <div class="col s12">
+                                                <div class="row">
+                                                    <button class="btn waves-effect waves-light light-blue width-max no-padding center-align" type="submit">
+                                                        Hledat
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
 
-                <div class="section no-pad-top">
-                    <div class="row">
-                        <div class="row no-mar-bot">
-                            {# Produkty #}
-                            {{ include('fragments/_products.html.twig', {products: products, admin: false, large: false, can_edit: false, can_delete: false}) }}
+                                {# Produkty #}
+                                {{ include('fragments/_products.html.twig', {products: products, admin: false, large: false, can_edit: false, can_delete: false}) }}
+                            </div>
                         </div>
-                    </div>
 
-                    {# Pagination #}
-                    {{ include('fragments/_pagination.html.twig') }}
+                        {# Pagination #}
+                        {{ include('fragments/_pagination.html.twig') }}
+                    </div>
                 </div>
             </div>
-        </div>
+        {{ form_end(filterForm) }}
     </div>
 
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {{ encore_entry_script_tags('productFilter') }}
 {% endblock %}

@@ -1,9 +1,9 @@
 import 'materialize-css/dist/css/materialize.min.css';
 require('materialize-css/dist/js/materialize.min');
+import 'materialize-css/extras/noUiSlider/nouislider.css';
 import './styles/app.css';
 
 const autocompleteMaxElements = 5;
-
 $(document).ready(function() {
 
     // materialize
@@ -23,32 +23,6 @@ $(document).ready(function() {
             ),
             limit: autocompleteMaxElements
         });
-    });
-
-    // smooth scroll na celý popis po kliknutí na odkaz "(Celý popis)"
-    $("#full-description-link").click(function(e) {
-        e.preventDefault();
-        const target = document.getElementById('full-description');
-        target.scrollIntoView({
-            behavior: 'auto',
-            block: 'center',
-            inline: 'center'
-        });
-    });
-
-    // obrázky na stránce produktu
-    $('.black-and-white-img:first').removeClass('black-and-white-img');
-
-    const productImageLarge = $('#product-image-large');
-    $('.product-image-small-link').click(function(e) {
-        e.preventDefault()
-
-        const clickedImage = $(this).children("img:first");
-        const src = clickedImage.attr('src');
-        productImageLarge.attr('src', src);
-
-        $('.product-image-small-link').find('img').addClass('black-and-white-img');
-        clickedImage.removeClass('black-and-white-img');
     });
 
     // dynamicke vytvareni inputu podle prototypu pro CollectionType

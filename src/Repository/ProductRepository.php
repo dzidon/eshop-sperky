@@ -53,6 +53,23 @@ class ProductRepository extends ServiceEntityRepository
         return $qb->getQuery()->getOneOrNullResult();
     }
 
+    public function getMinAndMaxPrice(ProductSection $section = null)
+    {
+        $queryBuilder = $this->createQueryBuilder('p')
+            ->select('min(p.priceWithVat) as priceMin, max(p.priceWithVat) as priceMax');
+
+        if($section !== null)
+        {
+            $queryBuilder
+                ->andWhere('p.section = :section')
+                ->setParameter('section', $section);
+        }
+
+        return $queryBuilder
+            ->getQuery()
+            ->getScalarResult()[0];
+    }
+
     public function findRelated(Product $product, int $quantity)
     {
         $productsCount = $this->getQueryForRelated($product, $quantity)
@@ -84,7 +101,7 @@ class ProductRepository extends ServiceEntityRepository
         return $products;
     }
 
-    public function getQueryForSearchAndPagination(bool $inAdmin, string $searchPhrase = null, string $sortAttribute = null, float $priceMin = null, float $priceMax = null, ProductSection $section = null): Query
+    public function getQueryForSearchAndPagination(bool $inAdmin, ProductSection $section = null, string $searchPhrase = null, string $sortAttribute = null, float $priceMin = null, float $priceMax = null): Query
     {
         $queryBuilder = $this->createQueryBuilder('p');
 
@@ -107,23 +124,25 @@ class ProductRepository extends ServiceEntityRepository
                             p.name LIKE :searchPhrase')
             ;
 
-            if($priceMin)
+            if($priceMin !== null)
             {
                 $queryBuilder
                     ->andWhere('p.priceWithVat >= :priceMin')
                     ->setParameter('priceMin', $priceMin);
             }
 
-            if($priceMax)
+            if($priceMax !== null)
             {
                 $queryBuilder
                     ->andWhere('p.priceWithVat <= :priceMax')
                     ->setParameter('priceMax', $priceMax);
             }
 
-            if($section)
+            if($section !== null)
             {
                 $queryBuilder
+                    ->select('p, ps')
+                    ->leftJoin('p.section', 'ps')
                     ->andWhere('p.section = :section')
                     ->setParameter('section', $section);
             }
