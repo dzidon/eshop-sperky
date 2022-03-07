@@ -23,6 +23,7 @@ class ProductCatalogFilterFormType extends AbstractType
             ])
             ->add('sortBy', ChoiceType::class, [
                 'choices' => Product::getSortDataForCatalog(),
+                'empty_data' => Product::getSortDataForCatalog()[array_key_first(Product::getSortDataForCatalog())],
                 'label' => 'Řazení',
             ])
             ->add('priceMin', NumberType::class, [

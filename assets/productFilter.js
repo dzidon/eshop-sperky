@@ -9,11 +9,21 @@ $(document).ready(function() {
     const priceMin = parseFloat(priceMinInput.data('price-min'));
     const priceMax = parseFloat(priceMaxInput.data('price-max'));
 
-    const priceMinCurrent = parseFloat(priceMinInput.val());
-    const priceMaxCurrent = parseFloat(priceMaxInput.val());
+    let priceMinCurrent = priceMin;
+    let priceMaxCurrent = priceMax;
+
+    if ($.isNumeric(priceMinInput.val()))
+    {
+        priceMinCurrent = parseFloat(priceMinInput.val());
+    }
+
+    if ($.isNumeric(priceMaxInput.val()))
+    {
+        priceMaxCurrent = parseFloat(priceMaxInput.val());
+    }
 
     const slider = document.getElementById('catalog-price-slider');
-    if(slider)
+    if (slider)
     {
         noUiSlider.create(slider, {
             start: [priceMinCurrent, priceMaxCurrent],
@@ -31,14 +41,10 @@ $(document).ready(function() {
         });
 
         // update min. hodnoty slideru po změně inputu
-        priceMinInput.change(function() {
-            slider.noUiSlider.set([parseFloat(priceMinInput.val()), parseFloat(priceMaxInput.val())]);
-        });
+        priceMinInput.change(sliderUpdate(slider, priceMin, priceMax));
 
         // update max. hodnoty slideru po změně inputu
-        priceMaxInput.change(function() {
-            slider.noUiSlider.set([parseFloat(priceMinInput.val()), parseFloat(priceMaxInput.val())]);
-        });
+        priceMaxInput.change(sliderUpdate(slider, priceMin, priceMax));
 
         // update inputů při posouvání
         slider.noUiSlider.on('update', inputsUpdate);
@@ -52,4 +58,27 @@ function inputsUpdate(values)
 
     priceMinInput.val(newMin);
     priceMaxInput.val(newMax);
+
+    M.updateTextFields();
+}
+
+function sliderUpdate(slider, priceMin, priceMax)
+{
+    return function ()
+    {
+        let priceMinToSet = priceMin;
+        let priceMaxToSet = priceMax;
+
+        if($.isNumeric(priceMinInput.val()))
+        {
+            priceMinToSet = parseFloat(priceMinInput.val());
+        }
+
+        if($.isNumeric(priceMaxInput.val()))
+        {
+            priceMaxToSet = parseFloat(priceMaxInput.val());
+        }
+
+        slider.noUiSlider.set([priceMinToSet, priceMaxToSet]);
+    }
 }

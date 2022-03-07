@@ -72,7 +72,10 @@ class ProductCatalogFilter
 
     public function setPriceMin(?float $priceMin): self
     {
-        $this->priceMin = $priceMin;
+        if($priceMin !== null)
+        {
+            $this->priceMin = $priceMin;
+        }
 
         return $this;
     }
@@ -84,7 +87,10 @@ class ProductCatalogFilter
 
     public function setPriceMax(?float $priceMax): self
     {
-        $this->priceMax = $priceMax;
+        if($priceMax !== null)
+        {
+            $this->priceMax = $priceMax;
+        }
 
         return $this;
     }
