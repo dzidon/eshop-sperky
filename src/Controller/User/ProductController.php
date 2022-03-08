@@ -57,6 +57,7 @@ class ProductController extends AbstractController
         }
 
         $priceData = $this->getDoctrine()->getRepository(Product::class)->getMinAndMaxPrice($section);
+
         $filterData = new ProductCatalogFilter();
         $filterData->setPriceMin($priceData['priceMin']);
         $filterData->setPriceMax($priceData['priceMax']);

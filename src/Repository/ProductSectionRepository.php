@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\ProductSection;
 use App\Service\SortingService;
+use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Query;
 use Doctrine\Persistence\ManagerRegistry;
@@ -28,7 +29,9 @@ class ProductSectionRepository extends ServiceEntityRepository
     public function findAllVisible()
     {
         return $this->createQueryBuilder('ps')
-            ->andWhere('ps.isHidden = 0')
+            ->andWhere('ps.isHidden = false')
+            ->andWhere('NOT (ps.availableSince IS NOT NULL AND ps.availableSince > :now)')
+            ->setParameter('now', new DateTime('now'))
             ->orderBy('ps.name', 'ASC')
             ->getQuery()
             ->getResult()

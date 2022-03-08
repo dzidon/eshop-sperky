@@ -9,6 +9,7 @@ twig:
         site_email: '%app_site_email%'
         site_facebook: '%app_site_facebook%'
         site_instagram: '%app_site_instagram%'
+        navbar_service: '@app.navbar_service'
 
 when@test:
     twig:

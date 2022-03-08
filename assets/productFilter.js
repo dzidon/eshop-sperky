@@ -68,7 +68,9 @@ $(document).ready(function() {
             // update inputů při posouvání
             slider.noUiSlider.on('update', inputsUpdate);
 
+            // nastavení focusu na odpovídající input
             slider.noUiSlider.on('start', priceInputSetFocus);
+            slider.noUiSlider.on('change', priceInputSetFocus);
         }
     }
 });

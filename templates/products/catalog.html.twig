@@ -20,11 +20,20 @@
                 <div class="col s12 l3">
                     <div class="row no-padding">
                         <div class="collection with-header hide-on-med-and-down">
+                            {# Sekce #}
                             <div class="collection-header grey lighten-4 valign-wrapper">
-                                <i class="material-icons margin-right15px">monetization_on</i>
-                                <strong>Cena (Kč)</strong>
+                                <span class="bold">Sekce</span>
                             </div>
+                            <a href="{{ path('products') }}" class="collection-item {% if app.request.get('slug') is same as(null) %}active{% endif %}">Všechny</a>
+                            {% set sections = navbar_service.getVisibleSections() %}
+                            {% for section in sections %}
+                                <a href="{{ path('products', {slug: section.getSlug()}) }}" class="collection-item {% if app.request.get('slug') is same as(section.getSlug()) %}active{% endif %}">{{ section.getName() }}</a>
+                            {% endfor %}
 
+                            {# Cena #}
+                            <div class="collection-header grey lighten-4 valign-wrapper">
+                                <span class="bold">Cena (Kč)</span>
+                            </div>
                             <div class="collection-item no-padding">
                                 <div class="col s12">
                                     <div class="col s10 offset-s1">
