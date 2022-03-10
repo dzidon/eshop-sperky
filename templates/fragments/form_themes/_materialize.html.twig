@@ -239,6 +239,16 @@
     {{ parent() }}
 {% endblock textarea_widget %}
 
+{# Checkbox kategorie v produktovém filtru #}
+{% block _categories_entry_row %}
+    <label class="input-field block">
+        {{ form_widget(form, {'attr': {'class': 'filled-in checkbox-light-blue'}}) }}
+        {{ form_label(form) }}
+        {{ form_help(form) }}
+        {{ form_errors(form) }}
+    </label>
+{% endblock _categories_entry_row %}
+
 {# Widget textového pole s autocomplete #}
 {% block autocomplete_text_widget %}
     {% set attr = attr|merge({'data-autocomplete': json_autocomplete }) %}

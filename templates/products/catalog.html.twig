@@ -52,6 +52,17 @@
                                     </div>
                                 </div>
                             </div>
+
+                            {% for categoryGroup in filterForm.categories.vars.choices %}
+                                <div class="collection-header grey lighten-4 valign-wrapper">
+                                    <span class="bold">{{ categoryGroup.label }}</span>
+                                </div>
+                                <div class="collection-item">
+                                    {% for id, category in categoryGroup.choices %}
+                                        {{ form_row(filterForm.categories.children[id]) }}
+                                    {% endfor %}
+                                </div>
+                            {% endfor %}
                         </div>
                     </div>
                 </div>
