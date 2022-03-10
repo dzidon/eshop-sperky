@@ -4,8 +4,8 @@ namespace App\Repository;
 
 use App\Entity\Product;
 use App\Entity\ProductSection;
+use App\Service\ProductCatalogFilterService;
 use App\Service\SortingService;
-use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
@@ -21,12 +21,14 @@ use Exception;
 class ProductRepository extends ServiceEntityRepository
 {
     private SortingService $sorting;
+    private ProductCatalogFilterService $filter;
 
-    public function __construct(ManagerRegistry $registry, SortingService $sorting)
+    public function __construct(ManagerRegistry $registry, SortingService $sorting, ProductCatalogFilterService $filter)
     {
         parent::__construct($registry, Product::class);
 
         $this->sorting = $sorting;
+        $this->filter = $filter;
     }
 
     public function findOneAndFetchEverything(array $criteria)
@@ -57,6 +59,8 @@ class ProductRepository extends ServiceEntityRepository
     {
         $queryBuilder = $this->createQueryBuilder('p')
             ->select('min(p.priceWithVat) as priceMin, max(p.priceWithVat) as priceMax');
+
+        $this->filter->addProductVisibilityCondition($queryBuilder);
 
         if($section !== null)
         {
@@ -111,7 +115,7 @@ class ProductRepository extends ServiceEntityRepository
         return $products;
     }
 
-    public function getQueryForSearchAndPagination(bool $inAdmin, ProductSection $section = null, string $searchPhrase = null, string $sortAttribute = null, float $priceMin = null, float $priceMax = null): Query
+    public function getQueryForSearchAndPagination(bool $inAdmin, ProductSection $section = null, string $searchPhrase = null, string $sortAttribute = null, float $priceMin = null, float $priceMax = null, array $categoriesGrouped = null): Query
     {
         $queryBuilder = $this->createQueryBuilder('p');
 
@@ -123,52 +127,23 @@ class ProductRepository extends ServiceEntityRepository
                 ->andWhere('p.id LIKE :searchPhrase OR
                             p.name LIKE :searchPhrase OR
                             p.slug LIKE :searchPhrase')
+                ->setParameter('searchPhrase', '%' . $searchPhrase . '%')
             ;
         }
         else
         {
             $sortData = $this->sorting->createSortData($sortAttribute, Product::getSortDataForCatalog());
-            $queryBuilder
-                // vyhledavani
-                ->andWhere('p.id LIKE :searchPhrase OR
-                            p.name LIKE :searchPhrase')
-            ;
-
-            if($priceMin !== null)
-            {
-                $queryBuilder
-                    ->andWhere('p.priceWithVat >= :priceMin')
-                    ->setParameter('priceMin', $priceMin);
-            }
-
-            if($priceMax !== null)
-            {
-                $queryBuilder
-                    ->andWhere('p.priceWithVat <= :priceMax')
-                    ->setParameter('priceMax', $priceMax);
-            }
-
-            if($section !== null)
-            {
-                $queryBuilder
-                    ->select('p, ps')
-                    ->leftJoin('p.section', 'ps')
-                    ->andWhere('p.section = :section')
-                    ->setParameter('section', $section);
-            }
+            $this->filter->addProductSearchConditions($queryBuilder, $searchPhrase, $priceMin, $priceMax, $section, $categoriesGrouped);
         }
 
-        $queryBuilder
-            ->setParameter('searchPhrase', '%' . $searchPhrase . '%')
-            ->orderBy('p.' . $sortData['attribute'], $sortData['order']);
-
+        $queryBuilder->orderBy('p.' . $sortData['attribute'], $sortData['order']);
         return $queryBuilder->getQuery();
     }
 
     private function getQueryForRelated(Product $product, int $quantity): QueryBuilder
     {
         $queryBuilder = $this->createQueryBuilder('p');
-        $this->addVisibilityCondition($queryBuilder);
+        $this->filter->addProductVisibilityCondition($queryBuilder);
 
         return $queryBuilder
             ->andWhere('p.id != :viewedProductId')
@@ -178,14 +153,5 @@ class ProductRepository extends ServiceEntityRepository
             ->setParameter('viewedProductSection', $product->getSection())
             ->orderBy('p.created', 'DESC')
             ->setMaxResults($quantity);
-    }
-
-    private function addVisibilityCondition(QueryBuilder $queryBuilder): void
-    {
-        $queryBuilder
-            ->andWhere('p.isHidden = false')
-            ->andWhere('NOT (p.availableSince IS NOT NULL AND p.availableSince > :now)')
-            ->andWhere('NOT (p.hideWhenSoldOut = true AND p.inventory <= 0)')
-            ->setParameter('now', new DateTime('now'));
     }
 }

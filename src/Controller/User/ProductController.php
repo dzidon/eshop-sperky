@@ -56,23 +56,20 @@ class ProductController extends AbstractController
             $this->breadcrumbs->addRoute('products', [], 'Všechny produkty');
         }
 
-        $priceData = $this->getDoctrine()->getRepository(Product::class)->getMinAndMaxPrice($section);
-
         $filterData = new ProductCatalogFilter();
-        $filterData->setPriceMin($priceData['priceMin']);
-        $filterData->setPriceMax($priceData['priceMax']);
+        $filterData->setSection($section);
 
-        $form = $formFactory->createNamed('', ProductCatalogFilterFormType::class, $filterData, ['price_min' => $priceData['priceMin'], 'price_max' => $priceData['priceMax']]);
+        $form = $formFactory->createNamed('', ProductCatalogFilterFormType::class, $filterData);
         // button je přidáván v šabloně, aby se nezobrazoval v odkazu
         $form->handleRequest($this->request);
 
         if ($form->isSubmitted() && $form->isValid())
         {
-            $queryForPagination = $this->getDoctrine()->getRepository(Product::class)->getQueryForSearchAndPagination($inAdmin = false, $section, $filterData->getSearchPhrase(), $filterData->getSortBy(), $filterData->getPriceMin(), $filterData->getPriceMax());
+            $queryForPagination = $this->getDoctrine()->getRepository(Product::class)->getQueryForSearchAndPagination($inAdmin = false, $filterData->getSection(), $filterData->getSearchPhrase(), $filterData->getSortBy(), $filterData->getPriceMin(), $filterData->getPriceMax(), $filterData->getCategoriesGrouped());
         }
         else
         {
-            $queryForPagination = $this->getDoctrine()->getRepository(Product::class)->getQueryForSearchAndPagination($inAdmin = false, $section);
+            $queryForPagination = $this->getDoctrine()->getRepository(Product::class)->getQueryForSearchAndPagination($inAdmin = false, $filterData->getSection());
         }
 
         $products = $paginatorService

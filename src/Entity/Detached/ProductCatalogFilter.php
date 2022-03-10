@@ -2,6 +2,10 @@
 
 namespace App\Entity\Detached;
 
+use App\Entity\ProductCategory;
+use App\Entity\ProductSection;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
@@ -24,6 +28,15 @@ class ProductCatalogFilter
      * @Assert\Type("numeric", message="Musíte zadat číselnou hodnotu.")
      */
     private $priceMax;
+
+    private $section;
+
+    private $categories;
+
+    public function __construct()
+    {
+        $this->categories = new ArrayCollection();
+    }
 
     /**
      * @Assert\Callback()
@@ -91,6 +104,59 @@ class ProductCatalogFilter
         {
             $this->priceMax = $priceMax;
         }
+
+        return $this;
+    }
+
+    public function getSection(): ?ProductSection
+    {
+        return $this->section;
+    }
+
+    public function setSection(?ProductSection $section): self
+    {
+        $this->section = $section;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|ProductCategory[]
+     */
+    public function getCategories(): Collection
+    {
+        return $this->categories;
+    }
+
+    public function getCategoriesGrouped(): ?array
+    {
+        if($this->categories === null || $this->categories->isEmpty())
+        {
+            return null;
+        }
+
+        $categoriesGrouped = [];
+        foreach ($this->categories as $category)
+        {
+            $categoryGroupName = $category->getProductCategoryGroup()->getName();
+            $categoriesGrouped[$categoryGroupName][] = $category;
+        }
+
+        return $categoriesGrouped;
+    }
+
+    public function addCategory(ProductCategory $category): self
+    {
+        if (!$this->categories->contains($category)) {
+            $this->categories[] = $category;
+        }
+
+        return $this;
+    }
+
+    public function removeCategory(ProductCategory $category): self
+    {
+        $this->categories->removeElement($category);
 
         return $this;
     }

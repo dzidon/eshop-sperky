@@ -128,7 +128,7 @@ class Product
     private $section;
 
     /**
-     * @ORM\ManyToMany(targetEntity=ProductCategory::class, cascade={"persist"})
+     * @ORM\ManyToMany(targetEntity=ProductCategory::class, inversedBy="products", cascade={"persist"})
      * @ORM\JoinTable(name="_product_category")
      */
     private $categories;
@@ -378,8 +378,10 @@ class Product
 
     public function addCategory(ProductCategory $category): self
     {
-        if (!$this->categories->contains($category)) {
+        if (!$this->categories->contains($category))
+        {
             $this->categories[] = $category;
+            $category->addProduct($this);
         }
 
         return $this;
@@ -387,7 +389,11 @@ class Product
 
     public function removeCategory(ProductCategory $category): self
     {
-        $this->categories->removeElement($category);
+        if ($this->categories->contains($category))
+        {
+            $this->categories->removeElement($category);
+            $category->removeProduct($this);
+        }
 
         return $this;
     }
