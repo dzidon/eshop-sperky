@@ -25,6 +25,23 @@ class ProductCategoryRepository extends ServiceEntityRepository
         $this->filter = $filter;
     }
 
+    public function getNumberOfProductsForFilter(ProductCategory $category, $categoriesChosen, $section)
+    {
+        $queryBuilder = $this->createQueryBuilder('pc')
+            ->select('count(p)')
+            ->innerJoin('pc.products', 'p')
+            ->andWhere('pc.id = :id')
+            ->setParameter(':id', $category->getId())
+        ;
+
+        return $this->filter
+            ->initialize($queryBuilder, $section, null, null, null, $categoriesChosen)
+            ->addCategoryProductCountConditions($category)
+            ->getQueryBuilder()
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
     public function qbFindCategoriesInSection($section = null): QueryBuilder
     {
         $queryBuilder = $this->createQueryBuilder('pc')
@@ -33,9 +50,10 @@ class ProductCategoryRepository extends ServiceEntityRepository
             ->innerJoin('pc.products', 'p')
         ;
 
-        $this->filter->addProductSearchConditions($queryBuilder, null, null, null, $section);
-
-        return $queryBuilder;
+        return $this->filter
+            ->initialize($queryBuilder, $section)
+            ->addProductSearchConditions()
+            ->getQueryBuilder();
     }
 
     public function qbFindAllAndFetchGroups(): QueryBuilder

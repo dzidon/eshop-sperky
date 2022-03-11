@@ -33,7 +33,7 @@ class ProductRepository extends ServiceEntityRepository
 
     public function findOneAndFetchEverything(array $criteria)
     {
-        $qb = $this->createQueryBuilder('p')
+        $queryBuilder = $this->createQueryBuilder('p')
             ->select('p, ps, pc, pcg, po, pi, pig, pimg')
             ->leftJoin('p.section', 'ps')
             ->leftJoin('p.categories', 'pc')
@@ -49,18 +49,21 @@ class ProductRepository extends ServiceEntityRepository
 
         foreach ($criteria as $name => $value)
         {
-            $qb->andWhere(sprintf('p.%s = :%s', $name, $name))->setParameter($name, $value);
+            $queryBuilder->andWhere(sprintf('p.%s = :%s', $name, $name))->setParameter($name, $value);
         }
 
-        return $qb->getQuery()->getOneOrNullResult();
+        return $this->filter
+            ->initialize($queryBuilder)
+            ->addProductVisibilityCondition()
+            ->getQueryBuilder()
+            ->getQuery()
+            ->getOneOrNullResult();
     }
 
     public function getMinAndMaxPrice(ProductSection $section = null)
     {
         $queryBuilder = $this->createQueryBuilder('p')
             ->select('min(p.priceWithVat) as priceMin, max(p.priceWithVat) as priceMax');
-
-        $this->filter->addProductVisibilityCondition($queryBuilder);
 
         if($section !== null)
         {
@@ -69,7 +72,10 @@ class ProductRepository extends ServiceEntityRepository
                 ->setParameter('section', $section);
         }
 
-        $priceData = $queryBuilder
+        $priceData = $this->filter
+            ->initialize($queryBuilder)
+            ->addProductVisibilityCondition()
+            ->getQueryBuilder()
             ->getQuery()
             ->getScalarResult()[0];
 
@@ -133,7 +139,10 @@ class ProductRepository extends ServiceEntityRepository
         else
         {
             $sortData = $this->sorting->createSortData($sortAttribute, Product::getSortDataForCatalog());
-            $this->filter->addProductSearchConditions($queryBuilder, $searchPhrase, $priceMin, $priceMax, $section, $categoriesGrouped);
+            $queryBuilder = $this->filter
+                ->initialize($queryBuilder, $section, $searchPhrase, $priceMin, $priceMax, $categoriesGrouped)
+                ->addProductSearchConditions()
+                ->getQueryBuilder();
         }
 
         $queryBuilder->orderBy('p.' . $sortData['attribute'], $sortData['order']);
@@ -143,9 +152,12 @@ class ProductRepository extends ServiceEntityRepository
     private function getQueryForRelated(Product $product, int $quantity): QueryBuilder
     {
         $queryBuilder = $this->createQueryBuilder('p');
-        $this->filter->addProductVisibilityCondition($queryBuilder);
 
-        return $queryBuilder
+        return $this->filter
+            ->initialize($queryBuilder)
+            ->addProductVisibilityCondition()
+            ->getQueryBuilder()
+
             ->andWhere('p.id != :viewedProductId')
             ->andWhere('p.section = :viewedProductSection')
             ->andWhere('p.section = :viewedProductSection')

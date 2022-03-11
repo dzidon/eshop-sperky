@@ -2,69 +2,141 @@
 
 namespace App\Service;
 
+use App\Entity\ProductCategory;
 use App\Entity\ProductSection;
 use DateTime;
 use Doctrine\ORM\QueryBuilder;
 
 class ProductCatalogFilterService
 {
-    public function addProductSearchConditions(QueryBuilder $queryBuilder, string $searchPhrase = null, float $priceMin = null, float $priceMax = null, ProductSection $section = null, array $categoriesGrouped = null): void
+    private QueryBuilder $queryBuilder;
+    private $searchPhrase;
+    private $priceMin;
+    private $priceMax;
+    private $section;
+    private $categoriesGrouped;
+
+    public function initialize(QueryBuilder $queryBuilder, ProductSection $section = null, string $searchPhrase = null, float $priceMin = null, float $priceMax = null, array $categoriesGrouped = null): self
     {
-        $this->addProductVisibilityCondition($queryBuilder);
+        $this->queryBuilder = $queryBuilder;
+        $this->section = $section;
+        $this->searchPhrase = $searchPhrase;
+        $this->priceMin = $priceMin;
+        $this->priceMax = $priceMax;
+        $this->categoriesGrouped = $categoriesGrouped;
 
-        $queryBuilder
-            ->andWhere('p.id LIKE :searchPhrase OR
-                        p.name LIKE :searchPhrase')
-            ->setParameter('searchPhrase', '%' . $searchPhrase . '%')
-        ;
+        return $this;
+    }
 
-        if($priceMin !== null)
-        {
-            $queryBuilder
-                ->andWhere('p.priceWithVat >= :priceMin')
-                ->setParameter('priceMin', $priceMin);
-        }
+    public function getQueryBuilder(): QueryBuilder
+    {
+        return $this->queryBuilder;
+    }
 
-        if($priceMax !== null)
-        {
-            $queryBuilder
-                ->andWhere('p.priceWithVat <= :priceMax')
-                ->setParameter('priceMax', $priceMax);
-        }
+    public function addProductSearchConditions(): self
+    {
+        $this->serveProductSearchConditions();
 
-        if($section !== null)
-        {
-            $queryBuilder
-                ->leftJoin('p.section', 'ps')
-                ->andWhere('p.section = :section')
-                ->setParameter('section', $section);
-        }
-
-        if($categoriesGrouped !== null)
+        if($this->categoriesGrouped !== null)
         {
             $parameterNumber = 0;
-            foreach ($categoriesGrouped as $groupName => $categories)
+            foreach ($this->categoriesGrouped as $groupName => $categories)
             {
                 $categoryGroupConditions = [];
                 foreach ($categories as $category)
                 {
                     $categoryGroupConditions[] = sprintf(':category%s MEMBER OF p.categories', $parameterNumber);
-                    $queryBuilder->setParameter(sprintf('category%s', $parameterNumber), $category);
+                    $this->queryBuilder->setParameter(sprintf('category%s', $parameterNumber), $category);
                     $parameterNumber++;
                 }
 
                 $groupCondition = '(' . implode(' OR ', $categoryGroupConditions) . ')';
-                $queryBuilder->andWhere($groupCondition);
+                $this->queryBuilder->andWhere($groupCondition);
             }
         }
+
+        return $this;
     }
 
-    public function addProductVisibilityCondition(QueryBuilder $queryBuilder): void
+    public function addCategoryProductCountConditions(ProductCategory $category): self
     {
-        $queryBuilder
+        $this->addProductVisibilityCondition();
+
+        if($this->section !== null)
+        {
+            $this->queryBuilder
+                ->leftJoin('p.section', 'ps')
+                ->andWhere('p.section = :section')
+                ->setParameter('section', $this->section);
+        }
+
+        if($this->categoriesGrouped !== null)
+        {
+            $parameterNumber = 0;
+            foreach ($this->categoriesGrouped as $groupName => $categories)
+            {
+                if($groupName === $category->getProductCategoryGroup()->getName())
+                {
+                    continue;
+                }
+
+                $categoryGroupConditions = [];
+                foreach ($categories as $category)
+                {
+                    $categoryGroupConditions[] = sprintf(':category%s MEMBER OF p.categories', $parameterNumber);
+                    $this->queryBuilder->setParameter(sprintf('category%s', $parameterNumber), $category);
+                    $parameterNumber++;
+                }
+
+                $groupCondition = '(' . implode(' OR ', $categoryGroupConditions) . ')';
+                $this->queryBuilder->andWhere($groupCondition);
+            }
+        }
+
+        return $this;
+    }
+
+    public function addProductVisibilityCondition(): self
+    {
+        $this->queryBuilder
             ->andWhere('p.isHidden = false')
             ->andWhere('NOT (p.availableSince IS NOT NULL AND p.availableSince > :now)')
             ->andWhere('NOT (p.hideWhenSoldOut = true AND p.inventory <= 0)')
             ->setParameter('now', new DateTime('now'));
+
+        return $this;
+    }
+
+    private function serveProductSearchConditions(): void
+    {
+        $this->addProductVisibilityCondition();
+
+        $this->queryBuilder
+            ->andWhere('p.id LIKE :searchPhrase OR
+                        p.name LIKE :searchPhrase')
+            ->setParameter('searchPhrase', '%' . $this->searchPhrase . '%')
+        ;
+
+        if($this->priceMin !== null)
+        {
+            $this->queryBuilder
+                ->andWhere('p.priceWithVat >= :priceMin')
+                ->setParameter('priceMin', $this->priceMin);
+        }
+
+        if($this->priceMax !== null)
+        {
+            $this->queryBuilder
+                ->andWhere('p.priceWithVat <= :priceMax')
+                ->setParameter('priceMax', $this->priceMax);
+        }
+
+        if($this->section !== null)
+        {
+            $this->queryBuilder
+                ->leftJoin('p.section', 'ps')
+                ->andWhere('p.section = :section')
+                ->setParameter('section', $this->section);
+        }
     }
 }

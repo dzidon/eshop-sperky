@@ -4,6 +4,7 @@ namespace App\Form;
 
 use App\Entity\Detached\ProductCatalogFilter;
 use App\Entity\Product;
+use App\Entity\ProductCategory;
 use App\Form\EventSubscriber\ProductCatalogCategorySubscriber;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\AbstractType;
@@ -11,6 +12,8 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ProductCatalogFilterFormType extends AbstractType
@@ -62,6 +65,32 @@ class ProductCatalogFilterFormType extends AbstractType
             ])
             ->addEventSubscriber($this->categorySubscriber)
         ;
+    }
+
+    public function finishView(FormView $view, FormInterface $form, array $options)
+    {
+        /** @var ProductCatalogFilter $filterData */
+        $filterData = $form->getData();
+
+        $section = $filterData->getSection();
+        $categoriesChosen = $filterData->getCategoriesGrouped();
+        $categoriesToRender = $view->children['categories']->children;
+        $categoriesGrouped = $view->children['categories']->vars['choices'];
+
+        foreach ($categoriesGrouped as $choiceGroupView)
+        {
+            foreach ($choiceGroupView->choices as $choiceView)
+            {
+                /** @var ProductCategory $category */
+                $category = $choiceView->data;
+
+                $count = $this->entityManager
+                    ->getRepository(ProductCategory::class)
+                    ->getNumberOfProductsForFilter($category, $categoriesChosen, $section);
+
+                $categoriesToRender[$category->getId()]->vars['label'] = sprintf('%s (%s)', $category->getName(), $count);
+            }
+        }
     }
 
     public function configureOptions(OptionsResolver $resolver): void
