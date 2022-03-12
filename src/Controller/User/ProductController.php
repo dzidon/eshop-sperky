@@ -37,7 +37,7 @@ class ProductController extends AbstractController
     /**
      * @Route("/produkty/{slug}", name="products")
      */
-    public function products(string $slug = null, FormFactoryInterface $formFactory, PaginatorService $paginatorService): Response
+    public function products(FormFactoryInterface $formFactory, PaginatorService $paginatorService, string $slug = null): Response
     {
         $section = null;
         if($slug)

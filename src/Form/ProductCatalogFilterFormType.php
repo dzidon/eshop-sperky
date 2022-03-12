@@ -5,7 +5,7 @@ namespace App\Form;
 use App\Entity\Detached\ProductCatalogFilter;
 use App\Entity\Product;
 use App\Entity\ProductCategory;
-use App\Form\EventSubscriber\ProductCatalogCategorySubscriber;
+use App\Form\EventSubscriber\ProductFilterSubscriber;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -19,9 +19,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class ProductCatalogFilterFormType extends AbstractType
 {
     private EntityManagerInterface $entityManager;
-    private ProductCatalogCategorySubscriber $categorySubscriber;
+    private ProductFilterSubscriber $categorySubscriber;
 
-    public function __construct(EntityManagerInterface $entityManager, ProductCatalogCategorySubscriber $categorySubscriber)
+    public function __construct(EntityManagerInterface $entityManager, ProductFilterSubscriber $categorySubscriber)
     {
         $this->entityManager = $entityManager;
         $this->categorySubscriber = $categorySubscriber;
@@ -31,25 +31,26 @@ class ProductCatalogFilterFormType extends AbstractType
     {
         /** @var ProductCatalogFilter $filterData */
         $filterData = $builder->getData();
-        $section = $filterData->getSection();
-        $priceData = $this->entityManager->getRepository(Product::class)->getMinAndMaxPrice($section);
+        $priceData = $this->entityManager->getRepository(Product::class)->getMinAndMaxPrice( $filterData->getSection() );
 
+        $filterData->setPriceMin($priceData['priceMin']);
+        $filterData->setPriceMax($priceData['priceMax']);
+        $filterData->setSortBy( Product::getSortDataForCatalog()[array_key_first(Product::getSortDataForCatalog())] );
+
+        $builder->setData($filterData);
         $builder
             ->add('searchPhrase', TextType::class, [
                 'required' => false,
-                'property_path' => 'searchPhrase',
                 'label' => 'Hledat název nebo ID produktu',
             ])
             ->add('sortBy', ChoiceType::class, [
                 'choices' => Product::getSortDataForCatalog(),
-                'empty_data' => Product::getSortDataForCatalog()[array_key_first(Product::getSortDataForCatalog())],
                 'label' => 'Řazení',
             ])
             ->add('priceMin', NumberType::class, [
                 'attr' => [
                     'data-price-min' => $priceData['priceMin'],
                 ],
-                'data' => $priceData['priceMin'],
                 'required' => false,
                 'invalid_message' => 'Musíte zadat číselnou hodnotu.',
                 'label' => 'Od',
@@ -58,7 +59,6 @@ class ProductCatalogFilterFormType extends AbstractType
                 'attr' => [
                     'data-price-max' => $priceData['priceMax'],
                 ],
-                'data' => $priceData['priceMax'],
                 'required' => false,
                 'invalid_message' => 'Musíte zadat číselnou hodnotu.',
                 'label' => 'Do',
@@ -98,16 +98,19 @@ class ProductCatalogFilterFormType extends AbstractType
                     $category = $choiceView->data;
                     $repository = $count = $this->entityManager->getRepository(ProductCategory::class);
 
-                    if($form->isSubmitted() && $form->isValid())
+                    if(!$filterData->getCategories()->contains($category))
                     {
-                        $count = $repository->getNumberOfProductsForFilter($category, $categoriesChosen, $section, $searchPhrase, $priceMin, $priceMax);
-                    }
-                    else
-                    {
-                        $count = $repository->getNumberOfProductsForFilter($category, [], $section, null, null, null);
-                    }
+                        if($form->isSubmitted() && $form->isValid())
+                        {
+                            $count = $repository->getNumberOfProductsForFilter($category, $categoriesChosen, $section, $searchPhrase, $priceMin, $priceMax);
+                        }
+                        else
+                        {
+                            $count = $repository->getNumberOfProductsForFilter($category, [], $section);
+                        }
 
-                    $categoriesToRender[$category->getId()]->vars['label'] = sprintf('%s (%s)', $category->getName(), $count);
+                        $categoriesToRender[$category->getId()]->vars['label'] = sprintf('%s (%s)', $category->getName(), $count);
+                    }
                 }
             }
         }
@@ -122,6 +125,7 @@ class ProductCatalogFilterFormType extends AbstractType
             'csrf_token_id'   => 'form_product_catalog_filter',
             'method' => 'GET',
             'allow_extra_fields' => true,
+            'validation_groups' => false, // validace se řeší v ProductFilterSubscriber, aby neházela errory
         ]);
     }
 }

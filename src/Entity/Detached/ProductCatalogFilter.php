@@ -7,25 +7,24 @@ use App\Entity\ProductSection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class ProductCatalogFilter
 {
     private $searchPhrase;
 
     /**
-     * @Assert\Choice(callback={"App\Entity\Product", "getSortDataForCatalog"}, message="Zvolte platnou možnost řazení.")
+     * @Assert\Choice(callback={"App\Entity\Product", "getSortDataForCatalog"})
      * @Assert\NotBlank
      */
     private $sortBy;
 
     /**
-     * @Assert\Type("numeric", message="Musíte zadat číselnou hodnotu.")
+     * @Assert\Type("numeric")
      */
     private $priceMin;
 
     /**
-     * @Assert\Type("numeric", message="Musíte zadat číselnou hodnotu.")
+     * @Assert\Type("numeric")
      */
     private $priceMax;
 
@@ -36,22 +35,6 @@ class ProductCatalogFilter
     public function __construct()
     {
         $this->categories = new ArrayCollection();
-    }
-
-    /**
-     * @Assert\Callback()
-     */
-    public function validate(ExecutionContextInterface $context)
-    {
-        if(is_numeric($this->priceMin) && is_numeric($this->priceMax))
-        {
-            if ($this->priceMin > $this->priceMax)
-            {
-                $context->buildViolation('Minimální cena nesmí být větší než maximální cena.')
-                    ->atPath('priceMin')
-                    ->addViolation();
-            }
-        }
     }
 
     public function getSearchPhrase(): ?string

@@ -76,23 +76,53 @@ class ProductCatalogFilterService
         if ($this->categoriesGrouped !== null)
         {
             $parameterNumber = 0;
-            foreach ($this->categoriesGrouped as $groupName => $categories)
+            foreach ($this->categoriesGrouped as $groupName => $categories) // skupiny zaskrtnutych kategorii
             {
-                if ($groupName === $currentCategory->getProductCategoryGroup()->getName())
-                {
-                    continue;
-                }
+                $andConditionExists = false;
+                $orConditionExists = false;
 
-                $categoryGroupConditions = [];
-                foreach ($categories as $category)
+                $categoryGroupConditions = [
+                    'AND' => [],
+                    'OR' => [],
+                ];
+
+                foreach ($categories as $category) // jednotlive zaskrtnute kategorie
                 {
-                    $categoryGroupConditions[] = sprintf('SUM(CASE WHEN pc.id = :id%s THEN 1 ELSE 0 END) > 0', $parameterNumber);
+                    if($category === $currentCategory)
+                    {
+                        continue;
+                    }
+
+                    if ($groupName === $currentCategory->getProductCategoryGroup()->getName())
+                    {
+                        $categoryGroupConditions['AND'][] = sprintf('SUM(CASE WHEN pc.id = :id%s THEN 1 ELSE 0 END) = 0', $parameterNumber);
+                        $andConditionExists = true;
+                    }
+                    else
+                    {
+                        $categoryGroupConditions['OR'][] = sprintf('SUM(CASE WHEN pc.id = :id%s THEN 1 ELSE 0 END) > 0', $parameterNumber);
+                        $orConditionExists = true;
+                    }
+
                     $this->productCountPlaceholders[sprintf('id%s', $parameterNumber)] = $category->getId();
                     $parameterNumber++;
                 }
 
-                $groupCondition = '(' . implode(' OR ', $categoryGroupConditions) . ')';
-                $allConditions[] = $groupCondition;
+                $groupAndCondition = implode(' AND ', $categoryGroupConditions['AND']);
+                $groupOrCondition = sprintf('(%s)', implode(' OR ', $categoryGroupConditions['OR']));
+
+                if($andConditionExists && $orConditionExists)
+                {
+                    $allConditions[] = sprintf('(%s AND %s)', $groupAndCondition, $groupOrCondition);
+                }
+                else if($andConditionExists)
+                {
+                    $allConditions[] = $groupAndCondition;
+                }
+                else if($orConditionExists)
+                {
+                    $allConditions[] = $groupOrCondition;
+                }
             }
         }
 

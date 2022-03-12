@@ -26,7 +26,7 @@ class ProductCategoryRepository extends ServiceEntityRepository
         $this->filter = $filter;
     }
 
-    public function getNumberOfProductsForFilter(ProductCategory $category, $categoriesChosen, ProductSection $section, $searchPhrase, $priceMin, $priceMax)
+    public function getNumberOfProductsForFilter(ProductCategory $category, $categoriesChosen, ProductSection $section, $searchPhrase = null, $priceMin = null, $priceMax = null)
     {
         $conn = $this->getEntityManager()->getConnection();
 
