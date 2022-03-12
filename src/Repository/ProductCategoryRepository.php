@@ -1,8 +1,9 @@
-<?php
+<?php /** @noinspection SqlNoDataSourceInspection */
 
 namespace App\Repository;
 
 use App\Entity\ProductCategory;
+use App\Entity\ProductSection;
 use App\Service\ProductCatalogFilterService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\QueryBuilder;
@@ -25,21 +26,40 @@ class ProductCategoryRepository extends ServiceEntityRepository
         $this->filter = $filter;
     }
 
-    public function getNumberOfProductsForFilter(ProductCategory $category, $categoriesChosen, $section)
+    public function getNumberOfProductsForFilter(ProductCategory $category, $categoriesChosen, ProductSection $section, $searchPhrase, $priceMin, $priceMax)
     {
-        $queryBuilder = $this->createQueryBuilder('pc')
-            ->select('count(p)')
-            ->innerJoin('pc.products', 'p')
-            ->andWhere('pc.id = :id')
-            ->setParameter(':id', $category->getId())
-        ;
+        $conn = $this->getEntityManager()->getConnection();
 
-        return $this->filter
-            ->initialize($queryBuilder, $section, null, null, null, $categoriesChosen)
-            ->addCategoryProductCountConditions($category)
-            ->getQueryBuilder()
-            ->getQuery()
-            ->getSingleScalarResult();
+        $this->filter
+            ->initialize(null, $section, $searchPhrase, $priceMin, $priceMax, $categoriesChosen)
+            ->createDataForCategoryProductCount($category);
+
+        $placeholderData = $this->filter->getProductCountPlaceholders();
+        $clauseData = $this->filter->getProductCountClauses();
+
+        $sql = sprintf('
+            SELECT COUNT(*) FROM (
+                SELECT joinTable.product_id
+                FROM _product_category joinTable 
+                JOIN product_category pc ON pc.id = joinTable.product_category_id
+                WHERE joinTable.product_id IN (
+                    SELECT id FROM product 
+                    WHERE section_id = :section_id
+                    %s
+                    %s
+                    %s
+                    AND is_hidden = false
+                    AND (NOT (available_since IS NOT NULL AND available_since > :now))
+                    AND (NOT (hide_when_sold_out = true AND inventory <= 0))
+                )
+                GROUP BY joinTable.product_id
+                %s
+            ) tableResult;
+        ', $clauseData['searchPhrase'], $clauseData['priceMin'], $clauseData['priceMax'], $clauseData['having']);
+
+        $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery($placeholderData);
+        return $resultSet->fetchOne();
     }
 
     public function qbFindCategoriesInSection($section = null): QueryBuilder
@@ -53,7 +73,8 @@ class ProductCategoryRepository extends ServiceEntityRepository
         return $this->filter
             ->initialize($queryBuilder, $section)
             ->addProductSearchConditions()
-            ->getQueryBuilder();
+            ->getQueryBuilder()
+        ;
     }
 
     public function qbFindAllAndFetchGroups(): QueryBuilder

@@ -67,28 +67,48 @@ class ProductCatalogFilterFormType extends AbstractType
         ;
     }
 
+    /**
+     * Po sestavení view chceme přidat počty produktů k jednotlivým kategoriím
+     *
+     * @param FormView $view
+     * @param FormInterface $form
+     * @param array $options
+     */
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
         /** @var ProductCatalogFilter $filterData */
         $filterData = $form->getData();
 
-        $section = $filterData->getSection();
-        $categoriesChosen = $filterData->getCategoriesGrouped();
-        $categoriesToRender = $view->children['categories']->children;
-        $categoriesGrouped = $view->children['categories']->vars['choices'];
-
-        foreach ($categoriesGrouped as $choiceGroupView)
+        if ($filterData->getSection() !== null)
         {
-            foreach ($choiceGroupView->choices as $choiceView)
+            $section = $filterData->getSection();
+            $searchPhrase = $filterData->getSearchPhrase();
+            $priceMin = $filterData->getPriceMin();
+            $priceMax = $filterData->getPriceMax();
+
+            $categoriesChosen = $filterData->getCategoriesGrouped();
+            $categoriesToRender = $view->children['categories']->children;
+            $categoriesGrouped = $view->children['categories']->vars['choices'];
+
+            foreach ($categoriesGrouped as $choiceGroupView)
             {
-                /** @var ProductCategory $category */
-                $category = $choiceView->data;
+                foreach ($choiceGroupView->choices as $choiceView)
+                {
+                    /** @var ProductCategory $category */
+                    $category = $choiceView->data;
+                    $repository = $count = $this->entityManager->getRepository(ProductCategory::class);
 
-                $count = $this->entityManager
-                    ->getRepository(ProductCategory::class)
-                    ->getNumberOfProductsForFilter($category, $categoriesChosen, $section);
+                    if($form->isSubmitted() && $form->isValid())
+                    {
+                        $count = $repository->getNumberOfProductsForFilter($category, $categoriesChosen, $section, $searchPhrase, $priceMin, $priceMax);
+                    }
+                    else
+                    {
+                        $count = $repository->getNumberOfProductsForFilter($category, [], $section, null, null, null);
+                    }
 
-                $categoriesToRender[$category->getId()]->vars['label'] = sprintf('%s (%s)', $category->getName(), $count);
+                    $categoriesToRender[$category->getId()]->vars['label'] = sprintf('%s (%s)', $category->getName(), $count);
+                }
             }
         }
     }
