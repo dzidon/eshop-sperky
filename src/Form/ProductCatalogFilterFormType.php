@@ -90,7 +90,7 @@ class ProductCatalogFilterFormType extends AbstractType
             $categoriesToRender = $view->children['categories']->children;
             $categoriesGrouped = $view->children['categories']->vars['choices'];
 
-            foreach ($categoriesGrouped as $choiceGroupView)
+            foreach ($categoriesGrouped as $groupName => $choiceGroupView)
             {
                 foreach ($choiceGroupView->choices as $choiceView)
                 {
@@ -109,7 +109,25 @@ class ProductCatalogFilterFormType extends AbstractType
                             $count = $repository->getNumberOfProductsForFilter($category, [], $section);
                         }
 
-                        $categoriesToRender[$category->getId()]->vars['label'] = sprintf('%s (%s)', $category->getName(), $count);
+                        if($count > 0)
+                        {
+                            $plusSign = '';
+                            if($categoriesChosen && array_key_exists($groupName, $categoriesChosen))
+                            {
+                                $plusSign = '+';
+                            }
+                            $categoriesToRender[$category->getId()]->vars['label'] = sprintf('%s (%s%s)', $category->getName(), $plusSign, $count);
+                        }
+                        else
+                        {
+                            unset($view->children['categories']->vars['choices'][$groupName]->choices[$category->getId()]);
+                            unset($view->children['categories']->children[$category->getId()]);
+
+                            if(count($view->children['categories']->vars['choices'][$groupName]->choices) === 0)
+                            {
+                                unset($view->children['categories']->vars['choices'][$groupName]);
+                            }
+                        }
                     }
                 }
             }
