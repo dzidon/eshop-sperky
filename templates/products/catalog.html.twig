@@ -19,53 +19,66 @@
             <div class="row margin-0">
                 <div class="col s12 l3">
                     <div class="row no-padding">
-                        <div class="collection with-header hide-on-med-and-down">
-                            {# Sekce #}
-                            <div class="collection-header grey lighten-4 valign-wrapper">
-                                <span class="bold">Sekce</span>
-                            </div>
-                            <a href="{{ path('products') }}" class="collection-item {% if app.request.get('slug') is same as(null) %}active{% endif %}">Všechny</a>
-                            {% set sections = navbar_service.getVisibleSections() %}
-                            {% for section in sections %}
-                                <a href="{{ path('products', {slug: section.getSlug()}) }}" class="collection-item {% if app.request.get('slug') is same as(section.getSlug()) %}active{% endif %}">{{ section.getName() }}</a>
-                            {% endfor %}
+                        <ul class="collapsible" id="product-filter-collapsible">
+                            <li>
+                                <div class="collapsible-header">
+                                    <i class="material-icons">menu</i>
+                                    <strong>
+                                        <a>Filtr</a>
+                                    </strong>
+                                </div>
+                                <div class="collapsible-body no-padding">
+                                    <div class="collection with-header">
+                                        {# Sekce #}
+                                        <div class="collection-header grey lighten-4 valign-wrapper">
+                                            <span class="bold">Sekce</span>
+                                        </div>
+                                        <a href="{{ path('products') }}" class="collection-item {% if app.request.get('slug') is same as(null) %}active{% endif %}">Všechny</a>
+                                        {% set sections = navbar_service.getVisibleSections() %}
+                                        {% for section in sections %}
+                                            <a href="{{ path('products', {slug: section.getSlug()}) }}" class="collection-item {% if app.request.get('slug') is same as(section.getSlug()) %}active{% endif %}">{{ section.getName() }}</a>
+                                        {% endfor %}
 
-                            {# Cena #}
-                            <div class="collection-header grey lighten-4 valign-wrapper">
-                                <span class="bold">Cena (Kč)</span>
-                            </div>
-                            <div class="collection-item no-padding">
-                                <div class="col s12">
-                                    <div class="col s10 offset-s1">
-                                        <div class="section">
-                                            <div id="catalog-price-slider" class="catalog-price-slider"></div>
+                                        {# Cena #}
+                                        <div class="collection-header grey lighten-4 valign-wrapper">
+                                            <span class="bold">Cena (Kč)</span>
                                         </div>
-                                    </div>
+                                        <div class="collection-item no-padding">
+                                            <div class="col s12">
+                                                <div class="col s10 offset-s1">
+                                                    <div class="section">
+                                                        <div id="catalog-price-slider" class="catalog-price-slider"></div>
+                                                    </div>
+                                                </div>
 
-                                    <div class="col s10 offset-s1">
-                                        <div class="col s5">
-                                            {{ form_row(filterForm.priceMin) }}
+                                                <div class="col s10 offset-s1">
+                                                    <div class="col s5">
+                                                        {{ form_row(filterForm.priceMin) }}
+                                                    </div>
+                                                    <div class="col s5 offset-s2">
+                                                        {{ form_row(filterForm.priceMax) }}
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div class="col s5 offset-s2">
-                                            {{ form_row(filterForm.priceMax) }}
-                                        </div>
+
+                                        {# Kategorie #}
+                                        {% if filterForm.categories is defined %}
+                                            {% for categoryGroup in filterForm.categories.vars.choices %}
+                                                <div class="collection-header grey lighten-4 valign-wrapper">
+                                                    <span class="bold">{{ categoryGroup.label }}</span>
+                                                </div>
+                                                <div class="collection-item">
+                                                    {% for id, category in categoryGroup.choices %}
+                                                        {{ form_row(filterForm.categories.children[id]) }}
+                                                    {% endfor %}
+                                                </div>
+                                            {% endfor %}
+                                        {% endif %}
                                     </div>
                                 </div>
-                            </div>
-
-                            {% if filterForm.categories is defined %}
-                                {% for categoryGroup in filterForm.categories.vars.choices %}
-                                    <div class="collection-header grey lighten-4 valign-wrapper">
-                                        <span class="bold">{{ categoryGroup.label }}</span>
-                                    </div>
-                                    <div class="collection-item">
-                                        {% for id, category in categoryGroup.choices %}
-                                            {{ form_row(filterForm.categories.children[id]) }}
-                                        {% endfor %}
-                                    </div>
-                                {% endfor %}
-                            {% endif %}
-                        </div>
+                            </li>
+                        </ul>
                     </div>
                 </div>
 

@@ -5,6 +5,8 @@ const priceMaxInput = $('#priceMax');
 
 $(document).ready(function() {
 
+    filterOpenOnLargeScreen();
+
     /*
         Slider cen v katalogu
      */
@@ -116,5 +118,15 @@ function priceInputSetFocus(values, handle)
     else if (handle === 1 && priceMaxInput)
     {
         priceMaxInput.focus();
+    }
+}
+
+function filterOpenOnLargeScreen()
+{
+    const filter = document.getElementById('product-filter-collapsible');
+    const instance = M.Collapsible.init(filter, {inDuration: 0, outDuration: 0});
+    if(window.innerWidth > 992)
+    {
+        instance.open();
     }
 }
