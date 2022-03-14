@@ -48,12 +48,6 @@ class ProductController extends AbstractController
             {
                 throw new NotFoundHttpException('Sekce nenalezena.');
             }
-
-            $this->breadcrumbs->addRoute('products', [], $section->getName());
-        }
-        else
-        {
-            $this->breadcrumbs->addRoute('products', [], 'Všechny produkty');
         }
 
         $filterData = new ProductCatalogFilter();
@@ -82,12 +76,32 @@ class ProductController extends AbstractController
             throw new NotFoundHttpException('Na této stránce nebyly nalezeny žádné produkty.');
         }
 
-        return $this->render('products/catalog.html.twig', [
-            'filterForm' => $form->createView(),
-            'products' => $products,
-            'breadcrumbs' => $this->breadcrumbs,
-            'pagination' => $paginatorService->createViewData(),
-        ]);
+        if ($this->request->isXmlHttpRequest())
+        {
+            return $this->render('fragments/forms_unique/_form_product_catalog.html.twig', [
+                'filterForm' => $form->createView(),
+                'products' => $products,
+                'pagination' => $paginatorService->createViewData(),
+            ]);
+        }
+        else
+        {
+            if($section === null)
+            {
+                $this->breadcrumbs->addRoute('products', [], 'Všechny produkty');
+            }
+            else
+            {
+                $this->breadcrumbs->addRoute('products', [], $section->getName());
+            }
+
+            return $this->render('products/catalog.html.twig', [
+                'filterForm' => $form->createView(),
+                'products' => $products,
+                'breadcrumbs' => $this->breadcrumbs,
+                'pagination' => $paginatorService->createViewData(),
+            ]);
+        }
     }
 
     /**

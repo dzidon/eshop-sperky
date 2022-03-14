@@ -14,6 +14,7 @@ $(document).ready(function() {
     $('.materialboxed').materialbox();
     $('select').formSelect();
     $('.dropdown-trigger').dropdown({ hover: false });
+    $('.modal').modal();
 
     // materialize autocomplete
     $('input.autocomplete').each(function() {

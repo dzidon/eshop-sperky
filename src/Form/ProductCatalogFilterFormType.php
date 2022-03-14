@@ -144,6 +144,9 @@ class ProductCatalogFilterFormType extends AbstractType
             'method' => 'GET',
             'allow_extra_fields' => true,
             'validation_groups' => false, // validace se řeší v ProductFilterSubscriber, aby neházela errory
+            'attr' => [
+                'id' => 'form-product-catalog',
+            ],
         ]);
     }
 }

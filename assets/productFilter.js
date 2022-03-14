@@ -1,11 +1,36 @@
 import * as noUiSlider from 'materialize-css/extras/noUiSlider/nouislider';
 
-const priceMinInput = $('#priceMin');
-const priceMaxInput = $('#priceMax');
+let searchPhraseInput;
+let priceMinInput;
+let priceMaxInput;
+let sortByInput;
+let categoriesInput;
+
+const xhr = new XMLHttpRequest();
 
 $(document).ready(function() {
+    initialize();
 
-    filterOpenOnLargeScreen();
+    // Otevření filtru na velkých obrazovkách
+    filterOpen(992);
+});
+
+function initialize()
+{
+    searchPhraseInput = $('#searchPhrase');
+    priceMinInput = $('#priceMin');
+    priceMaxInput = $('#priceMax');
+    sortByInput = $('#sortBy');
+    categoriesInput = $('[id^="categories"]');
+
+    /*
+        Update filtru
+     */
+    searchPhraseInput.on('change', catalogReset);
+    sortByInput.on('change', catalogReset);
+    priceMinInput.on('change', catalogReset);
+    priceMaxInput.on('change', catalogReset);
+    categoriesInput.on('change', catalogReset);
 
     /*
         Slider cen v katalogu
@@ -29,10 +54,10 @@ $(document).ready(function() {
     const slider = document.getElementById('catalog-price-slider');
     if (slider)
     {
-        let disable = false;
+        let disablePriceSlider = false;
         if (priceMin === priceMax) // nouislider neumí přijmout rovnající se min. a max. hodnoty
         {
-            disable = true;
+            disablePriceSlider = true;
 
             priceMin = 0;
             priceMax = 1;
@@ -55,7 +80,7 @@ $(document).ready(function() {
             })
         });
 
-        if (disable)
+        if (disablePriceSlider)
         {
             slider.setAttribute('disabled', 'true');
         }
@@ -69,13 +94,17 @@ $(document).ready(function() {
 
             // update inputů při posouvání
             slider.noUiSlider.on('update', inputsUpdate);
+            slider.noUiSlider.on('change', inputsUpdate);
 
             // nastavení focusu na odpovídající input
             slider.noUiSlider.on('start', priceInputSetFocus);
             slider.noUiSlider.on('change', priceInputSetFocus);
+
+            // odeslani formulare s filtrem po posunuti slideru
+            slider.noUiSlider.on('change', catalogReset);
         }
     }
-});
+}
 
 function inputsUpdate(values)
 {
@@ -84,8 +113,6 @@ function inputsUpdate(values)
 
     priceMinInput.val(newMin);
     priceMaxInput.val(newMax);
-
-    M.updateTextFields();
 }
 
 function sliderUpdate(slider, priceMin, priceMax)
@@ -121,12 +148,47 @@ function priceInputSetFocus(values, handle)
     }
 }
 
-function filterOpenOnLargeScreen()
+function filterOpen(afterWidth)
 {
     const filter = document.getElementById('product-filter-collapsible');
     const instance = M.Collapsible.init(filter, {inDuration: 0, outDuration: 0});
-    if(window.innerWidth > 992)
+    if(window.innerWidth > afterWidth)
     {
         instance.open();
     }
+}
+
+function catalogReset()
+{
+    const modalLoaderElement = $('#modal-loader').modal({
+        dismissible: false
+    });
+    M.Modal.getInstance(modalLoaderElement).open();
+
+    $.get({
+        url: '?' + $('#form-product-catalog').serialize(),
+        dataType: 'html',
+        xhr: function()
+        {
+            return xhr;
+        },
+        complete: function()
+        {
+            M.Modal.getInstance($('#modal-loader')).close();
+        },
+        success: function(data)
+        {
+            $('#product-catalog-container').html(data);
+            initialize();
+            filterOpen(0);
+            window.history.replaceState({}, '', xhr.responseURL);
+
+            $('select').formSelect();
+            M.updateTextFields();
+        },
+        error: function()
+        {
+            M.Modal.getInstance($('#modal-error')).open();
+        }
+    });
 }
