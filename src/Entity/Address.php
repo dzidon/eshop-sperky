@@ -12,6 +12,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=AddressRepository::class)
+ * @ORM\Table(indexes={@ORM\Index(name="search_idx", columns={"alias", "created"})})
  * @ORM\HasLifecycleCallbacks()
  * @AssertCustom\AllOrNone(targetAttributes={"company", "ic", "dic"})
  */

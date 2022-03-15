@@ -15,6 +15,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * @ORM\Entity(repositoryClass=ProductRepository::class)
+ * @ORM\Table(indexes={@ORM\Index(name="search_idx", columns={"name", "created", "price_with_vat", "inventory"})})
  * @ORM\HasLifecycleCallbacks()
  * @UniqueEntity(fields={"slug"}, message="Už existuje produktová sekce s tímto názvem pro odkaz.")
  */

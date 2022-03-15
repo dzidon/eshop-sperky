@@ -37,8 +37,7 @@ class ReviewRepository extends ServiceEntityRepository
             ->andWhere('u.isMuted = 0')
 
             //vyhledavani
-            ->andWhere('r.stars LIKE :searchPhrase OR
-                        r.text LIKE :searchPhrase OR
+            ->andWhere('r.text LIKE :searchPhrase OR
                         CONCAT(u.nameFirst, \' \', u.nameLast) LIKE :searchPhrase')
             ->setParameter('searchPhrase', '%' . $searchPhrase . '%')
 
