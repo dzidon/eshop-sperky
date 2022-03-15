@@ -1,23 +1,4 @@
-{% set route = app.request.get('_route') %}
-
-{% set items = {
-    0: {
-        'path': path('profile'),
-        'isActive': route == 'profile',
-        'title': get_parameter('app_page_title.profile'),
-    },
-    1: {
-        'path': path('profile_addresses'),
-        'isActive': route == 'profile_addresses' or route == 'profile_address' or route == 'profile_address_delete',
-        'title': get_parameter('app_page_title.profile_addresses'),
-    },
-    2: {
-        'path': path('profile_change_password'),
-        'isActive': route == 'profile_change_password',
-        'title': get_parameter('app_page_title.profile_change_password'),
-    },
-}
-%}
+{% set navigation_data = navbar_service.getProfileNavigationData() %}
 
 <div class="collection with-header hide-on-med-and-down">
     <div class="collection-header grey lighten-4 valign-wrapper">
@@ -25,8 +6,8 @@
         <strong>Menu</strong>
     </div>
 
-    {% for item in items %}
-        <a href="{{ item.path }}" class="collection-item {% if item.isActive %} active {% endif %}">
+    {% for item in navigation_data %}
+        <a href="{{ item.path }}" class="collection-item {% if item.isActive %}active{% endif %}">
             {{ item.title }}
         </a>
     {% endfor %}
@@ -42,8 +23,8 @@
         </div>
         <div class="collapsible-body no-padding">
             <div class="collection">
-                {% for item in items %}
-                    <a href="{{ item.path }}" class="collection-item {% if item.isActive %} active {% endif %}">
+                {% for item in navigation_data %}
+                    <a href="{{ item.path }}" class="collection-item {% if item.isActive %}active{% endif %}">
                         {{ item.title }}
                     </a>
                 {% endfor %}
