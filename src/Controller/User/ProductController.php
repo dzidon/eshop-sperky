@@ -78,11 +78,19 @@ class ProductController extends AbstractController
 
         if ($this->request->isXmlHttpRequest())
         {
-            return $this->render('fragments/forms_unique/_form_product_catalog.html.twig', [
+            $response = $this->render('fragments/forms_unique/_form_product_catalog.html.twig', [
                 'filterForm' => $form->createView(),
                 'products' => $products,
                 'pagination' => $paginatorService->createViewData(),
             ]);
+
+            $response->headers->add([
+                'Cache-Control' => 'no-store, must-revalidate, max-age=0',
+                'Pragma' => 'no-cache',
+                'Expires' => 'Sat, 26 Jul 1997 05:00:00 GMT',
+            ]);
+
+            return $response;
         }
         else
         {

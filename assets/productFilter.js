@@ -8,11 +8,17 @@ let categoriesInput;
 
 const xhr = new XMLHttpRequest();
 
-$(document).ready(function() {
+$(document).ready(function()
+{
     initialize();
 
     // Otevření filtru na velkých obrazovkách
     filterOpen(992);
+});
+
+$(window).bind("popstate", function()
+{
+    catalogResetUsingBackButton();
 });
 
 function initialize()
@@ -26,11 +32,11 @@ function initialize()
     /*
         Update filtru
      */
-    searchPhraseInput.on('change', catalogReset);
-    sortByInput.on('change', catalogReset);
-    priceMinInput.on('change', catalogReset);
-    priceMaxInput.on('change', catalogReset);
-    categoriesInput.on('change', catalogReset);
+    searchPhraseInput.on('change', catalogResetUsingForm);
+    sortByInput.on('change', catalogResetUsingForm);
+    priceMinInput.on('change', catalogResetUsingForm);
+    priceMaxInput.on('change', catalogResetUsingForm);
+    categoriesInput.on('change', catalogResetUsingForm);
 
     /*
         Slider cen v katalogu
@@ -101,7 +107,7 @@ function initialize()
             slider.noUiSlider.on('change', priceInputSetFocus);
 
             // odeslani formulare s filtrem po posunuti slideru
-            slider.noUiSlider.on('change', catalogReset);
+            slider.noUiSlider.on('change', catalogResetUsingForm);
         }
     }
 }
@@ -158,7 +164,17 @@ function filterOpen(afterWidth)
     }
 }
 
-function catalogReset()
+function catalogResetUsingBackButton()
+{
+    catalogReset(document.location.href, false);
+}
+
+function catalogResetUsingForm()
+{
+    catalogReset('?' + $('#form-product-catalog').serialize(), true);
+}
+
+function catalogReset(url, addToHistory)
 {
     const modalLoaderElement = $('#modal-loader').modal({
         dismissible: false
@@ -166,7 +182,7 @@ function catalogReset()
     M.Modal.getInstance(modalLoaderElement).open();
 
     $.get({
-        url: '?' + $('#form-product-catalog').serialize(),
+        url: url,
         dataType: 'html',
         xhr: function()
         {
@@ -181,10 +197,14 @@ function catalogReset()
             $('#product-catalog-container').html(data);
             initialize();
             filterOpen(0);
-            window.history.replaceState({}, '', xhr.responseURL);
 
             $('select').formSelect();
             M.updateTextFields();
+
+            if(addToHistory)
+            {
+                window.history.pushState({}, '', xhr.responseURL);
+            }
         },
         error: function()
         {
