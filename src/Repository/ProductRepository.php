@@ -60,6 +60,22 @@ class ProductRepository extends ServiceEntityRepository
             ->getOneOrNullResult();
     }
 
+    public function findLatest(int $count)
+    {
+        $queryBuilder = $this->createQueryBuilder('p')
+            ->setMaxResults($count)
+            ->orderBy('p.created', 'DESC')
+        ;
+
+        return $this->filter
+            ->initialize($queryBuilder)
+            ->addProductVisibilityCondition()
+            ->getQueryBuilder()
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
     public function getMinAndMaxPrice(ProductSection $section = null)
     {
         $queryBuilder = $this->createQueryBuilder('p')
@@ -159,7 +175,6 @@ class ProductRepository extends ServiceEntityRepository
             ->getQueryBuilder()
 
             ->andWhere('p.id != :viewedProductId')
-            ->andWhere('p.section = :viewedProductSection')
             ->andWhere('p.section = :viewedProductSection')
             ->setParameter('viewedProductId', $product->getId())
             ->setParameter('viewedProductSection', $product->getSection())

@@ -3,6 +3,7 @@
 namespace App\Controller\User;
 
 use App\Entity\Detached\ContactEmail;
+use App\Entity\Product;
 use App\Entity\Review;
 use App\Form\ContactFormType;
 use App\Service\BreadcrumbsService;
@@ -32,12 +33,14 @@ class MainController extends AbstractController
      */
     public function index(BreadcrumbsService $breadcrumbs): Response
     {
+        $latestProducts = $this->getDoctrine()->getRepository(Product::class)->findLatest(4);
         $latestReviews = $this->getDoctrine()->getRepository(Review::class)->findLatest(4);
-        $totalAndAverage = $this->getDoctrine()->getRepository(Review::class)->getTotalAndAverage();
+        $totalAndAverageRating = $this->getDoctrine()->getRepository(Review::class)->getTotalAndAverage();
 
         return $this->render('main/index.html.twig', [
-            'agregateReviewData' => $totalAndAverage,
+            'latestProducts' => $latestProducts,
             'latestReviews' => $latestReviews,
+            'totalAndAverageRating' => $totalAndAverageRating,
             'breadcrumbs' => $breadcrumbs,
         ]);
     }

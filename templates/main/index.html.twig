@@ -10,7 +10,7 @@
                 <h5 class="header col s12 light white-text">Každý náš produkt je přírodní originál</h5>
             </div>
             <div class="row center">
-                <a href="" id="download-button" class="btn-large waves-effect waves-light light-blue">Nakupovat</a>
+                <a href="{{ path('products') }}" id="download-button" class="btn-large waves-effect waves-light light-blue">Nakupovat</a>
             </div>
             <br><br>
         </div>
@@ -58,124 +58,11 @@
 
             <h2>
                 Novinky
-                <a href="  " class="btn-floating btn-medium waves-effect waves-light light-blue"><i class="material-icons">more_horiz</i></a>
+                <a href="{{ path('products') }}" class="btn-floating btn-medium waves-effect waves-light light-blue"><i class="material-icons">more_horiz</i></a>
             </h2>
 
-            <div class="col s12">
-                <div class="row flex-wrap">
-                    <div class="col s6 l4 xl3 margin-0">
-                        <div class="card">
-                            <a href="#" class="card-image waves-effect waves-block waves-light">
-                                <img alt="Obrázek produktu" src="https://materializecss.com/images/office.jpg">
-                            </a>
-
-                            <div class="card-content">
-                                <a href="#">
-                                    <h6 class="product-title">Náhrdelník z Mateřídoušky pro super lidi</h6>
-                                </a>
-                                <p class="bold">150 CZK vč. DPH</p>
-                                <p>Skladem</p>
-                            </div>
-
-                            <div class="card-action bold">
-                                <div class="center-align">
-                                    <a href="#" class="hide-on-med-and-up margin-0">
-                                        <i class="material-icons small">add_shopping_cart</i>
-                                    </a>
-                                </div>
-                                <a href="#" class="hide-on-small-only valign-wrapper">
-                                    <i class="material-icons">add_shopping_cart</i>
-                                    &nbsp;&nbsp;Do košíku
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col s6 l4 xl3 margin-0">
-                        <div class="card">
-                            <a href="#" class="card-image waves-effect waves-block waves-light">
-                                <img alt="Obrázek produktu" src="https://materializecss.com/images/office.jpg">
-                            </a>
-
-                            <div class="card-content">
-                                <a href="#">
-                                    <h6 class="product-title">Náhrdelník z Mateřídoušky pro super lidi</h6>
-                                </a>
-                                <p class="bold">150 CZK vč. DPH</p>
-                                <p class="red-text">Není skladem</p>
-                            </div>
-
-                            <div class="card-action bold">
-                                <div class="center-align">
-                                    <a href="#" class="hide-on-med-and-up margin-0">
-                                        <i class="material-icons small">add_shopping_cart</i>
-                                    </a>
-                                </div>
-                                <a href="#" class="hide-on-small-only valign-wrapper">
-                                    <i class="material-icons">add_shopping_cart</i>
-                                    &nbsp;&nbsp;Do košíku
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col s6 l4 xl3 margin-0">
-                        <div class="card">
-                            <a href="#" class="card-image waves-effect waves-block waves-light">
-                                <img alt="Obrázek produktu" src="https://materializecss.com/images/office.jpg">
-                            </a>
-
-                            <div class="card-content">
-                                <a href="#">
-                                    <h6 class="product-title">Náhrdelník z Mateřídoušky pro super lidi</h6>
-                                </a>
-                                <p class="bold">150 CZK vč. DPH</p>
-                                <p>Skladem</p>
-                            </div>
-
-                            <div class="card-action bold">
-                                <div class="center-align">
-                                    <a href="#" class="hide-on-med-and-up margin-0">
-                                        <i class="material-icons small">add_shopping_cart</i>
-                                    </a>
-                                </div>
-                                <a href="#" class="hide-on-small-only valign-wrapper">
-                                    <i class="material-icons">add_shopping_cart</i>
-                                    &nbsp;&nbsp;Do košíku
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col s6 l4 xl3 margin-0">
-                        <div class="card">
-                            <a href="#" class="card-image waves-effect waves-block waves-light">
-                                <img alt="Obrázek produktu" src="https://materializecss.com/images/office.jpg">
-                            </a>
-
-                            <div class="card-content">
-                                <a href="#">
-                                    <h6 class="product-title">Náhrdelník z Mateřídoušky pro super lidi</h6>
-                                </a>
-                                <p class="bold">150 CZK vč. DPH</p>
-                                <p class="red-text">Není skladem</p>
-                            </div>
-
-                            <div class="card-action bold">
-                                <div class="center-align">
-                                    <a href="#" class="hide-on-med-and-up margin-0">
-                                        <i class="material-icons small">add_shopping_cart</i>
-                                    </a>
-                                </div>
-                                <a href="#" class="hide-on-small-only valign-wrapper">
-                                    <i class="material-icons">add_shopping_cart</i>
-                                    &nbsp;&nbsp;Do košíku
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            {# Produkty #}
+            {{ include('fragments/_products.html.twig', {products: latestProducts, admin: false, large: true, can_edit: false, can_delete: false}) }}
 
             <h2>
                 Recenze
@@ -183,26 +70,26 @@
                 <a href="{{ path('review_edit') }}" class="btn-floating btn-medium waves-effect waves-light grey"><i class="material-icons">mode_edit</i></a>
             </h2>
 
-            {% if agregateReviewData.total is not empty %}
+            {% if totalAndAverageRating.total is not empty %}
                 <div class="row">
                     <div class="card white">
                         <div class="card-content valign-wrapper">
                             <div class="col s8 no-padding black-text left-align">
                                 <div class="valign-wrapper">
                                     <h6 class="no-mar-bot no-mar-top margin-right5px">
-                                        <strong>{{ agregateReviewData.average|number_format(1) }}</strong><span class="grey-text">/5</span>
+                                        <strong>{{ totalAndAverageRating.average|number_format(1) }}</strong><span class="grey-text">/5</span>
                                     </h6>
 
                                     <span class="amber-text accent-3 valign-wrapper">
                                         {# Hvězdy #}
-                                        {{ include('fragments/_review_stars.html.twig', {stars: rating_to_stars(agregateReviewData.average)}) }}
+                                        {{ include('fragments/_review_stars.html.twig', {stars: rating_to_stars(totalAndAverageRating.average)}) }}
                                     </span>
                                 </div>
                             </div>
 
                             <div class="col s4 no-padding right-align">
                                 <h6 class="margin-0 grey-text">
-                                    Celkem recenzí: <strong class="black-text">{{ agregateReviewData.total }}</strong>
+                                    Celkem recenzí: <strong class="black-text">{{ totalAndAverageRating.total }}</strong>
                                 </h6>
                             </div>
                         </div>
