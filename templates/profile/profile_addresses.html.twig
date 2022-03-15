@@ -17,79 +17,90 @@
         {% if addresses is empty %}
             Hledání neodpovídají žádné adresy.
         {% else %}
-            {% for address in addresses %}
-                <div class="card white black-text">
-                    <div class="card-content">
-                        <span class="card-title">{{ address.getAlias() }}</span>
-                        <div class="row margin-0">
-                            <div class="col s6 no-padding">Země:</div>
-                            <div class="col s6 no-padding">
-                                <strong>{{ address.getCountry() }}</strong>
+            <div class="col s12">
+                {% for address in addresses %}
+                    <div class="row">
+                        <div class="card white black-text">
+                            <div class="card-content">
+                                <span class="card-title">{{ address.getAlias() }}</span>
+                                <div class="row margin-0">
+                                    <div class="col s6 no-padding">Jméno a příjmení:</div>
+                                    <div class="col s6 no-padding">
+                                        <strong>{{ address.getFullName() }}</strong>
+                                    </div>
+                                </div>
+
+                                <div class="row margin-0">
+                                    <div class="col s6 no-padding">Země:</div>
+                                    <div class="col s6 no-padding">
+                                        <strong>{{ address.getCountry() }}</strong>
+                                    </div>
+                                </div>
+
+                                <div class="row margin-0">
+                                    <div class="col s6 no-padding">Ulice a č. popisné:</div>
+                                    <div class="col s6 no-padding">
+                                        <strong>{{ address.getStreet() }}</strong>
+                                    </div>
+                                </div>
+
+                                {% if address.getAdditionalInfo() is not null %}
+                                    <div class="row margin-0">
+                                        <div class="col s6 no-padding">Doplněk adresy:</div>
+                                        <div class="col s6 no-padding">
+                                            <strong>{{ address.getAdditionalInfo() }}</strong>
+                                        </div>
+                                    </div>
+                                {% endif %}
+
+                                <div class="row margin-0">
+                                    <div class="col s6 no-padding">Obec:</div>
+                                    <div class="col s6 no-padding">
+                                        <strong>{{ address.getTown() }}</strong>
+                                    </div>
+                                </div>
+
+                                <div class="row margin-0">
+                                    <div class="col s6 no-padding">PSČ:</div>
+                                    <div class="col s6 no-padding">
+                                        <strong>{{ address.getZip() }}</strong>
+                                    </div>
+                                </div>
+
+                                {% if address.getCompany() is not null and address.getIc() is not null and address.getDic() is not null %}
+                                    <br>
+
+                                    <div class="row margin-0">
+                                        <div class="col s6 no-padding">Název firmy:</div>
+                                        <div class="col s6 no-padding">
+                                            <strong>{{ address.getCompany() }}</strong>
+                                        </div>
+                                    </div>
+
+                                    <div class="row margin-0">
+                                        <div class="col s6 no-padding">IČ:</div>
+                                        <div class="col s6 no-padding">
+                                            <strong>{{ address.getIc() }}</strong>
+                                        </div>
+                                    </div>
+
+                                    <div class="row margin-0">
+                                        <div class="col s6 no-padding">DIČ:</div>
+                                        <div class="col s6 no-padding">
+                                            <strong>{{ address.getDic() }}</strong>
+                                        </div>
+                                    </div>
+                                {% endif %}
+
+                            </div>
+                            <div class="card-action">
+                                <a href="{{ path('profile_address', {id: address.getId()}) }}">Upravit</a>
+                                <a href="{{ path('profile_address_delete', {id: address.getId()}) }}">Smazat</a>
                             </div>
                         </div>
-
-                        <div class="row margin-0">
-                            <div class="col s6 no-padding">Ulice a č. popisné:</div>
-                            <div class="col s6 no-padding">
-                                <strong>{{ address.getStreet() }}</strong>
-                            </div>
-                        </div>
-
-                        {% if address.getAdditionalInfo() is not null %}
-                            <div class="row margin-0">
-                                <div class="col s6 no-padding">Doplněk adresy:</div>
-                                <div class="col s6 no-padding">
-                                    <strong>{{ address.getAdditionalInfo() }}</strong>
-                                </div>
-                            </div>
-                        {% endif %}
-
-                        <div class="row margin-0">
-                            <div class="col s6 no-padding">Obec:</div>
-                            <div class="col s6 no-padding">
-                                <strong>{{ address.getTown() }}</strong>
-                            </div>
-                        </div>
-
-                        <div class="row margin-0">
-                            <div class="col s6 no-padding">PSČ:</div>
-                            <div class="col s6 no-padding">
-                                <strong>{{ address.getZip() }}</strong>
-                            </div>
-                        </div>
-
-                        {% if address.getCompany() is not null and address.getIc() is not null and address.getDic() is not null %}
-                            <br>
-
-                            <div class="row margin-0">
-                                <div class="col s6 no-padding">Název firmy:</div>
-                                <div class="col s6 no-padding">
-                                    <strong>{{ address.getCompany() }}</strong>
-                                </div>
-                            </div>
-
-                            <div class="row margin-0">
-                                <div class="col s6 no-padding">IČ:</div>
-                                <div class="col s6 no-padding">
-                                    <strong>{{ address.getIc() }}</strong>
-                                </div>
-                            </div>
-
-                            <div class="row margin-0">
-                                <div class="col s6 no-padding">DIČ:</div>
-                                <div class="col s6 no-padding">
-                                    <strong>{{ address.getDic() }}</strong>
-                                </div>
-                            </div>
-                        {% endif %}
-
                     </div>
-                    <div class="card-action">
-                        <a href="{{ path('profile_address', {id: address.getId()}) }}">Upravit</a>
-                        <a href="{{ path('profile_address_delete', {id: address.getId()}) }}">Smazat</a>
-                    </div>
-                </div>
-            {% endfor %}
+                {% endfor %}
+            </div>
         {% endif %}
     </div>
 

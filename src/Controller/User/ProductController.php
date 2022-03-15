@@ -118,7 +118,7 @@ class ProductController extends AbstractController
     public function product(string $slug): Response
     {
         /** @var Product $product */
-        $product = $this->getDoctrine()->getRepository(Product::class)->findOneAndFetchEverything(['slug' => $slug]);
+        $product = $this->getDoctrine()->getRepository(Product::class)->findOneAndFetchEverything(['slug' => $slug], $visibleOnly = true);
         if($product === null || !$product->isVisible())
         {
             throw new NotFoundHttpException('Produkt nenalezen.');

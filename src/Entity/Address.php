@@ -109,6 +109,22 @@ class Address
     private $additionalInfo;
 
     /**
+     * @ORM\Column(type="string", length=255)
+     *
+     * @Assert\Length(max=255, maxMessage="Maximální počet znaků v křestním jméně: {{ limit }}")
+     * @Assert\NotBlank
+     */
+    private $nameFirst;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     *
+     * @Assert\Length(max=255, maxMessage="Maximální počet znaků v příjmení: {{ limit }}")
+     * @Assert\NotBlank
+     */
+    private $nameLast;
+
+    /**
      * @ORM\Column(type="datetime")
      */
     private $created;
@@ -123,6 +139,9 @@ class Address
         $this->created = new DateTime('now');
         $this->updated = $this->created;
         $this->user = $user;
+
+        $this->nameFirst = $this->user->getNameFirst();
+        $this->nameLast = $this->user->getNameLast();
     }
 
     public function getId(): ?int
@@ -248,6 +267,40 @@ class Address
         $this->additionalInfo = $additionalInfo;
 
         return $this;
+    }
+
+    public function getNameFirst(): ?string
+    {
+        return $this->nameFirst;
+    }
+
+    public function setNameFirst(?string $nameFirst): self
+    {
+        $this->nameFirst = $nameFirst;
+
+        return $this;
+    }
+
+    public function getNameLast(): ?string
+    {
+        return $this->nameLast;
+    }
+
+    public function setNameLast(?string $nameLast): self
+    {
+        $this->nameLast = $nameLast;
+
+        return $this;
+    }
+
+    /**
+     * Vrátí celé jméno
+     *
+     * @return string
+     */
+    public function getFullName(): string
+    {
+        return $this->nameFirst . ' ' . $this->nameLast;
     }
 
     public function getCreated(): ?DateTimeInterface

@@ -24,6 +24,9 @@ framework:
             product_images:
                 base_path: images/products/
 
+    uid:
+        default_uuid_version: 4
+
 when@test:
     framework:
         test: true

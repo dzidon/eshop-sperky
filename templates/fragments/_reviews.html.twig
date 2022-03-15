@@ -18,10 +18,6 @@
                     <div class="card white">
                         <div class="card-content black-text">
                             <span class="card-title">
-                                {% if review.getUser().genderIsSet() %}
-                                    {{ review.getUser().getGender() }}
-                                {% endif %}
-
                                 {# Klikatelné jméno, pokud je oprávněn nějak upravovat ostatní uživatele #}
                                 {{ include('fragments/_fullname_clickable.html.twig', {user: review.getUser(), authorized: can_manage_users}) }}
                             </span>

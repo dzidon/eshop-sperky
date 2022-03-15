@@ -19,6 +19,12 @@ class AddressFormType extends AbstractType
                 'attr' => ['autofocus' => 'autofocus'],
                 'label' => 'Alias',
             ])
+            ->add('nameFirst', TextType::class, [
+                'label' => 'Jméno',
+            ])
+            ->add('nameLast', TextType::class, [
+                'label' => 'Příjmení',
+            ])
             ->add('country', ChoiceType::class, [
                 'choices' => Address::COUNTRY_NAMES_DROPDOWN,
                 'label' => 'Země',

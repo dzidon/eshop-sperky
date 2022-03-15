@@ -2,11 +2,32 @@
 
 {% block profile_body %}
 
-    <div class="row">
-        E-mail: {{ app.user.email }}<br>
-        Datum registrace: {{ app.user.registered|date('d. m. Y H:i:s') }}<br>
+    <div class="section">
+        <div class="row">
+            E-mail: {{ app.user.email }}<br>
+            Datum registrace: {{ app.user.registered|date('d. m. Y H:i:s') }}<br>
+        </div>
     </div>
 
-    {{ form(personalDataForm) }}
+    {{ form_start(personalDataForm) }}
+        <div class="row">
+            <div class="row no-mar-bot text-fields-compound">
+                <div class="input-field col s12 m6">
+                    {{ form_widget(personalDataForm.nameFirst) }}
+                    {{ form_label(personalDataForm.nameFirst) }}
+                    {{ form_help(personalDataForm.nameFirst) }}
+                    {{ form_errors(personalDataForm.nameFirst) }}
+                </div>
+                <div class="input-field col s12 m6">
+                    {{ form_widget(personalDataForm.nameLast) }}
+                    {{ form_label(personalDataForm.nameLast) }}
+                    {{ form_help(personalDataForm.nameLast) }}
+                    {{ form_errors(personalDataForm.nameLast) }}
+                </div>
+            </div>
+        </div>
+
+        {{ form_rest(personalDataForm) }}
+    {{ form_end(personalDataForm) }}
 
 {% endblock %}

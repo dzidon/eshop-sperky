@@ -19,10 +19,6 @@ use App\Validation\Compound as AssertCompound;
  */
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
-    public const GENDER_NAME_UNDISCLOSED = 'Neuvádět';
-    public const GENDER_NAME_MALE = 'Pan';
-    public const GENDER_NAME_FEMALE = 'Paní';
-
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
@@ -81,14 +77,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @ORM\Column(type="datetime")
      */
     private $registered;
-
-    /**
-     * @ORM\Column(type="string", length=8)
-     *
-     * @Assert\Choice(choices={User::GENDER_NAME_UNDISCLOSED, User::GENDER_NAME_MALE, User::GENDER_NAME_FEMALE}, message="Zvolte platné oslovení.")
-     * @Assert\NotBlank
-     */
-    private $gender = User::GENDER_NAME_UNDISCLOSED;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
@@ -322,27 +310,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getGender(): ?string
-    {
-        return $this->gender;
-    }
-
-    public function genderIsSet(): bool
-    {
-        if($this->gender === self::GENDER_NAME_MALE || $this->gender === self::GENDER_NAME_FEMALE)
-        {
-            return true;
-        }
-        return false;
-    }
-
-    public function setGender(?string $gender): self
-    {
-        $this->gender = $gender;
-
-        return $this;
-    }
-
     public function getNameFirst(): ?string
     {
         return $this->nameFirst;
@@ -384,7 +351,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getFullName(): string
     {
-        return $this->getNameFirst() . ' ' . $this->getNameLast();
+        return $this->nameFirst . ' ' . $this->nameLast;
     }
 
     public function getPhoneNumber()
@@ -527,8 +494,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             'Křestní jméno (Z-A)' => 'nameFirst'.SortingService::ATTRIBUTE_TAG_DESC,
             'Příjmení (A-Z)' => 'nameLast'.SortingService::ATTRIBUTE_TAG_ASC,
             'Příjmení (Z-A)' => 'nameLast'.SortingService::ATTRIBUTE_TAG_DESC,
-            'Pohlaví (A-Z)' => 'gender'.SortingService::ATTRIBUTE_TAG_ASC,
-            'Pohlaví (Z-A)' => 'gender'.SortingService::ATTRIBUTE_TAG_DESC,
             'Od ověřených' => 'isVerified'.SortingService::ATTRIBUTE_TAG_DESC,
             'Od neověřených' => 'isVerified'.SortingService::ATTRIBUTE_TAG_ASC,
             'Od umlčených' => 'isMuted'.SortingService::ATTRIBUTE_TAG_DESC,

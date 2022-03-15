@@ -3,23 +3,19 @@
 namespace App\Form;
 
 use App\Entity\User;
+use App\Form\EventSubscriber\DefaultEmailSubscriber;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Security\Core\Security;
 
 class ResetPasswordRequestFormType extends AbstractType
 {
-    private string $defaultEmail = '';
+    private DefaultEmailSubscriber $emailSubscriber;
 
-    public function __construct(Security $security)
+    public function __construct(DefaultEmailSubscriber $emailSubscriber)
     {
-        $user = $security->getUser();
-        if($user)
-        {
-            $this->defaultEmail = $user->getEmail();
-        }
+        $this->emailSubscriber = $emailSubscriber;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -27,10 +23,10 @@ class ResetPasswordRequestFormType extends AbstractType
         $builder
             ->add('email', EmailType::class, [
                 'attr' => ['autofocus' => 'autofocus'],
-                'data' => $this->defaultEmail,
                 'label' => 'Email',
                 'help' => 'Zadejte e-mail, přes který jste zaregistrovali svůj účet a my vám na něj pošleme odkaz pro resetování hesla.',
             ])
+            ->addEventSubscriber($this->emailSubscriber)
         ;
     }
 

@@ -5,7 +5,28 @@
     {# Časy vytvoření a aktualizace #}
     {{ include('fragments/_instance_created_updated.html.twig', {instance: addressInstance}) }}
 
-    {{ form(addressForm) }}
+    {{ form_start(addressForm) }}
+        {{ form_row(addressForm.alias) }}
+
+        <div class="row">
+            <div class="row no-mar-bot text-fields-compound">
+                <div class="input-field col s12 m6">
+                    {{ form_widget(addressForm.nameFirst) }}
+                    {{ form_label(addressForm.nameFirst) }}
+                    {{ form_help(addressForm.nameFirst) }}
+                    {{ form_errors(addressForm.nameFirst) }}
+                </div>
+                <div class="input-field col s12 m6">
+                    {{ form_widget(addressForm.nameLast) }}
+                    {{ form_label(addressForm.nameLast) }}
+                    {{ form_help(addressForm.nameLast) }}
+                    {{ form_errors(addressForm.nameLast) }}
+                </div>
+            </div>
+        </div>
+
+        {{ form_rest(addressForm) }}
+    {{ form_end(addressForm) }}
 
     {% if addressInstance.getId() is not null and is_granted('address_delete', addressInstance) %}
         <div class="row center-align">

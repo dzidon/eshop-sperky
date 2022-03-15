@@ -31,7 +31,7 @@ class ProductRepository extends ServiceEntityRepository
         $this->filter = $filter;
     }
 
-    public function findOneAndFetchEverything(array $criteria)
+    public function findOneAndFetchEverything(array $criteria, bool $visibleOnly)
     {
         $queryBuilder = $this->createQueryBuilder('p')
             ->select('p, ps, pc, pcg, po, pi, pig, pimg')
@@ -52,10 +52,15 @@ class ProductRepository extends ServiceEntityRepository
             $queryBuilder->andWhere(sprintf('p.%s = :%s', $name, $name))->setParameter($name, $value);
         }
 
-        return $this->filter
-            ->initialize($queryBuilder)
-            ->addProductVisibilityCondition()
-            ->getQueryBuilder()
+        if($visibleOnly)
+        {
+            $queryBuilder = $this->filter
+                ->initialize($queryBuilder)
+                ->addProductVisibilityCondition()
+                ->getQueryBuilder();
+        }
+
+        return $queryBuilder
             ->getQuery()
             ->getOneOrNullResult();
     }

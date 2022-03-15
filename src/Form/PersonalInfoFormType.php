@@ -6,7 +6,6 @@ use App\Entity\User;
 use App\Form\EventSubscriber\AgreePrivacySubscriber;
 use libphonenumber\PhoneNumberFormat;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -24,15 +23,6 @@ class PersonalInfoFormType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('gender', ChoiceType::class, [
-                'choices' => array(
-                    User::GENDER_NAME_UNDISCLOSED => User::GENDER_NAME_UNDISCLOSED,
-                    User::GENDER_NAME_MALE => User::GENDER_NAME_MALE,
-                    User::GENDER_NAME_FEMALE => User::GENDER_NAME_FEMALE,
-                ),
-                'expanded' => true,
-                'label' => 'Oslovení',
-            ])
             ->add('nameFirst', TextType::class, [
                 'required' => false,
                 'label' => 'Jméno',

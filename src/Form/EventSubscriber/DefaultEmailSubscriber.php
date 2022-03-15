@@ -2,18 +2,17 @@
 
 namespace App\Form\EventSubscriber;
 
-use App\Entity\Detached\ContactEmail;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Security\Core\Security;
 
 /**
- * Subscriber pro kontaktní formulář
+ * Subscriber pro nastavení defaultního e-mailu podle přihlášeného uživatele
  *
  * @package App\Form\EventSubscriber
  */
-class ContactSubscriber implements EventSubscriberInterface
+class DefaultEmailSubscriber implements EventSubscriberInterface
 {
     private string $defaultEmail = '';
 
@@ -35,9 +34,8 @@ class ContactSubscriber implements EventSubscriberInterface
 
     public function preSetData(FormEvent $event): void
     {
-        /** @var ContactEmail $emailData */
-        $emailData = $event->getData();
-        $emailData->setEmail($this->defaultEmail);
-        $event->setData($emailData);
+        $data = $event->getData();
+        $data->setEmail($this->defaultEmail);
+        $event->setData($data);
     }
 }

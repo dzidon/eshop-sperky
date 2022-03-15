@@ -39,8 +39,7 @@ class ReviewRepository extends ServiceEntityRepository
             //vyhledavani
             ->andWhere('r.stars LIKE :searchPhrase OR
                         r.text LIKE :searchPhrase OR
-                        CONCAT(u.nameFirst, \' \', u.nameLast) LIKE :searchPhrase OR
-                        u.gender LIKE :searchPhrase')
+                        CONCAT(u.nameFirst, \' \', u.nameLast) LIKE :searchPhrase')
             ->setParameter('searchPhrase', '%' . $searchPhrase . '%')
 
             //razeni

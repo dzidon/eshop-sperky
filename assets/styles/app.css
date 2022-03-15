@@ -194,6 +194,10 @@ a.secondary-content {
     margin-bottom: 0;
 }
 
+.text-fields-compound {
+    margin-top: -1rem;
+}
+
 .product-title {
     line-height: 1.5;
 }

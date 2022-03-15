@@ -22,12 +22,7 @@
                             </strong>
 
                             {% if user.fullNameIsSet() %}
-                                -
-                                {% if user.genderIsSet() %}
-                                    {{ user.getGender() }}
-                                {% endif %}
-
-                                {{ user.getFullName() }}
+                                - {{ user.getFullName() }}
                             {% endif %}
 
                             {% if user.isMuted() %}

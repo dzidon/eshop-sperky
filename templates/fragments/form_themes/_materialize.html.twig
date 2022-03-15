@@ -191,7 +191,7 @@
 {# Radio buttony #}
 {% block choice_row %}
     <div class="row {% if not valid %} has-error{% endif %}">
-        <div class="input-field margin-0">
+        <div class="input-field {% if not expanded %}text-fields-compound{% endif %}">
             {% if label is not same as(false)  %}
                 <div class="radio-label">
                     {{ form_label(form) }}
