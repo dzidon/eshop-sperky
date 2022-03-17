@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use DateTime;
+use DateTimeInterface;
 use Symfony\Component\Uid\Uuid;
 use App\Repository\OrderRepository;
 use Doctrine\ORM\Mapping as ORM;
@@ -13,6 +15,9 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Order
 {
+    public const LIFETIME_IN_DAYS = 60;
+    public const REFRESH_WINDOW_IN_DAYS = 10; //REFRESH_AFTER_DAYS
+
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
@@ -25,9 +30,15 @@ class Order
      */
     private $token;
 
+    /**
+     * @ORM\Column(type="datetime")
+     */
+    private $expireAt;
+
     public function __construct()
     {
         $this->token = Uuid::v4();
+        $this->setExpireAtBasedOnLifetime();
     }
 
     public function getId(): ?int
@@ -43,6 +54,25 @@ class Order
     public function setToken(Uuid $token): self
     {
         $this->token = $token;
+
+        return $this;
+    }
+
+    public function getExpireAt(): ?DateTimeInterface
+    {
+        return $this->expireAt;
+    }
+
+    public function setExpireAt(DateTimeInterface $expireAt): self
+    {
+        $this->expireAt = $expireAt;
+
+        return $this;
+    }
+
+    public function setExpireAtBasedOnLifetime(): self
+    {
+        $this->expireAt = (new DateTime('now'))->modify(sprintf('+%d day', Order::LIFETIME_IN_DAYS));
 
         return $this;
     }

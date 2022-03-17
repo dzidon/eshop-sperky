@@ -6,6 +6,7 @@ use App\Entity\Review;
 use App\Service\SortingService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Query;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -29,12 +30,9 @@ class ReviewRepository extends ServiceEntityRepository
     {
         $sortData = $this->sorting->createSortData($sortAttribute, Review::getSortData());
 
-        return $this->createQueryBuilder('r')
+        $queryBuilder = $this->createQueryBuilder('r')
             ->select('r', 'u')
             ->innerJoin('r.user', 'u')
-            ->andWhere('u.nameFirst IS NOT NULL')
-            ->andWhere('u.nameLast IS NOT NULL')
-            ->andWhere('u.isMuted = 0')
 
             //vyhledavani
             ->andWhere('r.text LIKE :searchPhrase OR
@@ -43,25 +41,46 @@ class ReviewRepository extends ServiceEntityRepository
 
             //razeni
             ->orderBy('r.' . $sortData['attribute'], $sortData['order'])
-            ->getQuery();
+        ;
+
+        return $this->addVisibilityConditions($queryBuilder)
+            ->getQuery()
+        ;
     }
 
     public function findLatest(int $count)
     {
-        return $this->getQueryForSearchAndPagination()
+        $queryBuilder = $this->createQueryBuilder('r')
+            ->select('r', 'u')
+            ->innerJoin('r.user', 'u')
             ->setMaxResults($count)
-            ->getResult();
+            ->orderBy('r.created', 'DESC')
+        ;
+
+        return $this->addVisibilityConditions($queryBuilder)
+            ->getQuery()
+            ->getResult()
+        ;
     }
 
     public function getTotalAndAverage()
     {
-        return $this->createQueryBuilder('r')
+        $queryBuilder = $this->createQueryBuilder('r')
             ->select('count(r.id) as total, avg(r.stars) as average')
-            ->innerJoin('r.user', 'u')
-            ->andWhere('u.nameFirst IS NOT NULL')
-            ->andWhere('u.nameLast IS NOT NULL')
-            ->andWhere('u.isMuted = 0')
+            ->innerJoin('r.user', 'u');
+
+        return $this->addVisibilityConditions($queryBuilder)
             ->getQuery()
             ->getScalarResult()[0];
+    }
+
+    private function addVisibilityConditions(QueryBuilder $queryBuilder): QueryBuilder
+    {
+        $queryBuilder
+            ->andWhere('u.nameFirst IS NOT NULL')
+            ->andWhere('u.nameLast IS NOT NULL')
+            ->andWhere('u.isMuted = 0');
+
+        return $queryBuilder;
     }
 }

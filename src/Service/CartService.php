@@ -29,6 +29,7 @@ class CartService
         $this->entityManager = $entityManager;
         $this->request = $requestStack->getCurrentRequest();
 
+        $this->entityManager->clear();
         $this->obtainOrder();
     }
 
@@ -54,31 +55,37 @@ class CartService
 
     /**
      * Pokud je aktivní objednávka nová, uloží se do DB a vrátí se cookie s daným tokenem. Pokud už je aktivní
-     * objednávka uložená v DB, vrátí se null, protože není potřeba cookie nastavovat do odpovědi.
+     * objednávka uložená v DB, vrátí se null a nastaví se datum poslední aktivity.
      *
      * @return Cookie|null
      */
     public function getCookieAndSaveOrder()
     {
-        $this->entityManager->clear();
-
         if ($this->order->getId() === null)
         {
             $this->entityManager->persist($this->order);
             $this->entityManager->flush();
-
-            $token = $this->getToken();
-            $expires = time()+(60*60*24*30); // za měsíc
-
-            return (new Cookie(self::COOKIE_NAME))
-                ->withValue($token)
-                ->withExpires($expires)
-                ->withSecure(true)
-                ->withHttpOnly()
-            ;
+        }
+        // aby to při každém requestu nevolalo UPDATE, aktualizuje se datum expirace jen několik dní před expirací
+        else if (($this->order->getExpireAt()->getTimestamp() - time()) < (86400 * Order::REFRESH_WINDOW_IN_DAYS))
+        {
+            $this->order->setExpireAtBasedOnLifetime();
+            $this->entityManager->flush();
+        }
+        else
+        {
+            return null;
         }
 
-        return null;
+        $token = $this->getToken();
+        $expires = time() + (86400 * Order::LIFETIME_IN_DAYS);
+
+        return (new Cookie(self::COOKIE_NAME))
+            ->withValue($token)
+            ->withExpires($expires)
+            ->withSecure(true)
+            ->withHttpOnly()
+        ;
     }
 
     /**
