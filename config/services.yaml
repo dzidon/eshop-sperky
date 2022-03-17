@@ -84,5 +84,8 @@ services:
 
     app.navbar_service:
         class: App\Service\NavbarService
+    app.cart_service:
+        class: App\Service\CartService
 
     App\Service\NavbarService: '@app.navbar_service'
+    App\Service\CartService: '@app.cart_service'

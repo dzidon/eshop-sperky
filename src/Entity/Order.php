@@ -8,6 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass=OrderRepository::class)
+ * @ORM\Table(name="order_")
  * @ORM\HasLifecycleCallbacks()
  */
 class Order
@@ -24,33 +25,30 @@ class Order
      */
     private $token;
 
+    public function __construct()
+    {
+        $this->token = Uuid::v4();
+    }
+
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getToken()
+    public function getToken(): ?Uuid
     {
         return $this->token;
     }
 
-    public function setToken($token): self
+    public function setToken(Uuid $token): self
     {
         $this->token = $token;
 
         return $this;
     }
 
-    /**
-     * @ORM\PreFlush
-     */
-    public function generateTokenIfNull(): self
+    public function isOpen(): bool
     {
-        if($this->token === null)
-        {
-            $this->token = Uuid::v4();
-        }
-
-        return $this;
+        return true;
     }
 }
