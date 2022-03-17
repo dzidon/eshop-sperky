@@ -160,6 +160,11 @@ class Product
     private $mainImageName;
 
     /**
+     * @ORM\OneToMany(targetEntity=CartOccurence::class, mappedBy="product", cascade={"persist"})
+     */
+    private $cartOccurences;
+
+    /**
      * @ORM\Column(type="datetime")
      */
     private $created;
@@ -178,6 +183,7 @@ class Product
         $this->categories = new ArrayCollection();
         $this->info = new ArrayCollection();
         $this->images = new ArrayCollection();
+        $this->cartOccurences = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -567,6 +573,36 @@ class Product
                 $this->mainImageName = $image->getName();
             }
         }
+    }
+
+    /**
+     * @return Collection|CartOccurence[]
+     */
+    public function getCartOccurences(): Collection
+    {
+        return $this->cartOccurences;
+    }
+
+    public function addCartOccurence(CartOccurence $cartOccurence): self
+    {
+        if (!$this->cartOccurences->contains($cartOccurence)) {
+            $this->cartOccurences[] = $cartOccurence;
+            $cartOccurence->setProduct($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCartOccurence(CartOccurence $cartOccurence): self
+    {
+        if ($this->cartOccurences->removeElement($cartOccurence)) {
+            // set the owning side to null (unless already changed)
+            if ($cartOccurence->getProduct() === $this) {
+                $cartOccurence->setProduct(null);
+            }
+        }
+
+        return $this;
     }
 
     public static function getSortDataForAdmin(): array

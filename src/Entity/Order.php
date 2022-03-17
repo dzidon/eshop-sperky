@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use DateTime;
 use DateTimeInterface;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Uid\Uuid;
 use App\Repository\OrderRepository;
 use Doctrine\ORM\Mapping as ORM;
@@ -16,7 +18,7 @@ use Doctrine\ORM\Mapping as ORM;
 class Order
 {
     public const LIFETIME_IN_DAYS = 60;
-    public const REFRESH_WINDOW_IN_DAYS = 10; //REFRESH_AFTER_DAYS
+    public const REFRESH_WINDOW_IN_DAYS = 30;
 
     /**
      * @ORM\Id
@@ -35,10 +37,16 @@ class Order
      */
     private $expireAt;
 
+    /**
+     * @ORM\OneToMany(targetEntity=CartOccurence::class, mappedBy="order_", cascade={"persist"})
+     */
+    private $cartOccurences;
+
     public function __construct()
     {
         $this->token = Uuid::v4();
         $this->setExpireAtBasedOnLifetime();
+        $this->cartOccurences = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -73,6 +81,36 @@ class Order
     public function setExpireAtBasedOnLifetime(): self
     {
         $this->expireAt = (new DateTime('now'))->modify(sprintf('+%d day', Order::LIFETIME_IN_DAYS));
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|CartOccurence[]
+     */
+    public function getCartOccurences(): Collection
+    {
+        return $this->cartOccurences;
+    }
+
+    public function addCartOccurence(CartOccurence $cartOccurence): self
+    {
+        if (!$this->cartOccurences->contains($cartOccurence)) {
+            $this->cartOccurences[] = $cartOccurence;
+            $cartOccurence->setOrder($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCartOccurence(CartOccurence $cartOccurence): self
+    {
+        if ($this->cartOccurences->removeElement($cartOccurence)) {
+            // set the owning side to null (unless already changed)
+            if ($cartOccurence->getOrder() === $this) {
+                $cartOccurence->setOrder(null);
+            }
+        }
 
         return $this;
     }
