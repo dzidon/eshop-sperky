@@ -82,6 +82,10 @@ services:
             - '../src/Kernel.php'
             - '../src/Tests/'
 
+    App\EventSubscriber\DoctrineTrackingPolicySubscriber:
+        tags:
+            - { name: doctrine.event_subscriber, connection: default }
+
     app.navbar_service:
         class: App\Service\NavbarService
     app.cart_service:

@@ -57,6 +57,7 @@ class RefreshPermissionsCommand extends Command
             {
                 $permissionInDb->setName( $permissionHere->getName() );
                 $permissionInDb->setCategory( $permissionHere->getCategory() );
+                $this->entityManager->persist($permissionInDb);
 
                 $stats['updated'][] = $permissionInDb->getCode();
             }

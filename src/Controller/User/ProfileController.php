@@ -55,6 +55,7 @@ class ProfileController extends AbstractController
         if ($form->isSubmitted() && $form->isValid())
         {
             $entityManager = $this->getDoctrine()->getManager();
+            $entityManager->persist($user);
             $entityManager->flush();
 
             if ($user->getReview() !== null && !$user->fullNameIsSet())
@@ -92,6 +93,7 @@ class ProfileController extends AbstractController
         if ($form->isSubmitted() && $form->isValid())
         {
             $entityManager = $this->getDoctrine()->getManager();
+            $entityManager->persist($user);
             $entityManager->flush();
 
             $this->addFlash('success', 'Heslo změněno!');
@@ -189,14 +191,14 @@ class ProfileController extends AbstractController
         $user = $this->getUser();
         $this->breadcrumbs->addRoute('profile_addresses');
 
-        if($id !== null) //zadal id do url, snazi se editovat existujici
+        if($id !== null) // zadal id do url, snazi se editovat existujici
         {
             $address = $this->getDoctrine()->getRepository(Address::class)->findOneBy(['id' => $id]);
-            if($address === null) //nenaslo to zadnou adresu
+            if($address === null) // nenaslo to zadnou adresu
             {
                 throw new NotFoundHttpException('Adresa nenalezena.');
             }
-            else if(!$this->isGranted('address_edit', $address)) //nalezena adresa neni uzivatele
+            else if(!$this->isGranted('address_edit', $address)) // nalezena adresa neni uzivatele
             {
                 throw new AccessDeniedHttpException('Tuto adresu nemůžete editovat.');
             }

@@ -99,6 +99,7 @@ class VerificationFormAuthenticator extends AbstractLoginFormAuthenticator
     {
         $user = $token->getUser();
         $user->setIsVerified(true);
+        $this->entityManager->persist($user);
         $this->entityManager->flush();
 
         $request->getSession()->getFlashBag()->add('success', 'Ověření e-mailu proběhlo úspěšně, byli jste přihlášeni!');

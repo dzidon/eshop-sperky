@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use Symfony\Component\Validator\Constraints as Assert;
 use App\Repository\CartOccurenceRepository;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -31,6 +32,10 @@ class CartOccurence
 
     /**
      * @ORM\Column(type="integer")
+     *
+     * @Assert\Type("integer", message="Musíte zadat celé číslo.")
+     * @Assert\GreaterThan(0)
+     * @Assert\NotBlank
      */
     private $quantity;
 
@@ -53,6 +58,11 @@ class CartOccurence
      * @ORM\Column(type="string", length=500, nullable=true)
      */
     private $options;
+
+    public function __construct()
+    {
+        $this->quantity = 1;
+    }
 
     public function getId(): ?int
     {

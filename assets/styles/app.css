@@ -71,6 +71,9 @@ main {
     width: 200px;
 }
 
+.button-container-compound {
+    margin-bottom: -7px;
+}
 
 /*
     Input, Textarea

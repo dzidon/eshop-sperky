@@ -29,7 +29,6 @@ class CartService
         $this->entityManager = $entityManager;
         $this->request = $requestStack->getCurrentRequest();
 
-        $this->entityManager->clear();
         $this->obtainOrder();
     }
 
@@ -70,6 +69,7 @@ class CartService
         else if (($this->order->getExpireAt()->getTimestamp() - time()) < (86400 * Order::REFRESH_WINDOW_IN_DAYS))
         {
             $this->order->setExpireAtBasedOnLifetime();
+            $this->entityManager->persist($this->order);
             $this->entityManager->flush();
         }
         else

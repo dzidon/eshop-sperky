@@ -81,6 +81,7 @@ class RegistrationController extends AbstractController
                 $existingUser->setVerifyLinkLastSent($now);
                 $existingUser->setRegistered($now);
                 $existingUser->setPassword( $user->getPassword() );
+                $entityManager->persist($existingUser);
                 $entityManager->flush();
                 $userForEmailConfirmation = $existingUser;
 

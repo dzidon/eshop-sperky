@@ -108,29 +108,29 @@ class SocialAuthenticator extends OAuth2Authenticator
 
                 // pokud už se v minulosti přihlašoval danou službou
                 $userRepository = $this->entityManager->getRepository(User::class);
-                $existingUser = $userRepository->findOneBy([$serviceIdAttribute => $socialId]); //např. facebookId => 651519191561
+                $existingUser = $userRepository->findOneBy([$serviceIdAttribute => $socialId]); // např. facebookId => 651519191561
                 if ($existingUser) //social id nalezeno v naší db
                 {
-                    if($socialEmail === $existingUser->getUserIdentifier()) //v db exisutje user s danym emailem a social id
+                    if($socialEmail === $existingUser->getUserIdentifier()) // v db exisutje user s danym emailem a social id
                     {
                         $this->logger->info(sprintf("User %s (ID: %s) has logged in using %s. They have used this service to log in before (Social ID: %s).", $existingUser->getUserIdentifier(), $existingUser->getId(), $serviceName, $socialId));
                         return $existingUser;
                     }
-                    else //v db exisutje user s danym social id, email vsak nesedi, takze social id odpojime (tohle je edge case, ktery nastane jen pokud si uzivatel zmeni email na uctu treti strany)
+                    else // v db exisutje user s danym social id, email vsak nesedi, takze social id odpojime (tohle je edge case, ktery nastane jen pokud si uzivatel zmeni email na uctu treti strany)
                     {
                         $existingUser->$serviceIdAttributeSetter(null);
                         $this->entityManager->persist($existingUser);
-                        //kod pokracuje a dalsi postup se resi dole
+                        // kod pokracuje a dalsi postup se resi dole
                     }
                 }
 
                 // v minulosti se nepřihlašoval přes danou službu
                 $user = $userRepository->findOneBy(['email' => $socialEmail]);
-                if($user) //nějaký e-mail z naší DB se shoduje s emailem daného social účtu
+                if($user) // nějaký e-mail z naší DB se shoduje s emailem daného social účtu
                 {
                     $this->logger->info(sprintf("User %s (ID: %s) has logged in using %s by linking email addresses (Social ID: %s).", $user->getUserIdentifier(), $user->getId(), $serviceName, $socialId));
                 }
-                else //žadný e-mail z naší DB se neshoduje s emailem daného social účtu
+                else // žadný e-mail z naší DB se neshoduje s emailem daného social účtu
                 {
                     $socialNameFirst = $socialUser->getFirstName();
                     $socialNameLast = $socialUser->getLastName();

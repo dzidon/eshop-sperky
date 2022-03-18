@@ -2,6 +2,7 @@
 
 namespace App\Controller\User;
 
+use App\Entity\CartOccurence;
 use App\Entity\Detached\ProductCatalogFilter;
 use App\Entity\Product;
 use App\Entity\ProductSection;
@@ -11,7 +12,6 @@ use App\Service\BreadcrumbsService;
 use App\Service\PaginatorService;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -124,8 +124,9 @@ class ProductController extends AbstractController
             throw new NotFoundHttpException('Produkt nenalezen.');
         }
 
-        $form = $this->createForm(CartInsertFormType::class);
-        $form->add('submit', SubmitType::class, ['label' => 'Do košíku']);
+        $cartOccurence = new CartOccurence();
+        $cartOccurence->setProduct($product);
+        $form = $this->createForm(CartInsertFormType::class, $cartOccurence);
 
         $relatedProducts = null;
         if($product->getSection() !== null)

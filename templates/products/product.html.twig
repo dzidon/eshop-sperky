@@ -106,6 +106,22 @@
                             {% endfor %}
                         </div>
                     {% endif %}
+
+                    {{ form_start(cartInsertForm) }}
+                        <div class="row valign-wrapper flex-wrap">
+                            <div class="col s3 input-field no-mar-bot">
+                                {{ form_widget(cartInsertForm.quantity, {'attr': {'class': 'margin-0'}}) }}
+                                {{ form_label(cartInsertForm.quantity) }}
+                                {{ form_help(cartInsertForm.quantity) }}
+                                {{ form_errors(cartInsertForm.quantity) }}
+                            </div>
+                            <div class="col s9 button-container-compound">
+                                <button class="btn-large waves-effect waves-light light-blue center-align" type="submit">
+                                    Do košíku
+                                </button>
+                            </div>
+                        </div>
+                    {{ form_end(cartInsertForm) }}
                 </div>
             </div>
 
