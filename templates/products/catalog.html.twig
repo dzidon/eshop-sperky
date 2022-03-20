@@ -15,31 +15,6 @@
             {# Obsah katalogu #}
             {{ include('fragments/forms_unique/_form_product_catalog.html.twig') }}
         </div>
-
-        <div id="modal-loader" class="modal modal-loader">
-            <div class="modal-content center-align">
-                <div class="section">
-                    <div class="preloader-wrapper big active">
-                        <div class="spinner-layer spinner-black-only">
-                            <div class="circle-clipper left">
-                                <div class="circle"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <h6>Aktualizuji výpis...</h6>
-            </div>
-        </div>
-
-        <div id="modal-error" class="modal">
-            <div class="modal-content">
-                <h4>Chyba</h4>
-                <p>Nepodařilo se načíst katalog produktů, zkuste to znovu.</p>
-            </div>
-            <div class="modal-footer">
-                <a href="javascript:void(0);" class="modal-close waves-effect orange-text text-accent-2 btn-flat">Zavřít</a>
-            </div>
-        </div>
     </div>
 
 {% endblock %}

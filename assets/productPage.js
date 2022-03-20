@@ -34,10 +34,38 @@ $(document).ready(function() {
     });
 
     // formulář pro vložení do košíku
-    $('#form-cart-insert').on('submit', function(e)
+    const formCartInsert = $('#form-cart-insert');
+    formCartInsert.on('submit', function(e)
     {
         e.preventDefault();
+        M.Modal.getInstance($('#modal-loader')).open();
 
+        $.post({
+            url: formCartInsert.attr('action'),
+            data: formCartInsert.serialize(),
+            dataType: 'json',
+            complete: function()
+            {
+                M.Modal.getInstance($('#modal-loader')).close();
+            },
+            success: function(data)
+            {
+                if(data['errors'].length > 0)
+                {
+                    const errors = data['errors'].join('<br>');
+                    $('#modal-error-text').html(errors);
+                    M.Modal.getInstance($('#modal-error')).open();
+                }
+                /*else
+                {
 
+                }*/
+            },
+            error: function()
+            {
+                $('#modal-error-text').text('Nepodařilo se vložit produkt do košíku, zkuste to prosím znovu.')
+                M.Modal.getInstance($('#modal-error')).open();
+            }
+        });
     });
 });

@@ -62,15 +62,13 @@ class CartService
     {
         if ($this->order->getId() === null)
         {
-            $this->entityManager->persist($this->order);
-            $this->entityManager->flush();
+            $this->orderPersistAndFlush();
         }
         // aby to při každém requestu nevolalo UPDATE, aktualizuje se datum expirace jen několik dní před expirací
         else if (($this->order->getExpireAt()->getTimestamp() - time()) < (86400 * Order::REFRESH_WINDOW_IN_DAYS))
         {
             $this->order->setExpireAtBasedOnLifetime();
-            $this->entityManager->persist($this->order);
-            $this->entityManager->flush();
+            $this->orderPersistAndFlush();
         }
         else
         {
@@ -100,7 +98,7 @@ class CartService
             $uuid = Uuid::fromString($tokenInCookie);
 
             /** @var Order|null $order */
-            $this->order = $this->entityManager->getRepository(Order::class)->findOneBy(['token' => $uuid]);
+            $this->order = $this->entityManager->getRepository(Order::class)->findAndFetchCartOccurences($uuid);
             if ($this->order === null || !$this->order->isOpen())
             {
                 $this->createNewOrder();
@@ -118,5 +116,14 @@ class CartService
     private function createNewOrder(): void
     {
         $this->order = new Order();
+    }
+
+    /**
+     * Uloží aktivní objednávku do databáze
+     */
+    private function orderPersistAndFlush(): void
+    {
+        $this->entityManager->persist($this->order);
+        $this->entityManager->flush();
     }
 }

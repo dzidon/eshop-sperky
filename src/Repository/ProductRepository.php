@@ -34,18 +34,20 @@ class ProductRepository extends ServiceEntityRepository
     public function findOneAndFetchEverything(array $criteria, bool $visibleOnly)
     {
         $queryBuilder = $this->createQueryBuilder('p')
-            ->select('p, ps, pc, pcg, po, pi, pig, pimg')
+            ->select('p, ps, pc, pcg, po, pop, pi, pig, pimg')
             ->leftJoin('p.section', 'ps')
             ->leftJoin('p.categories', 'pc')
             ->leftJoin('pc.productCategoryGroup', 'pcg')
             ->leftJoin('p.options', 'po')
+            ->leftJoin('po.parameters', 'pop')
             ->leftJoin('p.info', 'pi')
             ->leftJoin('pi.productInformationGroup', 'pig')
             ->leftJoin('p.images', 'pimg')
             ->addOrderBy('pimg.priority', 'DESC')
             ->addOrderBy('pc.name', 'ASC')
             ->addOrderBy('pcg.name', 'ASC')
-            ->addOrderBy('pig.name', 'ASC');
+            ->addOrderBy('pig.name', 'ASC')
+            ->addOrderBy('pop.id', 'ASC');
 
         foreach ($criteria as $name => $value)
         {
@@ -140,6 +142,25 @@ class ProductRepository extends ServiceEntityRepository
 
         shuffle($products);
         return $products;
+    }
+
+    public function findOneForCartInsert($id)
+    {
+        $queryBuilder = $this->createQueryBuilder('p')
+            ->select('p, po, pop')
+            ->leftJoin('p.options', 'po')
+            ->leftJoin('po.parameters', 'pop')
+            ->andWhere('p.id LIKE :id')
+            ->setParameter('id', $id)
+        ;
+
+        return $this->filter
+            ->initialize($queryBuilder)
+            ->addProductVisibilityCondition()
+            ->getQueryBuilder()
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
     }
 
     public function getQueryForSearchAndPagination(bool $inAdmin, ProductSection $section = null, string $searchPhrase = null, string $sortAttribute = null, float $priceMin = null, float $priceMax = null, array $categoriesGrouped = null): Query

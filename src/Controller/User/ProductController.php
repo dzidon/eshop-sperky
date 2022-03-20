@@ -2,7 +2,7 @@
 
 namespace App\Controller\User;
 
-use App\Entity\CartOccurence;
+use App\Entity\Detached\CartInsert;
 use App\Entity\Detached\ProductCatalogFilter;
 use App\Entity\Product;
 use App\Entity\ProductSection;
@@ -119,14 +119,14 @@ class ProductController extends AbstractController
     {
         /** @var Product $product */
         $product = $this->getDoctrine()->getRepository(Product::class)->findOneAndFetchEverything(['slug' => $slug], $visibleOnly = true);
-        if($product === null || !$product->isVisible())
+        if($product === null)
         {
             throw new NotFoundHttpException('Produkt nenalezen.');
         }
 
-        $cartOccurence = new CartOccurence();
-        $cartOccurence->setProduct($product);
-        $form = $this->createForm(CartInsertFormType::class, $cartOccurence);
+        $cartInsertRequest = new CartInsert();
+        $cartInsertRequest->setProduct($product);
+        $form = $this->createForm(CartInsertFormType::class, $cartInsertRequest);
 
         $relatedProducts = null;
         if($product->getSection() !== null)

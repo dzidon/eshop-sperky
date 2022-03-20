@@ -176,10 +176,8 @@ function catalogResetUsingForm()
 
 function catalogReset(url, addToHistory)
 {
-    const modalLoaderElement = $('#modal-loader').modal({
-        dismissible: false
-    });
-    M.Modal.getInstance(modalLoaderElement).open();
+    $('#modal-loader-text').text('Aktualizuji výpis...');
+    M.Modal.getInstance($('#modal-loader')).open();
 
     $.get({
         url: url,
@@ -208,6 +206,7 @@ function catalogReset(url, addToHistory)
         },
         error: function()
         {
+            $('#modal-error-text').text('Nepodařilo se načíst katalog produktů, zkuste to prosím znovu.')
             M.Modal.getInstance($('#modal-error')).open();
         }
     });

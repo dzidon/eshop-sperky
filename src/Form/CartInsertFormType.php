@@ -2,14 +2,26 @@
 
 namespace App\Form;
 
-use App\Entity\CartOccurence;
+use App\Entity\Detached\CartInsert;
+use App\Form\EventSubscriber\CartOptionsSubscriber;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class CartInsertFormType extends AbstractType
 {
+    private UrlGeneratorInterface $router;
+    private CartOptionsSubscriber $cartOptionSubscriber;
+
+    public function __construct(UrlGeneratorInterface $router, CartOptionsSubscriber $cartOptionSubscriber)
+    {
+        $this->router = $router;
+        $this->cartOptionSubscriber = $cartOptionSubscriber;
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
@@ -17,15 +29,22 @@ class CartInsertFormType extends AbstractType
                 'attr' => [
                     'min' => 1
                 ],
+                'invalid_message' => 'Do počtu kusů musíte zadat celé číslo.',
                 'label' => 'Ks',
+                'error_bubbling' => true,
             ])
+            ->add('productId', HiddenType::class, [
+                'error_bubbling' => true,
+            ])
+            ->addEventSubscriber($this->cartOptionSubscriber)
         ;
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => CartOccurence::class,
+            'data_class' => CartInsert::class,
+            'action' => $this->router->generate('cart_insert'),
             'csrf_protection' => true,
             'csrf_field_name' => '_token',
             'csrf_token_id'   => 'form_cart_insert',
