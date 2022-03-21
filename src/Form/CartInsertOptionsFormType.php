@@ -32,14 +32,19 @@ class CartInsertOptionsFormType extends AbstractType
                 {
                     if ($option->isConfigured())
                     {
+                        // Dropdown
                         if ($option->getType() === ProductOption::TYPE_DROPDOWN)
                         {
                             $items = [];
+                            $emptyData = null;
                             foreach ($option->getParameters() as $parameter)
                             {
+                                if($emptyData === null)
+                                {
+                                    $emptyData = $parameter->getValue();
+                                }
                                 $items[$parameter->getValue()] = $parameter->getValue();
                             }
-                            $emptyData = (isset($items[0]) ? $items[0] : '');
 
                             $form->add(sprintf('%s', $option->getId()), ChoiceType::class, [
                                 'invalid_message' => sprintf('Do pole "%s" jste zadali neplatnou hodnotu. Zkuste prosím aktualizovat stránku.', $option->getName()),
@@ -49,6 +54,7 @@ class CartInsertOptionsFormType extends AbstractType
                                 'error_bubbling' => true,
                             ]);
                         }
+                        // Číslo
                         else if ($option->getType() === ProductOption::TYPE_NUMBER)
                         {
                             $form->add(sprintf('%s', $option->getId()), NumberType::class, [
