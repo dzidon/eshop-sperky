@@ -71,13 +71,12 @@
                         </div>
                     </div>
 
-                    {% if productInstance.getDescription() is not same as(null) %}
+                    {% if productInstance.getDescriptionShort() is not same as(null) %}
                         <div class="row">
                             <div class="col s12">
-                                {{ productInstance.getShortDescription() }}
-                                {% if productInstance.isDescriptionLong() %}
-                                    ...
-                                    <strong>
+                                {{ productInstance.getDescriptionShort() }}
+                                {% if productInstance.getDescription() is not same as(null) %}
+                                    <strong class="nowrap">
                                         <a href="javascript:void(0);" id="full-description-link">(Celý popis)</a>
                                     </strong>
                                 {% endif %}
@@ -134,7 +133,7 @@
                 <div class="row">
                     <div class="col s12 l9">
                         <h4 id="full-description">Popis</h4>
-                        {{ productInstance.getDescription() }}
+                        {{ productInstance.getDescription()|nl2br }}
                     </div>
                 </div>
             {% endif %}

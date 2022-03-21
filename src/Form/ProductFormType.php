@@ -62,9 +62,19 @@ class ProductFormType extends AbstractType
                 'required' => false,
                 'label' => 'Název v odkazu',
             ])
-            ->add('description', TextareaType::class, [
+            ->add('descriptionShort', TextareaType::class, [
+                'attr' => [
+                    'data-length' => 250,
+                ],
                 'required' => false,
-                'label' => 'Popis',
+                'label' => 'Krátký popis',
+            ])
+            ->add('description', TextareaType::class, [
+                'attr' => [
+                    'data-length' => 4096,
+                ],
+                'required' => false,
+                'label' => 'Dlouhý popis',
             ])
             ->add('inventory', IntegerType::class, [
                 'attr' => [

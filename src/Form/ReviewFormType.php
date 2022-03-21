@@ -18,6 +18,9 @@ class ReviewFormType extends AbstractType
                 'label' => 'Hodnocení',
             ])
             ->add('text', TextareaType::class, [
+                'attr' => [
+                    'data-length' => 1000,
+                ],
                 'required' => false,
                 'label' => 'Text',
             ])

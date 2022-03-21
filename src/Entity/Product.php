@@ -21,8 +21,6 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  */
 class Product
 {
-    public const DESCRIPTION_SHORT_LENGTH = 250;
-
     public const VAT_NONE = 0.0;
     public const VAT_BASIC = 0.21;
     public const VAT_LOWER_1 = 0.15;
@@ -86,9 +84,16 @@ class Product
     private $vat;
 
     /**
+     * @ORM\Column(type="string", length=250, nullable=true)
+     *
+     * @Assert\Length(max=250, maxMessage="Maximální počet znaků v krátkém popisu: {{ limit }}")
+     */
+    private $descriptionShort;
+
+    /**
      * @ORM\Column(type="string", length=4096, nullable=true)
      *
-     * @Assert\Length(max=4096, maxMessage="Maximální počet znaků v popisu: {{ limit }}")
+     * @Assert\Length(max=4096, maxMessage="Maximální počet znaků v dlouhém popisu: {{ limit }}")
      */
     private $description;
 
@@ -266,6 +271,18 @@ class Product
         return $this;
     }
 
+    public function getDescriptionShort(): ?string
+    {
+        return $this->descriptionShort;
+    }
+
+    public function setDescriptionShort(?string $descriptionShort): self
+    {
+        $this->descriptionShort = $descriptionShort;
+
+        return $this;
+    }
+
     public function getDescription(): ?string
     {
         return $this->description;
@@ -276,26 +293,6 @@ class Product
         $this->description = $description;
 
         return $this;
-    }
-
-    public function getShortDescription(): ?string
-    {
-        if($this->description === null)
-        {
-            return null;
-        }
-
-        return substr($this->description, 0, self::DESCRIPTION_SHORT_LENGTH);
-    }
-
-    public function isDescriptionLong(): bool
-    {
-        if($this->description === null)
-        {
-            return false;
-        }
-
-        return mb_strlen($this->description, 'utf-8') > self::DESCRIPTION_SHORT_LENGTH;
     }
 
     public function isHidden(): ?bool

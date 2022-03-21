@@ -33,6 +33,9 @@ class ContactFormType extends AbstractType
                 'label' => 'Předmět',
             ])
             ->add('text', TextareaType::class, [
+                'attr' => [
+                    'data-length' => 4096,
+                ],
                 'label' => 'Text',
             ])
             ->add('recaptcha', EWZRecaptchaType::class, [

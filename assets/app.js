@@ -15,12 +15,12 @@ $(document).ready(function() {
     $('select').formSelect();
     $('.dropdown-trigger').dropdown({ hover: false });
     $('.modal').modal();
+    $('textarea[data-length]').characterCounter();
     $('#modal-loader').modal({
         dismissible: false
     });
 
-    M.Modal.getInstance($('#modal-cart-insert')).open();
-
+    // M.Modal.getInstance($('#modal-cart-insert')).open();
 
     // materialize autocomplete
     $('input.autocomplete').each(function() {

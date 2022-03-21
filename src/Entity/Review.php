@@ -35,9 +35,9 @@ class Review
     private $stars;
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
+     * @ORM\Column(type="string", length=1000, nullable=true)
      *
-     * @Assert\Length(max=255, maxMessage="Maximální počet znaků v textu recenze: {{ limit }}")
+     * @Assert\Length(max=1000, maxMessage="Maximální počet znaků v textu recenze: {{ limit }}")
      */
     private $text;
 
