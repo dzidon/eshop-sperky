@@ -110,11 +110,7 @@
                     <div class="section">
                         {{ form_start(cartInsertForm) }}
                             <div class="col s12">
-                                {% for fieldName, field in cartInsertForm.children %}
-                                    {% if fieldName starts with 'option' %}
-                                        {{ form_row(field) }}
-                                    {% endif %}
-                                {% endfor %}
+                                {{ form_row(cartInsertForm.options) }}
                             </div>
                             <div class="row valign-wrapper flex-wrap">
                                 <div class="col s3 input-field no-mar-bot">

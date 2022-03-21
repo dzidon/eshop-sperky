@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Entity\Order;
+use App\Entity\Product;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
@@ -84,6 +85,12 @@ class CartService
             ->withSecure(true)
             ->withHttpOnly()
         ;
+    }
+
+
+    public function insertProduct(Product $product, int $quantity, array $options): void
+    {
+
     }
 
     /**

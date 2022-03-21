@@ -3,7 +3,6 @@
 namespace App\Form;
 
 use App\Entity\Detached\CartInsert;
-use App\Form\EventSubscriber\CartOptionsSubscriber;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
@@ -14,12 +13,10 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 class CartInsertFormType extends AbstractType
 {
     private UrlGeneratorInterface $router;
-    private CartOptionsSubscriber $cartOptionSubscriber;
 
-    public function __construct(UrlGeneratorInterface $router, CartOptionsSubscriber $cartOptionSubscriber)
+    public function __construct(UrlGeneratorInterface $router)
     {
         $this->router = $router;
-        $this->cartOptionSubscriber = $cartOptionSubscriber;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -36,7 +33,10 @@ class CartInsertFormType extends AbstractType
             ->add('productId', HiddenType::class, [
                 'error_bubbling' => true,
             ])
-            ->addEventSubscriber($this->cartOptionSubscriber)
+            ->add('options', CartInsertOptionsFormType::class, [
+                'error_bubbling' => true,
+                'label' => false,
+            ])
         ;
     }
 

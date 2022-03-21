@@ -6,6 +6,7 @@ use App\Entity\Detached\CartInsert;
 use App\Entity\Product;
 use App\Form\CartInsertFormType;
 use App\Service\CartService;
+use Exception;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -57,13 +58,13 @@ class CartController extends AbstractController
 
             if ($form->isSubmitted() && $form->isValid())
             {
-                if(true/*$this->cart->insertProduct($cartInsertRequest->getProduct(), $cartInsertRequest->getQuantity())*/)
+                try
                 {
-                    $responseData['errors'][] = $cartInsertRequest->getProduct()->getName();
+                    $this->cart->insertProduct($cartInsertRequest->getProduct(), $cartInsertRequest->getQuantity(), $cartInsertRequest->getOptions());
                 }
-                else
+                catch(Exception $exception)
                 {
-                    $responseData['errors'][] = sprintf('Máme na skladě jen %s ks.', $product->getInventory());
+                    $responseData['errors'][] = $exception->getMessage();
                 }
             }
             else
