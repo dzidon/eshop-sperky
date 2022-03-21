@@ -6,10 +6,10 @@ use App\Entity\Detached\CartInsert;
 use App\Entity\Product;
 use App\Form\CartInsertFormType;
 use App\Service\CartService;
+use App\Service\JsonResponseService;
 use Exception;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -23,11 +23,13 @@ class CartController extends AbstractController
     private $request;
     private CartService $cart;
     private LoggerInterface $logger;
+    private JsonResponseService $jsonResponse;
 
-    public function __construct(LoggerInterface $logger, RequestStack $requestStack, CartService $cart)
+    public function __construct(LoggerInterface $logger, RequestStack $requestStack, CartService $cart, JsonResponseService $jsonResponse)
     {
         $this->cart = $cart;
         $this->logger = $logger;
+        $this->jsonResponse = $jsonResponse;
         $this->request = $requestStack->getCurrentRequest();
     }
 
@@ -40,10 +42,6 @@ class CartController extends AbstractController
         {
             throw new NotFoundHttpException();
         }
-
-        $responseData = [
-            'errors' => [],
-        ];
 
         $productId = $this->getProductIdFromRequest('cart_insert_form');
         /** @var Product|null $product */
@@ -64,23 +62,23 @@ class CartController extends AbstractController
                 }
                 catch(Exception $exception)
                 {
-                    $responseData['errors'][] = $exception->getMessage();
+                    $this->jsonResponse->addResponseError($exception->getMessage());
                 }
             }
             else
             {
                 foreach ($form->getErrors() as $formError)
                 {
-                    $responseData['errors'][] = $formError->getMessage();
+                    $this->jsonResponse->addResponseError($formError->getMessage());
                 }
             }
         }
         else
         {
-            $responseData['errors'][] = 'Tento produkt už nejde vložit do košíku.';
+            $this->jsonResponse->addResponseError('Tento produkt už nejde vložit do košíku.');
         }
 
-        return new JsonResponse($responseData);
+        return $this->jsonResponse->createJsonResponse();
     }
 
     private function getProductIdFromRequest(string $formName): string

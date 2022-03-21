@@ -44,28 +44,28 @@ $(document).ready(function() {
             url: formCartInsert.attr('action'),
             data: formCartInsert.serialize(),
             dataType: 'json',
-            complete: function()
+        })
+        .done(function (data)
+        {
+            console.log(data)
+        })
+        .fail(function (jqXHR)
+        {
+            const data = jqXHR['responseJSON'];
+            if (data['errors'].length > 0)
             {
-                M.Modal.getInstance($('#modal-loader')).close();
-            },
-            success: function(data)
-            {
-                if(data['errors'].length > 0)
-                {
-                    const errors = data['errors'].join('<br>');
-                    $('#modal-error-text').html(errors);
-                    M.Modal.getInstance($('#modal-error')).open();
-                }
-                /*else
-                {
-
-                }*/
-            },
-            error: function()
+                const errors = data['errors'].join('<br>');
+                $('#modal-error-text').html(errors);
+            }
+            else
             {
                 $('#modal-error-text').text('Nepodařilo se vložit produkt do košíku, zkuste to prosím znovu.')
-                M.Modal.getInstance($('#modal-error')).open();
             }
+            M.Modal.getInstance($('#modal-error')).open();
+        })
+        .always(function ()
+        {
+            M.Modal.getInstance($('#modal-loader')).close();
         });
     });
 });
