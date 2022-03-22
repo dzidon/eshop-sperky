@@ -18,7 +18,7 @@ class CartInsert
 
     private $product;
 
-    private $options;
+    private $optionGroups;
 
     public function __construct()
     {
@@ -62,14 +62,14 @@ class CartInsert
         return $this;
     }
 
-    public function getOptions(): ?array
+    public function getOptionGroups(): array
     {
-        return $this->options;
+        return $this->optionGroups;
     }
 
-    public function setOptions(array $options): self
+    public function setOptionGroups(array $optionGroups): self
     {
-        $this->options = $options;
+        $this->optionGroups = $optionGroups;
 
         return $this;
     }

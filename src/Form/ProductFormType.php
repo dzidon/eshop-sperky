@@ -6,7 +6,7 @@ use App\Entity\Product;
 use App\Entity\ProductCategory;
 use App\Entity\ProductImage;
 use App\Entity\ProductInformation;
-use App\Entity\ProductOption;
+use App\Entity\ProductOptionGroup;
 use App\Entity\ProductSection;
 use App\Form\EventSubscriber\EntityCollectionRemovalSubscriber;
 use App\Form\EventSubscriber\ProductCategorySubscriber;
@@ -131,8 +131,8 @@ class ProductFormType extends AbstractType
                 'required' => false,
                 'label' => false,
             ])
-            ->add('options', EntityType::class, [
-                'class' => ProductOption::class,
+            ->add('optionGroups', EntityType::class, [
+                'class' => ProductOptionGroup::class,
                 'choice_label' => 'name',
                 'multiple' => true,
                 'expanded' => true,

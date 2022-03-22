@@ -120,7 +120,7 @@ class NavbarService
             [
                 'granted' => $this->security->isGranted('admin_product_options'),
                 'path' => $this->router->generate('admin_product_options'),
-                'isActive' => $this->currentRoute === 'admin_product_options' || $this->currentRoute === 'admin_product_option_edit' || $this->currentRoute === 'admin_product_option_configure' || $this->currentRoute === 'admin_product_option_delete',
+                'isActive' => $this->currentRoute === 'admin_product_options' || $this->currentRoute === 'admin_product_option_edit' || $this->currentRoute === 'admin_product_option_delete',
                 'title' => $this->parameterBag->get('app_page_title.admin_product_options')
             ],
             [

@@ -3,9 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\ProductOption;
-use App\Service\SortingService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\ORM\Query;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -16,31 +14,8 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class ProductOptionRepository extends ServiceEntityRepository
 {
-    private SortingService $sorting;
-
-    public function __construct(ManagerRegistry $registry, SortingService $sorting)
+    public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, ProductOption::class);
-
-        $this->sorting = $sorting;
-    }
-
-    public function getQueryForSearchAndPagination($searchPhrase = null, string $sortAttribute = null): Query
-    {
-        $sortData = $this->sorting->createSortData($sortAttribute, ProductOption::getSortData());
-
-        return $this->createQueryBuilder('po')
-
-            //podminky
-            ->orWhere('po.name LIKE :name')
-            ->setParameter('name', '%' . $searchPhrase . '%')
-
-            ->orWhere('po.type LIKE :type')
-            ->setParameter('type', '%' . $searchPhrase . '%')
-
-            //razeni
-            ->orderBy('po.' . $sortData['attribute'], $sortData['order'])
-            ->getQuery()
-        ;
     }
 }

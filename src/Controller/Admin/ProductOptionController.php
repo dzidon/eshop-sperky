@@ -2,10 +2,9 @@
 
 namespace App\Controller\Admin;
 
-use App\Entity\ProductOption;
+use App\Entity\ProductOptionGroup;
 use App\Form\HiddenTrueFormType;
-use App\Form\ProductOptionFormType;
-use App\Form\ProductOptionParametersFormType;
+use App\Form\ProductOptionGroupFormType;
 use App\Form\SearchTextAndSortFormType;
 use App\Service\BreadcrumbsService;
 use App\Service\PaginatorService;
@@ -43,106 +42,106 @@ class ProductOptionController extends AbstractController
     }
 
     /**
-     * @Route("/produktove-volby", name="admin_product_options")
+     * @Route("/skupiny-produktovych-voleb", name="admin_product_options")
      *
      * @IsGranted("admin_product_options")
      */
-    public function productOptions(FormFactoryInterface $formFactory, PaginatorService $paginatorService): Response
+    public function productOptionGroups(FormFactoryInterface $formFactory, PaginatorService $paginatorService): Response
     {
-        $form = $formFactory->createNamed('', SearchTextAndSortFormType::class, null, ['sort_choices' => ProductOption::getSortData()]);
+        $form = $formFactory->createNamed('', SearchTextAndSortFormType::class, null, ['sort_choices' => ProductOptionGroup::getSortData()]);
         //button je přidáván v šabloně, aby se nezobrazoval v odkazu
         $form->handleRequest($this->request);
 
         if ($form->isSubmitted() && $form->isValid())
         {
-            $queryForPagination = $this->getDoctrine()->getRepository(ProductOption::class)->getQueryForSearchAndPagination($form->get('searchPhrase')->getData(), $form->get('sortBy')->getData());
+            $queryForPagination = $this->getDoctrine()->getRepository(ProductOptionGroup::class)->getQueryForSearchAndPagination($form->get('searchPhrase')->getData(), $form->get('sortBy')->getData());
         }
         else
         {
-            $queryForPagination = $this->getDoctrine()->getRepository(ProductOption::class)->getQueryForSearchAndPagination();
+            $queryForPagination = $this->getDoctrine()->getRepository(ProductOptionGroup::class)->getQueryForSearchAndPagination();
         }
 
-        $options = $paginatorService
+        $optionGroups = $paginatorService
             ->initialize($queryForPagination, 3)
             ->getCurrentPageObjects();
 
         if($paginatorService->isCurrentPageOutOfBounds())
         {
-            throw new NotFoundHttpException('Na této stránce nebyly nalezeny žádné produktové volby.');
+            throw new NotFoundHttpException('Na této stránce nebyly nalezeny žádné skupiny produktových voleb.');
         }
 
         return $this->render('admin/product_options/admin_product_options.html.twig', [
             'searchForm' => $form->createView(),
-            'options' => $options,
+            'optionGroups' => $optionGroups,
             'breadcrumbs' => $this->breadcrumbs,
             'pagination' => $paginatorService->createViewData(),
         ]);
     }
 
     /**
-     * @Route("/produktova-volba/{id}", name="admin_product_option_edit", requirements={"id"="\d+"})
+     * @Route("/skupina-produktovych-voleb/{id}", name="admin_product_option_edit", requirements={"id"="\d+"})
      *
      * @IsGranted("product_option_edit")
      */
-    public function productOption($id = null): Response
+    public function productOptionGroup($id = null): Response
     {
         $user = $this->getUser();
 
-        if($id !== null) //zadal id do url, snazi se editovat existujici
+        if($id !== null) // zadal id do url, snazi se editovat existujici
         {
-            $option = $this->getDoctrine()->getRepository(ProductOption::class)->findOneBy(['id' => $id]);
-            if($option === null) //nenaslo to zadnou volbu
+            $optionGroup = $this->getDoctrine()->getRepository(ProductOptionGroup::class)->findOneBy(['id' => $id]);
+            if($optionGroup === null) // nenaslo to zadnou skupinu
             {
-                throw new NotFoundHttpException('Produktová volba nenalezena.');
+                throw new NotFoundHttpException('Skupina produktových voleb nenalezena.');
             }
 
-            $this->breadcrumbs->addRoute('admin_product_option_edit', ['id' => $option->getId()],'', 'edit');
+            $this->breadcrumbs->addRoute('admin_product_option_edit', ['id' => $optionGroup->getId()],'', 'edit');
         }
-        else //nezadal id do url, vytvari novou volbu
+        else // nezadal id do url, vytvari novou volbu
         {
-            $option = new ProductOption();
+            $optionGroup = new ProductOptionGroup();
             $this->breadcrumbs->addRoute('admin_product_option_edit', ['id' => null],'', 'new');
         }
 
-        $form = $this->createForm(ProductOptionFormType::class, $option);
-        $form->add('submit', SubmitType::class, ['label' => 'Uložit a pokračovat']);
+        $form = $this->createForm(ProductOptionGroupFormType::class, $optionGroup);
+        $form->add('submit', SubmitType::class, ['label' => 'Uložit']);
         $form->handleRequest($this->request);
 
         if ($form->isSubmitted() && $form->isValid())
         {
             $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->persist($option);
+            $entityManager->persist($optionGroup);
             $entityManager->flush();
 
-            $this->addFlash('success', 'Produktová volba uložena! Nyní ji nakonfigurujte.');
-            $this->logger->info(sprintf("Admin %s (ID: %s) has saved a product option %s (ID: %s).", $user->getUserIdentifier(), $user->getId(), $option->getName(), $option->getId()));
+            $this->addFlash('success', 'Skupina produktových voleb uložena!');
+            $this->logger->info(sprintf("Admin %s (ID: %s) has saved a product option group %s (ID: %s).", $user->getUserIdentifier(), $user->getId(), $optionGroup->getName(), $optionGroup->getId()));
 
-            return $this->redirectToRoute('admin_product_option_configure', ['id' => $option->getId()]);
+            return $this->redirectToRoute('admin_product_options');
         }
 
         return $this->render('admin/product_options/admin_product_option_edit.html.twig', [
-            'productOptionForm' => $form->createView(),
-            'productOptionInstance' => $option,
+            'productOptionGroupForm' => $form->createView(),
+            'productOptionGroupInstance' => $optionGroup,
             'breadcrumbs' => $this->breadcrumbs,
         ]);
     }
 
     /**
-     * @Route("/produktova-volba/{id}/smazat", name="admin_product_option_delete", requirements={"id"="\d+"})
+     * @Route("/skupina-produktovych-voleb/{id}/smazat", name="admin_product_option_delete", requirements={"id"="\d+"})
      *
      * @IsGranted("product_option_delete")
      */
-    public function productOptionDelete($id): Response
+    public function productOptionGroupDelete($id): Response
     {
         $user = $this->getUser();
 
-        $option = $this->getDoctrine()->getRepository(ProductOption::class)->findOneBy(['id' => $id]);
-        if($option === null) //nenaslo to zadnou volbu
+        $optionGroup = $this->getDoctrine()->getRepository(ProductOptionGroup::class)->findOneBy(['id' => $id]);
+        if($optionGroup === null) // nenaslo to zadnou skupinu
         {
-            throw new NotFoundHttpException('Produktová volba nenalezena.');
+            throw new NotFoundHttpException('Skupina produktových voleb nenalezena.');
         }
 
-        $form = $this->createForm(HiddenTrueFormType::class, null, ['csrf_token_id' => 'form_product_option_delete']);
+        $form = $this->createForm(HiddenTrueFormType::class, null, ['csrf_token_id' => 'form_product_option_group_delete']);
         $form->add('submit', SubmitType::class, [
             'label' => 'Smazat',
             'attr' => ['class' => 'btn-large red left'],
@@ -151,60 +150,20 @@ class ProductOptionController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid())
         {
-            $this->logger->info(sprintf("Admin %s (ID: %s) has deleted a product option %s (ID: %s).", $user->getUserIdentifier(), $user->getId(), $option->getName(), $option->getId()));
+            $this->logger->info(sprintf("Admin %s (ID: %s) has deleted a product option group %s (ID: %s).", $user->getUserIdentifier(), $user->getId(), $optionGroup->getName(), $optionGroup->getId()));
 
             $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->remove($option);
+            $entityManager->remove($optionGroup);
             $entityManager->flush();
 
-            $this->addFlash('success', 'Produktová volba smazána!');
+            $this->addFlash('success', 'Skupina produktových voleb smazána!');
             return $this->redirectToRoute('admin_product_options');
         }
 
         return $this->render('admin/product_options/admin_product_option_delete.html.twig', [
-            'productOptionDeleteForm' => $form->createView(),
-            'productOptionInstance' => $option,
-            'breadcrumbs' => $this->breadcrumbs->addRoute('admin_product_option_delete', ['id' => $option->getId()]),
-        ]);
-    }
-
-    /**
-     * @Route("/produktova-volba/{id}/konfigurovat", name="admin_product_option_configure", requirements={"id"="\d+"})
-     *
-     * @IsGranted("product_option_edit")
-     */
-    public function productOptionConfigure($id): Response
-    {
-        $user = $this->getUser();
-
-        $option = $this->getDoctrine()->getRepository(ProductOption::class)->findOneBy(['id' => $id]);
-        if($option === null) //nenaslo to zadnou volbu
-        {
-            throw new NotFoundHttpException('Produktová volba nenalezena.');
-        }
-
-        $form = $this->createForm(ProductOptionParametersFormType::class, $option);
-        $form->add('submit', SubmitType::class, ['label' => 'Uložit']);
-        $form->handleRequest($this->request);
-
-        if ($form->isSubmitted() && $form->isValid())
-        {
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->persist($option);
-            $entityManager->flush();
-
-            $this->addFlash('success', 'Produktová volba uložena a nakonfigurována!');
-            $this->logger->info(sprintf("Admin %s (ID: %s) has configured a product option %s (ID: %s).", $user->getUserIdentifier(), $user->getId(), $option->getName(), $option->getId()));
-
-            return $this->redirectToRoute('admin_product_options');
-        }
-
-        return $this->render('admin/product_options/admin_product_option_configure.html.twig', [
-            'productOptionConfigureForm' => $form->createView(),
-            'productOptionInstance' => $option,
-            'breadcrumbs' => $this->breadcrumbs
-                ->addRoute('admin_product_option_edit', ['id' => $option->getId()],'', 'edit')
-                ->addRoute('admin_product_option_configure', ['id' => $option->getId()]),
+            'productOptionGroupDeleteForm' => $form->createView(),
+            'productOptionGroupInstance' => $optionGroup,
+            'breadcrumbs' => $this->breadcrumbs->addRoute('admin_product_option_delete', ['id' => $optionGroup->getId()]),
         ]);
     }
 }

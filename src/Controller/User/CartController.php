@@ -58,7 +58,7 @@ class CartController extends AbstractController
             {
                 try
                 {
-                    $this->cart->insertProduct($cartInsertRequest->getProduct(), $cartInsertRequest->getQuantity(), $cartInsertRequest->getOptions());
+                    $this->cart->insertProduct($cartInsertRequest->getProduct(), $cartInsertRequest->getQuantity(), $cartInsertRequest->getOptionGroups());
                 }
                 catch(Exception $exception)
                 {

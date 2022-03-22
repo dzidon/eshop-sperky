@@ -52,7 +52,7 @@ $(document).ready(function() {
         .fail(function (jqXHR)
         {
             const data = jqXHR['responseJSON'];
-            if (data['errors'].length > 0)
+            if (Array.isArray(data['errors']) && data['errors'].length > 0)
             {
                 const errors = data['errors'].join('<br>');
                 $('#modal-error-text').html(errors);

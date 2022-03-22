@@ -34,12 +34,12 @@ class ProductRepository extends ServiceEntityRepository
     public function findOneAndFetchEverything(array $criteria, bool $visibleOnly)
     {
         $queryBuilder = $this->createQueryBuilder('p')
-            ->select('p, ps, pc, pcg, po, pop, pi, pig, pimg')
+            ->select('p, ps, pc, pcg, pog, pogo, pi, pig, pimg')
             ->leftJoin('p.section', 'ps')
             ->leftJoin('p.categories', 'pc')
             ->leftJoin('pc.productCategoryGroup', 'pcg')
-            ->leftJoin('p.options', 'po')
-            ->leftJoin('po.parameters', 'pop')
+            ->leftJoin('p.optionGroups', 'pog')
+            ->leftJoin('pog.options', 'pogo')
             ->leftJoin('p.info', 'pi')
             ->leftJoin('pi.productInformationGroup', 'pig')
             ->leftJoin('p.images', 'pimg')
@@ -47,7 +47,7 @@ class ProductRepository extends ServiceEntityRepository
             ->addOrderBy('pc.name', 'ASC')
             ->addOrderBy('pcg.name', 'ASC')
             ->addOrderBy('pig.name', 'ASC')
-            ->addOrderBy('pop.id', 'ASC');
+            ->addOrderBy('pogo.id', 'ASC');
 
         foreach ($criteria as $name => $value)
         {
@@ -147,9 +147,9 @@ class ProductRepository extends ServiceEntityRepository
     public function findOneForCartInsert($id)
     {
         $queryBuilder = $this->createQueryBuilder('p')
-            ->select('p, po, pop')
-            ->leftJoin('p.options', 'po')
-            ->leftJoin('po.parameters', 'pop')
+            ->select('p, pog, pogo')
+            ->leftJoin('p.optionGroups', 'pog')
+            ->leftJoin('pog.options', 'pogo')
             ->andWhere('p.id LIKE :id')
             ->setParameter('id', $id)
         ;

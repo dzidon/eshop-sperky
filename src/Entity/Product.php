@@ -140,10 +140,10 @@ class Product
     private $categories;
 
     /**
-     * @ORM\ManyToMany(targetEntity=ProductOption::class)
-     * @ORM\JoinTable(name="_product_option")
+     * @ORM\ManyToMany(targetEntity=ProductOptionGroup::class)
+     * @ORM\JoinTable(name="_product_optiongroup")
      */
-    private $options;
+    private $optionGroups;
 
     /**
      * @ORM\OneToMany(targetEntity=ProductInformation::class, mappedBy="product", cascade={"persist"})
@@ -184,7 +184,7 @@ class Product
         $this->created = new DateTime('now');
         $this->updated = $this->created;
 
-        $this->options = new ArrayCollection();
+        $this->optionGroups = new ArrayCollection();
         $this->categories = new ArrayCollection();
         $this->info = new ArrayCollection();
         $this->images = new ArrayCollection();
@@ -414,25 +414,25 @@ class Product
     }
 
     /**
-     * @return Collection|ProductOption[]
+     * @return Collection|ProductOptionGroup[]
      */
-    public function getOptions(): Collection
+    public function getOptionGroups(): Collection
     {
-        return $this->options;
+        return $this->optionGroups;
     }
 
-    public function addOption(ProductOption $option): self
+    public function addOptionGroup(ProductOptionGroup $optionGroup): self
     {
-        if (!$this->options->contains($option)) {
-            $this->options[] = $option;
+        if (!$this->optionGroups->contains($optionGroup)) {
+            $this->optionGroups[] = $optionGroup;
         }
 
         return $this;
     }
 
-    public function removeOption(ProductOption $option): self
+    public function removeOptionGroup(ProductOptionGroup $optionGroup): self
     {
-        $this->options->removeElement($option);
+        $this->optionGroups->removeElement($optionGroup);
 
         return $this;
     }

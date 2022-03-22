@@ -27,13 +27,13 @@ class CartInsertFormType extends AbstractType
                     'min' => 1
                 ],
                 'invalid_message' => 'Do počtu kusů musíte zadat celé číslo.',
-                'label' => 'Ks',
                 'error_bubbling' => true,
+                'label' => 'Ks',
             ])
             ->add('productId', HiddenType::class, [
                 'error_bubbling' => true,
             ])
-            ->add('options', CartInsertOptionsFormType::class, [
+            ->add('optionGroups', CartInsertOptionGroupsFormType::class, [
                 'error_bubbling' => true,
                 'label' => false,
             ])

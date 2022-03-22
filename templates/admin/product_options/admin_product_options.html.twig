@@ -21,32 +21,27 @@
     <div class="row">
         <h4>Výsledky ({{ pagination.getTotalItems() }})</h4>
 
-        {% if options is empty %}
-            Hledání neodpovídají žádné produktové volby.
+        {% if optionGroups is empty %}
+            Hledání neodpovídají žádné skupiny produktových voleb.
         {% else %}
             <div class="collection">
-                {% for option in options %}
+                {% for optionGroup in optionGroups %}
                     <div class="collection-item valign-wrapper">
                         <div class="col s9 no-padding">
                             <strong>
-                                {{ option.getName() }}
+                                {{ optionGroup.getName() }}
                             </strong>
-                            - {{ option.getType() }}
-
-                            {% if not option.isConfigured() %}
-                                - <span class="red-text">NENAKONFIGUROVÁNO</span>
-                            {% endif %}
                         </div>
 
                         <div class="col s3 no-padding right-align">
                             {% if can_edit %}
-                                <a href="{{ path('admin_product_option_edit', {id: option.getId()}) }}">
+                                <a href="{{ path('admin_product_option_edit', {id: optionGroup.getId()}) }}">
                                     <i class="fas fa-edit"></i>
                                 </a>
                             {% endif %}
 
                             {% if can_delete %}
-                                <a href="{{ path('admin_product_option_delete', {id: option.getId()}) }}">
+                                <a href="{{ path('admin_product_option_delete', {id: optionGroup.getId()}) }}">
                                     <i class="fas fa-trash-alt"></i>
                                 </a>
                             {% endif %}

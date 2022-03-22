@@ -2,7 +2,7 @@
 
 {# Řádek formuláře #}
 {% block form_row %}
-    <div class="{% if not compound %}row{% endif %} {% if (not compound or force_error|default(false)) and not valid %} has-error{% endif %}">
+    <div class="{% if not compound %}row{% endif %}">
         <div class="input-field">
             {{ form_widget(form) }}
             {{ form_label(form) }}
@@ -70,7 +70,7 @@
 
 {# Řádek pro datum a čas #}
 {% block datetime_row %}
-    <div class="row{% if (not compound or force_error|default(false)) and not valid %} has-error{% endif %}">
+    <div class="row">
         {{ form_label(form) }}
         <div class="input-field no-mar-top">
             {{ form_widget(form) }}
@@ -82,7 +82,7 @@
 
 {# Řádek checkboxu #}
 {% block checkbox_row %}
-    <div class="row {% if not valid %} has-error{% endif %}">
+    <div class="row">
         <label class="input-field block">
             {{ form_widget(form, {'attr': {'class': 'filled-in checkbox-light-blue'}}) }}
             {{ form_label(form) }}
@@ -190,7 +190,7 @@
 
 {# Radio buttony #}
 {% block choice_row %}
-    <div class="row {% if not valid %} has-error{% endif %}">
+    <div class="row">
         <div class="input-field {% if not expanded %}text-fields-compound{% endif %}">
             {% if label is not same as(false)  %}
                 <div class="radio-label">
@@ -270,7 +270,7 @@
 
 {# Řádek nahrávání obrázku (vich bundle) #}
 {% block vich_image_row %}
-    <div class="row{% if not valid %} has-error{% endif %}">
+    <div class="row">
         <div class="input-field no-mar-top">
             {{ form_label(form) }}
             {{ form_widget(form) }}
@@ -309,7 +309,7 @@
 
 {# Klikatelné hodnocení s hvězdami #}
 {% block star_choice_row %}
-    <div class="row {% if not valid %} has-error{% endif %}">
+    <div class="row">
         {{ form_label(form) }}
         <div class="rating">
             {{ form_widget(form) }}
