@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\CartOccurenceRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -30,6 +32,12 @@ class CartOccurence
     private $product;
 
     /**
+     * @ORM\ManyToMany(targetEntity=ProductOption::class)
+     * @ORM\JoinTable(name="_cartoccurence_productoption")
+     */
+    private $options;
+
+    /**
      * @ORM\Column(type="integer")
      */
     private $quantity;
@@ -49,14 +57,14 @@ class CartOccurence
      */
     private $name;
 
-    /**
-     * @ORM\Column(type="string", length=500, nullable=true)
-     */
-    private $options;
-
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function __construct()
+    {
+        $this->options = new ArrayCollection();
     }
 
     public function getOrder(): ?Order
@@ -83,6 +91,31 @@ class CartOccurence
         return $this;
     }
 
+    /**
+     * @return Collection|ProductOption[]
+     */
+    public function getOptions(): Collection
+    {
+        return $this->options;
+    }
+
+    public function addOption(ProductOption $option): self
+    {
+        if (!$this->options->contains($option))
+        {
+            $this->options[] = $option;
+        }
+
+        return $this;
+    }
+
+    public function removeOption(ProductOption $option): self
+    {
+        $this->options->removeElement($option);
+
+        return $this;
+    }
+
     public function getQuantity(): ?int
     {
         return $this->quantity;
@@ -91,6 +124,20 @@ class CartOccurence
     public function setQuantity(?int $quantity): self
     {
         $this->quantity = $quantity;
+
+        return $this;
+    }
+
+    public function addQuantity(int $quantity): self
+    {
+        if($this->quantity === null)
+        {
+            $this->quantity = $quantity;
+        }
+        else
+        {
+            $this->quantity += $quantity;
+        }
 
         return $this;
     }
@@ -127,18 +174,6 @@ class CartOccurence
     public function setName(string $name): self
     {
         $this->name = $name;
-
-        return $this;
-    }
-
-    public function getOptions(): ?string
-    {
-        return $this->options;
-    }
-
-    public function setOptions(?string $options): self
-    {
-        $this->options = $options;
 
         return $this;
     }

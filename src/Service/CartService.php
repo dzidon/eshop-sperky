@@ -2,9 +2,11 @@
 
 namespace App\Service;
 
+use App\Entity\CartOccurence;
 use App\Entity\Order;
 use App\Entity\Product;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -87,10 +89,69 @@ class CartService
         ;
     }
 
-
-    public function insertProduct(Product $product, int $quantity, array $options): void
+    /**
+     * @param Product $submittedProduct
+     * @param int $submittedQuantity
+     * @param array $submittedOptions
+     * @throws Exception
+     */
+    public function insertProduct(Product $submittedProduct, int $submittedQuantity, array $submittedOptions): void
     {
+        $inventory = $submittedProduct->getInventory();
+        $requiredQuantity = $submittedQuantity;
+        $existingCartOccurence = null;
 
+        foreach ($this->order->getCartOccurences() as $cartOccurence)
+        {
+            $cartOccurenceProduct = $cartOccurence->getProduct();
+            if($submittedProduct === $cartOccurenceProduct)
+            {
+                // zjišťování celkového počtu kusů produktu v košíku
+                $requiredQuantity += $cartOccurence->getQuantity();
+
+                // snaha najít v košíku vkládaný produkt s danými volbami
+                if($existingCartOccurence === null)
+                {
+                    $containsSubmittedOptions = ([] === array_udiff($cartOccurence->getOptions()->toArray(), $submittedOptions,
+                        function ($objA, $objB) {
+                            return $objA->getId() - $objB->getId();
+                        }
+                    ));
+
+                    if($containsSubmittedOptions)
+                    {
+                        $existingCartOccurence = $cartOccurence;
+                    }
+                }
+            }
+        }
+
+        if($requiredQuantity > $inventory)
+        {
+            throw new Exception('Tolik kusů už na skladě bohužel nemáme.');
+        }
+
+        if($existingCartOccurence === null)
+        {
+            $newCartOccurence = new CartOccurence();
+            $newCartOccurence->setOrder($this->order);
+            $newCartOccurence->setProduct($submittedProduct);
+            $newCartOccurence->setQuantity($submittedQuantity);
+            $newCartOccurence->setName($submittedProduct->getName());
+            $newCartOccurence->setPriceWithoutVat($submittedProduct->getPriceWithoutVat());
+            $newCartOccurence->setPriceWithVat($submittedProduct->getPriceWithVat());
+            foreach ($submittedOptions as $submittedOption)
+            {
+                $newCartOccurence->addOption($submittedOption);
+            }
+            $this->order->addCartOccurence($newCartOccurence);
+        }
+        else
+        {
+            $existingCartOccurence->addQuantity($submittedQuantity);
+        }
+
+        $this->orderPersistAndFlush();
     }
 
     /**
@@ -105,7 +166,7 @@ class CartService
             $uuid = Uuid::fromString($tokenInCookie);
 
             /** @var Order|null $order */
-            $this->order = $this->entityManager->getRepository(Order::class)->findAndFetchCartOccurences($uuid);
+            $this->order = $this->entityManager->getRepository(Order::class)->findOneAndFetchCartOccurences($uuid);
             if ($this->order === null || !$this->order->isOpen())
             {
                 $this->createNewOrder();

@@ -20,10 +20,13 @@ class OrderRepository extends ServiceEntityRepository
         parent::__construct($registry, Order::class);
     }
 
-    public function findAndFetchCartOccurences(Uuid $token)
+    public function findOneAndFetchCartOccurences(Uuid $token)
     {
         $results = $this->createQueryBuilder('o')
-            ->leftJoin('o.cartOccurences', 'co')
+            ->select('o, oc, ocp, oco')
+            ->leftJoin('o.cartOccurences', 'oc')
+            ->leftJoin('oc.product', 'ocp')
+            ->leftJoin('oc.options', 'oco')
             ->andWhere('o.token = :token')
             ->setParameter('token', $token, 'uuid')
             ->getQuery()
