@@ -41,7 +41,7 @@ class JsonResponseService
 
     public function setResponseHtml(?string $html): void
     {
-        $this->responseData['html'][] = $html;
+        $this->responseData['html'] = $html;
     }
 
     public function createJsonResponse(): JsonResponse

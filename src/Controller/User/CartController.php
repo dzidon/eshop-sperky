@@ -4,10 +4,10 @@ namespace App\Controller\User;
 
 use App\Entity\Detached\CartInsert;
 use App\Entity\Product;
+use App\Exception\CartException;
 use App\Form\CartInsertFormType;
 use App\Service\CartService;
 use App\Service\JsonResponseService;
-use Exception;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -59,8 +59,15 @@ class CartController extends AbstractController
                 try
                 {
                     $this->cart->insertProduct($cartInsertRequest->getProduct(), $cartInsertRequest->getQuantity(), $cartInsertRequest->getOptionGroups());
+                    $this->jsonResponse->setResponseHtml(
+                        $this->renderView('fragments/_cart_insert_modal_content.html.twig', [
+                            'cart'              => $this->cart,
+                            'product'           => $cartInsertRequest->getProduct(),
+                            'submittedQuantity' => $cartInsertRequest->getQuantity(),
+                        ])
+                    );
                 }
-                catch(Exception $exception)
+                catch(CartException $exception)
                 {
                     $this->jsonResponse->addResponseError($exception->getMessage());
                 }

@@ -20,8 +20,6 @@ $(document).ready(function() {
         dismissible: false
     });
 
-    // M.Modal.getInstance($('#modal-cart-insert')).open();
-
     // materialize autocomplete
     $('input.autocomplete').each(function() {
         $(this).autocomplete({

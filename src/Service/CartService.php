@@ -5,8 +5,8 @@ namespace App\Service;
 use App\Entity\CartOccurence;
 use App\Entity\Order;
 use App\Entity\Product;
+use App\Exception\CartException;
 use Doctrine\ORM\EntityManagerInterface;
-use Exception;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -55,6 +55,16 @@ class CartService
         return $this->order;
     }
 
+    public function getTotalProducts(): int
+    {
+        return 0;
+    }
+
+    public function getTotalPriceWithVat(): float
+    {
+        return 0.0;
+    }
+
     /**
      * Pokud je aktivní objednávka nová, uloží se do DB a vrátí se cookie s daným tokenem. Pokud už je aktivní
      * objednávka uložená v DB, vrátí se null a nastaví se datum poslední aktivity.
@@ -93,7 +103,7 @@ class CartService
      * @param Product $submittedProduct
      * @param int $submittedQuantity
      * @param array $submittedOptions
-     * @throws Exception
+     * @throws CartException
      */
     public function insertProduct(Product $submittedProduct, int $submittedQuantity, array $submittedOptions): void
     {
@@ -128,18 +138,20 @@ class CartService
 
         if($requiredQuantity > $inventory)
         {
-            throw new Exception('Tolik kusů už na skladě bohužel nemáme.');
+            throw new CartException('Tolik kusů už na skladě bohužel nemáme.');
         }
 
         if($existingCartOccurence === null)
         {
             $newCartOccurence = new CartOccurence();
-            $newCartOccurence->setOrder($this->order);
-            $newCartOccurence->setProduct($submittedProduct);
-            $newCartOccurence->setQuantity($submittedQuantity);
-            $newCartOccurence->setName($submittedProduct->getName());
-            $newCartOccurence->setPriceWithoutVat($submittedProduct->getPriceWithoutVat());
-            $newCartOccurence->setPriceWithVat($submittedProduct->getPriceWithVat());
+            $newCartOccurence
+                ->setOrder($this->order)
+                ->setProduct($submittedProduct)
+                ->setQuantity($submittedQuantity)
+                ->setName($submittedProduct->getName())
+                ->setPriceWithoutVat($submittedProduct->getPriceWithoutVat())
+                ->setPriceWithVat($submittedProduct->getPriceWithVat());
+
             foreach ($submittedOptions as $submittedOption)
             {
                 $newCartOccurence->addOption($submittedOption);

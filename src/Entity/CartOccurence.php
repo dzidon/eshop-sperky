@@ -57,6 +57,11 @@ class CartOccurence
      */
     private $name;
 
+    /**
+     * @ORM\Column(type="string", length=500, nullable=true)
+     */
+    private $optionsString;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -174,6 +179,18 @@ class CartOccurence
     public function setName(string $name): self
     {
         $this->name = $name;
+
+        return $this;
+    }
+
+    public function getOptionsString(): ?string
+    {
+        return $this->optionsString;
+    }
+
+    public function setOptionsString(?string $optionsString): self
+    {
+        $this->optionsString = $optionsString;
 
         return $this;
     }

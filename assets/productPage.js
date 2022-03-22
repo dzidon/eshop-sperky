@@ -47,7 +47,11 @@ $(document).ready(function() {
         })
         .done(function (data)
         {
-            console.log(data)
+            if (jQuery.type(data['html']) === "string")
+            {
+                $('#modal-content-cart-insert-inner').html(data['html']);
+                M.Modal.getInstance($('#modal-cart-insert')).open();
+            }
         })
         .fail(function (jqXHR)
         {
