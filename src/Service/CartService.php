@@ -21,7 +21,13 @@ class CartService
 {
     const COOKIE_NAME = 'CARTTOKEN';
 
+    /**
+     * @var Order|null
+     */
     private $order = null;
+    private int $totalProducts = 0;
+    private float $totalPriceWithoutVat = 0.0;
+    private float $totalPriceWithVat = 0.0;
 
     /** @var Request */
     private $request;
@@ -57,12 +63,17 @@ class CartService
 
     public function getTotalProducts(): int
     {
-        return 0;
+        return $this->totalProducts;
     }
 
     public function getTotalPriceWithVat(): float
     {
-        return 0.0;
+        return $this->totalPriceWithVat;
+    }
+
+    public function getTotalPriceWithoutVat(): float
+    {
+        return $this->totalPriceWithoutVat;
     }
 
     /**
@@ -164,6 +175,7 @@ class CartService
         }
 
         $this->orderPersistAndFlush();
+        $this->recalculateTotals();
     }
 
     /**
@@ -187,6 +199,23 @@ class CartService
         else
         {
             $this->createNewOrder();
+        }
+    }
+
+    /**
+     * Přepočítá celkový počet produktů, celkovou cenu bez DPH a celkovou cenu s DPH
+     */
+    private function recalculateTotals(): void
+    {
+        $this->totalProducts = 0;
+        $this->totalPriceWithVat = 0.0;
+        $this->totalPriceWithoutVat = 0.0;
+
+        foreach ($this->order->getCartOccurences() as $cartOccurence)
+        {
+            $this->totalProducts += $cartOccurence->getQuantity();
+            $this->totalPriceWithVat += $cartOccurence->getQuantity() * $cartOccurence->getPriceWithVat();
+            $this->totalPriceWithoutVat += $cartOccurence->getQuantity() * $cartOccurence->getPriceWithoutVat();
         }
     }
 
