@@ -21,7 +21,8 @@ $(document).ready(function() {
     });
 
     // materialize autocomplete
-    $('input.autocomplete').each(function() {
+    $('input.autocomplete').each(function()
+    {
         $(this).autocomplete({
             data: JSON.parse(
                 $(this).attr('data-autocomplete')
@@ -47,6 +48,24 @@ $(document).ready(function() {
             inline: 'center'
         });
     }
+
+    // vkládání produktů do košíku přes odkaz v náhledu
+    const productImageLarge = $('.cart-insert-link');
+    productImageLarge.click(function()
+    {
+        const wrapper = $(this).closest('.insertable-products-wrapper');
+        const csrfToken = wrapper.data('cart-insert-csrf-token');
+        const url = wrapper.data('cart-insert-url');
+        const data = {
+            'cart_insert_form': {
+                'productId': $(this).data('product-id'),
+                'quantity': 1,
+                '_token': csrfToken,
+            }
+        };
+
+        ajaxAddProductToCart(url, data);
+    });
 });
 
 /*
@@ -93,3 +112,40 @@ const addFormToCollection = (e) =>
         });
     }
 };
+
+export function ajaxAddProductToCart(url, data)
+{
+    M.Modal.getInstance($('#modal-loader')).open();
+
+    $.post({
+        url: url,
+        data: data,
+        dataType: 'json',
+    })
+    .done(function (data)
+    {
+        if (jQuery.type(data['html']) === "string")
+        {
+            $('#modal-content-cart-insert-inner').html(data['html']);
+            M.Modal.getInstance($('#modal-cart-insert')).open();
+        }
+    })
+    .fail(function (jqXHR)
+    {
+        const data = jqXHR['responseJSON'];
+        if (Array.isArray(data['errors']) && data['errors'].length > 0)
+        {
+            const errors = data['errors'].join('<br>');
+            $('#modal-error-text').html(errors);
+        }
+        else
+        {
+            $('#modal-error-text').text('Nepodařilo se vložit produkt do košíku, zkuste to prosím znovu.')
+        }
+        M.Modal.getInstance($('#modal-error')).open();
+    })
+    .always(function ()
+    {
+        M.Modal.getInstance($('#modal-loader')).close();
+    });
+}

@@ -2,7 +2,7 @@
     {% if products is empty %}
         Nebyly nalezeny žádné produkty.
     {% else %}
-        <div class="row flex-wrap">
+        <div class="row flex-wrap insertable-products-wrapper" data-cart-insert-url="{{ path('cart_insert') }}" data-cart-insert-csrf-token="{{ csrf_token('form_cart_insert') }}">
             {% for product in products %}
                 <div class="col s6 l4 {% if large %}xl3{% endif %} margin-0">
                     <div class="card">
@@ -67,7 +67,7 @@
                             </div>
                         {% else %}
                             <div class="card-action bold">
-                                <a href="#" class="margin-0 valign-wrapper">
+                                <a href="javascript:void(0);" class="margin-0 valign-wrapper cart-insert-link" data-product-id="{{ product.getId() }}">
                                     <div class="margin-right15px valign-wrapper">
                                         <i class="material-icons small">add_shopping_cart</i>
                                     </div>

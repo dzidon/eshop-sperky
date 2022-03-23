@@ -1,3 +1,5 @@
+import { ajaxAddProductToCart } from './app';
+
 $(document).ready(function() {
 
     // smooth scroll na celý popis po kliknutí na odkaz "(Celý popis)"
@@ -23,7 +25,7 @@ $(document).ready(function() {
         clickedImage.removeClass('black-and-white-img');
     });
 
-    //
+    // nastavení hodnoty "1", pokud je tam něco jinýho po změně
     const quantityInput = $('#cart_insert_form_quantity');
     quantityInput.on('change', function()
     {
@@ -38,38 +40,6 @@ $(document).ready(function() {
     formCartInsert.on('submit', function(e)
     {
         e.preventDefault();
-        M.Modal.getInstance($('#modal-loader')).open();
-
-        $.post({
-            url: formCartInsert.attr('action'),
-            data: formCartInsert.serialize(),
-            dataType: 'json',
-        })
-        .done(function (data)
-        {
-            if (jQuery.type(data['html']) === "string")
-            {
-                $('#modal-content-cart-insert-inner').html(data['html']);
-                M.Modal.getInstance($('#modal-cart-insert')).open();
-            }
-        })
-        .fail(function (jqXHR)
-        {
-            const data = jqXHR['responseJSON'];
-            if (Array.isArray(data['errors']) && data['errors'].length > 0)
-            {
-                const errors = data['errors'].join('<br>');
-                $('#modal-error-text').html(errors);
-            }
-            else
-            {
-                $('#modal-error-text').text('Nepodařilo se vložit produkt do košíku, zkuste to prosím znovu.')
-            }
-            M.Modal.getInstance($('#modal-error')).open();
-        })
-        .always(function ()
-        {
-            M.Modal.getInstance($('#modal-loader')).close();
-        });
+        ajaxAddProductToCart(formCartInsert.attr('action'), formCartInsert.serialize());
     });
 });

@@ -49,10 +49,7 @@
                     <div class="row">
                         <div class="col s12">
                             <h4 class="no-mar-top">
-                                {{ productInstance.getPriceWithVat() }} Kč
-                                {% if vat_payer %}
-                                    vč. DPH
-                                {% endif %}
+                                {{ productInstance.getPriceWithVat() }} Kč {% if vat_payer %}vč. DPH{% endif %}
                             </h4>
 
                             {% if not vat_payer %}
@@ -64,9 +61,9 @@
                     <div class="row">
                         <div class="col s12">
                             {% if productInstance.isInStock() %}
-                                <span class="green-text">Skladem {{ productInstance.getInventory() }} ks</span>
+                                <strong class="green-text">Skladem {{ productInstance.getInventory() }} ks</strong>
                             {% else %}
-                                <span class="red-text">Není skladem</span>
+                                <strong class="red-text">Není skladem</strong>
                             {% endif %}
                         </div>
                     </div>
@@ -120,7 +117,7 @@
                                 </div>
                                 <div class="col s9 button-container-compound">
                                     <button class="btn-large waves-effect waves-light light-blue center-align" type="submit">
-                                        Do košíku
+                                        Do košíku <i class="material-icons left">add_shopping_cart</i>
                                     </button>
                                 </div>
                             </div>
