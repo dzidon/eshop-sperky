@@ -80,6 +80,7 @@ services:
             - '../src/Entity/'
             - '../src/Kernel.php'
             - '../src/Tests/'
+            - '../src/Utils/'
 
     App\EventSubscriber\DoctrineTrackingPolicySubscriber:
         tags:

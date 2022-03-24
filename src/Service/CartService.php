@@ -6,6 +6,7 @@ use App\Entity\CartOccurence;
 use App\Entity\Order;
 use App\Entity\Product;
 use App\Exception\CartException;
+use App\Utils\OrderSynchronizer\OrderCartSynchronizer;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,9 +26,12 @@ class CartService
      * @var Order|null
      */
     private $order = null;
+
     private int $totalProducts = 0;
     private float $totalPriceWithoutVat = 0.0;
     private float $totalPriceWithVat = 0.0;
+    private bool $hasSynchronizationWarnings = false;
+    private bool $isOrderNew = false;
 
     /** @var Request */
     private $request;
@@ -76,6 +80,40 @@ class CartService
         return $this->totalPriceWithoutVat;
     }
 
+    public function hasSynchronizationWarnings(): bool
+    {
+        return $this->hasSynchronizationWarnings;
+    }
+
+    /**
+     * Tato metoda se volá jako první před vyvoláním každé controllerové akce. Zajišťuje existenci aktivní objednávky.
+     */
+    public function obtainCartOrder(): void
+    {
+        $tokenInCookie = (string) $this->request->cookies->get(self::COOKIE_NAME);
+
+        if (UUid::isValid($tokenInCookie))
+        {
+            $uuid = Uuid::fromString($tokenInCookie);
+
+            /** @var Order|null $order */
+            $this->order = $this->entityManager->getRepository(Order::class)->findOneAndFetchCartOccurences($uuid);
+            if ($this->order === null || $this->order->isCreatedManually() || $this->order->isFinished())
+            {
+                $this->createNewOrder();
+            }
+            else
+            {
+                $this->synchronizeAndAddWarningsToFlashBag();
+                $this->calculateTotals();
+            }
+        }
+        else
+        {
+            $this->createNewOrder();
+        }
+    }
+
     /**
      * Pokud je aktivní objednávka nová, uloží se do DB a vrátí se cookie s daným tokenem. Pokud už je aktivní
      * objednávka uložená v DB, vrátí se null a nastaví se datum poslední aktivity.
@@ -84,7 +122,7 @@ class CartService
      */
     public function getCookieAndSaveOrder()
     {
-        if ($this->order->getId() === null)
+        if ($this->isOrderNew)
         {
             $this->orderPersistAndFlush();
         }
@@ -111,6 +149,8 @@ class CartService
     }
 
     /**
+     * Vloží produkt do košíku s požadovaným množstvím a volbami.
+     *
      * @param Product $submittedProduct
      * @param int $submittedQuantity
      * @param array $submittedOptions
@@ -179,42 +219,27 @@ class CartService
     }
 
     /**
-     * Tato metoda se volá v konstruktoru. Zajišťuje existenci aktivní objednávky.
+     * Synchronizuje stav historických dat objednávky se stavem dat v ostatních entitách (např. ceny produktů).
+     * Pokud při synchronizaci vznikla nějaká varování, přidají se do flashbagu.
      */
-    private function obtainCartOrder(): void
+    private function synchronizeAndAddWarningsToFlashBag(): void
     {
-        $tokenInCookie = (string) $this->request->cookies->get(self::COOKIE_NAME);
+        $synchronizer = new OrderCartSynchronizer($this->order);
+        $synchronizer->synchronize();
 
-        if (UUid::isValid($tokenInCookie))
+        if($synchronizer->hasWarnings())
         {
-            $uuid = Uuid::fromString($tokenInCookie);
-
-            /** @var Order|null $order */
-            $this->order = $this->entityManager->getRepository(Order::class)->findOneAndFetchCartOccurences($uuid);
-            if ($this->order === null || $this->order->isCreatedManually() || $this->order->isFinished())
+            $this->hasSynchronizationWarnings = true;
+            foreach ($synchronizer->getWarnings() as $warning)
             {
-                $this->createNewOrder();
-            }
-            else
-            {
-                $this->syncOrder();
-                $this->calculateTotals();
+                $this->request->getSession()->getFlashBag()->add('warning', $warning);
             }
         }
-        else
-        {
-            $this->createNewOrder();
-        }
-    }
 
-    private function syncOrder(): void
-    {
-        // ceny produktu - warning
-        // pocet ks produktu - warning
-        // ze ma cartoccurence prirazenou prave jednu produktovou volbu z kazde skupiny prod voleb produktu - warning
-        // cena zvoleneho zpusobu dopravy - warning
-        // cena zvoleneho zpusobu platby - warning
-        // nazev produktu - zadny warning
+        if($synchronizer->orderChanged())
+        {
+            $this->orderPersistAndFlush();
+        }
     }
 
     /**
@@ -240,6 +265,7 @@ class CartService
     private function createNewOrder(): void
     {
         $this->order = new Order();
+        $this->isOrderNew = true;
     }
 
     /**
