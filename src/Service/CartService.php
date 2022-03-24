@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Uid\Uuid;
 
 /**
- * Třída řešící nákupní košík
+ * Třída řešící uživatelův nákupní košík a jeho aktivní objednávku
  *
  * @package App\Service
  */
@@ -38,7 +38,7 @@ class CartService
         $this->entityManager = $entityManager;
         $this->request = $requestStack->getCurrentRequest();
 
-        $this->obtainOrder();
+        $this->obtainCartOrder();
     }
 
     /**
@@ -175,13 +175,13 @@ class CartService
         }
 
         $this->orderPersistAndFlush();
-        $this->recalculateTotals();
+        $this->calculateTotals();
     }
 
     /**
      * Tato metoda se volá v konstruktoru. Zajišťuje existenci aktivní objednávky.
      */
-    private function obtainOrder(): void
+    private function obtainCartOrder(): void
     {
         $tokenInCookie = (string) $this->request->cookies->get(self::COOKIE_NAME);
 
@@ -191,9 +191,14 @@ class CartService
 
             /** @var Order|null $order */
             $this->order = $this->entityManager->getRepository(Order::class)->findOneAndFetchCartOccurences($uuid);
-            if ($this->order === null || !$this->order->isOpen())
+            if ($this->order === null || $this->order->isCreatedManually() || $this->order->isFinished())
             {
                 $this->createNewOrder();
+            }
+            else
+            {
+                $this->syncOrder();
+                $this->calculateTotals();
             }
         }
         else
@@ -202,10 +207,20 @@ class CartService
         }
     }
 
+    private function syncOrder(): void
+    {
+        // ceny produktu - warning
+        // pocet ks produktu - warning
+        // ze ma cartoccurence prirazenou prave jednu produktovou volbu z kazde skupiny prod voleb produktu - warning
+        // cena zvoleneho zpusobu dopravy - warning
+        // cena zvoleneho zpusobu platby - warning
+        // nazev produktu - zadny warning
+    }
+
     /**
-     * Přepočítá celkový počet produktů, celkovou cenu bez DPH a celkovou cenu s DPH
+     * Spočítá celkový počet produktů, celkovou cenu bez DPH a celkovou cenu s DPH
      */
-    private function recalculateTotals(): void
+    private function calculateTotals(): void
     {
         $this->totalProducts = 0;
         $this->totalPriceWithVat = 0.0;

@@ -42,6 +42,16 @@ class Order
      */
     private $cartOccurences;
 
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private bool $createdManually = false;
+
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private bool $finished = false;
+
     public function __construct()
     {
         $this->token = Uuid::v4();
@@ -115,8 +125,34 @@ class Order
         return $this;
     }
 
-    public function isOpen(): bool
+    public function isCreatedManually(): bool
     {
+        return $this->createdManually;
+    }
+
+    public function setCreatedManually(bool $createdManually): self
+    {
+        $this->createdManually = $createdManually;
+
+        return $this;
+    }
+
+    public function isFinished(): bool
+    {
+        return $this->finished;
+    }
+
+    public function setFinished(bool $finished): self
+    {
+        $this->finished = $finished;
+
+        return $this;
+    }
+
+    public function hasAllRequirements(): bool
+    {
+        // platební metoda, doručovací metoda a alespoň jeden cart occurence s quantity > 0
+
         return true;
     }
 }

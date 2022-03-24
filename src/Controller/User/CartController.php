@@ -65,7 +65,8 @@ class CartController extends AbstractController
                             'product'           => $cartInsertRequest->getProduct(),
                             'submittedQuantity' => $cartInsertRequest->getQuantity(),
                         ])
-                    );
+                    )
+                    ->setResponseData('totalProducts', $this->cart->getTotalProducts());
                 }
                 catch(CartException $exception)
                 {

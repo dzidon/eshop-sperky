@@ -14,6 +14,7 @@ $(document).ready(function() {
     $('.materialboxed').materialbox();
     $('select').formSelect();
     $('.dropdown-trigger').dropdown({ hover: false });
+    $('.tooltipped').tooltip();
     $('.modal').modal();
     $('textarea[data-length]').characterCounter();
     $('#modal-loader').modal({
@@ -128,6 +129,11 @@ export function ajaxAddProductToCart(url, data)
         {
             $('#modal-content-cart-insert-inner').html(data['html']);
             M.Modal.getInstance($('#modal-cart-insert')).open();
+        }
+
+        if (typeof(data['totalProducts']) != "undefined" && data['totalProducts'] !== null)
+        {
+            $('.navbar-cart-total-products').text(data['totalProducts']);
         }
     })
     .fail(function (jqXHR)
