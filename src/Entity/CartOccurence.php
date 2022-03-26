@@ -194,4 +194,22 @@ class CartOccurence
 
         return $this;
     }
+
+    public function generateOptionsString(): self
+    {
+        $this->optionsString = null;
+        foreach ($this->options as $option)
+        {
+            if($this->optionsString === null)
+            {
+                $this->optionsString = sprintf('%s: %s', $option->getProductOptionGroup()->getName(), $option->getName());
+            }
+            else
+            {
+                $this->optionsString .= sprintf(', %s: %s', $option->getProductOptionGroup()->getName(), $option->getName());
+            }
+        }
+
+        return $this;
+    }
 }

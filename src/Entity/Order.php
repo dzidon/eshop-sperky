@@ -38,7 +38,7 @@ class Order
     private $expireAt;
 
     /**
-     * @ORM\OneToMany(targetEntity=CartOccurence::class, mappedBy="order_", cascade={"persist"})
+     * @ORM\OneToMany(targetEntity=CartOccurence::class, mappedBy="order_", orphanRemoval=true, cascade={"persist"})
      */
     private $cartOccurences;
 
@@ -55,7 +55,6 @@ class Order
     public function __construct()
     {
         $this->token = Uuid::v4();
-        $this->setExpireAtBasedOnLifetime();
         $this->cartOccurences = new ArrayCollection();
     }
 

@@ -104,7 +104,6 @@ class ProductImage
         return $this;
     }
 
-
     public function setFile(?File $file = null): void
     {
         if ($file !== null)
@@ -161,14 +160,6 @@ class ProductImage
         $this->updated = $updated;
 
         return $this;
-    }
-
-    /**
-     * @ORM\PreUpdate
-     */
-    public function setUpdatedNow(): void
-    {
-        $this->updated = new DateTime('now');
     }
 
     /**

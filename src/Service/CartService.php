@@ -6,7 +6,7 @@ use App\Entity\CartOccurence;
 use App\Entity\Order;
 use App\Entity\Product;
 use App\Exception\CartException;
-use App\Utils\OrderSynchronizer\OrderCartSynchronizer;
+use App\Service\OrderSynchronizer\OrderCartSynchronizer;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
@@ -27,32 +27,28 @@ class CartService
      */
     private $order = null;
 
+    /**
+     * @var Cookie|null
+     */
+    private $orderCookie = null;
+
     private int $totalProducts = 0;
     private float $totalPriceWithoutVat = 0.0;
     private float $totalPriceWithVat = 0.0;
-    private bool $hasSynchronizationWarnings = false;
     private bool $isOrderNew = false;
 
     /** @var Request */
     private $request;
     private EntityManagerInterface $entityManager;
+    private OrderCartSynchronizer $synchronizer;
 
-    public function __construct(RequestStack $requestStack, EntityManagerInterface $entityManager)
+    public function __construct(RequestStack $requestStack, EntityManagerInterface $entityManager, OrderCartSynchronizer $synchronizer)
     {
+        $this->synchronizer = $synchronizer;
         $this->entityManager = $entityManager;
         $this->request = $requestStack->getCurrentRequest();
 
-        $this->obtainCartOrder();
-    }
-
-    /**
-     * Vrátí token aktivní objednávky jako string
-     *
-     * @return string
-     */
-    public function getToken(): string
-    {
-        return (string) $this->order->getToken();
+        $this->initialize();
     }
 
     /**
@@ -63,6 +59,11 @@ class CartService
     public function getOrder(): Order
     {
         return $this->order;
+    }
+
+    public function getOrderCookie()
+    {
+        return $this->orderCookie;
     }
 
     public function getTotalProducts(): int
@@ -82,70 +83,17 @@ class CartService
 
     public function hasSynchronizationWarnings(): bool
     {
-        return $this->hasSynchronizationWarnings;
+        return $this->synchronizer->hasWarnings();
     }
 
     /**
-     * Tato metoda se volá jako první před vyvoláním každé controllerové akce. Zajišťuje existenci aktivní objednávky.
-     */
-    public function obtainCartOrder(): void
-    {
-        $tokenInCookie = (string) $this->request->cookies->get(self::COOKIE_NAME);
-
-        if (UUid::isValid($tokenInCookie))
-        {
-            $uuid = Uuid::fromString($tokenInCookie);
-
-            /** @var Order|null $order */
-            $this->order = $this->entityManager->getRepository(Order::class)->findOneAndFetchCartOccurences($uuid);
-            if ($this->order === null || $this->order->isCreatedManually() || $this->order->isFinished())
-            {
-                $this->createNewOrder();
-            }
-            else
-            {
-                $this->synchronizeAndAddWarningsToFlashBag();
-                $this->calculateTotals();
-            }
-        }
-        else
-        {
-            $this->createNewOrder();
-        }
-    }
-
-    /**
-     * Pokud je aktivní objednávka nová, uloží se do DB a vrátí se cookie s daným tokenem. Pokud už je aktivní
-     * objednávka uložená v DB, vrátí se null a nastaví se datum poslední aktivity.
+     * Vrátí token aktivní objednávky jako string
      *
-     * @return Cookie|null
+     * @return string
      */
-    public function getCookieAndSaveOrder()
+    public function getOrderToken(): string
     {
-        if ($this->isOrderNew)
-        {
-            $this->orderPersistAndFlush();
-        }
-        // aby to při každém requestu nevolalo UPDATE, aktualizuje se datum expirace jen několik dní před expirací
-        else if (($this->order->getExpireAt()->getTimestamp() - time()) < (86400 * Order::REFRESH_WINDOW_IN_DAYS))
-        {
-            $this->order->setExpireAtBasedOnLifetime();
-            $this->orderPersistAndFlush();
-        }
-        else
-        {
-            return null;
-        }
-
-        $token = $this->getToken();
-        $expires = time() + (86400 * Order::LIFETIME_IN_DAYS);
-
-        return (new Cookie(self::COOKIE_NAME))
-            ->withValue($token)
-            ->withExpires($expires)
-            ->withSecure(true)
-            ->withHttpOnly()
-        ;
+        return (string) $this->order->getToken();
     }
 
     /**
@@ -160,7 +108,7 @@ class CartService
     {
         $inventory = $submittedProduct->getInventory();
         $requiredQuantity = $submittedQuantity;
-        $existingCartOccurence = null;
+        $targetCartOccurence = null;
 
         foreach ($this->order->getCartOccurences() as $cartOccurence)
         {
@@ -171,7 +119,7 @@ class CartService
                 $requiredQuantity += $cartOccurence->getQuantity();
 
                 // snaha najít v košíku vkládaný produkt s danými volbami
-                if($existingCartOccurence === null)
+                if($targetCartOccurence === null)
                 {
                     $containsSubmittedOptions = ([] === array_udiff($cartOccurence->getOptions()->toArray(), $submittedOptions,
                         function ($objA, $objB) {
@@ -181,7 +129,7 @@ class CartService
 
                     if($containsSubmittedOptions)
                     {
-                        $existingCartOccurence = $cartOccurence;
+                        $targetCartOccurence = $cartOccurence;
                     }
                 }
             }
@@ -192,10 +140,10 @@ class CartService
             throw new CartException('Tolik kusů už na skladě bohužel nemáme.');
         }
 
-        if($existingCartOccurence === null)
+        if($targetCartOccurence === null)
         {
-            $newCartOccurence = new CartOccurence();
-            $newCartOccurence
+            $targetCartOccurence = new CartOccurence();
+            $targetCartOccurence
                 ->setOrder($this->order)
                 ->setProduct($submittedProduct)
                 ->setQuantity($submittedQuantity)
@@ -205,17 +153,75 @@ class CartService
 
             foreach ($submittedOptions as $submittedOption)
             {
-                $newCartOccurence->addOption($submittedOption);
+                $targetCartOccurence->addOption($submittedOption);
             }
-            $this->order->addCartOccurence($newCartOccurence);
+            $targetCartOccurence->generateOptionsString();
+            $this->order->addCartOccurence($targetCartOccurence);
         }
         else
         {
-            $existingCartOccurence->addQuantity($submittedQuantity);
+            $targetCartOccurence->addQuantity($submittedQuantity);
         }
 
-        $this->orderPersistAndFlush();
+        $this->entityManager->persist($targetCartOccurence);
+        $this->entityManager->flush();
+
         $this->calculateTotals();
+    }
+
+    /**
+     * Tato metoda se volá jako první před vyvoláním každé controllerové akce. Zajišťuje existenci aktivní objednávky.
+     */
+    private function initialize(): void
+    {
+        $tokenInCookie = (string) $this->request->cookies->get(self::COOKIE_NAME);
+
+        if (UUid::isValid($tokenInCookie))
+        {
+            $uuid = Uuid::fromString($tokenInCookie);
+
+            /** @var Order|null $order */
+            $this->order = $this->entityManager->getRepository(Order::class)->findOneAndFetchCartOccurences($uuid);
+            if ($this->order === null || $this->order->isCreatedManually() || $this->order->isFinished())
+            {
+                $this->createNewOrder();
+            }
+        }
+        else
+        {
+            $this->createNewOrder();
+        }
+
+        $this->synchronizer->setOrder($this->order);
+        $this->synchronizeAndAddWarningsToFlashBag();
+
+        $this->calculateTotals();
+        $this->orderCookieObtain();
+
+        $this->entityManager->persist($this->order);
+        $this->entityManager->flush();
+    }
+
+    /**
+     * Vrátí novou cookie s tokenem aktivní objednávky, pokud je objednávka nová, nebo se blíží k expiraci.
+     */
+    private function orderCookieObtain(): void
+    {
+        $this->orderCookie = null;
+
+        if ($this->isOrderNew || (($this->order->getExpireAt()->getTimestamp() - time()) < (86400 * Order::REFRESH_WINDOW_IN_DAYS)))
+        {
+            $this->order->setExpireAtBasedOnLifetime();
+            $expires = time() + (86400 * Order::LIFETIME_IN_DAYS);
+            $token = $this->getOrderToken();
+
+            $this->orderCookie = (new Cookie(self::COOKIE_NAME))
+                ->withValue($token)
+                ->withExpires($expires)
+                ->withSecure(true)
+                ->withHttpOnly()
+            ;
+        }
     }
 
     /**
@@ -224,21 +230,11 @@ class CartService
      */
     private function synchronizeAndAddWarningsToFlashBag(): void
     {
-        $synchronizer = new OrderCartSynchronizer($this->order);
-        $synchronizer->synchronize();
+        $this->synchronizer->synchronize();
 
-        if($synchronizer->hasWarnings())
+        foreach ($this->synchronizer->getWarnings() as $warning)
         {
-            $this->hasSynchronizationWarnings = true;
-            foreach ($synchronizer->getWarnings() as $warning)
-            {
-                $this->request->getSession()->getFlashBag()->add('warning', $warning);
-            }
-        }
-
-        if($synchronizer->orderChanged())
-        {
-            $this->orderPersistAndFlush();
+            $this->request->getSession()->getFlashBag()->add('warning', $warning);
         }
     }
 
@@ -266,14 +262,5 @@ class CartService
     {
         $this->order = new Order();
         $this->isOrderNew = true;
-    }
-
-    /**
-     * Uloží aktivní objednávku do databáze
-     */
-    private function orderPersistAndFlush(): void
-    {
-        $this->entityManager->persist($this->order);
-        $this->entityManager->flush();
     }
 }

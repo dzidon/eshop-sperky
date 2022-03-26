@@ -23,12 +23,10 @@ class CartSubscriber implements EventSubscriberInterface
 
     public function onKernelResponse(ResponseEvent $event)
     {
-        $response = $event->getResponse();
-        $tokenCookie = $this->cart->getCookieAndSaveOrder();
-
+        $tokenCookie = $this->cart->getOrderCookie();
         if($tokenCookie !== null)
         {
-            $response->headers->setCookie($tokenCookie);
+            $event->getResponse()->headers->setCookie($tokenCookie);
         }
     }
 

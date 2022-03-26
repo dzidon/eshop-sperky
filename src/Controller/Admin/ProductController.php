@@ -110,8 +110,21 @@ class ProductController extends AbstractController
         if ($form->isSubmitted() && $form->isValid())
         {
             $entityManager = $this->getDoctrine()->getManager();
+            foreach ($product->getImages() as $image)
+            {
+                $entityManager->persist($image);
+            }
             $entityManager->persist($product);
             $entityManager->flush();
+
+            // workaround bugu (asi) ve vichuploader
+            $oldMainImageName = $product->getMainImageName();
+            $product->determineMainImageName();
+            if($oldMainImageName !== $product->getMainImageName())
+            {
+                $entityManager->persist($product);
+                $entityManager->flush();
+            }
 
             $this->addFlash('success', 'Produkt uložen!');
             $this->logger->info(sprintf("Admin %s (ID: %s) has saved a product %s (ID: %s).", $user->getUserIdentifier(), $user->getId(), $product->getName(), $product->getId()));

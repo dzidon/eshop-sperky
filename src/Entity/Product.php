@@ -153,7 +153,7 @@ class Product
     private $info;
 
     /**
-     * @ORM\OneToMany(targetEntity=ProductImage::class, mappedBy="product", orphanRemoval=true, cascade={"persist", "remove"})
+     * @ORM\OneToMany(targetEntity=ProductImage::class, mappedBy="product", orphanRemoval=true, cascade={"persist"})
      *
      * @Assert\Valid
      */
@@ -552,9 +552,6 @@ class Product
         $this->updated = new DateTime('now');
     }
 
-    /**
-     * @ORM\PreFlush
-     */
     public function determineMainImageName(): void
     {
         $this->mainImageName = null;
