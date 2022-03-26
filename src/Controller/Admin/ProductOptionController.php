@@ -73,7 +73,6 @@ class ProductOptionController extends AbstractController
         return $this->render('admin/product_options/admin_product_options.html.twig', [
             'searchForm' => $form->createView(),
             'optionGroups' => $optionGroups,
-            'breadcrumbs' => $this->breadcrumbs,
             'pagination' => $paginatorService->createViewData(),
         ]);
     }
@@ -122,7 +121,6 @@ class ProductOptionController extends AbstractController
         return $this->render('admin/product_options/admin_product_option_edit.html.twig', [
             'productOptionGroupForm' => $form->createView(),
             'productOptionGroupInstance' => $optionGroup,
-            'breadcrumbs' => $this->breadcrumbs,
         ]);
     }
 
@@ -160,10 +158,11 @@ class ProductOptionController extends AbstractController
             return $this->redirectToRoute('admin_product_options');
         }
 
+        $this->breadcrumbs->addRoute('admin_product_option_delete', ['id' => $optionGroup->getId()]);
+
         return $this->render('admin/product_options/admin_product_option_delete.html.twig', [
             'productOptionGroupDeleteForm' => $form->createView(),
             'productOptionGroupInstance' => $optionGroup,
-            'breadcrumbs' => $this->breadcrumbs->addRoute('admin_product_option_delete', ['id' => $optionGroup->getId()]),
         ]);
     }
 }

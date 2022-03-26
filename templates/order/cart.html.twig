@@ -12,15 +12,11 @@
         {# Flash zprávy #}
         {{ include('fragments/_flash_messages.html.twig') }}
 
-        <div id="product-catalog-container">
-            {# Obsah katalogu #}
-            {{ include('fragments/forms_unique/_form_product_catalog.html.twig') }}
-        </div>
+        {% if cartForm is null %}
+            Váš košík je prázdný. <a href="{{ path('products') }}">Zpět do obchodu</a>
+        {% else %}
+            {{ form(cartForm) }}
+        {% endif %}
     </div>
 
-{% endblock %}
-
-{% block javascripts %}
-    {{ parent() }}
-    {{ encore_entry_script_tags('productFilter') }}
 {% endblock %}

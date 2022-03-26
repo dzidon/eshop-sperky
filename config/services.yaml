@@ -29,13 +29,13 @@ parameters:
         edit: 'Upravit recenzi'
     app_page_title.review_delete: 'Smazat recenzi'
     app_page_title.forgot_password_request: 'Obnova hesla'
-    app_page_title.check_email: 'Potvrzení obnovy hesla'
     app_page_title.reset_password: 'Nové heslo'
     app_page_title.register: 'Registrace'
     app_page_title.login: 'Přihlášení'
     app_page_title.verify_email: 'Ověřit email'
     app_page_title.products: 'Všechny produkty'
     app_page_title.product: 'Produkt'
+    app_page_title.order_cart: 'Košík'
     app_page_title.admin_permission_overview: 'Moje oprávnění'
     app_page_title.admin_user_management: 'Uživatelé'
     app_page_title.admin_user_management_specific: 'Uživatel'
@@ -89,6 +89,9 @@ services:
         class: App\Service\NavbarService
     app.cart_service:
         class: App\Service\CartService
+    app.breadcrumbs_service:
+        class: App\Service\BreadcrumbsService
 
     App\Service\NavbarService: '@app.navbar_service'
     App\Service\CartService: '@app.cart_service'
+    App\Service\BreadcrumbsService: '@app.breadcrumbs_service'

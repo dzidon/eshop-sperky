@@ -67,7 +67,6 @@ class ReviewController extends AbstractController
         return $this->render('reviews/reviews_overview.html.twig', [
             'searchForm' => $form->createView(),
             'reviews' => $reviews,
-            'breadcrumbs' => $this->breadcrumbs,
             'pagination' => $paginatorService->createViewData(),
         ]);
     }
@@ -155,7 +154,6 @@ class ReviewController extends AbstractController
         return $this->render('reviews/review_edit.html.twig', [
             'review' => $review,
             'reviewForm' => $form->createView(),
-            'breadcrumbs' => $this->breadcrumbs,
         ]);
     }
 
@@ -204,10 +202,11 @@ class ReviewController extends AbstractController
             return $this->redirectToRoute('reviews');
         }
 
+        $this->breadcrumbs->addRoute('review_delete');
+
         return $this->render('reviews/review_delete.html.twig', [
             'reviewDeleteForm' => $form->createView(),
             'reviewInstance' => $review,
-            'breadcrumbs' => $this->breadcrumbs->addRoute('review_delete'),
         ]);
     }
 }

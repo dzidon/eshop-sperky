@@ -77,7 +77,6 @@ class UserController extends AbstractController
             'userAdmin' => $this->getUser(),
             'users' => $users,
             'userAdminCanEditThemself' => $this->getParameter('kernel.environment') === 'dev',
-            'breadcrumbs' => $this->breadcrumbs,
             'pagination' => $paginatorService->createViewData(),
         ]);
     }
@@ -196,12 +195,13 @@ class UserController extends AbstractController
             $formMuteView = $formMute->createView();
         }
 
+        $this->breadcrumbs->addRoute('admin_user_management_specific', ['id' => $userEdited], '', '', ($userEdited->fullNameIsSet() ? $userEdited->getFullName() : ''));
+
         return $this->render('admin/users/admin_user_management_specific.html.twig', [
             'formCredentials' => $formCredentialsView,
             'formPermissions' => $formPermissionsView,
             'formMute' => $formMuteView,
             'userEdited' => $userEdited,
-            'breadcrumbs' => $this->breadcrumbs->addRoute('admin_user_management_specific', ['id' => $userEdited], '', '', ($userEdited->fullNameIsSet() ? $userEdited->getFullName() : ''))
         ]);
     }
 }

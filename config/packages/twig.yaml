@@ -11,6 +11,7 @@ twig:
         site_instagram: '%app_site_instagram%'
         navbar_service: '@app.navbar_service'
         cart_service: '@app.cart_service'
+        breadcrumbs_service: '@app.breadcrumbs_service'
 
 when@test:
     twig:

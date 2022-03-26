@@ -106,7 +106,6 @@ class ProductController extends AbstractController
             return $this->render('products/catalog.html.twig', [
                 'filterForm' => $form->createView(),
                 'products' => $products,
-                'breadcrumbs' => $this->breadcrumbs,
                 'pagination' => $paginatorService->createViewData(),
             ]);
         }
@@ -140,13 +139,14 @@ class ProductController extends AbstractController
             'title' => ($section !== null ? $section->getName() : 'Všechny produkty'),
         ];
 
+        $this->breadcrumbs
+            ->addRoute('products', ['slug' => $sectionData['slug']], $sectionData['title'])
+            ->addRoute('product', ['slug' => $product->getSlug()], $product->getName());
+
         return $this->render('products/product.html.twig', [
             'productInstance' => $product,
             'relatedProducts' => $relatedProducts,
             'cartInsertForm' => $form->createView(),
-            'breadcrumbs' => $this->breadcrumbs
-                ->addRoute('products', ['slug' => $sectionData['slug']], $sectionData['title'])
-                ->addRoute('product', ['slug' => $product->getSlug()], $product->getName()),
         ]);
     }
 }

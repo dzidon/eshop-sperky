@@ -73,7 +73,6 @@ class ProductInfoController extends AbstractController
         return $this->render('admin/product_info/admin_product_info.html.twig', [
             'searchForm' => $form->createView(),
             'infoGroups' => $infoGroups,
-            'breadcrumbs' => $this->breadcrumbs,
             'pagination' => $paginatorService->createViewData(),
         ]);
     }
@@ -122,7 +121,6 @@ class ProductInfoController extends AbstractController
         return $this->render('admin/product_info/admin_product_info_edit.html.twig', [
             'productInfoGroupForm' => $form->createView(),
             'productInfoGroupInstance' => $infoGroup,
-            'breadcrumbs' => $this->breadcrumbs,
         ]);
     }
 
@@ -160,10 +158,11 @@ class ProductInfoController extends AbstractController
             return $this->redirectToRoute('admin_product_info');
         }
 
+        $this->breadcrumbs->addRoute('admin_product_info_delete', ['id' => $infoGroup->getId()]);
+
         return $this->render('admin/product_info/admin_product_info_delete.html.twig', [
             'productInfoGroupDeleteForm' => $form->createView(),
             'productInfoGroupInstance' => $infoGroup,
-            'breadcrumbs' => $this->breadcrumbs->addRoute('admin_product_info_delete', ['id' => $infoGroup->getId()]),
         ]);
     }
 }

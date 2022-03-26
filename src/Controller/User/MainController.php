@@ -31,7 +31,7 @@ class MainController extends AbstractController
     /**
      * @Route("/", name="home")
      */
-    public function index(BreadcrumbsService $breadcrumbs): Response
+    public function index(): Response
     {
         $latestProducts = $this->getDoctrine()->getRepository(Product::class)->findLatest(4);
         $latestReviews = $this->getDoctrine()->getRepository(Review::class)->findLatest(4);
@@ -41,7 +41,6 @@ class MainController extends AbstractController
             'latestProducts' => $latestProducts,
             'latestReviews' => $latestReviews,
             'totalAndAverageRating' => $totalAndAverageRating,
-            'breadcrumbs' => $breadcrumbs,
         ]);
     }
 
@@ -75,9 +74,10 @@ class MainController extends AbstractController
             }
         }
 
+        $this->breadcrumbs->addRoute('contact');
+
         return $this->render('main/contact.html.twig', [
             'contactForm' => $form->createView(),
-            'breadcrumbs' => $this->breadcrumbs->addRoute('contact'),
         ]);
     }
 }

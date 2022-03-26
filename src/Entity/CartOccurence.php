@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\CartOccurenceRepository;
+use App\Validation\Compound as AssertCompound;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -39,6 +40,8 @@ class CartOccurence
 
     /**
      * @ORM\Column(type="integer")
+     *
+     * @AssertCompound\ProductQuantityRequirements
      */
     private $quantity;
 

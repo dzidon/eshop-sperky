@@ -50,9 +50,12 @@ class LoginController extends AbstractController
 
         $request->getSession()->remove(Security::LAST_USERNAME);
 
+        $this->breadcrumbs
+            ->addRoute('home')
+            ->addRoute('login');
+
         return $this->render('authentication/login.html.twig', [
             'loginForm' => $form->createView(),
-            'breadcrumbs' => $this->breadcrumbs->addRoute('home')->addRoute('login'),
         ]);
     }
 

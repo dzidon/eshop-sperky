@@ -1,44 +1,23 @@
 <?php
 
-namespace App\Service;
+namespace App\Twig;
 
 use App\Entity\Review;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 /**
- * Třída TwigExtensions přidává rozšířující metody a filtry šablonovacímu systému Twig.
+ * Twig extension přidaávájící funkce související s recenzí
  *
- * @package App\Service
+ * @package App\Twig
  */
-class TwigExtensions extends AbstractExtension
+class ReviewExtension extends AbstractExtension
 {
-    private ParameterBagInterface $params;
-
-    public function __construct(ParameterBagInterface $params)
-    {
-        $this->params = $params;
-    }
-
     public function getFunctions(): array
     {
         return [
-            new TwigFunction('get_parameter', [$this, 'getParameter']),
             new TwigFunction('rating_to_stars', [$this, 'ratingToStars']),
         ];
-    }
-
-    /**
-     * Vrátí hodnotu parametru z services.yaml bez nutnosti vytvářet Twig global.
-     *
-     * @param string $name
-     *
-     * @return array|bool|float|int|string|null
-     */
-    public function getParameter(string $name)
-    {
-        return $this->params->get($name);
     }
 
     /**

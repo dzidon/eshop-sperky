@@ -1,6 +1,6 @@
 <div class="section grey lighten-4">
     <div class="container valign-wrapper flex-wrap">
-        {% for breadcrumb in breadcrumbs.getBreadcrumbsData() %}
+        {% for breadcrumb in breadcrumbs_service.breadcrumbsData %}
             {% if loop.last %}
                 <span>{{ breadcrumb.title }}</span>
             {% else %}
@@ -9,7 +9,7 @@
                         {{ breadcrumb.title }}
                     </a>
                 </strong>
-                <span>&nbsp;/&nbsp;</span>
+                <span>&nbsp;>&nbsp;</span>
             {% endif %}
         {% endfor %}
     </div>

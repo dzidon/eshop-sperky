@@ -4,13 +4,10 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0">
         <title>
-            {% block title %}
-                {% if breadcrumbs is defined %}
-                    {{ breadcrumbs.getPageTitle() }} -
-                {% endif %}
-
-                {{ site_name }}
-            {% endblock %}
+            {% if breadcrumbs_service is defined and breadcrumbs_service.pageTitle|length > 0 %}
+                {{ breadcrumbs_service.pageTitle }} -
+            {% endif %}
+            {{ site_name }}
         </title>
 
         <!-- CSS -->
@@ -27,15 +24,16 @@
                 <div class="nav-wrapper container">
                     <a id="logo-container" href="{{ path('home') }}" class="black-text brand-logo bold">ŠPERKY</a>
                     <ul class="right hide-on-med-and-down">
+                        {% set path_order_cart = path('order_cart') %}
                         {% set is_authenticated_remembered = is_granted('IS_AUTHENTICATED_REMEMBERED') %}
                         {% set can_enter_admin = is_granted('admin_permission_overview') %}
-                        {% set sections = navbar_service.getVisibleSections() %}
-                        {% set sections_count = sections|length %}
+                        {% set navbar_sections = navbar_service.getVisibleSections() %}
+                        {% set navbar_sections_count = navbar_sections|length %}
 
-                        {% if sections_count > 0  %}
+                        {% if navbar_sections_count > 0  %}
                             <ul id="dropdown_sections_desktop" class="dropdown-content">
                                 <li><a href="{{ path('products') }}" class="black-text">Všechny</a></li>
-                                {% for section in sections %}
+                                {% for section in navbar_sections %}
                                     <li><a href="{{ path('products', {slug: section.getSlug()}) }}" class="black-text">{{ section.getName() }}</a></li>
                                 {% endfor %}
                             </ul>
@@ -46,7 +44,7 @@
                             <li><a href="{{ path('products') }}" class="black-text"> <i class="material-icons left">filter_vintage</i> Produkty</a></li>
                         {% endif %}
 
-                        <li><a href="#" class="black-text"> <i class="material-icons left">shopping_cart</i> Košík <span class="cart-badge light-blue white-text navbar-cart-total-products">{{ cart_service.getTotalProducts() }}</span></a></li>
+                        <li><a href="{{ path_order_cart }}" class="black-text"> <i class="material-icons left">shopping_cart</i> Košík <span class="cart-badge light-blue white-text navbar-cart-total-products">{{ cart_service.getTotalProducts() }}</span></a></li>
 
                         {% if is_authenticated_remembered %}
                             {% if can_enter_admin %}
@@ -66,10 +64,10 @@
         </div>
 
         <ul id="nav-mobile" class="sidenav">
-            {% if sections_count > 0  %}
+            {% if navbar_sections_count > 0  %}
                 <ul id="dropdown_sections_mobile" class="dropdown-content black-text">
                     <li><a href="{{ path('products') }}" class="black-text">Všechny</a></li>
-                    {% for section in sections %}
+                    {% for section in navbar_sections %}
                         <li><a href="{{ path('products', {slug: section.getSlug()}) }}">{{ section.getName() }}</a></li>
                     {% endfor %}
                 </ul>
@@ -80,7 +78,7 @@
                 <li><a href="{{ path('products') }}"> <i class="material-icons left">filter_vintage</i> Produkty</a></li>
             {% endif %}
 
-            <li><a href="#"> <i class="material-icons left">shopping_cart</i> Košík <span class="cart-badge light-blue white-text navbar-cart-total-products">{{ cart_service.getTotalProducts() }}</span></a></li>
+            <li><a href="{{ path_order_cart }}"> <i class="material-icons left">shopping_cart</i> Košík <span class="cart-badge light-blue white-text navbar-cart-total-products">{{ cart_service.getTotalProducts() }}</span></a></li>
 
             {% if is_authenticated_remembered %}
                 {% if can_enter_admin %}
@@ -131,8 +129,8 @@
                         </div>
 
                         <div class="col s8 right-align">
-                            <a href="javascript:void(0);" class="btn-large waves-effect light-blue white-text hide-on-small-and-down">Pokračovat do košíku</a>
-                            <a href="javascript:void(0);" class="btn-floating btn-large waves-effect light-blue white-text hide-on-med-and-up">
+                            <a href="{{ path_order_cart }}" class="btn-large waves-effect light-blue white-text hide-on-small-and-down">Pokračovat do košíku</a>
+                            <a href="{{ path_order_cart }}" class="btn-floating btn-large waves-effect light-blue white-text hide-on-med-and-up">
                                 <i class="material-icons">shopping_cart</i>
                             </a>
                         </div>

@@ -108,9 +108,12 @@ class RegistrationController extends AbstractController
             return $this->redirectToRoute('home');
         }
 
+        $this->breadcrumbs
+            ->addRoute('home')
+            ->addRoute('register');
+
         return $this->render('authentication/register.html.twig', [
             'registrationForm' => $form->createView(),
-            'breadcrumbs' => $this->breadcrumbs->addRoute('home')->addRoute('register'),
         ]);
     }
 
@@ -142,9 +145,13 @@ class RegistrationController extends AbstractController
 
         $this->request->getSession()->remove(Security::LAST_USERNAME);
 
+        $this->breadcrumbs
+            ->addRoute('home')
+            ->addRoute('register')
+            ->addRoute('verify_email');
+
         return $this->render('authentication/verification.html.twig', [
             'verificationForm' => $form->createView(),
-            'breadcrumbs' => $this->breadcrumbs->addRoute('home')->addRoute('register')->addRoute('verify_email'),
         ]);
     }
 }

@@ -73,7 +73,6 @@ class ProductCategoryController extends AbstractController
         return $this->render('admin/product_categories/admin_product_categories.html.twig', [
             'searchForm' => $form->createView(),
             'categoryGroups' => $categoryGroups,
-            'breadcrumbs' => $this->breadcrumbs,
             'pagination' => $paginatorService->createViewData(),
         ]);
     }
@@ -122,7 +121,6 @@ class ProductCategoryController extends AbstractController
         return $this->render('admin/product_categories/admin_product_category_edit.html.twig', [
             'productCategoryGroupForm' => $form->createView(),
             'productCategoryGroupInstance' => $categoryGroup,
-            'breadcrumbs' => $this->breadcrumbs,
         ]);
     }
 
@@ -160,10 +158,11 @@ class ProductCategoryController extends AbstractController
             return $this->redirectToRoute('admin_product_categories');
         }
 
+        $this->breadcrumbs->addRoute('admin_product_category_delete', ['id' => $categoryGroup->getId()]);
+
         return $this->render('admin/product_categories/admin_product_category_delete.html.twig', [
             'productCategoryGroupDeleteForm' => $form->createView(),
             'productCategoryGroupInstance' => $categoryGroup,
-            'breadcrumbs' => $this->breadcrumbs->addRoute('admin_product_category_delete', ['id' => $categoryGroup->getId()]),
         ]);
     }
 }

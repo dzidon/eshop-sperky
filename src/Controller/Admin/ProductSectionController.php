@@ -74,7 +74,6 @@ class ProductSectionController extends AbstractController
         return $this->render('admin/product_sections/admin_product_sections.html.twig', [
             'searchForm' => $form->createView(),
             'sections' => $sections,
-            'breadcrumbs' => $this->breadcrumbs,
             'pagination' => $paginatorService->createViewData(),
         ]);
     }
@@ -123,7 +122,6 @@ class ProductSectionController extends AbstractController
         return $this->render('admin/product_sections/admin_product_section_edit.html.twig', [
             'productSectionForm' => $form->createView(),
             'productSectionInstance' => $section,
-            'breadcrumbs' => $this->breadcrumbs,
         ]);
     }
 
@@ -161,10 +159,11 @@ class ProductSectionController extends AbstractController
             return $this->redirectToRoute('admin_product_sections');
         }
 
+        $this->breadcrumbs->addRoute('admin_product_section_delete', ['id' => $section->getId()]);
+
         return $this->render('admin/product_sections/admin_product_section_delete.html.twig', [
             'productSectionDeleteForm' => $form->createView(),
             'productSectionInstance' => $section,
-            'breadcrumbs' => $this->breadcrumbs->addRoute('admin_product_section_delete', ['id' => $section->getId()]),
         ]);
     }
 }

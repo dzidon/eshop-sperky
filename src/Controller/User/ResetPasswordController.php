@@ -67,25 +67,6 @@ class ResetPasswordController extends AbstractController
 
         return $this->render('reset_password/request.html.twig', [
             'requestForm' => $form->createView(),
-            'breadcrumbs' => $this->breadcrumbs,
-        ]);
-    }
-
-    /**
-     * Potvrzovací stránka po zažádání o reset hesla.
-     *
-     * @Route("/potvrzeni", name="check_email")
-     */
-    public function checkEmail(): Response
-    {
-        if (null === ($resetToken = $this->getTokenObjectFromSession()))
-        {
-            $resetToken = $this->resetPasswordHelper->generateFakeResetToken();
-        }
-
-        return $this->render('reset_password/check_email.html.twig', [
-            'resetToken' => $resetToken,
-            'breadcrumbs' => $this->breadcrumbs->addRoute('check_email'),
         ]);
     }
 
@@ -147,9 +128,10 @@ class ResetPasswordController extends AbstractController
             }
         }
 
+        $this->breadcrumbs->addRoute('reset_password');
+
         return $this->render('reset_password/reset.html.twig', [
             'resetForm' => $form->createView(),
-            'breadcrumbs' => $this->breadcrumbs->addRoute('reset_password'),
         ]);
     }
 
@@ -161,7 +143,8 @@ class ResetPasswordController extends AbstractController
 
         if (!$user)
         {
-            return $this->redirectToRoute('check_email');
+            $this->resetPasswordHelper->generateFakeResetToken();
+            return $this->redirectWithSuccessMessage();
         }
 
         try
@@ -170,12 +153,8 @@ class ResetPasswordController extends AbstractController
         }
         catch (ResetPasswordExceptionInterface $e)
         {
-            // $this->addFlash('reset_password_error', sprintf(
-            //     'There was a problem handling your password reset request - %s',
-            //     $e->getReason()
-            // ));
-
-            return $this->redirectToRoute('check_email');
+            $this->resetPasswordHelper->generateFakeResetToken();
+            return $this->redirectWithSuccessMessage();
         }
 
         $email = (new TemplatedEmail())
@@ -200,6 +179,12 @@ class ResetPasswordController extends AbstractController
         $this->setTokenObjectInSession($resetToken);
         $this->logger->info(sprintf("Someone has requested a password reset for %s (ID: %s)", $user->getUserIdentifier(), $user->getId()));
 
-        return $this->redirectToRoute('check_email');
+        return $this->redirectWithSuccessMessage();
+    }
+
+    private function redirectWithSuccessMessage(): RedirectResponse
+    {
+        $this->addFlash('success', 'Pokud vámi zadaný email existuje, poslali jsme na něj odkaz, přes který si můžete resetovat heslo. Tento odkaz vyprší za 1 hodinu. Pokud email neobdržíte, zkontrolujte SPAM složku nebo to zkuste znovu.');
+        return $this->redirectToRoute('forgot_password_request');
     }
 }
