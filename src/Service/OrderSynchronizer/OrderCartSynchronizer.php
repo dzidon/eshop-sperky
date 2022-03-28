@@ -43,6 +43,17 @@ class OrderCartSynchronizer extends AbstractOrderSynchronizer
             }
             else
             {
+                // vložený počet ks je 0
+                if($cartOccurence->getQuantity() <= 0)
+                {
+                    $this->order->removeCartOccurence($cartOccurence);
+                    $this->addWarning(
+                        sprintf('quantityzero_%d', $product->getId()),
+                        sprintf('Produkt "%s" byl odstraněn, protože měl nastavený počet kusů na 0.', $cartOccurence->getName())
+                    );
+                    continue;
+                }
+
                 // počet ks na skladě
                 if (!isset($productsTotalQuantity[$product->getId()]))
                 {
@@ -53,7 +64,7 @@ class OrderCartSynchronizer extends AbstractOrderSynchronizer
                 {
                     $this->order->removeCartOccurence($cartOccurence);
                     $this->addWarning(
-                        sprintf('quantity_%s', $cartOccurence->getName()),
+                        sprintf('quantity_%d', $product->getId()),
                         sprintf('Produkt "%s" byl odstraněn, protože už nemáme tolik kusů na skladě.', $cartOccurence->getName())
                     );
 
@@ -65,7 +76,7 @@ class OrderCartSynchronizer extends AbstractOrderSynchronizer
                 if ($product->getName() !== null && $cartOccurence->getName() !== $product->getName())
                 {
                     $this->addWarning(
-                        sprintf('name_%s', $cartOccurence->getName()),
+                        sprintf('name_%d', $product->getId()),
                         sprintf('Název produktu "%s" je nyní "%s".', $cartOccurence->getName(), $product->getName())
                     );
 
@@ -101,7 +112,7 @@ class OrderCartSynchronizer extends AbstractOrderSynchronizer
                     $cartOccurence->setPriceWithVat($product->getPriceWithVat());
 
                     $this->addWarning(
-                        sprintf('price_%s', $cartOccurence->getName()),
+                        sprintf('price_%d', $product->getId()),
                         sprintf('Cena produktu "%s" je nyní %.2f Kč vč. DPH (%.2f Kč bez DPH).', $cartOccurence->getName(), $cartOccurence->getPriceWithVat(), $cartOccurence->getPriceWithoutVat())
                     );
                 }

@@ -6,6 +6,7 @@ let priceMaxInput;
 let sortByInput;
 let categoriesInput;
 
+let requestInProgress = false;
 const xhr = new XMLHttpRequest();
 
 $(document).ready(function()
@@ -37,6 +38,12 @@ function initialize()
     priceMinInput.on('change', catalogResetUsingForm);
     priceMaxInput.on('change', catalogResetUsingForm);
     categoriesInput.on('change', catalogResetUsingForm);
+
+    $('#form-product-catalog').on('submit', function(e)
+    {
+        e.preventDefault();
+        catalogResetUsingForm();
+    });
 
     /*
         Slider cen v katalogu
@@ -176,6 +183,12 @@ function catalogResetUsingForm()
 
 function catalogReset(url, addToHistory)
 {
+    if(requestInProgress)
+    {
+        return;
+    }
+    requestInProgress = true;
+
     $('#modal-loader-text').text('Aktualizuji výpis...');
     M.Modal.getInstance($('#modal-loader')).open();
 
@@ -189,6 +202,7 @@ function catalogReset(url, addToHistory)
         complete: function()
         {
             M.Modal.getInstance($('#modal-loader')).close();
+            requestInProgress = false;
         },
         success: function(data)
         {
@@ -206,7 +220,8 @@ function catalogReset(url, addToHistory)
         },
         error: function()
         {
-            $('#modal-error-text').text('Nepodařilo se načíst katalog produktů, zkuste to prosím znovu.')
+            $('#modal-error-text').text('Nepodařilo se načíst katalog produktů, zkuste to prosím znovu.');
+            $('#modal-error-heading').text('Chyba');
             M.Modal.getInstance($('#modal-error')).open();
         }
     });

@@ -86,6 +86,11 @@ class CartService
         return $this->synchronizer->hasWarnings();
     }
 
+    public function getAndRemoveSynchronizationWarnings(): array
+    {
+        return $this->synchronizer->getAndRemoveWarnings();
+    }
+
     /**
      * Vrátí token aktivní objednávky jako string
      *
@@ -170,6 +175,62 @@ class CartService
     }
 
     /**
+     * Aktualizuje počty produktů v košíku. Pokud je nějaký počet 0, produkt se odstraní.
+     */
+    public function updateQuantities(): void
+    {
+        foreach ($this->order->getCartOccurences() as $cartOccurence)
+        {
+            if($cartOccurence->getQuantity() <= 0)
+            {
+                $this->order->removeCartOccurence($cartOccurence);
+                $this->entityManager->remove($cartOccurence);
+            }
+            else
+            {
+                $this->entityManager->persist($cartOccurence);
+            }
+        }
+
+        $this->entityManager->flush();
+        $this->calculateTotals();
+    }
+
+    /**
+     * Odstraní CartOccurence z košíku
+     *
+     * @param int|null $cartOccurenceId
+     * @throws CartException
+     */
+    public function removeCartOccurence(?int $cartOccurenceId): void
+    {
+        if($cartOccurenceId === null)
+        {
+            throw new CartException('Byl zadán neplatný produkt.');
+        }
+
+        $found = false;
+        foreach ($this->order->getCartOccurences() as $cartOccurence)
+        {
+            if($cartOccurence->getId() === $cartOccurenceId)
+            {
+                $found = true;
+                $this->order->removeCartOccurence($cartOccurence);
+                $this->entityManager->remove($cartOccurence);
+                break;
+            }
+        }
+
+        if(!$found)
+        {
+            throw new CartException('Tento produkt v košíku nemáte.');
+        }
+
+        $this->entityManager->flush();
+        $this->calculateTotals();
+    }
+
+    /**
      * Tato metoda se volá jako první před vyvoláním každé controllerové akce. Zajišťuje existenci aktivní objednávky.
      */
     private function initialize(): void
@@ -192,8 +253,9 @@ class CartService
             $this->createNewOrder();
         }
 
-        $this->synchronizer->setOrder($this->order);
-        $this->synchronizeAndAddWarningsToFlashBag();
+        $this->synchronizer
+            ->setOrder($this->order)
+            ->synchronize();
 
         $this->calculateTotals();
         $this->orderCookieObtain();
@@ -221,20 +283,6 @@ class CartService
                 ->withSecure(true)
                 ->withHttpOnly()
             ;
-        }
-    }
-
-    /**
-     * Synchronizuje stav historických dat objednávky se stavem dat v ostatních entitách (např. ceny produktů).
-     * Pokud při synchronizaci vznikla nějaká varování, přidají se do flashbagu.
-     */
-    private function synchronizeAndAddWarningsToFlashBag(): void
-    {
-        $this->synchronizer->synchronize();
-
-        foreach ($this->synchronizer->getWarnings() as $warning)
-        {
-            $this->request->getSession()->getFlashBag()->add('warning', $warning);
         }
     }
 

@@ -4,11 +4,13 @@ namespace App\Entity\Detached;
 
 use App\Entity\Product;
 use App\Validation\Compound as AssertCompound;
+use Symfony\Component\Validator\Constraints as Assert;
 
 class CartInsert
 {
     /**
      * @AssertCompound\ProductQuantityRequirements
+     * @Assert\GreaterThanOrEqual(1)
      */
     private $quantity;
 

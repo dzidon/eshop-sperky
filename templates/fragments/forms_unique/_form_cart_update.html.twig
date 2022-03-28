@@ -1,0 +1,84 @@
+{% if cartForm.children.cartOccurences.children is empty %}
+    Váš košík je prázdný. <a href="{{ path('products') }}">Zpět do obchodu</a>
+{% else %}
+    {{ form_start(cartForm) }}
+        <div class="collection" id="cart-wrapper" data-cart-remove-url="{{ path('cart_remove') }}">
+            <div class="collection-item">
+                <div class="row no-mar-bot">
+                    <div class="col s4">
+                        <span>Produkt</span>
+                    </div>
+                    <div class="col s2">
+                        <span>Dostupnost</span>
+                    </div>
+                    <div class="col s1">
+                        <span>Množství</span>
+                    </div>
+                    <div class="col s2 offset-s1">
+                        <span>Cena za kus {% if vat_payer %}vč. DPH{% endif %}</span>
+                    </div>
+                    <div class="col s2">
+                        <span>Celkem {% if vat_payer %}vč. DPH{% endif %}</span>
+                    </div>
+                </div>
+            </div>
+
+            {% for cartOccurence in cartForm.children.cartOccurences.children %}
+                {% set cartOccurenceData = cartOccurence.vars.data %}
+                <div class="collection-item">
+                    <div class="row no-mar-bot valign-wrapper flex-wrap">
+
+                        {# Obrázek, název a volby #}
+                        <div class="col s4 valign-wrapper">
+                            <a href="{{ path('product', {slug: cartOccurenceData.product.slug}) }}" class="margin-right15px">
+                                <div class="img-cart-product">
+                                    <img alt="Obrázek produktu" class="responsive-img" src="{% if cartOccurenceData.product.mainImageName %} {{ asset(cartOccurenceData.product.mainImageName, 'product_images') }}  {% else %} {{ asset('no-image.png', 'images') }} {% endif %}">
+                                </div>
+                            </a>
+                            <a href="{{ path('product', {slug: cartOccurenceData.product.slug}) }}">
+                                <h6 class="margin-0">{{ cartOccurenceData.name }}</h6>
+                                <span class="grey-text">{{ cartOccurenceData.optionsString }}</span>
+                            </a>
+                        </div>
+
+                        {# Počet ks skladem #}
+                        <div class="col s2">
+                            <h6 class="margin-0 green-text">Skladem {{ cartOccurenceData.product.inventory }} ks</h6>
+                        </div>
+
+                        {# Množství #}
+                        <div class="col s1">
+                            <div class="input-field no-mar-bot">
+                                {{ form_widget(cartOccurence.children.quantity) }}
+                                {{ form_label(cartOccurence.children.quantity) }}
+                                {{ form_errors(cartOccurence.children.quantity) }}
+                                {{ form_help(cartOccurence.children.quantity) }}
+                            </div>
+                        </div>
+
+                        {# Cena za kus #}
+                        <div class="col s1 offset-s1">
+                            <h6 class="margin-0">{{ cartOccurenceData.product.priceWithVat }} Kč</h6>
+                        </div>
+
+                        {# Cena za kus * počet kusů #}
+                        <div class="col s1 offset-s1">
+                            <h6 class="margin-0">
+                                <strong>{{ cartOccurenceData.product.priceWithVat * cartOccurenceData.quantity }} Kč</strong>
+                            </h6>
+                        </div>
+
+                        {# Tlačítko pro smazání #}
+                        <div class="col s1 right-align">
+                            <a href="javascript:void(0);" class="btn-floating btn-medium waves-effect waves-light grey lighten-2 button-cart-remove" data-cart-occurence-id="{{ cartOccurenceData.id }}">
+                                <i class="material-icons black-text">close</i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <input type="submit" hidden>
+    {{ form_end(cartForm) }}
+{% endif %}

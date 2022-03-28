@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\CartOccurenceRepository;
 use App\Validation\Compound as AssertCompound;
+use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -42,6 +43,7 @@ class CartOccurence
      * @ORM\Column(type="integer")
      *
      * @AssertCompound\ProductQuantityRequirements
+     * @Assert\GreaterThanOrEqual(0)
      */
     private $quantity;
 

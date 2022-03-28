@@ -15,8 +15,9 @@ class CartOccurenceFormType extends AbstractType
         $builder
             ->add('quantity', IntegerType::class, [
                 'attr' => [
-                    'min' => 1
+                    'min' => 0
                 ],
+                'error_bubbling' => true,
                 'invalid_message' => 'Do počtu kusů musíte zadat celé číslo.',
                 'label' => 'Ks',
             ])

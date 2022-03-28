@@ -1,7 +1,7 @@
 import 'materialize-css/dist/css/materialize.min.css';
 require('materialize-css/dist/js/materialize.min');
 import 'materialize-css/extras/noUiSlider/nouislider.css';
-import './styles/app.css';
+import '../styles/app.css';
 
 const autocompleteMaxElements = 5;
 $(document).ready(function() {
@@ -116,6 +116,7 @@ const addFormToCollection = (e) =>
 
 export function ajaxAddProductToCart(url, data)
 {
+    $('#modal-loader-text').text('Načítání...');
     M.Modal.getInstance($('#modal-loader')).open();
 
     $.post({
@@ -146,7 +147,8 @@ export function ajaxAddProductToCart(url, data)
         }
         else
         {
-            $('#modal-error-text').text('Nepodařilo se vložit produkt do košíku, zkuste to prosím znovu.')
+            $('#modal-error-text').text('Nepodařilo se vložit produkt do košíku, zkuste to prosím znovu.');
+            $('#modal-error-heading').text('Chyba');
         }
         M.Modal.getInstance($('#modal-error')).open();
     })

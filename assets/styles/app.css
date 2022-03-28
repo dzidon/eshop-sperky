@@ -36,6 +36,11 @@ main {
     opacity: 1;
 }
 
+.img-cart-product {
+    width: 50px;
+    height: 50px;
+}
+
 .cart-badge {
     padding-left: 7px;
     padding-right: 7px;

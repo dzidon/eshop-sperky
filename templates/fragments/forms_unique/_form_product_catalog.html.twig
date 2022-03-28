@@ -21,8 +21,8 @@
                                     <span class="bold">Sekce</span>
                                 </div>
                                 <a href="{{ path('products') }}" class="collection-item {% if app.request.get('slug') is same as(null) %}active{% endif %}">Všechny</a>
-                                {% set sections = navbar_service.getVisibleSections() %}
-                                {% for section in sections %}
+                                {% set filter_sections = navbar_service.getVisibleSections() %}
+                                {% for section in filter_sections %}
                                     <a href="{{ path('products', {slug: section.getSlug()}) }}" class="collection-item {% if app.request.get('slug') is same as(section.getSlug()) %}active{% endif %}">{{ section.getName() }}</a>
                                 {% endfor %}
 

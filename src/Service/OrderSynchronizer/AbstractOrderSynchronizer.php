@@ -20,10 +20,13 @@ abstract class AbstractOrderSynchronizer
      * Nastaví objednávku, jejíž stav se má synchronizovat.
      *
      * @param Order $order
+     * @return AbstractOrderSynchronizer
      */
-    public function setOrder(Order $order)
+    public function setOrder(Order $order): self
     {
         $this->order = $order;
+
+        return $this;
     }
 
     /**
@@ -34,6 +37,20 @@ abstract class AbstractOrderSynchronizer
     public function getWarnings(): array
     {
         return $this->warnings;
+    }
+
+    /**
+     * Vrátí a smaže várování, která vznikla při synchronizaci.
+     *
+     * @return array
+     */
+    public function getAndRemoveWarnings(): array
+    {
+        $warnings = $this->warnings;
+        $this->warnings = [];
+        $this->hasWarnings = false;
+
+        return $warnings;
     }
 
     /**

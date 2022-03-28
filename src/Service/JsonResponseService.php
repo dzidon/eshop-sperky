@@ -16,6 +16,7 @@ class JsonResponseService
     private int $responseStatus = Response::HTTP_OK;
     private array $responseData = [
         'errors' => [],
+        'warnings' => [],
         'html' => null,
     ];
 
@@ -44,6 +45,13 @@ class JsonResponseService
         return $this;
     }
 
+    public function addResponseWarning(string $text): self
+    {
+        $this->responseData['warnings'][] = $text;
+
+        return $this;
+    }
+
     public function setResponseHtml(?string $html): self
     {
         $this->responseData['html'] = $html;
@@ -53,9 +61,9 @@ class JsonResponseService
 
     public function setResponseData(string $key, $data): self
     {
-        if($key === 'errors' || $key === 'html')
+        if($key === 'errors' || $key === 'html' || $key === 'warnings')
         {
-            throw new LogicException('Do metody setResponseData v JsonResponseService nepatří klíče errors a html. Použijte metody addResponseError a setResponseHtml.');
+            throw new LogicException('Do metody setResponseData v JsonResponseService nepatří klíče errors, html a warnings. Použijte metody addResponseError, addResponseWarning a setResponseHtml.');
         }
 
         $this->responseData[$key] = $data;
