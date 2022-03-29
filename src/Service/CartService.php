@@ -175,7 +175,8 @@ class CartService
     }
 
     /**
-     * Aktualizuje počty produktů v košíku. Pokud je nějaký počet 0, produkt se odstraní.
+     * Aktualizuje počty produktů v košíku. Pokud je nějaký počet 0, produkt se odstraní. Pokud je počet
+     * větší než 0, CartOccurence se uloží.
      */
     public function updateQuantities(): void
     {

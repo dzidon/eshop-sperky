@@ -2,8 +2,8 @@
     Váš košík je prázdný. <a href="{{ path('products') }}">Zpět do obchodu</a>
 {% else %}
     {{ form_start(cartForm) }}
-        <div class="collection" id="cart-wrapper" data-cart-remove-url="{{ path('cart_remove') }}">
-            <div class="collection-item">
+        <div class="collection z-depth-1" id="cart-wrapper" data-cart-remove-url="{{ path('cart_remove') }}">
+            <div class="collection-item hide-on-med-and-down">
                 <div class="row no-mar-bot">
                     <div class="col s4">
                         <span>Produkt</span>
@@ -26,10 +26,10 @@
             {% for cartOccurence in cartForm.children.cartOccurences.children %}
                 {% set cartOccurenceData = cartOccurence.vars.data %}
                 <div class="collection-item">
-                    <div class="row no-mar-bot valign-wrapper flex-wrap">
+                    <div class="row no-mar-bot valign-wrapper flex-wrap section">
 
                         {# Obrázek, název a volby #}
-                        <div class="col s4 valign-wrapper">
+                        <div class="col s12 m10 l4 valign-wrapper">
                             <a href="{{ path('product', {slug: cartOccurenceData.product.slug}) }}" class="margin-right15px">
                                 <div class="img-cart-product">
                                     <img alt="Obrázek produktu" class="responsive-img" src="{% if cartOccurenceData.product.mainImageName %} {{ asset(cartOccurenceData.product.mainImageName, 'product_images') }}  {% else %} {{ asset('no-image.png', 'images') }} {% endif %}">
@@ -37,17 +37,24 @@
                             </a>
                             <a href="{{ path('product', {slug: cartOccurenceData.product.slug}) }}">
                                 <h6 class="margin-0">{{ cartOccurenceData.name }}</h6>
-                                <span class="grey-text">{{ cartOccurenceData.optionsString }}</span>
+                                <div class="grey-text">{{ cartOccurenceData.optionsString }}</div>
+                            </a>
+                        </div>
+
+                        {# Tlačítko pro smazání - velká obrazovka #}
+                        <div class="col m2 right-align hide-on-small-and-down hide-on-large-only hide-on-extra-large-only">
+                            <a href="javascript:void(0);" class="btn-floating btn-medium waves-effect waves-light grey lighten-2 button-cart-remove" data-cart-occurence-id="{{ cartOccurenceData.id }}">
+                                <i class="material-icons black-text">close</i>
                             </a>
                         </div>
 
                         {# Počet ks skladem #}
-                        <div class="col s2">
-                            <h6 class="margin-0 green-text">Skladem {{ cartOccurenceData.product.inventory }} ks</h6>
+                        <div class="col s8 m3 l2 margin-0">
+                            <span class="green-text">Skladem {{ cartOccurenceData.product.inventory }} ks</span>
                         </div>
 
                         {# Množství #}
-                        <div class="col s1">
+                        <div class="col s4 m3 l1 margin-0">
                             <div class="input-field no-mar-bot">
                                 {{ form_widget(cartOccurence.children.quantity) }}
                                 {{ form_label(cartOccurence.children.quantity) }}
@@ -57,22 +64,30 @@
                         </div>
 
                         {# Cena za kus #}
-                        <div class="col s1 offset-s1">
-                            <h6 class="margin-0">{{ cartOccurenceData.product.priceWithVat }} Kč</h6>
+                        <div class="col s12 m3 l1 offset-l1">
+                            <span>{{ cartOccurenceData.product.priceWithVat }} Kč</span>
+                            <span class="hide-on-large-only hide-on-extra-large-only">{% if vat_payer %}vč. DPH{% endif %} za kus</span>
                         </div>
 
                         {# Cena za kus * počet kusů #}
-                        <div class="col s1 offset-s1">
-                            <h6 class="margin-0">
-                                <strong>{{ cartOccurenceData.product.priceWithVat * cartOccurenceData.quantity }} Kč</strong>
-                            </h6>
+                        <div class="col s12 m3 l1 offset-l1">
+                            <strong>{{ cartOccurenceData.product.priceWithVat * cartOccurenceData.quantity }} Kč <span class="hide-on-large-only hide-on-extra-large-only">{% if vat_payer %}vč. DPH{% endif %} celkem</span></strong>
                         </div>
 
-                        {# Tlačítko pro smazání #}
-                        <div class="col s1 right-align">
+                        {# Tlačítko pro smazání - velká obrazovka #}
+                        <div class="col l1 right-align hide-on-med-and-down">
                             <a href="javascript:void(0);" class="btn-floating btn-medium waves-effect waves-light grey lighten-2 button-cart-remove" data-cart-occurence-id="{{ cartOccurenceData.id }}">
                                 <i class="material-icons black-text">close</i>
                             </a>
+                        </div>
+
+                        {# Tlačítko pro smazání - malá obrazovka #}
+                        <div class="col s12 hide-on-med-and-up">
+                            <div class="section no-pad-bot">
+                                <a href="javascript:void(0);" class="btn waves-effect waves-light grey lighten-2 button-cart-remove black-text" data-cart-occurence-id="{{ cartOccurenceData.id }}">
+                                    Vyndat
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -81,4 +96,23 @@
 
         <input type="submit" hidden>
     {{ form_end(cartForm) }}
+
+    <div class="row right-align">
+        <h5>
+            <strong>{{ cart_service.totalPriceWithVat }} Kč {% if vat_payer %}vč. DPH{% endif %} celkem</strong>
+            {% if vat_payer %}
+                <span>{{ cart_service.totalPriceWithoutVat }} Kč celkem bez DPH</span>
+            {% endif %}
+        </h5>
+    </div>
+
+    <div class="row section right valign-wrapper flex-wrap">
+        <div class="col margin-right15px">
+            <a href="{{ path('products') }}">Zpět do obchodu</a>
+        </div>
+
+        <div>
+            <a href="" class="btn-large waves-effect waves-light light-blue">Pokračovat</a>
+        </div>
+    </div>
 {% endif %}

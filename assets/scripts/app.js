@@ -51,22 +51,7 @@ $(document).ready(function() {
     }
 
     // vkládání produktů do košíku přes odkaz v náhledu
-    const productImageLarge = $('.cart-insert-link');
-    productImageLarge.click(function()
-    {
-        const wrapper = $(this).closest('.insertable-products-wrapper');
-        const csrfToken = wrapper.data('cart-insert-csrf-token');
-        const url = wrapper.data('cart-insert-url');
-        const data = {
-            'cart_insert_form': {
-                'productId': $(this).data('product-id'),
-                'quantity': 1,
-                '_token': csrfToken,
-            }
-        };
-
-        ajaxAddProductToCart(url, data);
-    });
+    initializeAddToCartLinks();
 });
 
 /*
@@ -155,5 +140,25 @@ export function ajaxAddProductToCart(url, data)
     .always(function ()
     {
         M.Modal.getInstance($('#modal-loader')).close();
+    });
+}
+
+export function initializeAddToCartLinks()
+{
+    const productImageLarge = $('.cart-insert-link');
+    productImageLarge.click(function()
+    {
+        const wrapper = $(this).closest('.insertable-products-wrapper');
+        const csrfToken = wrapper.data('cart-insert-csrf-token');
+        const url = wrapper.data('cart-insert-url');
+        const data = {
+            'cart_insert_form': {
+                'productId': $(this).data('product-id'),
+                'quantity': 1,
+                '_token': csrfToken,
+            }
+        };
+
+        ajaxAddProductToCart(url, data);
     });
 }

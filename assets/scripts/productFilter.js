@@ -1,4 +1,5 @@
 import * as noUiSlider from 'materialize-css/extras/noUiSlider/nouislider';
+import { initializeAddToCartLinks } from './app';
 
 let searchPhraseInput;
 let priceMinInput;
@@ -208,6 +209,7 @@ function catalogReset(url, addToHistory)
         {
             $('#product-catalog-container').html(data);
             initialize();
+            initializeAddToCartLinks();
             filterOpen(0);
 
             $('select').formSelect();
