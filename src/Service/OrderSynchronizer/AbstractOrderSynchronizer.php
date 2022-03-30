@@ -4,6 +4,7 @@ namespace App\Service\OrderSynchronizer;
 
 use App\Entity\Order;
 use LogicException;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Abstraktní třída pro synchronizátory, které zajišťují aktuálnost stavu objednávky.
@@ -12,9 +13,16 @@ use LogicException;
  */
 abstract class AbstractOrderSynchronizer
 {
+    protected Order $order;
     protected bool $hasWarnings = false;
     private array $warnings = [];
-    protected Order $order;
+
+    private $request;
+
+    public function __construct(RequestStack $requestStack)
+    {
+        $this->request = $requestStack->getCurrentRequest();
+    }
 
     /**
      * Nastaví objednávku, jejíž stav se má synchronizovat.
@@ -30,40 +38,6 @@ abstract class AbstractOrderSynchronizer
     }
 
     /**
-     * Vrátí várování, která vznikla při synchronizaci.
-     *
-     * @return array
-     */
-    public function getWarnings(): array
-    {
-        return $this->warnings;
-    }
-
-    /**
-     * Vrátí a smaže várování, která vznikla při synchronizaci.
-     *
-     * @return array
-     */
-    public function getAndRemoveWarnings(): array
-    {
-        $warnings = $this->warnings;
-        $this->warnings = [];
-        $this->hasWarnings = false;
-
-        return $warnings;
-    }
-
-    /**
-     * Vrátí true, pokud při synchronizaci vznikla nějaká varování.
-     *
-     * @return bool
-     */
-    public function hasWarnings(): bool
-    {
-        return $this->hasWarnings;
-    }
-
-    /**
      * Synchronizuje stav objednávky.
      */
     public function synchronize(): void
@@ -71,6 +45,20 @@ abstract class AbstractOrderSynchronizer
         if($this->order === null)
         {
             throw new LogicException( sprintf('%s nedostal objednávku přes setOrder.', static::class) );
+        }
+    }
+
+    /**
+     * Přidá varování do flash bagu
+     */
+    public function addWarningsToFlashBag(): void
+    {
+        if($this->hasWarnings)
+        {
+            foreach ($this->warnings as $warning)
+            {
+                $this->request->getSession()->getFlashBag()->add('warning', $warning);
+            }
         }
     }
 

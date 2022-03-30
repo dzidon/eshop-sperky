@@ -81,16 +81,6 @@ class CartService
         return $this->totalPriceWithoutVat;
     }
 
-    public function hasSynchronizationWarnings(): bool
-    {
-        return $this->synchronizer->hasWarnings();
-    }
-
-    public function getAndRemoveSynchronizationWarnings(): array
-    {
-        return $this->synchronizer->getAndRemoveWarnings();
-    }
-
     /**
      * Vrátí token aktivní objednávky jako string
      *
@@ -257,6 +247,8 @@ class CartService
         $this->synchronizer
             ->setOrder($this->order)
             ->synchronize();
+
+        $this->synchronizer->addWarningsToFlashBag();
 
         $this->calculateTotals();
         $this->orderCookieObtain();

@@ -1,0 +1,101 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+
+    {# Breadcrumbs #}
+    {{ include('fragments/_breadcrumbs.html.twig') }}
+
+    <div class="container">
+        {# h1 #}
+        {{ include('fragments/_h1.html.twig') }}
+
+        {# Flash zprávy #}
+        {{ include('fragments/_flash_messages.html.twig') }}
+
+        <div class="row">
+            <div class="section no-pad-top">
+                <ul class="tabs z-depth-1">
+                    <li class="tab col s4 selected"><a target="_self" href="">1. Košík</a></li>
+                    <li class="tab col s4">2. Doprava a platba</li>
+                    <li class="tab col s4">3. Dodací údaje</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="collection z-depth-1">
+                <div class="collection-item hide-on-med-and-down">
+                    <div class="row no-mar-bot">
+                        <div class="col s4">
+                            <span>Produkt</span>
+                        </div>
+                        <div class="col s4">
+                            <span>Množství</span>
+                        </div>
+                        <div class="col s2">
+                            <span>Cena za kus {% if vat_payer %}vč. DPH{% endif %}</span>
+                        </div>
+                        <div class="col s2">
+                            <span>Celkem {% if vat_payer %}vč. DPH{% endif %}</span>
+                        </div>
+                    </div>
+                </div>
+
+                {% for cartOccurence in order.cartOccurences %}
+                    <div class="collection-item">
+                        <div class="row no-mar-bot valign-wrapper flex-wrap section">
+
+                            {# Název a volby #}
+                            <div class="col s12 m6 l4">
+                                <div>
+                                    <strong class="margin-0">{{ cartOccurence.name }}</strong>
+                                </div>
+                                <span class="grey-text">{{ cartOccurence.optionsString }}</span>
+                            </div>
+
+                            {# Množství #}
+                            <div class="col s12 m6 l4 margin-0">
+                                <span>{{ cartOccurence.quantity }} ks</span>
+                            </div>
+
+                            {# Cena za kus #}
+                            <div class="col s6 l2">
+                                <span>{{ cartOccurence.priceWithVat }} Kč {% if vat_payer %}vč. DPH{% endif %}</span>
+                                <span class="hide-on-large-only hide-on-extra-large-only">za kus</span>
+                            </div>
+
+                            {# Cena za kus * počet kusů #}
+                            <div class="col s6 l2">
+                                <strong>
+                                    {{ cartOccurence.priceWithVat * cartOccurence.quantity }} Kč {% if vat_payer %}vč. DPH{% endif %}
+                                    <span class="hide-on-large-only hide-on-extra-large-only">celkem</span>
+                                </strong>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="row right-align">
+            {% if vat_payer %}
+                <h5>{{ custom_order_service.totalPriceWithoutVat }} Kč celkem bez DPH</h5>
+            {% endif %}
+
+            <h5>
+                <strong>{{ custom_order_service.totalPriceWithVat }} Kč {% if vat_payer %}vč. DPH {% endif %}celkem</strong>
+            </h5>
+        </div>
+
+        <div class="row section right valign-wrapper flex-wrap">
+            <div class="col margin-right15px">
+                <a href="{{ path('products') }}">Zpět do obchodu</a>
+            </div>
+
+            <div>
+                <a href="" class="btn-large waves-effect waves-light light-blue">Pokračovat</a>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

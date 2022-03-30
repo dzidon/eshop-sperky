@@ -4,7 +4,6 @@ namespace App\EventSubscriber;
 
 use App\Service\CartService;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
@@ -23,18 +22,6 @@ class CartSubscriber implements EventSubscriberInterface
         $this->cart = $cart;
     }
 
-    public function onKernelController(ControllerEvent $event)
-    {
-        // varování vzniklá při synchronizaci
-        if($this->cart->hasSynchronizationWarnings())
-        {
-            foreach ($this->cart->getAndRemoveSynchronizationWarnings() as $warning)
-            {
-                $event->getRequest()->getSession()->getFlashBag()->add('warning', $warning);
-            }
-        }
-    }
-
     public function onKernelResponse(ResponseEvent $event)
     {
         // cookie
@@ -48,7 +35,6 @@ class CartSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            KernelEvents::CONTROLLER => 'onKernelController',
             KernelEvents::RESPONSE => 'onKernelResponse',
         ];
     }
