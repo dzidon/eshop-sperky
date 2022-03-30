@@ -1,0 +1,31 @@
+<div class="row">
+    <div class="section">
+        {% set orderNavigationData = navbar_service.getOrderNavigationData(orderPageNumber, orderToken) %}
+
+        <ul class="tabs z-depth-1 hide-on-med-and-down">
+            {% for pageNumber, pageData in orderNavigationData %}
+                <li class="tab col s4 selected {% if pageData.isActive %}active{% endif %}">
+                    {% if pageData.isClickable %}
+                        <a target="_self" href="{{ pageData.path }}">
+                            {{ pageNumber }}. {{ pageData.title }}
+                        </a>
+                    {% else %}
+                        <span>{{ pageNumber }}. {{ pageData.title }}</span>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+
+        <div class="collection z-depth-1 hide-on-large-only hide-on-extra-large-only">
+            {% for pageNumber, pageData in orderNavigationData %}
+                {% if pageData.isClickable %}
+                    <a href="{{ pageData.path }}" class="collection-item {% if pageData.isActive %} active {% endif %}">
+                        {{ pageNumber }}. {{ pageData.title }}
+                    </a>
+                {% else %}
+                    <div class="collection-item">{{ pageNumber }}. {{ pageData.title }}</div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+</div>

@@ -14,15 +14,8 @@
             {{ include('fragments/_flash_messages.html.twig') }}
         </div>
 
-        <div class="row">
-            <div class="section no-pad-top">
-                <ul class="tabs z-depth-1">
-                    <li class="tab col s4 selected"><a target="_self" href="">1. Košík</a></li>
-                    <li class="tab col s4">2. Doprava a platba</li>
-                    <li class="tab col s4">3. Dodací údaje</li>
-                </ul>
-            </div>
-        </div>
+        {# Flash zprávy #}
+        {{ include('fragments/_order_nav.html.twig', {'orderPageNumber': 1, 'orderToken': null}) }}
 
         <div id="cart-container">
             {# Formulář košíku, nebo text o tom, že je prázdný #}
