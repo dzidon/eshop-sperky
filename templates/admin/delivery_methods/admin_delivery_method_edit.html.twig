@@ -1,0 +1,30 @@
+{% extends 'admin/admin_base.html.twig' %}
+
+{% block admin_body %}
+
+    {# Časy vytvoření a aktualizace #}
+    {{ include('fragments/_instance_created_updated.html.twig', {instance: deliveryMethodInstance}) }}
+
+    {{ form_start(deliveryMethodForm) }}
+        {{ form_row(deliveryMethodForm.name) }}
+        {{ form_row(deliveryMethodForm.imageFile) }}
+        {{ form_row(deliveryMethodForm.priceWithoutVat) }}
+        {{ form_row(deliveryMethodForm.vat) }}
+
+        <div class="row">
+            <div>
+                DPH: <strong class="js-output-amount-vat">0</strong> Kč
+            </div>
+
+            <div>
+                Cena s DPH: <strong class="js-output-price-with-vat">0</strong> Kč
+            </div>
+        </div>
+    {{ form_end(deliveryMethodForm) }}
+
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {{ encore_entry_script_tags('productVatCalculator') }}
+{% endblock %}

@@ -18,8 +18,10 @@ class SortingService
      * Vytvoří data potřebná pro řazení
      *
      * Příklad vráceného pole:
-     *      'attribute' => 'email'
-     *      'order'     => 'ASC'
+     *      ['attribute' => 'email',
+     *       'order'     => 'ASC'],
+     *      ['attribute' => 'price',
+     *       'order'     => 'DESC'],
      *
      * @param $attribute
      * @param $allSortAttributes

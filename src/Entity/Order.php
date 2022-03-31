@@ -57,6 +57,18 @@ class Order
      */
     private bool $finished = false;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=DeliveryMethod::class, inversedBy="orders")
+     * @ORM\JoinColumn(onDelete="SET NULL")
+     */
+    private $deliveryMethod;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=PaymentMethod::class, inversedBy="orders")
+     * @ORM\JoinColumn(onDelete="SET NULL")
+     */
+    private $paymentMethod;
+
     public function __construct()
     {
         $this->token = Uuid::v4();
@@ -158,5 +170,30 @@ class Order
         // platební metoda, doručovací metoda a alespoň jeden cart occurence s quantity > 0
 
         return true;
+    }
+
+    public function getDeliveryMethod(): ?DeliveryMethod
+    {
+        return $this->deliveryMethod;
+    }
+
+    public function setDeliveryMethod(?DeliveryMethod $deliveryMethod): self
+    {
+        $this->deliveryMethod = $deliveryMethod;
+
+        return $this;
+    }
+
+
+    public function getPaymentMethod(): ?PaymentMethod
+    {
+        return $this->paymentMethod;
+    }
+
+    public function setPaymentMethod(?PaymentMethod $paymentMethod): self
+    {
+        $this->paymentMethod = $paymentMethod;
+
+        return $this;
     }
 }

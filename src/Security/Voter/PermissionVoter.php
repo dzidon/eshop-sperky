@@ -15,12 +15,14 @@ class PermissionVoter implements VoterInterface
     const CATEGORY_PRODUCT_CATEGORIES = 'Produktové kategore';
     const CATEGORY_PRODUCT_OPTIONS = 'Produktové volby';
     const CATEGORY_PRODUCT_INFO = 'Skupiny produktových informací';
+    const CATEGORY_DELIVERY_PAYMENT_METHODS = 'Doručovací a platební metody';
 
     /*
      * (!!!) Po úpravě téhle konstanty je nutné vyvolat příkaz 'php bin/console app:refresh-permissions', aby se aktualizoval obsah tabulky 'permission'
      */
     public const PERMISSIONS = [
-        //recenze
+
+        // recenze
         'review_edit' => [
             'name' => 'Editace recenzí',
             'category' => self::CATEGORY_REVIEWS,
@@ -30,7 +32,7 @@ class PermissionVoter implements VoterInterface
             'category' => self::CATEGORY_REVIEWS,
         ],
 
-        //sprava uzivatelu
+        // sprava uzivatelu
         'user_edit_credentials' => [
             'name' => 'Editace osobních údajů uživatelů',
             'category' => self::CATEGORY_USERS,
@@ -44,7 +46,7 @@ class PermissionVoter implements VoterInterface
             'category' => self::CATEGORY_USERS,
         ],
 
-        //sprava produktovych sekci
+        // sprava produktovych sekci
         'product_section_edit' => [
             'name' => 'Tvorba a editace produktových sekcí',
             'category' => self::CATEGORY_PRODUCT_SECTIONS,
@@ -54,7 +56,7 @@ class PermissionVoter implements VoterInterface
             'category' => self::CATEGORY_PRODUCT_SECTIONS,
         ],
 
-        //sprava produktovych kategorii
+        // sprava produktovych kategorii
         'product_category_edit' => [
             'name' => 'Tvorba a editace produktových kategorií',
             'category' => self::CATEGORY_PRODUCT_CATEGORIES,
@@ -64,7 +66,7 @@ class PermissionVoter implements VoterInterface
             'category' => self::CATEGORY_PRODUCT_CATEGORIES,
         ],
 
-        //sprava produktovych voleb
+        // sprava produktovych voleb
         'product_option_edit' => [
             'name' => 'Tvorba a editace produktových voleb',
             'category' => self::CATEGORY_PRODUCT_OPTIONS,
@@ -74,7 +76,7 @@ class PermissionVoter implements VoterInterface
             'category' => self::CATEGORY_PRODUCT_OPTIONS,
         ],
 
-        //sprava skupin produktovych informaci
+        // sprava skupin produktovych informaci
         'product_info_edit' => [
             'name' => 'Tvorba a editace skupin produktových informací',
             'category' => self::CATEGORY_PRODUCT_INFO,
@@ -84,7 +86,7 @@ class PermissionVoter implements VoterInterface
             'category' => self::CATEGORY_PRODUCT_INFO,
         ],
 
-        //sprava produktu
+        // sprava produktu
         'product_edit' => [
             'name' => 'Tvorba a editace produktů',
             'category' => self::CATEGORY_PRODUCTS,
@@ -92,6 +94,16 @@ class PermissionVoter implements VoterInterface
         'product_delete' => [
             'name' => 'Mazání produktů',
             'category' => self::CATEGORY_PRODUCTS,
+        ],
+
+        // doručovací a platební metody
+        'delivery_method_edit' => [
+            'name' => 'Editace doručovacích metod',
+            'category' => self::CATEGORY_DELIVERY_PAYMENT_METHODS,
+        ],
+        'payment_method_edit' => [
+            'name' => 'Editace platebních metod',
+            'category' => self::CATEGORY_DELIVERY_PAYMENT_METHODS,
         ],
     ];
 

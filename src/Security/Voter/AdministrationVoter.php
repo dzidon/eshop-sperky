@@ -15,6 +15,8 @@ class AdministrationVoter implements VoterInterface
     const SECTION_PRODUCT_CATEGORY_MANAGEMENT = 'admin_product_categories';
     const SECTION_PRODUCT_OPTION_MANAGEMENT = 'admin_product_options';
     const SECTION_PRODUCT_INFO_MANAGEMENT = 'admin_product_info';
+    const SECTION_DELIVERY_METHOD_MANAGEMENT = 'admin_delivery_methods';
+    const SECTION_PAYMENT_METHOD_MANAGEMENT = 'admin_payment_methods';
 
     const REQUIRED_PERMISSIONS = [
         self::SECTION_PERMISSION_OVERVIEW => '_any',
@@ -35,6 +37,12 @@ class AdministrationVoter implements VoterInterface
         ],
         self::SECTION_PRODUCT_INFO_MANAGEMENT => [
             'product_info_edit', 'product_info_delete'
+        ],
+        self::SECTION_DELIVERY_METHOD_MANAGEMENT => [
+            'delivery_method_edit',
+        ],
+        self::SECTION_PAYMENT_METHOD_MANAGEMENT => [
+            'payment_method_edit',
         ],
     ];
 

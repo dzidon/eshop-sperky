@@ -271,8 +271,8 @@
 {# Řádek nahrávání obrázku (vich bundle) #}
 {% block vich_image_row %}
     <div class="row">
+        {{ form_label(form) }}
         <div class="input-field no-mar-top">
-            {{ form_label(form) }}
             {{ form_widget(form) }}
             {{ form_help(form) }}
             {{ form_errors(form) }}
@@ -296,7 +296,9 @@
         {{ form_widget(form.file, {attr: attr}) }}
 
         {% if form.delete is defined %}
-            {{ form_row(form.delete) }}
+            <div class="col s12">
+                {{ form_row(form.delete, {label: 'Smazat obrázek'}) }}
+            </div>
         {% endif %}
 
         {% if download_uri %}

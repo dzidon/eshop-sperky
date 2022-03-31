@@ -1,0 +1,43 @@
+{% extends 'admin/admin_base.html.twig' %}
+
+{% set can_edit = is_granted('payment_method_edit') %}
+
+{% block admin_body %}
+
+    <div class="row">
+        {# Formulář - vyhledávací pole, řazení #}
+        {{ include('fragments/forms_unique/_form_search_order.html.twig', {form: searchForm}) }}
+    </div>
+
+    <div class="row">
+        <h4>Výsledky ({{ pagination.getTotalItems() }})</h4>
+
+        {% if paymentMethods is empty %}
+            Hledání neodpovídají žádné platební metody.
+        {% else %}
+            <div class="collection">
+                {% for paymentMethod in paymentMethods %}
+                    <div class="collection-item valign-wrapper">
+                        <div class="col s9 no-padding">
+                            <strong>
+                                {{ paymentMethod.name }}
+                            </strong>
+                        </div>
+
+                        <div class="col s3 no-padding right-align">
+                            {% if can_edit %}
+                                <a href="{{ path('admin_payment_method_edit', {id: paymentMethod.id}) }}">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
+    {# Pagination #}
+    {{ include('fragments/_pagination.html.twig') }}
+
+{% endblock %}

@@ -18,7 +18,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 class RefreshPermissionsCommand extends Command
 {
     protected static $defaultName = 'app:refresh-permissions';
-    protected static $defaultDescription = 'Updates the "permission" table in the database so that is matches PermissionVoter::PERMISSIONS.';
+    protected static $defaultDescription = 'Updates the "permission" table in the database so that it matches PermissionVoter::PERMISSIONS.';
 
     private EntityManagerInterface $entityManager;
 

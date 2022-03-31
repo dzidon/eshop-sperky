@@ -9,9 +9,9 @@ use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use App\Validation as AssertCustom;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use App\Validation\Compound as AssertCompound;
 
 /**
  * @ORM\Entity(repositoryClass=ProductRepository::class)
@@ -76,10 +76,7 @@ class Product
     /**
      * @ORM\Column(type="float")
      *
-     * @Assert\Type("numeric", message="Musíte zadat číselnou hodnotu.")
-     * @Assert\Choice(choices=Product::VAT_VALUES, message="Zvolte platnou hodnotu DPH.")
-     * @AssertCustom\Vat
-     * @Assert\NotBlank
+     * @AssertCompound\VatRequirements
      */
     private $vat;
 
@@ -257,11 +254,6 @@ class Product
     public function getVat(): ?float
     {
         return $this->vat;
-    }
-
-    public function getVatReadable(): string
-    {
-        return ($this->vat * 100) . ' %';
     }
 
     public function setVat(float $vat): self

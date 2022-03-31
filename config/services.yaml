@@ -65,6 +65,10 @@ parameters:
         new: 'Nový produkt'
         edit: 'Upravit produkt'
     app_page_title.admin_product_delete: 'Smazat produkt'
+    app_page_title.admin_delivery_methods: 'Doručovací metody'
+    app_page_title.admin_delivery_method_edit: 'Upravit doručovací metodu'
+    app_page_title.admin_payment_methods: 'Platební metody'
+    app_page_title.admin_payment_method_edit: 'Upravit platební metodu'
 
 services:
     # default configuration for services in *this* file

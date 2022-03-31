@@ -130,6 +130,18 @@ class NavbarService
                 'isActive'  => $this->currentRoute === 'admin_product_info' || $this->currentRoute === 'admin_product_info_edit' || $this->currentRoute === 'admin_product_info_delete',
                 'title'     => $this->parameterBag->get('app_page_title.admin_product_info')
             ],
+            [
+                'granted'   => $this->security->isGranted('admin_delivery_methods'),
+                'path'      => $this->router->generate('admin_delivery_methods'),
+                'isActive'  => $this->currentRoute === 'admin_delivery_methods' || $this->currentRoute === 'admin_delivery_method_edit',
+                'title'     => $this->parameterBag->get('app_page_title.admin_delivery_methods')
+            ],
+            [
+                'granted'   => $this->security->isGranted('admin_payment_methods'),
+                'path'      => $this->router->generate('admin_payment_methods'),
+                'isActive'  => $this->currentRoute === 'admin_payment_methods' || $this->currentRoute === 'admin_payment_method_edit',
+                'title'     => $this->parameterBag->get('app_page_title.admin_payment_methods')
+            ],
         ];
     }
 
