@@ -23,10 +23,12 @@ class OrderRepository extends ServiceEntityRepository
     public function findOneAndFetchCartOccurences(Uuid $token)
     {
         $results = $this->createQueryBuilder('o')
-            ->select('o, oc, ocp, oco')
+            ->select('o, oc, ocp, ocpp, oco, ocop')
             ->leftJoin('o.cartOccurences', 'oc')
             ->leftJoin('oc.product', 'ocp')
+            ->leftJoin('ocp.optionGroups', 'ocpp')
             ->leftJoin('oc.options', 'oco')
+            ->leftJoin('oco.productOptionGroup', 'ocop')
             ->andWhere('o.token = :token')
             ->setParameter('token', $token, 'uuid')
             ->getQuery()

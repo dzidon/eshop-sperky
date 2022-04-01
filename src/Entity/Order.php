@@ -60,14 +60,42 @@ class Order
     /**
      * @ORM\ManyToOne(targetEntity=DeliveryMethod::class, inversedBy="orders")
      * @ORM\JoinColumn(onDelete="SET NULL")
+     *
+     * @Assert\NotBlank
      */
     private $deliveryMethod;
 
     /**
      * @ORM\ManyToOne(targetEntity=PaymentMethod::class, inversedBy="orders")
      * @ORM\JoinColumn(onDelete="SET NULL")
+     *
+     * @Assert\NotBlank
      */
     private $paymentMethod;
+
+    /**
+     * @ORM\Column(type="float")
+     */
+    private $deliveryPriceWithoutVat;
+
+    /**
+     * @ORM\Column(type="float")
+     */
+    private $deliveryPriceWithVat;
+
+    /**
+     * @ORM\Column(type="float")
+     */
+    private $paymentPriceWithoutVat;
+
+    /**
+     * @ORM\Column(type="float")
+     */
+    private $paymentPriceWithVat;
+
+    private int $totalQuantity = 0;
+    private float $totalPriceWithoutVat = 0.0;
+    private float $totalPriceWithVat = 0.0;
 
     public function __construct()
     {
@@ -193,6 +221,127 @@ class Order
     public function setPaymentMethod(?PaymentMethod $paymentMethod): self
     {
         $this->paymentMethod = $paymentMethod;
+
+        return $this;
+    }
+
+    public function getTotalQuantity(): int
+    {
+        return $this->totalQuantity;
+    }
+
+    public function getTotalPriceWithVat(bool $withMethods = false): float
+    {
+        $totalPriceWithVat = $this->totalPriceWithVat;
+        if ($withMethods)
+        {
+            $totalPriceWithVat += $this->deliveryPriceWithVat;
+            $totalPriceWithVat += $this->paymentPriceWithVat;
+        }
+
+        return $totalPriceWithVat;
+    }
+
+    public function getTotalPriceWithoutVat(bool $withMethods = false): float
+    {
+        $totalPriceWithoutVat = $this->totalPriceWithoutVat;
+        if ($withMethods)
+        {
+            $totalPriceWithoutVat += $this->deliveryPriceWithoutVat;
+            $totalPriceWithoutVat += $this->paymentPriceWithoutVat;
+        }
+
+        return $totalPriceWithoutVat;
+    }
+
+    public function calculateTotals(): void
+    {
+        $this->totalQuantity = 0;
+        $this->totalPriceWithVat = 0.0;
+        $this->totalPriceWithoutVat = 0.0;
+
+        foreach ($this->cartOccurences as $cartOccurence)
+        {
+            $this->totalQuantity += $cartOccurence->getQuantity();
+            $this->totalPriceWithVat += $cartOccurence->getQuantity() * $cartOccurence->getPriceWithVat();
+            $this->totalPriceWithoutVat += $cartOccurence->getQuantity() * $cartOccurence->getPriceWithoutVat();
+        }
+    }
+
+    public function getDeliveryPriceWithoutVat(): ?float
+    {
+        return $this->deliveryPriceWithoutVat;
+    }
+
+    public function setDeliveryPriceWithoutVat(float $deliveryPriceWithoutVat): self
+    {
+        $this->deliveryPriceWithoutVat = $deliveryPriceWithoutVat;
+
+        return $this;
+    }
+
+    public function getDeliveryPriceWithVat(): ?float
+    {
+        return $this->deliveryPriceWithVat;
+    }
+
+    public function setDeliveryPriceWithVat(float $deliveryPriceWithVat): self
+    {
+        $this->deliveryPriceWithVat = $deliveryPriceWithVat;
+
+        return $this;
+    }
+
+    public function getPaymentPriceWithoutVat(): ?float
+    {
+        return $this->paymentPriceWithoutVat;
+    }
+
+    public function setPaymentPriceWithoutVat(float $paymentPriceWithoutVat): self
+    {
+        $this->paymentPriceWithoutVat = $paymentPriceWithoutVat;
+
+        return $this;
+    }
+
+    public function getPaymentPriceWithVat(): ?float
+    {
+        return $this->paymentPriceWithVat;
+    }
+
+    public function setPaymentPriceWithVat(float $paymentPriceWithVat): self
+    {
+        $this->paymentPriceWithVat = $paymentPriceWithVat;
+
+        return $this;
+    }
+
+    /**
+     * @ORM\PreFlush
+     */
+    public function setPricesOfMethods(): self
+    {
+        if ($this->deliveryMethod === null)
+        {
+            $this->deliveryPriceWithoutVat = 0.0;
+            $this->deliveryPriceWithVat = 0.0;
+        }
+        else
+        {
+            $this->deliveryPriceWithoutVat = $this->deliveryMethod->getPriceWithoutVat();
+            $this->deliveryPriceWithVat = $this->deliveryMethod->getPriceWithVat();
+        }
+
+        if ($this->paymentMethod === null)
+        {
+            $this->paymentPriceWithoutVat = 0.0;
+            $this->paymentPriceWithVat = 0.0;
+        }
+        else
+        {
+            $this->paymentPriceWithoutVat = $this->paymentMethod->getPriceWithoutVat();
+            $this->paymentPriceWithVat = $this->paymentMethod->getPriceWithVat();
+        }
 
         return $this;
     }

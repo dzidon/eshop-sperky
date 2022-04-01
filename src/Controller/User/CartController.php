@@ -88,7 +88,7 @@ class CartController extends AbstractController
                             'submittedQuantity' => $cartInsertRequest->getQuantity(),
                         ])
                     )
-                    ->setResponseData('totalProducts', $this->cart->getTotalProducts());
+                    ->setResponseData('totalProducts', $this->cart->getOrder()->getTotalQuantity());
                 }
                 catch(CartException $exception)
                 {
@@ -144,7 +144,7 @@ class CartController extends AbstractController
 
         return $this->jsonResponse
             ->setResponseData('flashHtml', $this->renderView('fragments/_flash_messages.html.twig'))
-            ->setResponseData('totalProducts', $this->cart->getTotalProducts())
+            ->setResponseData('totalProducts', $this->cart->getOrder()->getTotalQuantity())
             ->createJsonResponse()
         ;
     }
@@ -175,7 +175,7 @@ class CartController extends AbstractController
         return $this->jsonResponse
             ->setResponseHtml($this->renderView('fragments/forms_unique/_form_cart_update.html.twig', ['cartForm' => $form->createView()]))
             ->setResponseData('flashHtml', $this->renderView('fragments/_flash_messages.html.twig'))
-            ->setResponseData('totalProducts', $this->cart->getTotalProducts())
+            ->setResponseData('totalProducts', $this->cart->getOrder()->getTotalQuantity())
             ->createJsonResponse()
         ;
     }

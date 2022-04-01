@@ -1,0 +1,36 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+
+    {# Breadcrumbs #}
+    {{ include('fragments/_breadcrumbs.html.twig') }}
+
+    <div class="container">
+        {# h1 #}
+        {{ include('fragments/_h1.html.twig') }}
+
+        {# Flash zprávy #}
+        {{ include('fragments/_flash_messages.html.twig') }}
+
+        {# Navigace aktivní objednávky #}
+        {{ include('fragments/_order_nav.html.twig', {'orderPageNumber': 2, 'orderToken': token}) }}
+
+        {{ form_start(orderMethodsForm) }}
+            {{ form_row(orderMethodsForm.deliveryMethod) }}
+            {{ form_row(orderMethodsForm.paymentMethod) }}
+
+            <div class="row section right valign-wrapper flex-wrap">
+                <div class="col margin-right15px">
+                    {% if token is null %}
+                        <a href="{{ path('order_cart') }}">Zpět</a>
+                    {% else %}
+                        <a href="{{ path('order_custom', {token: token}) }}">Zpět</a>
+                    {% endif %}
+                </div>
+
+                <button class="btn-large waves-effect waves-light light-blue" type="submit">Pokračovat</button>
+            </div>
+        {{ form_end(orderMethodsForm) }}
+    </div>
+
+{% endblock %}

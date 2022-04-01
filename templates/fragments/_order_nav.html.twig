@@ -4,9 +4,9 @@
 
         <ul class="tabs z-depth-1 hide-on-med-and-down">
             {% for pageNumber, pageData in orderNavigationData %}
-                <li class="tab col s4 selected {% if pageData.isActive %}active{% endif %}">
+                <li class="tab col s4">
                     {% if pageData.isClickable %}
-                        <a target="_self" href="{{ pageData.path }}">
+                        <a target="_self" href="{{ pageData.path }}" {% if pageData.isActive %}class="active"{% endif %}>
                             {{ pageNumber }}. {{ pageData.title }}
                         </a>
                     {% else %}

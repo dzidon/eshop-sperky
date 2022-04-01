@@ -162,8 +162,8 @@ class NavbarService
             2 => [
                 'isActive'      => ($currentPage === 2),
                 'isClickable'   => ($currentPage >= 2),
-                'title'         => '!Doprava a platba',
-                'path'          => '',
+                'title'         => $this->parameterBag->get('app_page_title.order_methods'),
+                'path'          => $this->router->generate('order_methods', ['token' => $token]),
             ],
             3 => [
                 'isActive'      => ($currentPage === 3),

@@ -13,6 +13,8 @@ parameters:
     app_email_noreply: 'noreply@sperky-test.cz'
     app_email_verify_link_throttle_limit: 600 # seconds
 
+    container.dumper.inline_factories: true
+
     # route titles
     app_page_title.home: 'Domů'
     app_page_title.contact: 'Kontakt'
@@ -37,6 +39,7 @@ parameters:
     app_page_title.product: 'Produkt'
     app_page_title.order_cart: 'Košík'
     app_page_title.order_custom: 'Objednávka na míru'
+    app_page_title.order_methods: 'Doprava a platba'
     app_page_title.admin_permission_overview: 'Moje oprávnění'
     app_page_title.admin_user_management: 'Uživatelé'
     app_page_title.admin_user_management_specific: 'Uživatel'

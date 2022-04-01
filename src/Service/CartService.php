@@ -32,9 +32,6 @@ class CartService
      */
     private $orderCookie = null;
 
-    private int $totalProducts = 0;
-    private float $totalPriceWithoutVat = 0.0;
-    private float $totalPriceWithVat = 0.0;
     private bool $isOrderNew = false;
 
     /** @var Request */
@@ -64,21 +61,6 @@ class CartService
     public function getOrderCookie()
     {
         return $this->orderCookie;
-    }
-
-    public function getTotalProducts(): int
-    {
-        return $this->totalProducts;
-    }
-
-    public function getTotalPriceWithVat(): float
-    {
-        return $this->totalPriceWithVat;
-    }
-
-    public function getTotalPriceWithoutVat(): float
-    {
-        return $this->totalPriceWithoutVat;
     }
 
     /**
@@ -161,7 +143,7 @@ class CartService
         $this->entityManager->persist($targetCartOccurence);
         $this->entityManager->flush();
 
-        $this->calculateTotals();
+        $this->order->calculateTotals();
     }
 
     /**
@@ -184,7 +166,7 @@ class CartService
         }
 
         $this->entityManager->flush();
-        $this->calculateTotals();
+        $this->order->calculateTotals();
     }
 
     /**
@@ -218,7 +200,7 @@ class CartService
         }
 
         $this->entityManager->flush();
-        $this->calculateTotals();
+        $this->order->calculateTotals();
     }
 
     /**
@@ -250,7 +232,7 @@ class CartService
 
         $this->synchronizer->addWarningsToFlashBag();
 
-        $this->calculateTotals();
+        $this->order->calculateTotals();
         $this->orderCookieObtain();
 
         $this->entityManager->persist($this->order);
@@ -276,23 +258,6 @@ class CartService
                 ->withSecure(true)
                 ->withHttpOnly()
             ;
-        }
-    }
-
-    /**
-     * Spočítá celkový počet produktů, celkovou cenu bez DPH a celkovou cenu s DPH
-     */
-    private function calculateTotals(): void
-    {
-        $this->totalProducts = 0;
-        $this->totalPriceWithVat = 0.0;
-        $this->totalPriceWithoutVat = 0.0;
-
-        foreach ($this->order->getCartOccurences() as $cartOccurence)
-        {
-            $this->totalProducts += $cartOccurence->getQuantity();
-            $this->totalPriceWithVat += $cartOccurence->getQuantity() * $cartOccurence->getPriceWithVat();
-            $this->totalPriceWithoutVat += $cartOccurence->getQuantity() * $cartOccurence->getPriceWithoutVat();
         }
     }
 

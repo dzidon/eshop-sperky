@@ -1,13 +1,18 @@
 <div class="col s12 m3 hide-on-small-and-down">
-    <img src="{% if product.getMainImageName() %} {{ asset(product.getMainImageName(), 'product_images') }}  {% else %} {{ asset('no-image.png', 'images') }} {% endif %}" class="responsive-img " id="product-image-large" alt="Obrázek produktu">
+    <a href="{{ path('product', {slug: product.getSlug()}) }}">
+        <img src="{% if product.getMainImageName() %} {{ asset(product.getMainImageName(), 'product_images') }}  {% else %} {{ asset('no-image.png', 'images') }} {% endif %}" class="responsive-img " id="product-image-large" alt="Obrázek produktu">
+    </a>
 </div>
 
 <div class="col s12 m8 offset-m1 offset-l1 offset-xl1">
     <div class="col s12">
         <div class="row">
-            <h4 class="no-mar-top">
-                <strong>{{ product.getName() }}</strong>
-            </h4>
+            <a href="{{ path('product', {slug: product.getSlug()}) }}">
+                <h4 class="no-mar-top">
+                    <strong>{{ product.getName() }}</strong>
+                </h4>
+            </a>
+
             <h5 class="margin-0">{{ submittedQuantity }} ks</h5>
             <h5 class="margin-0">{{ product.getPriceWithVat() * submittedQuantity }} Kč {% if vat_payer %}vč. DPH{% endif %}</h5>
         </div>
@@ -19,15 +24,16 @@
                 Celkem produktů:
             </div>
             <div class="col no-padding s6 right-align">
-                <strong>{{ cart.getTotalProducts() }}</strong>
+                <strong>{{ cart.order.totalQuantity }}</strong>
             </div>
         </div>
+
         <div class="row">
             <div class="col no-padding s6 left-align">
                 Celková cena:
             </div>
             <div class="col no-padding s6 right-align">
-                <strong>{{ cart.getTotalPriceWithVat() }} Kč {% if vat_payer %}vč. DPH{% endif %}</strong>
+                <strong>{{ cart.order.totalPriceWithVat }} Kč {% if vat_payer %}vč. DPH{% endif %}</strong>
             </div>
         </div>
     </div>

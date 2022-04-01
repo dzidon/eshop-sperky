@@ -105,7 +105,7 @@
         {% endif %}
 
         <h5>
-            <strong>{{ cart_service.totalPriceWithVat }} Kč {% if vat_payer %}vč. DPH {% endif %}celkem</strong>
+            <strong>{{ cart_service.order.totalPriceWithVat }} Kč {% if vat_payer %}vč. DPH {% endif %}celkem</strong>
         </h5>
     </div>
 
@@ -115,7 +115,7 @@
         </div>
 
         <div>
-            <a href="" class="btn-large waves-effect waves-light light-blue">Pokračovat</a>
+            <a href="{{ path('order_methods') }}" class="btn-large waves-effect waves-light light-blue">Pokračovat</a>
         </div>
     </div>
 {% endif %}

@@ -44,7 +44,7 @@
                             <li><a href="{{ path('products') }}" class="black-text"> <i class="material-icons left">filter_vintage</i> Produkty</a></li>
                         {% endif %}
 
-                        <li><a href="{{ path_order_cart }}" class="black-text"> <i class="material-icons left">shopping_cart</i> Košík <span class="cart-badge light-blue white-text navbar-cart-total-products">{{ cart_service.getTotalProducts() }}</span></a></li>
+                        <li><a href="{{ path_order_cart }}" class="black-text"> <i class="material-icons left">shopping_cart</i> Košík <span class="cart-badge light-blue white-text navbar-cart-total-products">{{ cart_service.order.totalQuantity }}</span></a></li>
 
                         {% if is_authenticated_remembered %}
                             {% if can_enter_admin %}
@@ -78,7 +78,7 @@
                 <li><a href="{{ path('products') }}"> <i class="material-icons left">filter_vintage</i> Produkty</a></li>
             {% endif %}
 
-            <li><a href="{{ path_order_cart }}"> <i class="material-icons left">shopping_cart</i> Košík <span class="cart-badge light-blue white-text navbar-cart-total-products">{{ cart_service.getTotalProducts() }}</span></a></li>
+            <li><a href="{{ path_order_cart }}"> <i class="material-icons left">shopping_cart</i> Košík <span class="cart-badge light-blue white-text navbar-cart-total-products">{{ cart_service.order.totalQuantity }}</span></a></li>
 
             {% if is_authenticated_remembered %}
                 {% if can_enter_admin %}

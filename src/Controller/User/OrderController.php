@@ -3,6 +3,7 @@
 namespace App\Controller\User;
 
 use App\Form\CartFormType;
+use App\Form\OrderMethodsFormType;
 use App\Service\BreadcrumbsService;
 use App\Service\CartService;
 use App\Service\CustomOrderService;
@@ -32,13 +33,12 @@ class OrderController extends AbstractController
      */
     public function orderCustom($token = null): Response
     {
-        $this->customOrderService->loadCustomOrder($token);
-        if ($this->customOrderService->getOrder() === null)
+        if ($this->customOrderService->loadCustomOrder($token) === null)
         {
             throw $this->createNotFoundException('Objednávka nenalezena.');
         }
 
-        $this->breadcrumbs->addRoute('order_custom');
+        $this->breadcrumbs->addRoute('order_custom', ['token' => $token]);
 
         return $this->render('order/custom_overview.html.twig', [
             'order' => $this->customOrderService->getOrder(),
@@ -59,6 +59,50 @@ class OrderController extends AbstractController
 
         return $this->render('order/cart.html.twig', [
             'cartForm' => $formView,
+        ]);
+    }
+
+    /**
+     * @Route("/objednavka/doprava-a-platba/{token}", name="order_methods")
+     */
+    public function orderMethods($token = null): Response
+    {
+        $targetOrder = $this->cart->getOrder();
+
+        if($token !== null)
+        {
+            if ($this->customOrderService->loadCustomOrder($token) === null)
+            {
+                throw $this->createNotFoundException('Objednávka nenalezena.');
+            }
+
+            $targetOrder = $this->customOrderService->getOrder();
+            $this->breadcrumbs->addRoute('order_custom', ['token' => $token]);
+        }
+        else
+        {
+            $this->breadcrumbs->addRoute('order_cart');
+        }
+
+        $form = $this->createForm(OrderMethodsFormType::class, $targetOrder);
+        // tlačítko se přidává v šabloně
+        $form->handleRequest($this->request);
+
+        if ($form->isSubmitted() && $form->isValid())
+        {
+            $this->getDoctrine()->getManager()->persist($targetOrder);
+            $this->getDoctrine()->getManager()->flush();
+
+            $this->addFlash('success', 'saved');
+            return $this->redirectToRoute('order_methods');
+        }
+
+        $this->breadcrumbs->addRoute('order_methods');
+
+        return $this->render('order/methods.html.twig', [
+            'order' => $targetOrder,
+            'token'=> $token,
+            'orderMethodsForm' => $form->createView(),
         ]);
     }
 }
