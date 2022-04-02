@@ -24,9 +24,6 @@ class OrderCartSynchronizer extends AbstractOrderSynchronizer
     {
         parent::synchronize();
 
-        // TODO: cena zvoleneho zpusobu dopravy
-        // TODO: cena zvoleneho zpusobu platby
-
         $productsTotalQuantity = [];
 
         foreach ($this->order->getCartOccurences() as $cartOccurence)
@@ -71,17 +68,6 @@ class OrderCartSynchronizer extends AbstractOrderSynchronizer
                     continue;
                 }
                 $productsTotalQuantity[$product->getId()] += $cartOccurence->getQuantity();
-
-                // nazev produktu
-                if ($product->getName() !== null && $cartOccurence->getName() !== $product->getName())
-                {
-                    $this->addWarning(
-                        sprintf('name_%d', $product->getId()),
-                        sprintf('Název produktu "%s" je nyní "%s".', $cartOccurence->getName(), $product->getName())
-                    );
-
-                    $cartOccurence->setName($product->getName());
-                }
 
                 // produktove volby, jejichz skupina neni prirazena danemu produktu
                 foreach ($cartOccurence->getOptions() as $option)

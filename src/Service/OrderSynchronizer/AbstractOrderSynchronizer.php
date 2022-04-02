@@ -46,6 +46,34 @@ abstract class AbstractOrderSynchronizer
         {
             throw new LogicException( sprintf('%s nedostal objednávku přes setOrder.', static::class) );
         }
+
+        // cena doručovací metody
+        $deliveryMethod = $this->order->getDeliveryMethod();
+        if ($deliveryMethod !== null)
+        {
+            if (($this->order->getDeliveryPriceWithoutVat() !== $deliveryMethod->getPriceWithoutVat())
+              || $this->order->getDeliveryPriceWithVat()    !== $deliveryMethod->getPriceWithVat())
+            {
+                $this->order->setDeliveryPriceWithoutVat( $deliveryMethod->getPriceWithoutVat() );
+                $this->order->setDeliveryPriceWithVat( $deliveryMethod->getPriceWithVat() );
+
+                $this->addWarning('delivery_method_price', sprintf('Cena doručovací metody "%s" je nyní %.2f Kč vč. DPH (%.2f Kč bez DPH).', $deliveryMethod->getName(), $this->order->getDeliveryPriceWithVat(), $this->order->getDeliveryPriceWithoutVat()));
+            }
+        }
+
+        // cena platební metody
+        $paymentMethod = $this->order->getPaymentMethod();
+        if ($paymentMethod !== null)
+        {
+            if (($this->order->getPaymentPriceWithoutVat() !== $paymentMethod->getPriceWithoutVat())
+              || $this->order->getPaymentPriceWithVat()    !== $paymentMethod->getPriceWithVat())
+            {
+                $this->order->setPaymentPriceWithoutVat( $paymentMethod->getPriceWithoutVat() );
+                $this->order->setPaymentPriceWithVat( $paymentMethod->getPriceWithVat() );
+
+                $this->addWarning('payment_method_price', sprintf('Cena platební metody "%s" je nyní %.2f Kč vč. DPH (%.2f Kč bez DPH).', $paymentMethod->getName(), $this->order->getPaymentPriceWithVat(), $this->order->getPaymentPriceWithoutVat()));
+            }
+        }
     }
 
     /**

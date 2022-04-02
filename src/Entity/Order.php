@@ -76,22 +76,32 @@ class Order
     /**
      * @ORM\Column(type="float")
      */
-    private $deliveryPriceWithoutVat;
+    private $deliveryPriceWithoutVat = 0.0;
 
     /**
      * @ORM\Column(type="float")
      */
-    private $deliveryPriceWithVat;
+    private $deliveryPriceWithVat = 0.0;
 
     /**
      * @ORM\Column(type="float")
      */
-    private $paymentPriceWithoutVat;
+    private $paymentPriceWithoutVat = 0.0;
 
     /**
      * @ORM\Column(type="float")
      */
-    private $paymentPriceWithVat;
+    private $paymentPriceWithVat = 0.0;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $deliveryMethodName = null;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $paymentMethodName = null;
 
     private int $totalQuantity = 0;
     private float $totalPriceWithoutVat = 0.0;
@@ -316,6 +326,30 @@ class Order
         return $this;
     }
 
+    public function getDeliveryMethodName(): ?string
+    {
+        return $this->deliveryMethodName;
+    }
+
+    public function setDeliveryMethodName(?string $deliveryMethodName): self
+    {
+        $this->deliveryMethodName = $deliveryMethodName;
+
+        return $this;
+    }
+
+    public function getPaymentMethodName(): ?string
+    {
+        return $this->paymentMethodName;
+    }
+
+    public function setPaymentMethodName(?string $paymentMethodName): self
+    {
+        $this->paymentMethodName = $paymentMethodName;
+
+        return $this;
+    }
+
     /**
      * @ORM\PreFlush
      */
@@ -325,22 +359,26 @@ class Order
         {
             $this->deliveryPriceWithoutVat = 0.0;
             $this->deliveryPriceWithVat = 0.0;
+            $this->deliveryMethodName = null;
         }
         else
         {
             $this->deliveryPriceWithoutVat = $this->deliveryMethod->getPriceWithoutVat();
             $this->deliveryPriceWithVat = $this->deliveryMethod->getPriceWithVat();
+            $this->deliveryMethodName = $this->deliveryMethod->getName();
         }
 
         if ($this->paymentMethod === null)
         {
             $this->paymentPriceWithoutVat = 0.0;
             $this->paymentPriceWithVat = 0.0;
+            $this->paymentMethodName = null;
         }
         else
         {
             $this->paymentPriceWithoutVat = $this->paymentMethod->getPriceWithoutVat();
             $this->paymentPriceWithVat = $this->paymentMethod->getPriceWithVat();
+            $this->paymentMethodName = $this->paymentMethod->getName();
         }
 
         return $this;

@@ -29,23 +29,26 @@ class CartOccurenceQuantityValidator extends ConstraintValidator
         {
             $product = $cartOccurence->getProduct();
 
-            if (!isset($productsTotal[$product->getId()]))
+            if($product !== null)
             {
-                $productsTotal[$product->getId()] = $cartOccurence->getQuantity();
-            }
-            else
-            {
-                $productsTotal[$product->getId()] += $cartOccurence->getQuantity();
-            }
+                if (!isset($productsTotal[$product->getId()]))
+                {
+                    $productsTotal[$product->getId()] = $cartOccurence->getQuantity();
+                }
+                else
+                {
+                    $productsTotal[$product->getId()] += $cartOccurence->getQuantity();
+                }
 
-            if ($productsTotal[$product->getId()] > $product->getInventory())
-            {
-                $this->context
-                    ->buildViolation($constraint->message)
-                    ->setParameter('{{ inventory }}', $product->getInventory())
-                    ->setParameter('{{ productName }}', $product->getName())
-                    ->atPath(sprintf('[%s].quantity', $key))
-                    ->addViolation();
+                if ($productsTotal[$product->getId()] > $product->getInventory())
+                {
+                    $this->context
+                        ->buildViolation($constraint->message)
+                        ->setParameter('{{ inventory }}', $product->getInventory())
+                        ->setParameter('{{ productName }}', $product->getName())
+                        ->atPath(sprintf('[%s].quantity', $key))
+                        ->addViolation();
+                }
             }
         }
     }

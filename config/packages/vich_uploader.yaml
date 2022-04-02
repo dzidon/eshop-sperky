@@ -9,6 +9,7 @@ vich_uploader:
             inject_on_load: true
             delete_on_update: true
             delete_on_remove: true
+
         delivery_method_images:
             uri_prefix: /images/delivery-methods
             upload_destination: '%kernel.project_dir%/public/images/delivery-methods'
@@ -16,6 +17,7 @@ vich_uploader:
             inject_on_load: true
             delete_on_update: true
             delete_on_remove: true
+
         payment_method_images:
             uri_prefix: /images/payment-methods
             upload_destination: '%kernel.project_dir%/public/images/payment-methods'

@@ -16,19 +16,122 @@
         {{ include('fragments/_order_nav.html.twig', {'orderPageNumber': 2, 'orderToken': token}) }}
 
         {{ form_start(orderMethodsForm) }}
-            {{ form_row(orderMethodsForm.deliveryMethod) }}
-            {{ form_row(orderMethodsForm.paymentMethod) }}
+            <div class="row flex-wrap">
+                <div class="col s12 l7">
+                    <div class="row">
+                        <h5>{{ orderMethodsForm.children.deliveryMethod.vars.label }}</h5>
 
-            <div class="row section right valign-wrapper flex-wrap">
-                <div class="col margin-right15px">
-                    {% if token is null %}
-                        <a href="{{ path('order_cart') }}">Zpět</a>
-                    {% else %}
-                        <a href="{{ path('order_custom', {token: token}) }}">Zpět</a>
-                    {% endif %}
+                        <div class="collection z-depth-1">
+                            {% for methodKey, methodChoiceView in orderMethodsForm.children.deliveryMethod.vars.choices %}
+                                <div class="collection-item">
+                                    <label class="cursor-pointer">
+                                        <div class="row no-mar-bot section valign-wrapper flex-wrap">
+                                            {% set methodData = methodChoiceView.data %}
+
+                                            <div class="col s9 valign-wrapper">
+                                                <div class="col no-padding valign-wrapper">
+                                                    {{ form_widget(orderMethodsForm.children.deliveryMethod.children[methodKey], {attr: {class: 'filled-in checkbox-light-blue with-gap'}}) }}
+                                                    <span></span>
+                                                </div>
+
+                                                <div class="col valign-wrapper">
+                                                    {% if methodData.imagePath is not null %}
+                                                        <div class="img-order-method margin-right15px valign-wrapper">
+                                                            <img src="{{ asset(methodData.imagePath, 'delivery_method_images') }}" class="responsive-img" alt="Obrázek doručovací metody {{ methodData.name }}">
+                                                        </div>
+                                                    {% endif %}
+
+                                                    <h6 class="margin-0 black-text">{{ methodChoiceView.label }}</h6>
+                                                </div>
+                                            </div>
+
+                                            <div class="col s3 right-align">
+                                                <h6 class="margin-0 black-text">
+                                                    <strong>
+                                                        {% if methodData.priceWithVat == 0 %}
+                                                            ZDARMA
+                                                        {% else %}
+                                                            {{ methodData.priceWithVat }} Kč
+                                                        {% endif %}
+                                                    </strong>
+                                                </h6>
+                                            </div>
+                                        </div>
+                                    </label>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <h5>{{ orderMethodsForm.children.paymentMethod.vars.label }}</h5>
+
+                        <div class="collection z-depth-1">
+                            {% for methodKey, methodChoiceView in orderMethodsForm.children.paymentMethod.vars.choices %}
+                                <div class="collection-item">
+                                    <label class="cursor-pointer">
+                                        <div class="row no-mar-bot section valign-wrapper flex-wrap">
+                                            {% set methodData = methodChoiceView.data %}
+
+                                            <div class="col s9 valign-wrapper">
+                                                <div class="col no-padding valign-wrapper">
+                                                    {{ form_widget(orderMethodsForm.children.paymentMethod.children[methodKey], {attr: {class: 'filled-in checkbox-light-blue with-gap'}}) }}
+                                                    <span></span>
+                                                </div>
+
+                                                <div class="col valign-wrapper">
+                                                    {% if methodData.imagePath is not null %}
+                                                        <div class="img-order-method margin-right15px valign-wrapper">
+                                                            <img src="{{ asset(methodData.imagePath, 'payment_method_images') }}" class="responsive-img" alt="Obrázek platební metody {{ methodData.name }}">
+                                                        </div>
+                                                    {% endif %}
+
+                                                    <h6 class="margin-0 black-text">{{ methodChoiceView.label }}</h6>
+                                                </div>
+                                            </div>
+
+                                            <div class="col s3 right-align">
+                                                <h6 class="margin-0 black-text">
+                                                    <strong>
+                                                        {% if methodData.priceWithVat == 0 %}
+                                                            ZDARMA
+                                                        {% else %}
+                                                            {{ methodData.priceWithVat }} Kč
+                                                        {% endif %}
+                                                    </strong>
+                                                </h6>
+                                            </div>
+                                        </div>
+                                    </label>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
                 </div>
 
-                <button class="btn-large waves-effect waves-light light-blue" type="submit">Pokračovat</button>
+                <div class="col s12 l4 container-sticky-bottom offset-l1 offset-xl1">
+                    <div class="row sticky-bottom">
+                        <h5>Souhrn objednávky</h5>
+
+                        <div class="collection z-depth-1">
+                            <div class="collection-item">
+
+                            </div>
+                        </div>
+
+                        <div class="row section right margin-0 valign-wrapper flex-wrap">
+                            <div class="col margin-right15px">
+                                {% if token is null %}
+                                    <a href="{{ path('order_cart') }}">Zpět</a>
+                                {% else %}
+                                    <a href="{{ path('order_custom', {token: token}) }}">Zpět</a>
+                                {% endif %}
+                            </div>
+
+                            <button class="btn-large waves-effect waves-light light-blue" type="submit">Pokračovat</button>
+                        </div>
+                    </div>
+                </div>
             </div>
         {{ form_end(orderMethodsForm) }}
     </div>

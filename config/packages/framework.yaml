@@ -23,6 +23,10 @@ framework:
                 base_path: images/
             product_images:
                 base_path: images/products/
+            delivery_method_images:
+                base_path: images/delivery-methods/
+            payment_method_images:
+                base_path: images/payment-methods/
 
     uid:
         default_uuid_version: 4
