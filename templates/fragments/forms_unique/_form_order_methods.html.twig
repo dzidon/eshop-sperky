@@ -5,7 +5,7 @@
                 <h4>{{ orderMethodsForm.children.deliveryMethod.vars.label }}</h4>
             </div>
 
-            <div class="row">
+            <div class="row no-mar-bot">
                 <div class="collection z-depth-1">
                     {% for methodKey, methodChoiceView in orderMethodsForm.children.deliveryMethod.vars.choices %}
                         <div class="collection-item">
@@ -53,7 +53,7 @@
                 <h4>{{ orderMethodsForm.children.paymentMethod.vars.label }}</h4>
             </div>
 
-            <div class="row">
+            <div class="row no-mar-bot">
                 <div class="collection z-depth-1">
                     {% for methodKey, methodChoiceView in orderMethodsForm.children.paymentMethod.vars.choices %}
                         <div class="collection-item">
@@ -99,7 +99,7 @@
         </div>
 
         <div class="col s12 l4 container-sticky-bottom offset-l1 offset-xl1">
-            <div class="row sticky-bottom">
+            <div class="row no-mar-bot sticky-bottom">
                 <div class="col s12">
                     <div class="row">
                         <h4>Souhrn objednávky</h4>
@@ -107,25 +107,32 @@
                 </div>
 
                 <div class="collection z-depth-1">
-                    {% for cartOccurence in cart_service.order.cartOccurences %}
+                    {% for cartOccurence in order.cartOccurences %}
                         <div class="collection-item">
                             <div class="row no-mar-bot section">
                                 <div class="col s8 flex-nowrap">
-                                    {% set product_path = path('product', {slug: cartOccurence.product.slug}) %}
+                                    {% if cartOccurence.product is not null %}
+                                        {% set product_path = path('product', {slug: cartOccurence.product.slug}) %}
+
+                                        <div class="col no-padding margin-right15px">
+                                            <a href="{{ product_path }}">
+                                                <div class="img-cart-overview">
+                                                    <img alt="Obrázek produktu" class="responsive-img" src="{% if cartOccurence.product.mainImageName %} {{ asset(cartOccurence.product.mainImageName, 'product_images') }}  {% else %} {{ asset('no-image.png', 'images') }} {% endif %}">
+                                                </div>
+                                            </a>
+                                        </div>
+                                    {% endif %}
 
                                     <div class="col no-padding">
-                                        <a href="{{ product_path }}">
-                                            <div class="img-cart-overview">
-                                                <img alt="Obrázek produktu" class="responsive-img" src="{% if cartOccurence.product.mainImageName %} {{ asset(cartOccurence.product.mainImageName, 'product_images') }}  {% else %} {{ asset('no-image.png', 'images') }} {% endif %}">
-                                            </div>
-                                        </a>
-                                    </div>
-
-                                    <div class="col">
-                                        <a href="{{ product_path }}">
+                                        {% if cartOccurence.product is null %}
                                             <strong class="margin-0">{{ cartOccurence.quantity }}x {{ cartOccurence.name }}</strong>
                                             <div class="grey-text">{{ cartOccurence.optionsString }}</div>
-                                        </a>
+                                        {% else %}
+                                            <a href="{{ product_path }}">
+                                                <strong class="margin-0">{{ cartOccurence.quantity }}x {{ cartOccurence.name }}</strong>
+                                                <div class="grey-text">{{ cartOccurence.optionsString }}</div>
+                                            </a>
+                                        {% endif %}
                                     </div>
                                 </div>
 
@@ -143,7 +150,7 @@
                             </div>
 
                             <div class="col s4 right-align">
-                                <strong>{{ cart_service.order.totalPriceWithVat }} Kč</strong>
+                                <strong>{{ order.totalPriceWithVat }} Kč</strong>
                             </div>
                         </div>
                     </div>
@@ -188,11 +195,11 @@
                 <div class="row right-align">
                     <div class="col s12">
                         {% if vat_payer %}
-                            <h5 class="no-mar-bot">{{ cart_service.getTotalPriceWithoutVat(true) }} Kč celkem bez DPH</h5>
+                            <h5 class="no-mar-bot">{{ order.getTotalPriceWithoutVat(true) }} Kč celkem bez DPH</h5>
                         {% endif %}
 
                         <h5 class="no-mar-bot">
-                            <strong>{{ cart_service.order.getTotalPriceWithVat(true) }} Kč {% if vat_payer %}vč. DPH {% endif %}celkem</strong>
+                            <strong>{{ order.getTotalPriceWithVat(true) }} Kč {% if vat_payer %}vč. DPH {% endif %}celkem</strong>
                         </h5>
                     </div>
                 </div>

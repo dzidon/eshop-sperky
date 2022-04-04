@@ -54,12 +54,11 @@ class OrderController extends AbstractController
     {
         $order = $this->cart->getOrder();
         $form = $this->createForm(CartFormType::class, $order);
-        $formView = $form->createView();
 
         $this->breadcrumbs->addRoute('order_cart');
 
         return $this->render('order/cart.html.twig', [
-            'cartForm' => $formView,
+            'cartForm' => $form->createView(),
         ]);
     }
 
@@ -85,7 +84,9 @@ class OrderController extends AbstractController
             $this->breadcrumbs->addRoute('order_cart');
         }
 
-        $form = $this->createForm(OrderMethodsFormType::class, $targetOrder);
+        $form = $this->createForm(OrderMethodsFormType::class, $targetOrder, [
+            'action' => $this->generateUrl('order_methods', ['token' => $token]),
+        ]);
         // tlačítko se přidává v šabloně
         $form->handleRequest($this->request);
 
@@ -97,7 +98,7 @@ class OrderController extends AbstractController
             if(!$this->request->isXmlHttpRequest())
             {
                 $this->addFlash('success', 'saved');
-                return $this->redirectToRoute('order_methods');
+                return $this->redirectToRoute('order_methods', ['token' => $token]);
             }
         }
 

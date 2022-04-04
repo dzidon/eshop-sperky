@@ -166,6 +166,8 @@ class CartService
         }
 
         $this->entityManager->flush();
+
+        $this->order->reindexCartOccurences();
         $this->order->calculateTotals();
     }
 
@@ -200,6 +202,8 @@ class CartService
         }
 
         $this->entityManager->flush();
+
+        $this->order->reindexCartOccurences();
         $this->order->calculateTotals();
     }
 

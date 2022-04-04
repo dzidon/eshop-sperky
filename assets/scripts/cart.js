@@ -20,9 +20,10 @@ function initialize()
             ajaxUpdateCart(formCartUpdate.attr('action'), formCartUpdate.serialize());
         });
 
-        $('.form-input-quantity').on('submit', function ()
+        formCartUpdate.on('submit', function (e)
         {
             ajaxUpdateCart(formCartUpdate.attr('action'), formCartUpdate.serialize());
+            e.preventDefault();
         });
     }
 

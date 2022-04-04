@@ -175,6 +175,13 @@ class Order
         return $this;
     }
 
+    public function reindexCartOccurences(): self
+    {
+        $this->cartOccurences = new ArrayCollection($this->cartOccurences->getValues());
+
+        return $this;
+    }
+
     public function isCreatedManually(): bool
     {
         return $this->createdManually;

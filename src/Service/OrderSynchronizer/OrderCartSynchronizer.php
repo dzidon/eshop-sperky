@@ -48,6 +48,7 @@ class OrderCartSynchronizer extends AbstractOrderSynchronizer
                         sprintf('quantityzero_%d', $product->getId()),
                         sprintf('Produkt "%s" byl odstraněn, protože měl nastavený počet kusů na 0.', $cartOccurence->getName())
                     );
+
                     continue;
                 }
 

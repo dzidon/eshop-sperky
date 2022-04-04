@@ -9,17 +9,9 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class OrderMethodsFormType extends AbstractType
 {
-    private UrlGeneratorInterface $router;
-
-    public function __construct(UrlGeneratorInterface $router)
-    {
-        $this->router = $router;
-    }
-
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
@@ -44,7 +36,6 @@ class OrderMethodsFormType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class'        => Order::class,
-            'action'            => $this->router->generate('order_methods'),
             'csrf_protection'   => true,
             'csrf_field_name'   => '_token',
             'csrf_token_id'     => 'form_cart_methods',

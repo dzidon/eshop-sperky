@@ -58,6 +58,9 @@ class CustomOrderService
                 $this->synchronizer->addWarningsToFlashBag();
 
                 $this->order->calculateTotals();
+
+                $this->entityManager->persist($this->order);
+                $this->entityManager->flush();
             }
         }
 
