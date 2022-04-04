@@ -87,7 +87,7 @@ class ProductCatalogFilterFormType extends AbstractType
             $priceMax = $filterData->getPriceMax();
 
             $categoriesChosen = $filterData->getCategoriesGrouped();
-            $categoriesToRender = $view->children['categories']->children;
+            $categoriesToRender = $view->children['categories'];
             $categoriesGrouped = $view->children['categories']->vars['choices'];
 
             foreach ($categoriesGrouped as $groupName => $choiceGroupView)
@@ -116,16 +116,16 @@ class ProductCatalogFilterFormType extends AbstractType
                             {
                                 $plusSign = '+';
                             }
-                            $categoriesToRender[$category->getId()]->vars['label'] = sprintf('%s (%s%s)', $category->getName(), $plusSign, $count);
+                            $categoriesToRender->children[$category->getId()]->vars['label'] = sprintf('%s (%s%s)', $category->getName(), $plusSign, $count);
                         }
                         else
                         {
-                            unset($view->children['categories']->vars['choices'][$groupName]->choices[$category->getId()]);
-                            unset($view->children['categories']->children[$category->getId()]);
+                            unset($categoriesToRender->vars['choices'][$groupName]->choices[$category->getId()]);
+                            unset($categoriesToRender->children[$category->getId()]);
 
-                            if(count($view->children['categories']->vars['choices'][$groupName]->choices) === 0)
+                            if(count($categoriesToRender->vars['choices'][$groupName]->choices) === 0)
                             {
-                                unset($view->children['categories']->vars['choices'][$groupName]);
+                                unset($categoriesToRender->vars['choices'][$groupName]);
                             }
                         }
                     }

@@ -42,8 +42,8 @@ class Order
     /**
      * @ORM\OneToMany(targetEntity=CartOccurence::class, mappedBy="order_", orphanRemoval=true, cascade={"persist"})
      *
-     * @AssertCustom\CartOccurenceQuantity
-     * @Assert\Valid
+     * @AssertCustom\CartOccurenceQuantity(groups={"cart"})
+     * @Assert\Valid(groups={"cart"})
      */
     private $cartOccurences;
 
@@ -60,16 +60,12 @@ class Order
     /**
      * @ORM\ManyToOne(targetEntity=DeliveryMethod::class, inversedBy="orders")
      * @ORM\JoinColumn(onDelete="SET NULL")
-     *
-     * @Assert\NotBlank
      */
     private $deliveryMethod;
 
     /**
      * @ORM\ManyToOne(targetEntity=PaymentMethod::class, inversedBy="orders")
      * @ORM\JoinColumn(onDelete="SET NULL")
-     *
-     * @Assert\NotBlank
      */
     private $paymentMethod;
 

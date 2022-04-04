@@ -31,12 +31,14 @@
 
                             {# Obrázek, název a volby #}
                             <div class="col s12 m10 l4 valign-wrapper">
-                                <a href="{{ path('product', {slug: cartOccurenceData.product.slug}) }}" class="margin-right15px">
+                                {% set product_path = path('product', {slug: cartOccurenceData.product.slug}) %}
+
+                                <a href="{{ product_path }}" class="margin-right15px">
                                     <div class="img-cart-product">
                                         <img alt="Obrázek produktu" class="responsive-img" src="{% if cartOccurenceData.product.mainImageName %} {{ asset(cartOccurenceData.product.mainImageName, 'product_images') }}  {% else %} {{ asset('no-image.png', 'images') }} {% endif %}">
                                     </div>
                                 </a>
-                                <a href="{{ path('product', {slug: cartOccurenceData.product.slug}) }}">
+                                <a href="{{ product_path }}">
                                     <strong class="margin-0">{{ cartOccurenceData.name }}</strong>
                                     <div class="grey-text">{{ cartOccurenceData.optionsString }}</div>
                                 </a>
@@ -101,10 +103,10 @@
 
     <div class="row right-align">
         {% if vat_payer %}
-            <h5>{{ cart_service.totalPriceWithoutVat }} Kč celkem bez DPH</h5>
+            <h5 class="no-mar-bot">{{ cart_service.totalPriceWithoutVat }} Kč celkem bez DPH</h5>
         {% endif %}
 
-        <h5>
+        <h5 class="no-mar-bot">
             <strong>{{ cart_service.order.totalPriceWithVat }} Kč {% if vat_payer %}vč. DPH {% endif %}celkem</strong>
         </h5>
     </div>

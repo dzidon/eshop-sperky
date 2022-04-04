@@ -1,5 +1,8 @@
 import * as noUiSlider from 'materialize-css/extras/noUiSlider/nouislider';
 import { initializeAddToCartLinks } from './app';
+import { errorModalOpen } from './app';
+import { loaderOpen } from './app';
+import { loaderClose } from './app';
 
 let searchPhraseInput;
 let priceMinInput;
@@ -190,8 +193,7 @@ function catalogReset(url, addToHistory)
     }
     requestInProgress = true;
 
-    $('#modal-loader-text').text('Aktualizuji výpis...');
-    M.Modal.getInstance($('#modal-loader')).open();
+    loaderOpen('Aktualizuji výpis...');
 
     $.get({
         url: url,
@@ -202,7 +204,7 @@ function catalogReset(url, addToHistory)
         },
         complete: function()
         {
-            M.Modal.getInstance($('#modal-loader')).close();
+            loaderClose();
             requestInProgress = false;
         },
         success: function(data)
@@ -222,9 +224,7 @@ function catalogReset(url, addToHistory)
         },
         error: function()
         {
-            $('#modal-error-text').text('Nepodařilo se načíst katalog produktů, zkuste to prosím znovu.');
-            $('#modal-error-heading').text('Chyba');
-            M.Modal.getInstance($('#modal-error')).open();
+            errorModalOpen('Nepodařilo se načíst katalog produktů, zkuste to prosím znovu.');
         }
     });
 }

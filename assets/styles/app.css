@@ -46,6 +46,11 @@ main {
     width: 40px;
 }
 
+.img-cart-overview {
+    width: 30px;
+    height: 30px;
+}
+
 .cart-badge {
     padding-left: 7px;
     padding-right: 7px;
@@ -55,6 +60,11 @@ main {
 .flex-wrap {
     display: flex;
     flex-wrap: wrap;
+}
+
+.flex-nowrap {
+    display: flex;
+    flex-wrap: nowrap;
 }
 
 .margin-0 {
@@ -268,7 +278,7 @@ a.secondary-content {
 .sticky-bottom {
     position: sticky;
     margin-top: auto;
-    bottom: 0;
+    bottom: 20px;
 }
 
 /*

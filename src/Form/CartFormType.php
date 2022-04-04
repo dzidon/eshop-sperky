@@ -33,12 +33,13 @@ class CartFormType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class'      => Order::class,
-            'action'          => $this->router->generate('cart_update'),
-            'csrf_protection' => true,
-            'csrf_field_name' => '_token',
-            'csrf_token_id'   => 'form_cart_update',
-            'attr'            => [
+            'data_class'        => Order::class,
+            'action'            => $this->router->generate('cart_update'),
+            'csrf_protection'   => true,
+            'csrf_field_name'   => '_token',
+            'csrf_token_id'     => 'form_cart_update',
+            'validation_groups' => ['Default', 'cart'],
+            'attr'              => [
                 'id' => 'form-cart-update'
             ],
         ]);

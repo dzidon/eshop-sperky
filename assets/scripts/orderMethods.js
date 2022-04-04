@@ -11,34 +11,18 @@ $(document).ready(function()
 
 function initialize()
 {
-    // formulář celého košíku
-    const formCartUpdate = $('#form-cart-update');
-    if(formCartUpdate)
+    // formulář obsahující platební a doručovací metody
+    const formOrderMethods = $('#form-order-methods');
+    if(formOrderMethods)
     {
-        formCartUpdate.on('change', function()
+        formOrderMethods.on('change', function()
         {
-            ajaxUpdateCart(formCartUpdate.attr('action'), formCartUpdate.serialize());
-        });
-
-        $('.form-input-quantity').on('submit', function ()
-        {
-            ajaxUpdateCart(formCartUpdate.attr('action'), formCartUpdate.serialize());
+            ajaxUpdateOrderMethods(formOrderMethods.attr('action'), formOrderMethods.serialize());
         });
     }
-
-    // tlačítka pro odstranění
-    $('.button-cart-remove').click(function()
-    {
-        const url = $('#cart-wrapper').data('cart-remove-url');
-        const data = {
-            'cartOccurenceId': $(this).data('cart-occurence-id'),
-        };
-
-        ajaxUpdateCart(url, data);
-    });
 }
 
-function ajaxUpdateCart(url, data)
+function ajaxUpdateOrderMethods(url, data)
 {
     if(requestInProgress)
     {
@@ -46,7 +30,7 @@ function ajaxUpdateCart(url, data)
     }
     requestInProgress = true;
 
-    loaderOpen('Aktualizuji košík...');
+    loaderOpen('Aktualizuji...');
 
     $.post({
         url: url,
@@ -55,12 +39,12 @@ function ajaxUpdateCart(url, data)
     })
     .done(function (data)
     {
-        renderCart(data);
+        renderOrderMethods(data);
     })
     .fail(function (jqXHR)
     {
         renderErrors(jqXHR['responseJSON']);
-        renderCart(jqXHR['responseJSON']);
+        renderOrderMethods(jqXHR['responseJSON']);
     })
     .always(function ()
     {
@@ -68,15 +52,14 @@ function ajaxUpdateCart(url, data)
     });
 }
 
-function renderCart(data)
+function renderOrderMethods(data)
 {
     if (typeof(data) == "undefined")
     {
         return;
     }
 
-    $('#cart-container').html(data['html']);
-    $('#flash-container').html(data['flashHtml']);
+    $('#form-order-methods').html(data['html']);
 
     if (typeof(data['totalProducts']) != "undefined" && data['totalProducts'] !== null)
     {
@@ -93,14 +76,13 @@ function renderErrors(data)
     }
     else
     {
-        errorModalOpen('Nepodařilo se aktualizovat košík, zkuste to prosím znovu.');
+        errorModalOpen('Nepodařilo se aktualizovat dopravu a platbu, zkuste to prosím později.');
     }
 }
 
 function cleanUp()
 {
     loaderClose();
-    M.updateTextFields();
     initialize();
     requestInProgress = false;
 }

@@ -9,9 +9,17 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class OrderMethodsFormType extends AbstractType
 {
+    private UrlGeneratorInterface $router;
+
+    public function __construct(UrlGeneratorInterface $router)
+    {
+        $this->router = $router;
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
@@ -20,7 +28,7 @@ class OrderMethodsFormType extends AbstractType
                 'multiple' => false,
                 'expanded' => true,
                 'choice_label' => 'name',
-                'label' => 'Způsob dopravy'
+                'label' => 'Způsob dopravy',
             ])
             ->add('paymentMethod', EntityType::class, [
                 'class' => PaymentMethod::class,
@@ -35,10 +43,14 @@ class OrderMethodsFormType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class'      => Order::class,
-            'csrf_protection' => true,
-            'csrf_field_name' => '_token',
-            'csrf_token_id'   => 'form_cart_methods',
+            'data_class'        => Order::class,
+            'action'            => $this->router->generate('order_methods'),
+            'csrf_protection'   => true,
+            'csrf_field_name'   => '_token',
+            'csrf_token_id'     => 'form_cart_methods',
+            'attr'              => [
+                'id' => 'form-order-methods'
+            ],
         ]);
     }
 }

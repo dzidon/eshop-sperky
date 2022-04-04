@@ -101,8 +101,7 @@ const addFormToCollection = (e) =>
 
 export function ajaxAddProductToCart(url, data)
 {
-    $('#modal-loader-text').text('Načítání...');
-    M.Modal.getInstance($('#modal-loader')).open();
+    loaderOpen();
 
     $.post({
         url: url,
@@ -125,21 +124,19 @@ export function ajaxAddProductToCart(url, data)
     .fail(function (jqXHR)
     {
         const data = jqXHR['responseJSON'];
-        if (Array.isArray(data['errors']) && data['errors'].length > 0)
+        if (typeof(data) != "undefined" && Array.isArray(data['errors']) && data['errors'].length > 0)
         {
             const errors = data['errors'].join('<br>');
-            $('#modal-error-text').html(errors);
+            errorModalOpen(errors);
         }
         else
         {
-            $('#modal-error-text').text('Nepodařilo se vložit produkt do košíku, zkuste to prosím znovu.');
-            $('#modal-error-heading').text('Chyba');
+            errorModalOpen('Nepodařilo se vložit produkt do košíku, zkuste to prosím znovu.');
         }
-        M.Modal.getInstance($('#modal-error')).open();
     })
     .always(function ()
     {
-        M.Modal.getInstance($('#modal-loader')).close();
+        loaderClose();
     });
 }
 
@@ -161,4 +158,22 @@ export function initializeAddToCartLinks()
 
         ajaxAddProductToCart(url, data);
     });
+}
+
+export function loaderOpen(text = 'Načítání...')
+{
+    $('#modal-loader-text').text(text);
+    M.Modal.getInstance($('#modal-loader')).open();
+}
+
+export function loaderClose()
+{
+    M.Modal.getInstance($('#modal-loader')).close();
+}
+
+export function errorModalOpen(htmlContent, headerText = 'Chyba')
+{
+    $('#modal-error-text').html(htmlContent);
+    $('#modal-error-heading').text(headerText);
+    M.Modal.getInstance($('#modal-error')).open();
 }

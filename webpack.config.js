@@ -25,6 +25,7 @@ Encore
     .addEntry('productFilter', './assets/scripts/productFilter.js')
     .addEntry('productPage', './assets/scripts/productPage.js')
     .addEntry('cart', './assets/scripts/cart.js')
+    .addEntry('orderMethods', './assets/scripts/orderMethods.js')
 
     // enables the Symfony UX Stimulus bridge (used in assets/bootstrap.js)
     //.enableStimulusBridge('./assets/controllers.json')

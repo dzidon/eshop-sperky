@@ -7,6 +7,7 @@ use App\Form\OrderMethodsFormType;
 use App\Service\BreadcrumbsService;
 use App\Service\CartService;
 use App\Service\CustomOrderService;
+use App\Service\JsonResponseService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -65,7 +66,7 @@ class OrderController extends AbstractController
     /**
      * @Route("/objednavka/doprava-a-platba/{token}", name="order_methods")
      */
-    public function orderMethods($token = null): Response
+    public function orderMethods(JsonResponseService $jsonResponse, $token = null): Response
     {
         $targetOrder = $this->cart->getOrder();
 
@@ -93,16 +94,33 @@ class OrderController extends AbstractController
             $this->getDoctrine()->getManager()->persist($targetOrder);
             $this->getDoctrine()->getManager()->flush();
 
-            $this->addFlash('success', 'saved');
-            return $this->redirectToRoute('order_methods');
+            if(!$this->request->isXmlHttpRequest())
+            {
+                $this->addFlash('success', 'saved');
+                return $this->redirectToRoute('order_methods');
+            }
         }
 
         $this->breadcrumbs->addRoute('order_methods');
 
-        return $this->render('order/methods.html.twig', [
-            'order' => $targetOrder,
-            'token'=> $token,
-            'orderMethodsForm' => $form->createView(),
-        ]);
+        if($this->request->isXmlHttpRequest())
+        {
+            return $jsonResponse
+                ->setResponseHtml($this->renderView('fragments/forms_unique/_form_order_methods.html.twig', [
+                    'order' => $targetOrder,
+                    'token'=> $token,
+                    'orderMethodsForm' => $form->createView()
+                ]))
+                ->createJsonResponse()
+            ;
+        }
+        else
+        {
+            return $this->render('order/methods.html.twig', [
+                'order' => $targetOrder,
+                'token'=> $token,
+                'orderMethodsForm' => $form->createView(),
+            ]);
+        }
     }
 }
