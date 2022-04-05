@@ -22,6 +22,10 @@ class Order
     public const LIFETIME_IN_DAYS = 60;
     public const REFRESH_WINDOW_IN_DAYS = 30;
 
+    const DELIVERY_METHODS_THAT_LOCK_ADDRESS = [
+        DeliveryMethod::TYPE_PACKETA_CZ,
+    ];
+
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
@@ -98,6 +102,22 @@ class Order
      * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $paymentMethodName = null;
+
+    /*
+     * Doručovací adresa
+     */
+
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $addressDeliveryLocked = false;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     *
+     * @Assert\Length(max=255, groups={"addresses"}, maxMessage="Maximální počet znaků v doplňku adresy: {{ limit }}")
+     */
+    private $addressDeliveryAdditionalInfo;
 
     private int $totalQuantity = 0;
     private float $totalPriceWithoutVat = 0.0;
@@ -222,9 +242,21 @@ class Order
     {
         $this->deliveryMethod = $deliveryMethod;
 
+        if(in_array($this->deliveryMethod->getType(), self::DELIVERY_METHODS_THAT_LOCK_ADDRESS))
+        {
+            $this->addressDeliveryLocked = true;
+        }
+        else
+        {
+            if($this->addressDeliveryLocked)
+            {
+                $this->resetAddressDelivery();
+            }
+            $this->addressDeliveryLocked = false;
+        }
+
         return $this;
     }
-
 
     public function getPaymentMethod(): ?PaymentMethod
     {
@@ -353,10 +385,34 @@ class Order
         return $this;
     }
 
+    public function isAddressDeliveryLocked(): ?bool
+    {
+        return $this->addressDeliveryLocked;
+    }
+
+    public function setAddressDeliveryLocked(bool $addressDeliveryLocked): self
+    {
+        $this->addressDeliveryLocked = $addressDeliveryLocked;
+
+        return $this;
+    }
+
+    public function getAddressDeliveryAdditionalInfo(): ?string
+    {
+        return $this->addressDeliveryAdditionalInfo;
+    }
+
+    public function setAddressDeliveryAdditionalInfo(?string $addressDeliveryAdditionalInfo): self
+    {
+        $this->addressDeliveryAdditionalInfo = $addressDeliveryAdditionalInfo;
+
+        return $this;
+    }
+
     /**
      * @ORM\PreFlush
      */
-    public function setPricesOfMethods(): self
+    public function setHistoricalData(): self
     {
         if ($this->deliveryMethod === null)
         {
@@ -385,5 +441,10 @@ class Order
         }
 
         return $this;
+    }
+
+    private function resetAddressDelivery(): void
+    {
+        $this->addressDeliveryAdditionalInfo = null;
     }
 }

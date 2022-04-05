@@ -9,6 +9,7 @@ twig:
         site_email: '%app_site_email%'
         site_facebook: '%app_site_facebook%'
         site_instagram: '%app_site_instagram%'
+        packeta_key: '%app_packeta_key%'
         navbar_service: '@app.navbar_service'
         cart_service: '@app.cart_service'
         breadcrumbs_service: '@app.breadcrumbs_service'

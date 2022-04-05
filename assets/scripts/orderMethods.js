@@ -1,6 +1,7 @@
 import { loaderOpen } from './app';
 import { loaderClose } from './app';
 import { errorModalOpen } from './app';
+require('./packetaLibrary');
 
 let requestInProgress = false;
 
@@ -15,16 +16,26 @@ function initialize()
     const formOrderMethods = $('#form-order-methods');
     if(formOrderMethods)
     {
-        formOrderMethods.on('change', function()
+        $('.method-normal').on('click', function(e)
         {
             ajaxUpdateOrderMethods(formOrderMethods.attr('action'), formOrderMethods.serialize());
+            e.preventDefault();
+        });
+
+        $('.method-packeta-cz').on('click', function(e)
+        {
+            Packeta.Widget.pick( $(this).data('packeta-key'), console.log, {
+                country: 'cs',
+                language: 'cs',
+            });
+            e.preventDefault();
         });
     }
 }
 
 function ajaxUpdateOrderMethods(url, data)
 {
-    if(requestInProgress)
+    if(requestInProgress || data === null)
     {
         return;
     }

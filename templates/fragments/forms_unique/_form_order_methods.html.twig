@@ -15,7 +15,12 @@
 
                                     <div class="col s9 valign-wrapper">
                                         <div class="col no-padding valign-wrapper">
-                                            {{ form_widget(orderMethodsForm.children.deliveryMethod.children[methodKey], {attr: {class: 'filled-in checkbox-light-blue with-gap'}}) }}
+                                            {% set attributes = {class: 'filled-in checkbox-light-blue with-gap method-normal'} %}
+                                            {% if methodData.type is same as (constant('App\\Entity\\DeliveryMethod::TYPE_PACKETA_CZ')) %}
+                                                {% set attributes = {'class': 'filled-in checkbox-light-blue with-gap method-packeta-cz', 'data-packeta-key': packeta_key} %}
+                                            {% endif %}
+
+                                            {{ form_widget(orderMethodsForm.children.deliveryMethod.children[methodKey], {attr: attributes}) }}
                                             <span></span>
                                         </div>
 
@@ -63,7 +68,7 @@
 
                                     <div class="col s9 valign-wrapper">
                                         <div class="col no-padding valign-wrapper">
-                                            {{ form_widget(orderMethodsForm.children.paymentMethod.children[methodKey], {attr: {class: 'filled-in checkbox-light-blue with-gap'}}) }}
+                                            {{ form_widget(orderMethodsForm.children.paymentMethod.children[methodKey], {attr: {class: 'filled-in checkbox-light-blue with-gap method-normal'}}) }}
                                             <span></span>
                                         </div>
 

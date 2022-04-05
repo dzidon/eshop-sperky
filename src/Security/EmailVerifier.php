@@ -36,7 +36,7 @@ class EmailVerifier
      * @param string $verifyEmailRouteName
      * @param null|UserInterface $user Pokud je null, jedná se ověřovací e-mail, který se nikam nepošle, protože
      *                                 uživatel (útočník?) zkouší zaregistrovat e-mail, který už je ověřený.
-     *                                 Také je možné, že ještě neuplynul čas uvedený v app_email_verify_link_throttle_limit
+     *                                 Také je možné, že ještě neuplynul čas uvedený v app_email_verify_throttling_interval
      *                                 od posledního odeslaného odkazu.
      *
      * @throws TransportExceptionInterface

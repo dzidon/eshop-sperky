@@ -67,7 +67,8 @@ class RegistrationController extends AbstractController
             $entityManager = $this->getDoctrine()->getManager();
             $userForEmailConfirmation = null;
             $now = new DateTime('now');
-            if($existingUser === null)
+
+            if ($existingUser === null)
             {
                 $user->setVerifyLinkLastSent($now);
                 $entityManager->persist($user);
@@ -76,7 +77,7 @@ class RegistrationController extends AbstractController
 
                 $this->logger->info(sprintf("User %s (ID: %s) has registered a new account using email & password.", $user->getUserIdentifier(), $user->getId()));
             }
-            else if(!$existingUser->isVerified() && $existingUser->canSendAnotherVerifyLink($parameterBag->get('app_email_verify_link_throttle_limit')))
+            else if (!$existingUser->isVerified() && $existingUser->canSendAnotherVerifyLink($parameterBag->get('app_email_verify_throttling_interval')))
             {
                 $existingUser->setVerifyLinkLastSent($now);
                 $existingUser->setRegistered($now);
@@ -98,8 +99,8 @@ class RegistrationController extends AbstractController
                 $this->logger->error(sprintf("User %s has tried to register, but the following error occurred in sendEmailConfirmation: %s", $user->getUserIdentifier(), $exception->getMessage()));
             }
 
-            //uživatel už je ověřený nebo je moc brzo na další ověřovací odkaz
-            if(!$userForEmailConfirmation)
+            // uživatel už je ověřený nebo je moc brzo na další ověřovací odkaz
+            if (!$userForEmailConfirmation)
             {
                 $this->logger->error(sprintf("User %s has tried to register, but this email is already verified or it's too soon for another verification link.", $user->getUserIdentifier()));
             }

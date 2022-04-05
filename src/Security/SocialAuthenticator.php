@@ -78,7 +78,7 @@ class SocialAuthenticator extends OAuth2Authenticator
 
     public function authenticate(Request $request): PassportInterface
     {
-        if($this->security->isGranted('IS_AUTHENTICATED_FULLY')) //uživatel už je přihlášen úplně
+        if ($this->security->isGranted('IS_AUTHENTICATED_FULLY')) //uživatel už je přihlášen úplně
         {
             throw new AlreadyAuthenticatedException();
         }
@@ -100,7 +100,7 @@ class SocialAuthenticator extends OAuth2Authenticator
                 $socialEmail = $socialUser->getEmail();
                 $socialId = $socialUser->getId();
 
-                if($socialEmail === null || $socialId === null)
+                if ($socialEmail === null || $socialId === null)
                 {
                     $this->logger->error(sprintf("Failed %s login due to insufficient data provided (Social email: %s, Social ID: %s).", $serviceName, $socialEmail, $socialId));
                     throw new InsufficientSocialDataException();
@@ -111,7 +111,7 @@ class SocialAuthenticator extends OAuth2Authenticator
                 $existingUser = $userRepository->findOneBy([$serviceIdAttribute => $socialId]); // např. facebookId => 651519191561
                 if ($existingUser) //social id nalezeno v naší db
                 {
-                    if($socialEmail === $existingUser->getUserIdentifier()) // v db exisutje user s danym emailem a social id
+                    if ($socialEmail === $existingUser->getUserIdentifier()) // v db exisutje user s danym emailem a social id
                     {
                         $this->logger->info(sprintf("User %s (ID: %s) has logged in using %s. They have used this service to log in before (Social ID: %s).", $existingUser->getUserIdentifier(), $existingUser->getId(), $serviceName, $socialId));
                         return $existingUser;
@@ -126,7 +126,7 @@ class SocialAuthenticator extends OAuth2Authenticator
 
                 // v minulosti se nepřihlašoval přes danou službu
                 $user = $userRepository->findOneBy(['email' => $socialEmail]);
-                if($user) // nějaký e-mail z naší DB se shoduje s emailem daného social účtu
+                if ($user) // nějaký e-mail z naší DB se shoduje s emailem daného social účtu
                 {
                     $this->logger->info(sprintf("User %s (ID: %s) has logged in using %s by linking email addresses (Social ID: %s).", $user->getUserIdentifier(), $user->getId(), $serviceName, $socialId));
                 }

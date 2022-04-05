@@ -8,8 +8,7 @@ use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
- * Subscriber řešící nastavení tokenu aktivní objednávky do cookie po vrácení odpovědi a vložení varování
- * vzniklých při synchronizaci do FlashBagu.
+ * Subscriber řešící nastavení tokenu aktivní objednávky do cookie po vrácení odpovědi.
  *
  * @package App\EventSubscriber
  */

@@ -11,7 +11,8 @@ parameters:
     app_site_facebook: 'https://www.facebook.com'
     app_site_instagram: 'https://www.instagram.com'
     app_email_noreply: 'noreply@sperky-test.cz'
-    app_email_verify_link_throttle_limit: 600 # seconds
+    app_email_verify_throttling_interval: 600 # seconds
+    app_packeta_key: '%env(PACKETA_KEY)%'
 
     container.dumper.inline_factories: true
 

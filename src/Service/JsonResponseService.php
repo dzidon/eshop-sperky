@@ -39,7 +39,7 @@ class JsonResponseService
 
     public function addResponseError(string $text): self
     {
-        $this->responseStatus = Response::HTTP_NOT_FOUND;
+        $this->responseStatus = Response::HTTP_UNPROCESSABLE_ENTITY;
         $this->responseData['errors'][] = $text;
 
         return $this;
