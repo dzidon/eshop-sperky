@@ -5,13 +5,22 @@ namespace App\Form;
 use App\Entity\DeliveryMethod;
 use App\Entity\Order;
 use App\Entity\PaymentMethod;
+use App\Form\EventSubscriber\OrderMethodsSubscriber;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class OrderMethodsFormType extends AbstractType
 {
+    private OrderMethodsSubscriber $orderMethodsSubscriber;
+
+    public function __construct(OrderMethodsSubscriber $orderMethodsSubscriber)
+    {
+        $this->orderMethodsSubscriber = $orderMethodsSubscriber;
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
@@ -27,8 +36,14 @@ class OrderMethodsFormType extends AbstractType
                 'multiple' => false,
                 'expanded' => true,
                 'choice_label' => 'name',
-                'label' => 'Způsob platby'
+                'label' => 'Způsob platby',
             ])
+            ->add('staticAddressDeliveryAdditionalInfo', HiddenType::class, [
+                'attr' => [
+                    'class' => 'staticAddressDeliveryAdditionalInfo',
+                ],
+            ])
+            ->addEventSubscriber($this->orderMethodsSubscriber)
         ;
     }
 

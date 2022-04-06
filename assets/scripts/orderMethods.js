@@ -3,6 +3,7 @@ import { loaderClose } from './app';
 import { errorModalOpen } from './app';
 require('./packetaLibrary');
 
+const formOrderMethods = $('#form-order-methods');
 let requestInProgress = false;
 
 $(document).ready(function()
@@ -13,29 +14,50 @@ $(document).ready(function()
 function initialize()
 {
     // formulář obsahující platební a doručovací metody
-    const formOrderMethods = $('#form-order-methods');
     if(formOrderMethods)
     {
-        $('.method-normal').on('click', function(e)
+        // doprava
+        $('.delivery-normal').on('click', function()
         {
             ajaxUpdateOrderMethods(formOrderMethods.attr('action'), formOrderMethods.serialize());
+            $(".method-delivery").prop("checked", false);
+        });
+
+        $('.delivery-packeta-cz').on('click', function(e)
+        {
+            Packeta.Widget.pick( $(this).data('packeta-key'), onPacketaFinished, {
+                country: 'cz',
+                language: 'cs',
+            });
+
             e.preventDefault();
         });
 
-        $('.method-packeta-cz').on('click', function(e)
+        // platba
+        $('.method-payment').on('click', function()
         {
-            Packeta.Widget.pick( $(this).data('packeta-key'), console.log, {
-                country: 'cs',
-                language: 'cs',
-            });
-            e.preventDefault();
+            ajaxUpdateOrderMethods(formOrderMethods.attr('action'), formOrderMethods.serialize());
+            $(".method-payment").prop("checked", false);
         });
+    }
+}
+
+function onPacketaFinished(data)
+{
+    if(typeof(data) != "undefined" && data !== null && formOrderMethods)
+    {
+        const packetaRadio = $(".delivery-packeta-cz");
+
+        packetaRadio.prop("checked", true);
+        $('.staticAddressDeliveryAdditionalInfo').val(data['id']);
+        ajaxUpdateOrderMethods(formOrderMethods.attr('action'), formOrderMethods.serialize());
+        packetaRadio.prop("checked", false);
     }
 }
 
 function ajaxUpdateOrderMethods(url, data)
 {
-    if(requestInProgress || data === null)
+    if(requestInProgress)
     {
         return;
     }
@@ -70,7 +92,7 @@ function renderOrderMethods(data)
         return;
     }
 
-    $('#form-order-methods').html(data['html']);
+    formOrderMethods.html(data['html']);
 
     if (typeof(data['totalProducts']) != "undefined" && data['totalProducts'] !== null)
     {

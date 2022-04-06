@@ -23,7 +23,7 @@ class Order
     public const REFRESH_WINDOW_IN_DAYS = 30;
 
     const DELIVERY_METHODS_THAT_LOCK_ADDRESS = [
-        DeliveryMethod::TYPE_PACKETA_CZ,
+        DeliveryMethod::TYPE_PACKETA_CZ => true,
     ];
 
     /**
@@ -119,6 +119,9 @@ class Order
      */
     private $addressDeliveryAdditionalInfo;
 
+    private $staticAddressDeliveryAdditionalInfo;
+
+    private $previousDeliveryType;
     private int $totalQuantity = 0;
     private float $totalPriceWithoutVat = 0.0;
     private float $totalPriceWithVat = 0.0;
@@ -241,19 +244,6 @@ class Order
     public function setDeliveryMethod(?DeliveryMethod $deliveryMethod): self
     {
         $this->deliveryMethod = $deliveryMethod;
-
-        if(in_array($this->deliveryMethod->getType(), self::DELIVERY_METHODS_THAT_LOCK_ADDRESS))
-        {
-            $this->addressDeliveryLocked = true;
-        }
-        else
-        {
-            if($this->addressDeliveryLocked)
-            {
-                $this->resetAddressDelivery();
-            }
-            $this->addressDeliveryLocked = false;
-        }
 
         return $this;
     }
@@ -412,13 +402,19 @@ class Order
     /**
      * @ORM\PreFlush
      */
-    public function setHistoricalData(): self
+    public function fixDeliveryMethodData(): void
     {
+        /* Historická data pro doručovací metodu */
         if ($this->deliveryMethod === null)
         {
             $this->deliveryPriceWithoutVat = 0.0;
             $this->deliveryPriceWithVat = 0.0;
             $this->deliveryMethodName = null;
+
+            if ($this->addressDeliveryLocked)
+            {
+                $this->resetAddressDelivery();
+            }
         }
         else
         {
@@ -427,6 +423,23 @@ class Order
             $this->deliveryMethodName = $this->deliveryMethod->getName();
         }
 
+        /* Zamykání/odemykání doručovací adresy */
+        if ($this->deliveryMethod !== null && isset(self::DELIVERY_METHODS_THAT_LOCK_ADDRESS[$this->deliveryMethod->getType()]))
+        {
+            $this->addressDeliveryLocked = true;
+        }
+        else
+        {
+            $this->addressDeliveryLocked = false;
+        }
+    }
+
+    /**
+     * @ORM\PreFlush
+     */
+    public function fixPaymentMethodData(): void
+    {
+        /* Historická data pro platební metodu */
         if ($this->paymentMethod === null)
         {
             $this->paymentPriceWithoutVat = 0.0;
@@ -438,6 +451,47 @@ class Order
             $this->paymentPriceWithoutVat = $this->paymentMethod->getPriceWithoutVat();
             $this->paymentPriceWithVat = $this->paymentMethod->getPriceWithVat();
             $this->paymentMethodName = $this->paymentMethod->getName();
+        }
+    }
+
+    public function getStaticAddressDeliveryAdditionalInfo(): ?string
+    {
+        return $this->staticAddressDeliveryAdditionalInfo;
+    }
+
+    public function setStaticAddressDeliveryAdditionalInfo(?string $staticAddressDeliveryAdditionalInfo): self
+    {
+        $this->staticAddressDeliveryAdditionalInfo = $staticAddressDeliveryAdditionalInfo;
+
+        return $this;
+    }
+
+    public function determinePreviousDeliveryType(): self
+    {
+        if($this->getDeliveryMethod() === null)
+        {
+            $this->previousDeliveryType = null;
+        }
+        else
+        {
+            $this->previousDeliveryType = $this->getDeliveryMethod()->getType();
+        }
+
+        return $this;
+    }
+
+    public function determineAddressDelivery(): self
+    {
+        // přechod na null/Českou poštu
+        if ($this->addressDeliveryLocked && ($this->deliveryMethod === null || !isset(self::DELIVERY_METHODS_THAT_LOCK_ADDRESS[$this->deliveryMethod->getType()])))
+        {
+            $this->resetAddressDelivery();
+        }
+
+        // přechod na Zásilkovnu
+        if ($this->staticAddressDeliveryAdditionalInfo !== null && $this->deliveryMethod !== null && isset(self::DELIVERY_METHODS_THAT_LOCK_ADDRESS[$this->deliveryMethod->getType()]))
+        {
+            $this->addressDeliveryAdditionalInfo = $this->staticAddressDeliveryAdditionalInfo;
         }
 
         return $this;

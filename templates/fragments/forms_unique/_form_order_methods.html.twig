@@ -15,9 +15,9 @@
 
                                     <div class="col s9 valign-wrapper">
                                         <div class="col no-padding valign-wrapper">
-                                            {% set attributes = {class: 'filled-in checkbox-light-blue with-gap method-normal'} %}
+                                            {% set attributes = {class: 'filled-in checkbox-light-blue with-gap method-delivery delivery-normal'} %}
                                             {% if methodData.type is same as (constant('App\\Entity\\DeliveryMethod::TYPE_PACKETA_CZ')) %}
-                                                {% set attributes = {'class': 'filled-in checkbox-light-blue with-gap method-packeta-cz', 'data-packeta-key': packeta_key} %}
+                                                {% set attributes = {'class': 'filled-in checkbox-light-blue with-gap method-delivery delivery-packeta-cz', 'data-packeta-key': packeta_key} %}
                                             {% endif %}
 
                                             {{ form_widget(orderMethodsForm.children.deliveryMethod.children[methodKey], {attr: attributes}) }}
@@ -31,7 +31,12 @@
                                                 </div>
                                             {% endif %}
 
-                                            <h6 class="margin-0 black-text">{{ methodChoiceView.label }}</h6>
+                                            <div>
+                                                <h6 class="margin-0 black-text">{{ methodChoiceView.label }}</h6>
+                                                {% if methodData is same as (order.deliveryMethod) and order.addressDeliveryLocked %}
+                                                    <span>{{ order.addressDeliveryAdditionalInfo }}</span>
+                                                {% endif %}
+                                            </div>
                                         </div>
                                     </div>
 
@@ -68,7 +73,7 @@
 
                                     <div class="col s9 valign-wrapper">
                                         <div class="col no-padding valign-wrapper">
-                                            {{ form_widget(orderMethodsForm.children.paymentMethod.children[methodKey], {attr: {class: 'filled-in checkbox-light-blue with-gap method-normal'}}) }}
+                                            {{ form_widget(orderMethodsForm.children.paymentMethod.children[methodKey], {attr: {class: 'filled-in checkbox-light-blue with-gap method-payment'}}) }}
                                             <span></span>
                                         </div>
 
