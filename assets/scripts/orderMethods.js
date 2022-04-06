@@ -25,7 +25,7 @@ function initialize()
 
         $('.delivery-packeta-cz').on('click', function(e)
         {
-            Packeta.Widget.pick( $(this).data('packeta-key'), onPacketaFinished, {
+            Packeta.Widget.pick( $(this).data('packeta-key'), onPacketaCzFinished, {
                 country: 'cz',
                 language: 'cs',
             });
@@ -42,7 +42,7 @@ function initialize()
     }
 }
 
-function onPacketaFinished(data)
+function onPacketaCzFinished(data)
 {
     if(typeof(data) != "undefined" && data !== null && formOrderMethods)
     {
@@ -50,6 +50,11 @@ function onPacketaFinished(data)
 
         packetaRadio.prop("checked", true);
         $('.staticAddressDeliveryAdditionalInfo').val(data['id']);
+        $('.staticAddressDeliveryCountry').val('Česká republika');
+        $('.staticAddressDeliveryStreet').val(data['street']);
+        $('.staticAddressDeliveryTown').val(data['city']);
+        $('.staticAddressDeliveryZip').val(data['zip']);
+
         ajaxUpdateOrderMethods(formOrderMethods.attr('action'), formOrderMethods.serialize());
         packetaRadio.prop("checked", false);
     }

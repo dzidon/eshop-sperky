@@ -43,6 +43,26 @@ class OrderMethodsFormType extends AbstractType
                     'class' => 'staticAddressDeliveryAdditionalInfo',
                 ],
             ])
+            ->add('staticAddressDeliveryCountry', HiddenType::class, [
+                'attr' => [
+                    'class' => 'staticAddressDeliveryCountry',
+                ],
+            ])
+            ->add('staticAddressDeliveryStreet', HiddenType::class, [
+                'attr' => [
+                    'class' => 'staticAddressDeliveryStreet',
+                ],
+            ])
+            ->add('staticAddressDeliveryTown', HiddenType::class, [
+                'attr' => [
+                    'class' => 'staticAddressDeliveryTown',
+                ],
+            ])
+            ->add('staticAddressDeliveryZip', HiddenType::class, [
+                'attr' => [
+                    'class' => 'staticAddressDeliveryZip',
+                ],
+            ])
             ->addEventSubscriber($this->orderMethodsSubscriber)
         ;
     }

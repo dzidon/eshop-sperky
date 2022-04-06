@@ -34,7 +34,7 @@
                                             <div>
                                                 <h6 class="margin-0 black-text">{{ methodChoiceView.label }}</h6>
                                                 {% if methodData is same as (order.deliveryMethod) and order.addressDeliveryLocked %}
-                                                    <span>{{ order.addressDeliveryAdditionalInfo }}</span>
+                                                    <span>{{ order.addressDeliveryStreet }}, {{ order.addressDeliveryTown }} {{ order.addressDeliveryZip }}</span>
                                                 {% endif %}
                                             </div>
                                         </div>

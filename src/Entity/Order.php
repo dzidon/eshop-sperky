@@ -113,12 +113,48 @@ class Order
     private $addressDeliveryLocked = false;
 
     /**
+     * @ORM\Column(type="string", length=32)
+     *
+     * @Assert\Choice(choices=Address::COUNTRY_NAMES, groups={"addresses_delivery"}, message="Zvolte platnou zemi.")
+     * @Assert\NotBlank(groups={"addresses_delivery"})
+     */
+    private $addressDeliveryCountry;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     *
+     * @AssertCustom\Compound\StreetRequirements(groups={"addresses_delivery"})
+     * @Assert\NotBlank(groups={"addresses_delivery"})
+     */
+    private $addressDeliveryStreet;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     *
+     * @Assert\Length(max=255, groups={"addresses_delivery"}, maxMessage="Maximální počet znaků v obci: {{ limit }}")
+     * @Assert\NotBlank(groups={"addresses_delivery"})
+     */
+    private $addressDeliveryTown;
+
+    /**
+     * @ORM\Column(type="string", length=5)
+     *
+     * @AssertCustom\ZipCode(groups={"addresses_delivery"})
+     * @Assert\NotBlank(groups={"addresses_delivery"})
+     */
+    private $addressDeliveryZip;
+
+    /**
      * @ORM\Column(type="string", length=255, nullable=true)
      *
-     * @Assert\Length(max=255, groups={"addresses"}, maxMessage="Maximální počet znaků v doplňku adresy: {{ limit }}")
+     * @Assert\Length(max=255, groups={"addresses_delivery"}, maxMessage="Maximální počet znaků v doplňku adresy: {{ limit }}")
      */
     private $addressDeliveryAdditionalInfo;
 
+    private $staticAddressDeliveryCountry;
+    private $staticAddressDeliveryStreet;
+    private $staticAddressDeliveryTown;
+    private $staticAddressDeliveryZip;
     private $staticAddressDeliveryAdditionalInfo;
 
     private $previousDeliveryType;
@@ -399,6 +435,54 @@ class Order
         return $this;
     }
 
+    public function getAddressDeliveryCountry(): ?string
+    {
+        return $this->addressDeliveryCountry;
+    }
+
+    public function setAddressDeliveryCountry(?string $addressDeliveryCountry): self
+    {
+        $this->addressDeliveryCountry = $addressDeliveryCountry;
+
+        return $this;
+    }
+
+    public function getAddressDeliveryStreet(): ?string
+    {
+        return $this->addressDeliveryStreet;
+    }
+
+    public function setAddressDeliveryStreet(?string $addressDeliveryStreet): self
+    {
+        $this->addressDeliveryStreet = $addressDeliveryStreet;
+
+        return $this;
+    }
+
+    public function getAddressDeliveryTown(): ?string
+    {
+        return $this->addressDeliveryTown;
+    }
+
+    public function setAddressDeliveryTown(?string $addressDeliveryTown): self
+    {
+        $this->addressDeliveryTown = $addressDeliveryTown;
+
+        return $this;
+    }
+
+    public function getAddressDeliveryZip(): ?string
+    {
+        return $this->addressDeliveryZip;
+    }
+
+    public function setAddressDeliveryZip(?string $addressDeliveryZip): self
+    {
+        $this->addressDeliveryZip = preg_replace('/\s+/', '', $addressDeliveryZip);
+
+        return $this;
+    }
+
     /**
      * @ORM\PreFlush
      */
@@ -466,6 +550,54 @@ class Order
         return $this;
     }
 
+    public function getStaticAddressDeliveryCountry(): ?string
+    {
+        return $this->staticAddressDeliveryCountry;
+    }
+
+    public function setStaticAddressDeliveryCountry(?string $staticAddressDeliveryCountry): self
+    {
+        $this->staticAddressDeliveryCountry = $staticAddressDeliveryCountry;
+
+        return $this;
+    }
+
+    public function getStaticAddressDeliveryStreet(): ?string
+    {
+        return $this->staticAddressDeliveryStreet;
+    }
+
+    public function setStaticAddressDeliveryStreet(?string $staticAddressDeliveryStreet): self
+    {
+        $this->staticAddressDeliveryStreet = $staticAddressDeliveryStreet;
+
+        return $this;
+    }
+
+    public function getStaticAddressDeliveryTown(): ?string
+    {
+        return $this->staticAddressDeliveryTown;
+    }
+
+    public function setStaticAddressDeliveryTown(?string $staticAddressDeliveryTown): self
+    {
+        $this->staticAddressDeliveryTown = $staticAddressDeliveryTown;
+
+        return $this;
+    }
+
+    public function getStaticAddressDeliveryZip(): ?string
+    {
+        return $this->staticAddressDeliveryZip;
+    }
+
+    public function setStaticAddressDeliveryZip(?string $staticAddressDeliveryZip): self
+    {
+        $this->staticAddressDeliveryZip = $staticAddressDeliveryZip;
+
+        return $this;
+    }
+
     public function determinePreviousDeliveryType(): self
     {
         if($this->getDeliveryMethod() === null)
@@ -491,14 +623,27 @@ class Order
         // přechod na Zásilkovnu
         if ($this->staticAddressDeliveryAdditionalInfo !== null && $this->deliveryMethod !== null && isset(self::DELIVERY_METHODS_THAT_LOCK_ADDRESS[$this->deliveryMethod->getType()]))
         {
-            $this->addressDeliveryAdditionalInfo = $this->staticAddressDeliveryAdditionalInfo;
+            $this->loadAddressDeliveryFromStatic();
         }
 
         return $this;
     }
 
+    private function loadAddressDeliveryFromStatic(): void
+    {
+        $this->setAddressDeliveryAdditionalInfo($this->staticAddressDeliveryAdditionalInfo);
+        $this->setAddressDeliveryCountry($this->staticAddressDeliveryCountry);
+        $this->setAddressDeliveryStreet($this->staticAddressDeliveryStreet);
+        $this->setAddressDeliveryTown($this->staticAddressDeliveryTown);
+        $this->setAddressDeliveryZip($this->staticAddressDeliveryZip);
+    }
+
     private function resetAddressDelivery(): void
     {
         $this->addressDeliveryAdditionalInfo = null;
+        $this->addressDeliveryCountry = null;
+        $this->addressDeliveryStreet = null;
+        $this->addressDeliveryTown = null;
+        $this->addressDeliveryZip = null;
     }
 }
