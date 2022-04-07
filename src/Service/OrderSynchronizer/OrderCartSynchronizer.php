@@ -10,6 +10,18 @@ namespace App\Service\OrderSynchronizer;
 class OrderCartSynchronizer extends AbstractOrderSynchronizer
 {
     /**
+     * Před vyvoláním těchto cest dojde k synchronizaci košíku
+     */
+    public const SYNCHRONIZATION_ROUTES = [
+        'cart_insert' => true,
+        'cart_update' => true,
+        'cart_remove' => true,
+        'order_cart' => true,
+        'order_methods' => true,
+        'order_addresses' => true,
+    ];
+
+    /**
      * {@inheritdoc}
      */
     protected static function getWarningPrefix(): string

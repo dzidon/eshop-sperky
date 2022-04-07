@@ -44,8 +44,6 @@ class CartService
         $this->synchronizer = $synchronizer;
         $this->entityManager = $entityManager;
         $this->request = $requestStack->getCurrentRequest();
-
-        $this->initialize();
     }
 
     /**
@@ -71,6 +69,46 @@ class CartService
     public function getOrderToken(): string
     {
         return (string) $this->order->getToken();
+    }
+
+    /**
+     * Tato metoda se volá jako první před vyvoláním každé controllerové akce.
+     * Zajišťuje existenci aktivní objednávky. Může vyvolat synchronizaci objednávky.
+     *
+     * @param bool $synchronize
+     */
+    public function initialize(bool $synchronize): void
+    {
+        $tokenInCookie = (string) $this->request->cookies->get(self::COOKIE_NAME);
+
+        if (UUid::isValid($tokenInCookie))
+        {
+            $uuid = Uuid::fromString($tokenInCookie);
+
+            /** @var Order|null $order */
+            $this->order = $this->entityManager->getRepository(Order::class)->findOneAndFetchCartOccurences($uuid);
+            if ($this->order === null || $this->order->isCreatedManually() || $this->order->isFinished())
+            {
+                $this->createNewOrder();
+            }
+        }
+        else
+        {
+            $this->createNewOrder();
+        }
+
+        $this->synchronizer->setOrder($this->order);
+        if($synchronize)
+        {
+            $this->synchronizer->synchronize();
+            $this->synchronizer->addWarningsToFlashBag();
+        }
+
+        $this->order->calculateTotals();
+        $this->orderCookieObtain();
+
+        $this->entityManager->persist($this->order);
+        $this->entityManager->flush();
     }
 
     /**
@@ -205,42 +243,6 @@ class CartService
 
         $this->order->reindexCartOccurences();
         $this->order->calculateTotals();
-    }
-
-    /**
-     * Tato metoda se volá jako první před vyvoláním každé controllerové akce. Zajišťuje existenci aktivní objednávky.
-     */
-    private function initialize(): void
-    {
-        $tokenInCookie = (string) $this->request->cookies->get(self::COOKIE_NAME);
-
-        if (UUid::isValid($tokenInCookie))
-        {
-            $uuid = Uuid::fromString($tokenInCookie);
-
-            /** @var Order|null $order */
-            $this->order = $this->entityManager->getRepository(Order::class)->findOneAndFetchCartOccurences($uuid);
-            if ($this->order === null || $this->order->isCreatedManually() || $this->order->isFinished())
-            {
-                $this->createNewOrder();
-            }
-        }
-        else
-        {
-            $this->createNewOrder();
-        }
-
-        $this->synchronizer
-            ->setOrder($this->order)
-            ->synchronize();
-
-        $this->synchronizer->addWarningsToFlashBag();
-
-        $this->order->calculateTotals();
-        $this->orderCookieObtain();
-
-        $this->entityManager->persist($this->order);
-        $this->entityManager->flush();
     }
 
     /**
