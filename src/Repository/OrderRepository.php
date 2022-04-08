@@ -20,7 +20,7 @@ class OrderRepository extends ServiceEntityRepository
         parent::__construct($registry, Order::class);
     }
 
-    public function findOneAndFetchCartOccurences(Uuid $token)
+    public function findOneAndFetchEverything(Uuid $token)
     {
         $results = $this->createQueryBuilder('o')
             ->select('o, oc, dm, pm, ocp, ocpp, oco, ocop')
@@ -31,6 +31,25 @@ class OrderRepository extends ServiceEntityRepository
             ->leftJoin('ocp.optionGroups', 'ocpp')
             ->leftJoin('oc.options', 'oco')
             ->leftJoin('oco.productOptionGroup', 'ocop')
+            ->andWhere('o.token = :token')
+            ->setParameter('token', $token, 'uuid')
+            ->getQuery()
+            ->getResult()
+        ;
+
+        if(isset($results[0]))
+        {
+            return $results[0];
+        }
+
+        return null;
+    }
+
+    public function findOneAndFetchCartOccurences(Uuid $token)
+    {
+        $results = $this->createQueryBuilder('o')
+            ->select('o, oc')
+            ->leftJoin('o.cartOccurences', 'oc')
             ->andWhere('o.token = :token')
             ->setParameter('token', $token, 'uuid')
             ->getQuery()

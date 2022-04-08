@@ -75,9 +75,9 @@ class CartService
      * Tato metoda se volá jako první před vyvoláním každé controllerové akce.
      * Zajišťuje existenci aktivní objednávky. Může vyvolat synchronizaci objednávky.
      *
-     * @param bool $synchronize
+     * @param bool $loadFully
      */
-    public function initialize(bool $synchronize): void
+    public function initialize(bool $loadFully): void
     {
         $tokenInCookie = (string) $this->request->cookies->get(self::COOKIE_NAME);
 
@@ -85,8 +85,17 @@ class CartService
         {
             $uuid = Uuid::fromString($tokenInCookie);
 
-            /** @var Order|null $order */
-            $this->order = $this->entityManager->getRepository(Order::class)->findOneAndFetchCartOccurences($uuid);
+            // pokus o načtení aktivní objednávky
+            if ($loadFully)
+            {
+                $this->order = $this->entityManager->getRepository(Order::class)->findOneAndFetchEverything($uuid);
+            }
+            else
+            {
+                $this->order = $this->entityManager->getRepository(Order::class)->findOneAndFetchCartOccurences($uuid);
+            }
+
+            // nic to nenašlo || nalezená objednávka není aktivní
             if ($this->order === null || $this->order->isCreatedManually() || $this->order->isFinished())
             {
                 $this->createNewOrder();
@@ -98,7 +107,7 @@ class CartService
         }
 
         $this->synchronizer->setOrder($this->order);
-        if($synchronize)
+        if ($loadFully)
         {
             $this->synchronizer->synchronize();
             $this->synchronizer->addWarningsToFlashBag();

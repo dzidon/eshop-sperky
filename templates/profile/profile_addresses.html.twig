@@ -67,23 +67,29 @@
                                     </div>
                                 </div>
 
-                                {% if address.getCompany() is not null and address.getIc() is not null and address.getDic() is not null %}
+                                {% if address.getCompany() is not null or address.getIc() is not null or address.getDic() is not null %}
                                     <br>
+                                {% endif %}
 
+                                {% if address.getCompany() is not null %}
                                     <div class="row margin-0">
                                         <div class="col s6 no-padding">Název firmy:</div>
                                         <div class="col s6 no-padding">
                                             <strong>{{ address.getCompany() }}</strong>
                                         </div>
                                     </div>
+                                {% endif %}
 
+                                {% if address.getIc() is not null %}
                                     <div class="row margin-0">
                                         <div class="col s6 no-padding">IČ:</div>
                                         <div class="col s6 no-padding">
                                             <strong>{{ address.getIc() }}</strong>
                                         </div>
                                     </div>
+                                {% endif %}
 
+                                {% if address.getDic() is not null %}
                                     <div class="row margin-0">
                                         <div class="col s6 no-padding">DIČ:</div>
                                         <div class="col s6 no-padding">

@@ -74,6 +74,7 @@ class OrderMethodsFormType extends AbstractType
             'csrf_protection'   => true,
             'csrf_field_name'   => '_token',
             'csrf_token_id'     => 'form_order_methods',
+            'validation_groups' => ['Default', 'methods'],
             'attr'              => [
                 'id' => 'form-order-methods'
             ],

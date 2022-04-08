@@ -6,6 +6,7 @@ use DateTime;
 use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\Persistence\Proxy;
 use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Validator\Constraints as Assert;
 use App\Validation\Compound as AssertCompound;
@@ -17,6 +18,8 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Entity(repositoryClass=OrderRepository::class)
  * @ORM\Table(name="order_")
  * @ORM\HasLifecycleCallbacks()
+ *
+ * @AssertCustom\PacketaId(groups={"methods"})
  */
 class Order
 {
@@ -506,10 +509,6 @@ class Order
         return $this;
     }
 
-
-
-
-
     public function getAddressDeliveryAdditionalInfo(): ?string
     {
         return $this->addressDeliveryAdditionalInfo;
@@ -647,6 +646,15 @@ class Order
         return $this;
     }
 
+    public function injectStaticAddressDelivery(): void
+    {
+        $this->staticAddressDeliveryAdditionalInfo = $this->addressDeliveryAdditionalInfo;
+        $this->staticAddressDeliveryCountry = $this->addressDeliveryCountry;
+        $this->staticAddressDeliveryStreet = $this->addressDeliveryStreet;
+        $this->staticAddressDeliveryTown = $this->addressDeliveryTown;
+        $this->staticAddressDeliveryZip = $this->addressDeliveryZip;
+    }
+
     private function loadAddressDeliveryFromStatic(): void
     {
         $this->setAddressDeliveryAdditionalInfo($this->staticAddressDeliveryAdditionalInfo);
@@ -670,33 +678,37 @@ class Order
      */
     public function fixDeliveryMethodData(): void
     {
-        /* Historická data pro doručovací metodu */
-        if ($this->deliveryMethod === null)
+        if (!$this->deliveryMethod instanceof Proxy)
         {
-            $this->deliveryPriceWithoutVat = 0.0;
-            $this->deliveryPriceWithVat = 0.0;
-            $this->deliveryMethodName = null;
-
-            if ($this->addressDeliveryLocked)
+            /* Historická data pro doručovací metodu */
+            if ($this->deliveryMethod === null)
             {
-                $this->resetAddressDelivery();
-            }
-        }
-        else
-        {
-            $this->deliveryPriceWithoutVat = $this->deliveryMethod->getPriceWithoutVat();
-            $this->deliveryPriceWithVat = $this->deliveryMethod->getPriceWithVat();
-            $this->deliveryMethodName = $this->deliveryMethod->getName();
-        }
+                $this->deliveryPriceWithoutVat = 0.0;
+                $this->deliveryPriceWithVat = 0.0;
+                $this->deliveryMethodName = null;
 
-        /* Zamykání/odemykání doručovací adresy */
-        if ($this->deliveryMethod !== null && isset(self::DELIVERY_METHODS_THAT_LOCK_ADDRESS[$this->deliveryMethod->getType()]))
-        {
-            $this->addressDeliveryLocked = true;
-        }
-        else
-        {
-            $this->addressDeliveryLocked = false;
+                if ($this->addressDeliveryLocked)
+                {
+                    $this->resetAddressDelivery();
+                    $this->addressDeliveryLocked = false;
+                }
+            }
+            else
+            {
+                $this->deliveryPriceWithoutVat = $this->deliveryMethod->getPriceWithoutVat();
+                $this->deliveryPriceWithVat = $this->deliveryMethod->getPriceWithVat();
+                $this->deliveryMethodName = $this->deliveryMethod->getName();
+
+                /* Zamykání/odemykání doručovací adresy */
+                if (isset(self::DELIVERY_METHODS_THAT_LOCK_ADDRESS[$this->deliveryMethod->getType()]))
+                {
+                    $this->addressDeliveryLocked = true;
+                }
+                else
+                {
+                    $this->addressDeliveryLocked = false;
+                }
+            }
         }
     }
 
@@ -705,18 +717,21 @@ class Order
      */
     public function fixPaymentMethodData(): void
     {
-        /* Historická data pro platební metodu */
-        if ($this->paymentMethod === null)
+        if (!$this->paymentMethod instanceof Proxy)
         {
-            $this->paymentPriceWithoutVat = 0.0;
-            $this->paymentPriceWithVat = 0.0;
-            $this->paymentMethodName = null;
-        }
-        else
-        {
-            $this->paymentPriceWithoutVat = $this->paymentMethod->getPriceWithoutVat();
-            $this->paymentPriceWithVat = $this->paymentMethod->getPriceWithVat();
-            $this->paymentMethodName = $this->paymentMethod->getName();
+            /* Historická data pro platební metodu */
+            if ($this->paymentMethod === null)
+            {
+                $this->paymentPriceWithoutVat = 0.0;
+                $this->paymentPriceWithVat = 0.0;
+                $this->paymentMethodName = null;
+            }
+            else
+            {
+                $this->paymentPriceWithoutVat = $this->paymentMethod->getPriceWithoutVat();
+                $this->paymentPriceWithVat = $this->paymentMethod->getPriceWithVat();
+                $this->paymentMethodName = $this->paymentMethod->getName();
+            }
         }
     }
 }

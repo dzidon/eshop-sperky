@@ -7,10 +7,9 @@ use Symfony\Component\Validator\Constraint;
 /**
  * @Annotation
  */
-class AllOrNone extends Constraint
+class PacketaId extends Constraint
 {
-    public $message = 'Vyplnili jste některý z firemních údajů, musíte vyplnit i tento.';
-    public $targetAttributes = [];
+    public $message = 'Tato pobočka Zásilkovny je neplatná, zvolte prosím jinou.';
 
     public function getTargets()
     {

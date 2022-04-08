@@ -29,8 +29,8 @@ class CartSubscriber implements EventSubscriberInterface
     {
         // načtení aktivní objednávky a případná synchronizace
         $currentRoute = $event->getRequest()->attributes->get('_route');
-        $synchronize = isset(OrderCartSynchronizer::SYNCHRONIZATION_ROUTES[$currentRoute]);
-        $this->cart->initialize($synchronize);
+        $loadFully = isset(OrderCartSynchronizer::SYNCHRONIZATION_ROUTES[$currentRoute]);
+        $this->cart->initialize($loadFully);
     }
 
     public function onKernelResponse(ResponseEvent $event)

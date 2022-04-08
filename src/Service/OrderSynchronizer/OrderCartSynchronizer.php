@@ -10,7 +10,7 @@ namespace App\Service\OrderSynchronizer;
 class OrderCartSynchronizer extends AbstractOrderSynchronizer
 {
     /**
-     * Před vyvoláním těchto cest dojde k synchronizaci košíku
+     * Před vyvoláním těchto cest dojde k úplnému načtení a synchronizaci košíku
      */
     public const SYNCHRONIZATION_ROUTES = [
         'cart_insert' => true,
