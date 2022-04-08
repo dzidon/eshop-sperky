@@ -1,0 +1,103 @@
+<div class="col s12">
+    <div class="row">
+        <h4>Souhrn objednávky</h4>
+    </div>
+</div>
+
+<div class="collection z-depth-1">
+    {% for cartOccurence in order.cartOccurences %}
+        <div class="collection-item">
+            <div class="row no-mar-bot section">
+                <div class="col s8 flex-nowrap">
+                    {% if cartOccurence.product is not null %}
+                        {% set product_path = path('product', {slug: cartOccurence.product.slug}) %}
+
+                        <div class="col no-padding margin-right15px">
+                            <a href="{{ product_path }}">
+                                <div class="img-cart-overview">
+                                    <img alt="Obrázek produktu" class="responsive-img" src="{% if cartOccurence.product.mainImageName %} {{ asset(cartOccurence.product.mainImageName, 'product_images') }}  {% else %} {{ asset('no-image.png', 'images') }} {% endif %}">
+                                </div>
+                            </a>
+                        </div>
+                    {% endif %}
+
+                    <div class="col no-padding">
+                        {% if cartOccurence.product is null %}
+                            <strong class="margin-0">{{ cartOccurence.quantity }}x {{ cartOccurence.name }}</strong>
+                            <div class="grey-text">{{ cartOccurence.optionsString }}</div>
+                        {% else %}
+                            <a href="{{ product_path }}">
+                                <strong class="margin-0">{{ cartOccurence.quantity }}x {{ cartOccurence.name }}</strong>
+                                <div class="grey-text">{{ cartOccurence.optionsString }}</div>
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="col s4 right-align">
+                    <strong>{{ cartOccurence.priceWithVat * cartOccurence.quantity }} Kč</strong>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+
+    <div class="collection-item">
+        <div class="row no-mar-bot section">
+            <div class="col s8">
+                <strong>Cena produktů</strong>
+            </div>
+
+            <div class="col s4 right-align">
+                <strong>{{ order.totalPriceWithVat }} Kč</strong>
+            </div>
+        </div>
+    </div>
+
+    {% if order.deliveryMethod is not null %}
+        <div class="collection-item">
+            <div class="row no-mar-bot section">
+                <div class="col s8">{{ order.deliveryMethod.name }}</div>
+
+                <div class="col s4 right-align">
+                    <strong>
+                        {% if order.deliveryMethod.priceWithVat == 0 %}
+                            ZDARMA
+                        {% else %}
+                            {{ order.deliveryMethod.priceWithVat }} Kč
+                        {% endif %}
+                    </strong>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    {% if order.paymentMethod is not null %}
+        <div class="collection-item">
+            <div class="row no-mar-bot section">
+                <div class="col s8">{{ order.paymentMethod.name }}</div>
+
+                <div class="col s4 right-align">
+                    <strong>
+                        {% if order.paymentMethod.priceWithVat == 0 %}
+                            ZDARMA
+                        {% else %}
+                            {{ order.paymentMethod.priceWithVat }} Kč
+                        {% endif %}
+                    </strong>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<div class="row right-align">
+    <div class="col s12">
+        {% if vat_payer %}
+            <h5 class="no-mar-bot">{{ order.getTotalPriceWithoutVat(true) }} Kč celkem bez DPH</h5>
+        {% endif %}
+
+        <h5 class="no-mar-bot">
+            <strong>{{ order.getTotalPriceWithVat(true) }} Kč {% if vat_payer %}vč. DPH {% endif %}celkem</strong>
+        </h5>
+    </div>
+</div>

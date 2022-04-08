@@ -1,0 +1,120 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+
+    {# Breadcrumbs #}
+    {{ include('fragments/_breadcrumbs.html.twig') }}
+
+    <div class="container">
+        {# h1 #}
+        {{ include('fragments/_h1.html.twig') }}
+
+        {# Flash zprávy #}
+        {{ include('fragments/_flash_messages.html.twig') }}
+
+        {# Navigace aktivní objednávky #}
+        {{ include('fragments/_order_nav.html.twig', {'orderPageNumber': 3, 'orderToken': token}) }}
+
+        {{ form_start(orderAddressesForm) }}
+            <div class="row flex-wrap">
+                <div class="col s12 l7">
+                    <div class="row">
+                        <h4>Osobní údaje</h4>
+                    </div>
+
+                    <div class="row no-mar-bot">
+                        <div class="row no-mar-bot text-fields-compound">
+                            <div class="input-field col s12 m6">
+                                {{ form_widget(orderAddressesForm.addressDeliveryNameFirst) }}
+                                {{ form_label(orderAddressesForm.addressDeliveryNameFirst) }}
+                                {{ form_help(orderAddressesForm.addressDeliveryNameFirst) }}
+                                {{ form_errors(orderAddressesForm.addressDeliveryNameFirst) }}
+                            </div>
+                            <div class="input-field col s12 m6">
+                                {{ form_widget(orderAddressesForm.addressDeliveryNameLast) }}
+                                {{ form_label(orderAddressesForm.addressDeliveryNameLast) }}
+                                {{ form_help(orderAddressesForm.addressDeliveryNameLast) }}
+                                {{ form_errors(orderAddressesForm.addressDeliveryNameLast) }}
+                            </div>
+                        </div>
+                    </div>
+
+                    {{ form_row(orderAddressesForm.email) }}
+                    {{ form_row(orderAddressesForm.phoneNumber) }}
+
+                    <div class="row">
+                        <h4>Dodací a fakturační adresa</h4>
+                    </div>
+
+                    {% if order.addressDeliveryLocked %}
+                        <div class="row no-mar-bot">
+                            <div class="card">
+                                <div class="card-content">
+                                    <div class="row">
+                                        <div class="col s12">
+                                            <h6 class="no-mar-top">
+                                                <i class="fas fa-truck margin-right5px"></i> <strong>{{ order.deliveryMethod.name }}</strong>
+                                            </h6>
+                                        </div>
+                                    </div>
+
+                                    <div class="row no-mar-bot">
+                                        <div class="col s6 m4">
+                                            Země:
+                                        </div>
+                                        <div class="col s6 m8">
+                                            <strong>{{ order.addressDeliveryCountry }}</strong>
+                                        </div>
+
+                                        <div class="col s6 m4">
+                                            Ulice a č. popisné:
+                                        </div>
+                                        <div class="col s6 m8">
+                                            <strong>{{ order.addressDeliveryStreet }}</strong>
+                                        </div>
+
+                                        <div class="col s6 m4">
+                                            Obec:
+                                        </div>
+                                        <div class="col s6 m8">
+                                            <strong>{{ order.addressDeliveryTown }}</strong>
+                                        </div>
+
+                                        <div class="col s6 m4">
+                                            PSČ:
+                                        </div>
+                                        <div class="col s6 m8">
+                                            <strong>{{ order.addressDeliveryZip }}</strong>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% else %}
+                        {{ form_row(orderAddressesForm.addressDeliveryCountry) }}
+                        {{ form_row(orderAddressesForm.addressDeliveryStreet) }}
+                        {{ form_row(orderAddressesForm.addressDeliveryAdditionalInfo) }}
+                        {{ form_row(orderAddressesForm.addressDeliveryTown) }}
+                        {{ form_row(orderAddressesForm.addressDeliveryZip) }}
+                    {% endif %}
+                </div>
+
+                <div class="col s12 l4 container-sticky-bottom offset-l1 offset-xl1">
+                    <div class="row no-mar-bot sticky-bottom">
+                        {# Souhrn objednávky #}
+                        {{ include('fragments/_order_summary.html.twig', {'order': order}) }}
+
+                        <div class="row section right margin-0 valign-wrapper flex-wrap">
+                            <div class="col margin-right15px">
+                                <a href="{{ path('order_methods', {'token': token}) }}">Zpět</a>
+                            </div>
+
+                            <button class="btn-large waves-effect waves-light light-blue" type="submit">Objednat</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {{ form_end(orderAddressesForm) }}
+    </div>
+
+{% endblock %}

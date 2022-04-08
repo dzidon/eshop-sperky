@@ -17,16 +17,8 @@ class OrderMethodsSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            FormEvents::PRE_SET_DATA => 'preSetData',
             FormEvents::POST_SUBMIT => 'submit',
         ];
-    }
-
-    public function preSetData(FormEvent $event): void
-    {
-        /** @var Order $order */
-        $order = $event->getData();
-        $order->determinePreviousDeliveryType();
     }
 
     public function submit(FormEvent $event): void

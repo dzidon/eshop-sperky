@@ -17,7 +17,7 @@
 
         <div class="order-methods-wrapper">
             {# Způsob dopravy a způsob platby #}
-            {{ include('fragments/forms_unique/_form_order_methods.html.twig') }}
+            {{ include('fragments/forms_unique/_form_order_methods.html.twig', {'orderMethodsForm': orderMethodsForm, 'order': order, 'token': token}) }}
         </div>
     </div>
 

@@ -73,7 +73,7 @@ class OrderMethodsFormType extends AbstractType
             'data_class'        => Order::class,
             'csrf_protection'   => true,
             'csrf_field_name'   => '_token',
-            'csrf_token_id'     => 'form_cart_methods',
+            'csrf_token_id'     => 'form_order_methods',
             'attr'              => [
                 'id' => 'form-order-methods'
             ],

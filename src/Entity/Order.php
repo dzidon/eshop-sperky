@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Validator\Constraints as Assert;
+use App\Validation\Compound as AssertCompound;
 use App\Validation as AssertCustom;
 use App\Repository\OrderRepository;
 use Doctrine\ORM\Mapping as ORM;
@@ -104,6 +105,25 @@ class Order
     private $paymentMethodName = null;
 
     /*
+     * Osobní údaje
+     */
+
+    /**
+     * @ORM\Column(type="string", length=180, nullable=true)
+     *
+     * @AssertCompound\EmailRequirements(groups={"addresses"})
+     * @Assert\NotBlank(groups={"addresses"})
+     */
+    private $email;
+
+    /**
+     * @ORM\Column(type="phone_number", nullable=true)
+     *
+     * @Assert\NotBlank(groups={"addresses"})
+     */
+    private $phoneNumber;
+
+    /*
      * Doručovací adresa
      */
 
@@ -113,7 +133,23 @@ class Order
     private $addressDeliveryLocked = false;
 
     /**
-     * @ORM\Column(type="string", length=32)
+     * @ORM\Column(type="string", length=255, nullable=true)
+     *
+     * @Assert\Length(max=255, groups={"addresses"}, maxMessage="Maximální počet znaků v křestním jméně: {{ limit }}")
+     * @Assert\NotBlank(groups={"addresses"})
+     */
+    private $addressDeliveryNameFirst;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     *
+     * @Assert\Length(max=255, groups={"addresses"}, maxMessage="Maximální počet znaků v příjmení: {{ limit }}")
+     * @Assert\NotBlank(groups={"addresses"})
+     */
+    private $addressDeliveryNameLast;
+
+    /**
+     * @ORM\Column(type="string", length=32, nullable=true)
      *
      * @Assert\Choice(choices=Address::COUNTRY_NAMES, groups={"addresses_delivery"}, message="Zvolte platnou zemi.")
      * @Assert\NotBlank(groups={"addresses_delivery"})
@@ -121,7 +157,7 @@ class Order
     private $addressDeliveryCountry;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, nullable=true)
      *
      * @AssertCustom\Compound\StreetRequirements(groups={"addresses_delivery"})
      * @Assert\NotBlank(groups={"addresses_delivery"})
@@ -129,7 +165,7 @@ class Order
     private $addressDeliveryStreet;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, nullable=true)
      *
      * @Assert\Length(max=255, groups={"addresses_delivery"}, maxMessage="Maximální počet znaků v obci: {{ limit }}")
      * @Assert\NotBlank(groups={"addresses_delivery"})
@@ -137,7 +173,7 @@ class Order
     private $addressDeliveryTown;
 
     /**
-     * @ORM\Column(type="string", length=5)
+     * @ORM\Column(type="string", length=5, nullable=true)
      *
      * @AssertCustom\ZipCode(groups={"addresses_delivery"})
      * @Assert\NotBlank(groups={"addresses_delivery"})
@@ -157,7 +193,6 @@ class Order
     private $staticAddressDeliveryZip;
     private $staticAddressDeliveryAdditionalInfo;
 
-    private $previousDeliveryType;
     private int $totalQuantity = 0;
     private float $totalPriceWithoutVat = 0.0;
     private float $totalPriceWithVat = 0.0;
@@ -411,6 +446,30 @@ class Order
         return $this;
     }
 
+    public function getEmail(): ?string
+    {
+        return $this->email;
+    }
+
+    public function setEmail(?string $email): self
+    {
+        $this->email = $email;
+
+        return $this;
+    }
+
+    public function getPhoneNumber()
+    {
+        return $this->phoneNumber;
+    }
+
+    public function setPhoneNumber($phoneNumber): self
+    {
+        $this->phoneNumber = $phoneNumber;
+
+        return $this;
+    }
+
     public function isAddressDeliveryLocked(): ?bool
     {
         return $this->addressDeliveryLocked;
@@ -422,6 +481,34 @@ class Order
 
         return $this;
     }
+
+    public function getAddressDeliveryNameFirst(): ?string
+    {
+        return $this->addressDeliveryNameFirst;
+    }
+
+    public function setAddressDeliveryNameFirst(?string $addressDeliveryNameFirst): self
+    {
+        $this->addressDeliveryNameFirst = $addressDeliveryNameFirst;
+
+        return $this;
+    }
+
+    public function getAddressDeliveryNameLast(): ?string
+    {
+        return $this->addressDeliveryNameLast;
+    }
+
+    public function setAddressDeliveryNameLast(?string $addressDeliveryNameLast): self
+    {
+        $this->addressDeliveryNameLast = $addressDeliveryNameLast;
+
+        return $this;
+    }
+
+
+
+
 
     public function getAddressDeliveryAdditionalInfo(): ?string
     {
@@ -481,61 +568,6 @@ class Order
         $this->addressDeliveryZip = preg_replace('/\s+/', '', $addressDeliveryZip);
 
         return $this;
-    }
-
-    /**
-     * @ORM\PreFlush
-     */
-    public function fixDeliveryMethodData(): void
-    {
-        /* Historická data pro doručovací metodu */
-        if ($this->deliveryMethod === null)
-        {
-            $this->deliveryPriceWithoutVat = 0.0;
-            $this->deliveryPriceWithVat = 0.0;
-            $this->deliveryMethodName = null;
-
-            if ($this->addressDeliveryLocked)
-            {
-                $this->resetAddressDelivery();
-            }
-        }
-        else
-        {
-            $this->deliveryPriceWithoutVat = $this->deliveryMethod->getPriceWithoutVat();
-            $this->deliveryPriceWithVat = $this->deliveryMethod->getPriceWithVat();
-            $this->deliveryMethodName = $this->deliveryMethod->getName();
-        }
-
-        /* Zamykání/odemykání doručovací adresy */
-        if ($this->deliveryMethod !== null && isset(self::DELIVERY_METHODS_THAT_LOCK_ADDRESS[$this->deliveryMethod->getType()]))
-        {
-            $this->addressDeliveryLocked = true;
-        }
-        else
-        {
-            $this->addressDeliveryLocked = false;
-        }
-    }
-
-    /**
-     * @ORM\PreFlush
-     */
-    public function fixPaymentMethodData(): void
-    {
-        /* Historická data pro platební metodu */
-        if ($this->paymentMethod === null)
-        {
-            $this->paymentPriceWithoutVat = 0.0;
-            $this->paymentPriceWithVat = 0.0;
-            $this->paymentMethodName = null;
-        }
-        else
-        {
-            $this->paymentPriceWithoutVat = $this->paymentMethod->getPriceWithoutVat();
-            $this->paymentPriceWithVat = $this->paymentMethod->getPriceWithVat();
-            $this->paymentMethodName = $this->paymentMethod->getName();
-        }
     }
 
     public function getStaticAddressDeliveryAdditionalInfo(): ?string
@@ -598,20 +630,6 @@ class Order
         return $this;
     }
 
-    public function determinePreviousDeliveryType(): self
-    {
-        if($this->getDeliveryMethod() === null)
-        {
-            $this->previousDeliveryType = null;
-        }
-        else
-        {
-            $this->previousDeliveryType = $this->getDeliveryMethod()->getType();
-        }
-
-        return $this;
-    }
-
     public function determineAddressDelivery(): self
     {
         // přechod na null/Českou poštu
@@ -645,5 +663,60 @@ class Order
         $this->addressDeliveryStreet = null;
         $this->addressDeliveryTown = null;
         $this->addressDeliveryZip = null;
+    }
+
+    /**
+     * @ORM\PreFlush
+     */
+    public function fixDeliveryMethodData(): void
+    {
+        /* Historická data pro doručovací metodu */
+        if ($this->deliveryMethod === null)
+        {
+            $this->deliveryPriceWithoutVat = 0.0;
+            $this->deliveryPriceWithVat = 0.0;
+            $this->deliveryMethodName = null;
+
+            if ($this->addressDeliveryLocked)
+            {
+                $this->resetAddressDelivery();
+            }
+        }
+        else
+        {
+            $this->deliveryPriceWithoutVat = $this->deliveryMethod->getPriceWithoutVat();
+            $this->deliveryPriceWithVat = $this->deliveryMethod->getPriceWithVat();
+            $this->deliveryMethodName = $this->deliveryMethod->getName();
+        }
+
+        /* Zamykání/odemykání doručovací adresy */
+        if ($this->deliveryMethod !== null && isset(self::DELIVERY_METHODS_THAT_LOCK_ADDRESS[$this->deliveryMethod->getType()]))
+        {
+            $this->addressDeliveryLocked = true;
+        }
+        else
+        {
+            $this->addressDeliveryLocked = false;
+        }
+    }
+
+    /**
+     * @ORM\PreFlush
+     */
+    public function fixPaymentMethodData(): void
+    {
+        /* Historická data pro platební metodu */
+        if ($this->paymentMethod === null)
+        {
+            $this->paymentPriceWithoutVat = 0.0;
+            $this->paymentPriceWithVat = 0.0;
+            $this->paymentMethodName = null;
+        }
+        else
+        {
+            $this->paymentPriceWithoutVat = $this->paymentMethod->getPriceWithoutVat();
+            $this->paymentPriceWithVat = $this->paymentMethod->getPriceWithVat();
+            $this->paymentMethodName = $this->paymentMethod->getName();
+        }
     }
 }

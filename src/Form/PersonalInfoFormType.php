@@ -24,6 +24,7 @@ class PersonalInfoFormType extends AbstractType
     {
         $builder
             ->add('nameFirst', TextType::class, [
+                'attr' => ['autofocus' => 'autofocus'],
                 'required' => false,
                 'label' => 'Jméno',
             ])

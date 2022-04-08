@@ -3,6 +3,7 @@
 namespace App\Controller\User;
 
 use App\Form\CartFormType;
+use App\Form\OrderAddressesFormType;
 use App\Form\OrderMethodsFormType;
 use App\Service\BreadcrumbsService;
 use App\Service\CartService;
@@ -71,17 +72,20 @@ class OrderController extends AbstractController
 
         if($token !== null)
         {
-            if ($this->customOrderService->loadCustomOrder($token) === null)
+            if (($targetOrder = $this->customOrderService->loadCustomOrder($token)) === null)
             {
                 throw $this->createNotFoundException('Objednávka nenalezena.');
             }
 
-            $targetOrder = $this->customOrderService->getOrder();
-            $this->breadcrumbs->addRoute('order_custom', ['token' => $token]);
+            $this->breadcrumbs
+                ->addRoute('order_custom', ['token' => $token])
+                ->addRoute('order_methods', ['token' => $token]);
         }
         else
         {
-            $this->breadcrumbs->addRoute('order_cart');
+            $this->breadcrumbs
+                ->addRoute('order_cart')
+                ->addRoute('order_methods');
         }
 
         $form = $this->createForm(OrderMethodsFormType::class, $targetOrder, [
@@ -97,12 +101,9 @@ class OrderController extends AbstractController
 
             if(!$this->request->isXmlHttpRequest())
             {
-                $this->addFlash('success', 'saved');
-                return $this->redirectToRoute('order_methods', ['token' => $token]);
+                return $this->redirectToRoute('order_addresses', ['token' => $token]);
             }
         }
-
-        $this->breadcrumbs->addRoute('order_methods');
 
         if($this->request->isXmlHttpRequest())
         {
@@ -123,5 +124,52 @@ class OrderController extends AbstractController
                 'orderMethodsForm' => $form->createView(),
             ]);
         }
+    }
+
+    /**
+     * @Route("/objednavka/dodaci-udaje/{token}", name="order_addresses")
+     */
+    public function orderAddresses($token = null): Response
+    {
+        $targetOrder = $this->cart->getOrder();
+
+        if ($token !== null)
+        {
+            if (($targetOrder = $this->customOrderService->loadCustomOrder($token)) === null)
+            {
+                throw $this->createNotFoundException('Objednávka nenalezena.');
+            }
+
+            $this->breadcrumbs
+                ->addRoute('order_custom', ['token' => $token])
+                ->addRoute('order_methods', ['token' => $token])
+                ->addRoute('order_addresses', ['token' => $token]);
+        }
+        else
+        {
+            $this->breadcrumbs
+                ->addRoute('order_cart')
+                ->addRoute('order_methods')
+                ->addRoute('order_addresses');
+        }
+
+        $form = $this->createForm(OrderAddressesFormType::class, $targetOrder);
+        // tlačítko se přidává v šabloně
+        $form->handleRequest($this->request);
+
+        if ($form->isSubmitted() && $form->isValid() /*hasrequirements...*/)
+        {
+            $this->getDoctrine()->getManager()->persist($targetOrder);
+            $this->getDoctrine()->getManager()->flush();
+
+            $this->addFlash('success', 'saved');
+            return $this->redirectToRoute('order_addresses', ['token' => $token]);
+        }
+
+        return $this->render('order/addresses.html.twig', [
+            'order' => $targetOrder,
+            'token'=> $token,
+            'orderAddressesForm' => $form->createView(),
+        ]);
     }
 }

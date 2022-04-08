@@ -168,8 +168,8 @@ class NavbarService
             3 => [
                 'isActive'      => ($currentPage === 3),
                 'isClickable'   => ($currentPage === 3),
-                'title'         => '!Dodací údaje',
-                'path'          => '',
+                'title'         => $this->parameterBag->get('app_page_title.order_addresses'),
+                'path'          => $this->router->generate('order_addresses', ['token' => $token]),
             ],
         ];
     }
