@@ -33,6 +33,7 @@ class CartService
     private $orderCookie = null;
 
     private bool $isOrderNew = false;
+    private int $totalQuantityForNavbar = 0;
 
     /** @var Request */
     private $request;
@@ -44,6 +45,11 @@ class CartService
         $this->synchronizer = $synchronizer;
         $this->entityManager = $entityManager;
         $this->request = $requestStack->getCurrentRequest();
+    }
+
+    public function getTotalQuantityForNavbar(): int
+    {
+        return $this->totalQuantityForNavbar;
     }
 
     /**
@@ -73,51 +79,57 @@ class CartService
 
     /**
      * Tato metoda se volá jako první před vyvoláním každé controllerové akce.
-     * Zajišťuje existenci aktivní objednávky. Může vyvolat synchronizaci objednávky.
+     * Buď zajístí existenci aktivní objednávky nebo jen zjistí počet produktů v košíku
+     * pro zobrazení v navigaci.
      *
      * @param bool $loadFully
      */
     public function initialize(bool $loadFully): void
     {
         $tokenInCookie = (string) $this->request->cookies->get(self::COOKIE_NAME);
+        $tokenIsValid = UUid::isValid($tokenInCookie);
 
-        if (UUid::isValid($tokenInCookie))
+        if ($loadFully)
         {
-            $uuid = Uuid::fromString($tokenInCookie);
-
-            // pokus o načtení aktivní objednávky
-            if ($loadFully)
+            if ($tokenIsValid)
             {
+                $uuid = Uuid::fromString($tokenInCookie);
                 $this->order = $this->entityManager->getRepository(Order::class)->findOneAndFetchEverything($uuid);
+
+                if ($this->order === null || $this->order->isCreatedManually() || $this->order->isFinished())
+                {
+                    $this->createNewOrder();
+                }
             }
             else
             {
-                $this->order = $this->entityManager->getRepository(Order::class)->findOneAndFetchCartOccurences($uuid);
-            }
-
-            // nic to nenašlo || nalezená objednávka není aktivní
-            if ($this->order === null || $this->order->isCreatedManually() || $this->order->isFinished())
-            {
                 $this->createNewOrder();
             }
+
+            $this->synchronizer->setOrder($this->order);
+            $this->synchronizer->synchronize();
+            $this->synchronizer->addWarningsToFlashBag();
+
+            $this->order->calculateTotals();
+            $this->totalQuantityForNavbar = $this->order->getTotalQuantity();
+            $this->orderCookieObtain();
+
+            $this->entityManager->persist($this->order);
+            $this->entityManager->flush();
         }
         else
         {
-            $this->createNewOrder();
+            if ($tokenIsValid)
+            {
+                $uuid = Uuid::fromString($tokenInCookie);
+                $result = $this->entityManager->getRepository(Order::class)->getCartTotalQuantity($uuid);
+
+                if (isset($result['quantity']) && $result['quantity'] !== null)
+                {
+                    $this->totalQuantityForNavbar = (int) $result['quantity'];
+                }
+            }
         }
-
-        $this->synchronizer->setOrder($this->order);
-        if ($loadFully)
-        {
-            $this->synchronizer->synchronize();
-            $this->synchronizer->addWarningsToFlashBag();
-        }
-
-        $this->order->calculateTotals();
-        $this->orderCookieObtain();
-
-        $this->entityManager->persist($this->order);
-        $this->entityManager->flush();
     }
 
     /**

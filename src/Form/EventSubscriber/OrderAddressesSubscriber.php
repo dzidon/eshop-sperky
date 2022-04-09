@@ -41,6 +41,7 @@ class OrderAddressesSubscriber implements EventSubscriberInterface
     {
         return [
             FormEvents::PRE_SET_DATA => 'preSetData',
+            FormEvents::SUBMIT => 'submit',
         ];
     }
 
@@ -48,6 +49,19 @@ class OrderAddressesSubscriber implements EventSubscriberInterface
     {
         $this->setDefaultData($event);
         $this->addDeliveryAddressFields($event);
+    }
+
+    public function submit(FormEvent $event): void
+    {
+        /** @var Order $order */
+        $order = $event->getData();
+
+        if (!$order->isCompanyChecked())
+        {
+            $order->setAddressBillingCompany(null);
+            $order->setAddressBillingIc(null);
+            $order->setAddressBillingDic(null);
+        }
     }
 
     private function setDefaultData(FormEvent $event): void

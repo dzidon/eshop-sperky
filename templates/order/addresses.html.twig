@@ -97,6 +97,18 @@
                         {{ form_row(orderAddressesForm.addressDeliveryTown) }}
                         {{ form_row(orderAddressesForm.addressDeliveryZip) }}
                     {% endif %}
+
+                    <div class="row">
+                        <h4>Firma</h4>
+                    </div>
+
+                    {{ form_row(orderAddressesForm.companyChecked) }}
+
+                    <div id="company-fields">
+                        {{ form_row(orderAddressesForm.addressBillingCompany) }}
+                        {{ form_row(orderAddressesForm.addressBillingIc) }}
+                        {{ form_row(orderAddressesForm.addressBillingDic) }}
+                    </div>
                 </div>
 
                 <div class="col s12 l4 container-sticky-bottom offset-l1 offset-xl1">
@@ -117,4 +129,8 @@
         {{ form_end(orderAddressesForm) }}
     </div>
 
+{% endblock %}
+
+{% block javascripts %}
+    {{ encore_entry_script_tags('orderAddresses') }}
 {% endblock %}

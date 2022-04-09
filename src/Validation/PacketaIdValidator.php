@@ -27,7 +27,7 @@ class PacketaIdValidator extends ConstraintValidator
             throw new LogicException('PacketaIdValidator jde použít jen na objektech třídy App\Entity\Order.');
         }
 
-        if ($order->getDeliveryMethod()->getType() !== DeliveryMethod::TYPE_PACKETA_CZ)
+        if ($order->getDeliveryMethod() === null || $order->getDeliveryMethod()->getType() !== DeliveryMethod::TYPE_PACKETA_CZ)
         {
             return;
         }

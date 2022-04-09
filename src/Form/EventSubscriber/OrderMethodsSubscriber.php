@@ -26,7 +26,7 @@ class OrderMethodsSubscriber implements EventSubscriberInterface
     {
         /** @var Order $order */
         $order = $event->getData();
-        if (isset(Order::DELIVERY_METHODS_THAT_LOCK_ADDRESS[$order->getDeliveryMethod()->getType()]))
+        if ($order->getDeliveryMethod() !== null && isset(Order::DELIVERY_METHODS_THAT_LOCK_ADDRESS[$order->getDeliveryMethod()->getType()]))
         {
             $order->injectStaticAddressDelivery();
         }

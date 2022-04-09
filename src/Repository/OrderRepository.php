@@ -45,22 +45,17 @@ class OrderRepository extends ServiceEntityRepository
         return null;
     }
 
-    public function findOneAndFetchCartOccurences(Uuid $token)
+    public function getCartTotalQuantity(Uuid $token)
     {
-        $results = $this->createQueryBuilder('o')
-            ->select('o, oc')
+        return $this->createQueryBuilder('o')
+            ->select('sum(oc.quantity) as quantity')
             ->leftJoin('o.cartOccurences', 'oc')
             ->andWhere('o.token = :token')
+            ->andWhere('o.createdManually = false')
+            ->andWhere('o.finished = false')
             ->setParameter('token', $token, 'uuid')
             ->getQuery()
-            ->getResult()
+            ->getScalarResult()[0]
         ;
-
-        if(isset($results[0]))
-        {
-            return $results[0];
-        }
-
-        return null;
     }
 }

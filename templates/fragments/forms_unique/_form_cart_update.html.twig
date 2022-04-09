@@ -1,5 +1,7 @@
 {% if cartForm.children.cartOccurences.children is empty %}
-    Váš košík je prázdný. <a href="{{ path('products') }}">Zpět do obchodu</a>
+    <div class="row">
+        Váš košík je prázdný. <a href="{{ path('products') }}">Zpět do obchodu</a>
+    </div>
 {% else %}
     <div class="row">
         {{ form_start(cartForm) }}

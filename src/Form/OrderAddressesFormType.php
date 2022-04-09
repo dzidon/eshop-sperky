@@ -7,6 +7,7 @@ use App\Form\EventSubscriber\OrderAddressesSubscriber;
 use libphonenumber\PhoneNumberFormat;
 use Misd\PhoneNumberBundle\Form\Type\PhoneNumberType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -40,6 +41,23 @@ class OrderAddressesFormType extends AbstractType
                 'format' => PhoneNumberFormat::INTERNATIONAL,
                 'label' => 'Telefon',
             ])
+            ->add('companyChecked', CheckboxType::class, [
+                'required' => false,
+                'label' => 'Nakupuji na firmu',
+                'attr' => [
+                    'class' => 'company-checkbox',
+                ],
+            ])
+            ->add('addressBillingCompany', TextType::class, [
+                'required' => false,
+                'label' => 'Název firmy',
+            ])
+            ->add('addressBillingIc', TextType::class, [
+                'label' => 'IČ',
+            ])
+            ->add('addressBillingDic', TextType::class, [
+                'label' => 'DIČ',
+            ])
             ->addEventSubscriber($this->addressesSubscriber)
         ;
     }
@@ -60,6 +78,11 @@ class OrderAddressesFormType extends AbstractType
                 if (!$order->isAddressDeliveryLocked())
                 {
                     $groups[] = 'addresses_delivery';
+                }
+
+                if ($order->isCompanyChecked())
+                {
+                    $groups[] = 'addresses_company';
                 }
 
                 return $groups;

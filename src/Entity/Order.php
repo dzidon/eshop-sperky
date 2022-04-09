@@ -190,6 +190,35 @@ class Order
      */
     private $addressDeliveryAdditionalInfo;
 
+    /*
+     * Firma
+     */
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     *
+     * @Assert\Length(max=255, groups={"addresses_company"}, maxMessage="Maximální počet znaků v názvu firmy: {{ limit }}")
+     */
+    private $addressBillingCompany;
+
+    /**
+     * @ORM\Column(type="string", length=8, nullable=true)
+     *
+     * @AssertCustom\Ic(groups={"addresses_company"})
+     * @Assert\NotBlank(groups={"addresses_company"})
+     */
+    private $addressBillingIc;
+
+    /**
+     * @ORM\Column(type="string", length=12, nullable=true)
+     *
+     * @AssertCustom\Dic(groups={"addresses_company"})
+     * @Assert\NotBlank(groups={"addresses_company"})
+     */
+    private $addressBillingDic;
+
+    private bool $companyChecked = false;
+
     private $staticAddressDeliveryCountry;
     private $staticAddressDeliveryStreet;
     private $staticAddressDeliveryTown;
@@ -569,6 +598,42 @@ class Order
         return $this;
     }
 
+    public function getAddressBillingCompany(): ?string
+    {
+        return $this->addressBillingCompany;
+    }
+
+    public function setAddressBillingCompany(?string $addressBillingCompany): self
+    {
+        $this->addressBillingCompany = $addressBillingCompany;
+
+        return $this;
+    }
+
+    public function getAddressBillingIc(): ?string
+    {
+        return $this->addressBillingIc;
+    }
+
+    public function setAddressBillingIc(?string $addressBillingIc): self
+    {
+        $this->addressBillingIc = $addressBillingIc;
+
+        return $this;
+    }
+
+    public function getAddressBillingDic(): ?string
+    {
+        return $this->addressBillingDic;
+    }
+
+    public function setAddressBillingDic(?string $addressBillingDic): self
+    {
+        $this->addressBillingDic = $addressBillingDic;
+
+        return $this;
+    }
+
     public function getStaticAddressDeliveryAdditionalInfo(): ?string
     {
         return $this->staticAddressDeliveryAdditionalInfo;
@@ -671,6 +736,16 @@ class Order
         $this->addressDeliveryStreet = null;
         $this->addressDeliveryTown = null;
         $this->addressDeliveryZip = null;
+    }
+
+    public function isCompanyChecked(): bool
+    {
+        return $this->companyChecked;
+    }
+
+    public function setCompanyChecked(bool $companyChecked): void
+    {
+        $this->companyChecked = $companyChecked;
     }
 
     /**
