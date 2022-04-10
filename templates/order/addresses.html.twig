@@ -109,6 +109,47 @@
                         {{ form_row(orderAddressesForm.addressBillingIc) }}
                         {{ form_row(orderAddressesForm.addressBillingDic) }}
                     </div>
+
+                    <div class="row">
+                        <h4>Fakturační adresa</h4>
+                    </div>
+
+                    {{ form_row(orderAddressesForm.billingAddressChecked) }}
+
+                    <div id="billing-address-fields">
+                        <div class="row no-mar-bot">
+                            <div class="row text-fields-compound">
+                                <div class="input-field col s12 m6">
+                                    {{ form_widget(orderAddressesForm.addressBillingNameFirst) }}
+                                    {{ form_label(orderAddressesForm.addressBillingNameFirst) }}
+                                    {{ form_help(orderAddressesForm.addressBillingNameFirst) }}
+                                    {{ form_errors(orderAddressesForm.addressBillingNameFirst) }}
+                                </div>
+                                <div class="input-field col s12 m6">
+                                    {{ form_widget(orderAddressesForm.addressBillingNameLast) }}
+                                    {{ form_label(orderAddressesForm.addressBillingNameLast) }}
+                                    {{ form_help(orderAddressesForm.addressBillingNameLast) }}
+                                    {{ form_errors(orderAddressesForm.addressBillingNameLast) }}
+                                </div>
+                            </div>
+                        </div>
+
+                        {{ form_row(orderAddressesForm.addressBillingCountry) }}
+                        {{ form_row(orderAddressesForm.addressBillingStreet) }}
+                        {{ form_row(orderAddressesForm.addressBillingAdditionalInfo) }}
+                        {{ form_row(orderAddressesForm.addressBillingTown) }}
+                        {{ form_row(orderAddressesForm.addressBillingZip) }}
+                    </div>
+
+                    <div class="row">
+                        <h4>Poznámka</h4>
+                    </div>
+
+                    {{ form_row(orderAddressesForm.noteChecked) }}
+
+                    <div id="note-container">
+                        {{ form_row(orderAddressesForm.note) }}
+                    </div>
                 </div>
 
                 <div class="col s12 l4 container-sticky-bottom offset-l1 offset-xl1">

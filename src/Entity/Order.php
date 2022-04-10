@@ -217,7 +217,80 @@ class Order
      */
     private $addressBillingDic;
 
+    /*
+     * Fakturacni adresa
+     */
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     *
+     * @Assert\Length(max=255, groups={"addresses_billing"}, maxMessage="Maximální počet znaků v křestním jméně: {{ limit }}")
+     * @Assert\NotBlank(groups={"addresses_billing"})
+     */
+    private $addressBillingNameFirst;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     *
+     * @Assert\Length(max=255, groups={"addresses_billing"}, maxMessage="Maximální počet znaků v příjmení: {{ limit }}")
+     * @Assert\NotBlank(groups={"addresses_billing"})
+     */
+    private $addressBillingNameLast;
+
+    /**
+     * @ORM\Column(type="string", length=32, nullable=true)
+     *
+     * @Assert\Choice(choices=Address::COUNTRY_NAMES, groups={"addresses_billing"}, message="Zvolte platnou zemi.")
+     * @Assert\NotBlank(groups={"addresses_billing"})
+     */
+    private $addressBillingCountry;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     *
+     * @AssertCustom\Compound\StreetRequirements(groups={"addresses_billing"})
+     * @Assert\NotBlank(groups={"addresses_billing"})
+     */
+    private $addressBillingStreet;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     *
+     * @Assert\Length(max=255, groups={"addresses_billing"}, maxMessage="Maximální počet znaků v doplňku adresy: {{ limit }}")
+     */
+    private $addressBillingAdditionalInfo;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     *
+     * @Assert\Length(max=255, groups={"addresses_billing"}, maxMessage="Maximální počet znaků v obci: {{ limit }}")
+     * @Assert\NotBlank(groups={"addresses_billing"})
+     */
+    private $addressBillingTown;
+
+    /**
+     * @ORM\Column(type="string", length=5, nullable=true)
+     *
+     * @AssertCustom\ZipCode(groups={"addresses_billing"})
+     * @Assert\NotBlank(groups={"addresses_billing"})
+     */
+    private $addressBillingZip;
+
+    /*
+     * Popis
+     */
+
+    /**
+     * @ORM\Column(type="string", length=500, nullable=true)
+     *
+     * @Assert\Length(max=500, groups={"addresses_note"}, maxMessage="Maximální počet znaků v poznámce: {{ limit }}")
+     * @Assert\NotBlank(groups={"addresses_note"})
+     */
+    private $note;
+
     private bool $companyChecked = false;
+    private bool $billingAddressChecked = false;
+    private bool $noteChecked = false;
 
     private $staticAddressDeliveryCountry;
     private $staticAddressDeliveryStreet;
@@ -634,6 +707,102 @@ class Order
         return $this;
     }
 
+    public function getAddressBillingNameFirst(): ?string
+    {
+        return $this->addressBillingNameFirst;
+    }
+
+    public function setAddressBillingNameFirst(?string $addressBillingNameFirst): self
+    {
+        $this->addressBillingNameFirst = $addressBillingNameFirst;
+
+        return $this;
+    }
+
+    public function getAddressBillingNameLast(): ?string
+    {
+        return $this->addressBillingNameLast;
+    }
+
+    public function setAddressBillingNameLast(?string $addressBillingNameLast): self
+    {
+        $this->addressBillingNameLast = $addressBillingNameLast;
+
+        return $this;
+    }
+
+    public function getAddressBillingCountry(): ?string
+    {
+        return $this->addressBillingCountry;
+    }
+
+    public function setAddressBillingCountry(?string $addressBillingCountry): self
+    {
+        $this->addressBillingCountry = $addressBillingCountry;
+
+        return $this;
+    }
+
+    public function getAddressBillingStreet(): ?string
+    {
+        return $this->addressBillingStreet;
+    }
+
+    public function setAddressBillingStreet(?string $addressBillingStreet): self
+    {
+        $this->addressBillingStreet = $addressBillingStreet;
+
+        return $this;
+    }
+
+    public function getAddressBillingAdditionalInfo(): ?string
+    {
+        return $this->addressBillingAdditionalInfo;
+    }
+
+    public function setAddressBillingAdditionalInfo(?string $addressBillingAdditionalInfo): self
+    {
+        $this->addressBillingAdditionalInfo = $addressBillingAdditionalInfo;
+
+        return $this;
+    }
+
+    public function getAddressBillingTown(): ?string
+    {
+        return $this->addressBillingTown;
+    }
+
+    public function setAddressBillingTown(?string $addressBillingTown): self
+    {
+        $this->addressBillingTown = $addressBillingTown;
+
+        return $this;
+    }
+
+    public function getAddressBillingZip(): ?string
+    {
+        return $this->addressBillingZip;
+    }
+
+    public function setAddressBillingZip(?string $addressBillingZip): self
+    {
+        $this->addressBillingZip = preg_replace('/\s+/', '', $addressBillingZip);
+
+        return $this;
+    }
+
+    public function getNote(): ?string
+    {
+        return $this->note;
+    }
+
+    public function setNote(?string $note): self
+    {
+        $this->note = $note;
+
+        return $this;
+    }
+
     public function getStaticAddressDeliveryAdditionalInfo(): ?string
     {
         return $this->staticAddressDeliveryAdditionalInfo;
@@ -694,6 +863,36 @@ class Order
         return $this;
     }
 
+    public function isCompanyChecked(): bool
+    {
+        return $this->companyChecked;
+    }
+
+    public function setCompanyChecked(bool $companyChecked): void
+    {
+        $this->companyChecked = $companyChecked;
+    }
+
+    public function isBillingAddressChecked(): bool
+    {
+        return $this->billingAddressChecked;
+    }
+
+    public function setBillingAddressChecked(bool $billingAddressChecked): void
+    {
+        $this->billingAddressChecked = $billingAddressChecked;
+    }
+
+    public function isNoteChecked(): bool
+    {
+        return $this->noteChecked;
+    }
+
+    public function setNoteChecked(bool $noteChecked): void
+    {
+        $this->noteChecked = $noteChecked;
+    }
+
     public function determineAddressDelivery(): self
     {
         // přechod na null/Českou poštu
@@ -738,14 +937,22 @@ class Order
         $this->addressDeliveryZip = null;
     }
 
-    public function isCompanyChecked(): bool
+    public function resetAddressBilling(): void
     {
-        return $this->companyChecked;
+        $this->addressBillingNameFirst = null;
+        $this->addressBillingNameLast = null;
+        $this->addressBillingCountry = null;
+        $this->addressBillingStreet = null;
+        $this->addressBillingAdditionalInfo = null;
+        $this->addressBillingTown = null;
+        $this->addressBillingZip = null;
     }
 
-    public function setCompanyChecked(bool $companyChecked): void
+    public function resetDataCompany(): void
     {
-        $this->companyChecked = $companyChecked;
+        $this->addressBillingCompany = null;
+        $this->addressBillingIc = null;
+        $this->addressBillingDic = null;
     }
 
     /**
@@ -753,36 +960,33 @@ class Order
      */
     public function fixDeliveryMethodData(): void
     {
-        if (!$this->deliveryMethod instanceof Proxy)
+        /* Historická data pro doručovací metodu */
+        if ($this->deliveryMethod === null)
         {
-            /* Historická data pro doručovací metodu */
-            if ($this->deliveryMethod === null)
-            {
-                $this->deliveryPriceWithoutVat = 0.0;
-                $this->deliveryPriceWithVat = 0.0;
-                $this->deliveryMethodName = null;
+            $this->deliveryPriceWithoutVat = 0.0;
+            $this->deliveryPriceWithVat = 0.0;
+            $this->deliveryMethodName = null;
 
-                if ($this->addressDeliveryLocked)
-                {
-                    $this->resetAddressDelivery();
-                    $this->addressDeliveryLocked = false;
-                }
+            if ($this->addressDeliveryLocked)
+            {
+                $this->resetAddressDelivery();
+                $this->addressDeliveryLocked = false;
+            }
+        }
+        else
+        {
+            $this->deliveryPriceWithoutVat = $this->deliveryMethod->getPriceWithoutVat();
+            $this->deliveryPriceWithVat = $this->deliveryMethod->getPriceWithVat();
+            $this->deliveryMethodName = $this->deliveryMethod->getName();
+
+            /* Zamykání/odemykání doručovací adresy */
+            if (isset(self::DELIVERY_METHODS_THAT_LOCK_ADDRESS[$this->deliveryMethod->getType()]))
+            {
+                $this->addressDeliveryLocked = true;
             }
             else
             {
-                $this->deliveryPriceWithoutVat = $this->deliveryMethod->getPriceWithoutVat();
-                $this->deliveryPriceWithVat = $this->deliveryMethod->getPriceWithVat();
-                $this->deliveryMethodName = $this->deliveryMethod->getName();
-
-                /* Zamykání/odemykání doručovací adresy */
-                if (isset(self::DELIVERY_METHODS_THAT_LOCK_ADDRESS[$this->deliveryMethod->getType()]))
-                {
-                    $this->addressDeliveryLocked = true;
-                }
-                else
-                {
-                    $this->addressDeliveryLocked = false;
-                }
+                $this->addressDeliveryLocked = false;
             }
         }
     }
@@ -792,21 +996,18 @@ class Order
      */
     public function fixPaymentMethodData(): void
     {
-        if (!$this->paymentMethod instanceof Proxy)
+        /* Historická data pro platební metodu */
+        if ($this->paymentMethod === null)
         {
-            /* Historická data pro platební metodu */
-            if ($this->paymentMethod === null)
-            {
-                $this->paymentPriceWithoutVat = 0.0;
-                $this->paymentPriceWithVat = 0.0;
-                $this->paymentMethodName = null;
-            }
-            else
-            {
-                $this->paymentPriceWithoutVat = $this->paymentMethod->getPriceWithoutVat();
-                $this->paymentPriceWithVat = $this->paymentMethod->getPriceWithVat();
-                $this->paymentMethodName = $this->paymentMethod->getName();
-            }
+            $this->paymentPriceWithoutVat = 0.0;
+            $this->paymentPriceWithVat = 0.0;
+            $this->paymentMethodName = null;
+        }
+        else
+        {
+            $this->paymentPriceWithoutVat = $this->paymentMethod->getPriceWithoutVat();
+            $this->paymentPriceWithVat = $this->paymentMethod->getPriceWithVat();
+            $this->paymentMethodName = $this->paymentMethod->getName();
         }
     }
 }

@@ -84,7 +84,7 @@
 {% block checkbox_row %}
     <div class="row">
         <label class="input-field block">
-            {% set attr = attr|merge({class: (attr.class) ~ ' filled-in checkbox-light-blue'}) %}
+            {% set attr = attr|merge({class: attr.class|default('') ~ ' filled-in checkbox-light-blue'}) %}
 
             {{ form_widget(form, {'attr': attr}) }}
             {{ form_label(form) }}

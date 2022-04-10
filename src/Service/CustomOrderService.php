@@ -46,7 +46,7 @@ class CustomOrderService
             $uuid = Uuid::fromString($token);
 
             /** @var Order|null $order */
-            $order = $this->entityManager->getRepository(Order::class)->findOneAndFetchCartOccurences($uuid);
+            $order = $this->entityManager->getRepository(Order::class)->findOneAndFetchEverything($uuid);
             if ($order !== null && $order->isCreatedManually() && !$order->isFinished())
             {
                 $this->order = $order;

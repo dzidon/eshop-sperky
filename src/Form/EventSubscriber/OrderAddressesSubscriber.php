@@ -28,7 +28,7 @@ class OrderAddressesSubscriber implements EventSubscriberInterface
     {
         /** @var User $user */
         $user = $security->getUser();
-        if($user)
+        if($user !== null)
         {
             $this->defaultPhoneNumber = $user->getPhoneNumber();
             $this->defaultNameFirst = $user->getNameFirst();
@@ -58,9 +58,17 @@ class OrderAddressesSubscriber implements EventSubscriberInterface
 
         if (!$order->isCompanyChecked())
         {
-            $order->setAddressBillingCompany(null);
-            $order->setAddressBillingIc(null);
-            $order->setAddressBillingDic(null);
+            $order->resetDataCompany();
+        }
+
+        if (!$order->isBillingAddressChecked())
+        {
+            $order->resetAddressBilling();
+        }
+
+        if (!$order->isNoteChecked())
+        {
+            $order->setNote(null);
         }
     }
 

@@ -4,32 +4,63 @@ import { errorModalOpen } from './app';
 
 $(document).ready(function()
 {
-    const checkbox = $('.company-checkbox');
+    const companyCheckbox = $('.company-checkbox');
+    const billingAddressCheckbox = $('.billing-address-checkbox');
+    const noteCheckbox = $('.note-checkbox');
 
-    checkbox.each(function()
+    /*
+        Firma
+     */
+    companyCheckbox.each(function()
     {
-        hideOrShowCompanyFields(this);
+        hideOrShowFields(this, 'company-fields');
     });
 
-    checkbox.change(function()
+    companyCheckbox.change(function()
     {
-        hideOrShowCompanyFields(this);
+        hideOrShowFields(this, 'company-fields');
+    });
+
+    /*
+        Doručovací adresa
+     */
+    billingAddressCheckbox.each(function()
+    {
+        hideOrShowFields(this, 'billing-address-fields');
+    });
+
+    billingAddressCheckbox.change(function()
+    {
+        hideOrShowFields(this, 'billing-address-fields');
+    });
+
+    /*
+        Poznámka
+     */
+    noteCheckbox.each(function()
+    {
+        hideOrShowFields(this, 'note-container');
+    });
+
+    noteCheckbox.change(function()
+    {
+        hideOrShowFields(this, 'note-container');
     });
 });
 
-function hideOrShowCompanyFields(checkbox)
+function hideOrShowFields(checkbox, containerName)
 {
-    const parent = $('#company-fields');
-    const children = $("#company-fields :input");
+    const container = $('#' + containerName);
+    const inputsInside = $('#' + containerName + ' :input');
 
     if(checkbox.checked)
     {
-        parent.show();
-        children.attr("disabled", false);
+        container.show();
+        inputsInside.attr("disabled", false);
     }
     else
     {
-        parent.hide();
-        children.attr("disabled", true);
+        container.hide();
+        inputsInside.attr("disabled", true);
     }
 }
