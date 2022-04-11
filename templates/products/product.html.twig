@@ -42,7 +42,7 @@
                     <h1 class="h3-fontsize no-mar-top">
                         {{ productInstance.getName() }}
                         {% if is_granted('product_edit') %}
-                            <a href="{{ path('admin_product_edit', {id: productInstance.getId()}) }}" class="btn-floating btn-medium waves-effect waves-light light-blue"><i class="material-icons">mode_edit</i></a>
+                            <a href="{{ path('admin_product_edit', {id: productInstance.getId()}) }}" class="btn-floating btn-medium waves-effect waves-light blue"><i class="material-icons">mode_edit</i></a>
                         {% endif %}
                     </h1>
 
@@ -116,7 +116,7 @@
                                     {{ form_errors(cartInsertForm.quantity) }}
                                 </div>
                                 <div class="col s9 button-container-compound">
-                                    <button class="btn-large waves-effect waves-light light-blue center-align" type="submit">
+                                    <button class="btn-large waves-effect waves-light blue center-align" type="submit">
                                         Do košíku <i class="material-icons left">add_shopping_cart</i>
                                     </button>
                                 </div>

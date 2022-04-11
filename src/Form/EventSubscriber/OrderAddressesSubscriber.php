@@ -110,19 +110,34 @@ class OrderAddressesSubscriber implements EventSubscriberInterface
             $form
                 ->add('addressDeliveryCountry', ChoiceType::class, [
                     'choices' => Address::COUNTRY_NAMES_DROPDOWN,
+                    'attr' => [
+                        'class' => 'addressDeliveryCountry',
+                    ],
                     'label' => 'Země',
                 ])
                 ->add('addressDeliveryStreet', TextType::class, [
+                    'attr' => [
+                        'class' => 'addressDeliveryStreet',
+                    ],
                     'label' => 'Ulice a číslo popisné',
                 ])
                 ->add('addressDeliveryAdditionalInfo', TextType::class, [
                     'required' => false,
+                    'attr' => [
+                        'class' => 'addressDeliveryAdditionalInfo',
+                    ],
                     'label' => 'Doplněk adresy',
                 ])
                 ->add('addressDeliveryTown', TextType::class, [
+                    'attr' => [
+                        'class' => 'addressDeliveryTown',
+                    ],
                     'label' => 'Obec',
                 ])
                 ->add('addressDeliveryZip', TextType::class, [
+                    'attr' => [
+                        'class' => 'addressDeliveryZip',
+                    ],
                     'label' => 'PSČ',
                 ])
             ;

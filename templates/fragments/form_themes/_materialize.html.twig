@@ -84,7 +84,7 @@
 {% block checkbox_row %}
     <div class="row">
         <label class="input-field block">
-            {% set attr = attr|merge({class: attr.class|default('') ~ ' filled-in checkbox-light-blue'}) %}
+            {% set attr = attr|merge({class: attr.class|default('') ~ ' filled-in checkbox-blue'}) %}
 
             {{ form_widget(form, {'attr': attr}) }}
             {{ form_label(form) }}
@@ -153,15 +153,15 @@
     {% endif %}
 {% endblock checkbox_label %}
 
-{# Label checkboxu na podmínky používání #}
-{% block terms_checkbox_label %}
+{# Label checkboxu na souhlas se zpracováním osobních údajů a s obchodními podmínkami #}
+{% block privacy_and_terms_checkbox_label %}
     <span>
-        Souhlasím s <a href="#"> podmínkami používání</a>
+        Souhlasím se <a href="#"> zpracováním osobních údajů</a> a s <a href="#"> obchodními podmínkami</a>
         {% if required %}
             <span class="required-star">*</span>
         {% endif %}
     </span>
-{% endblock terms_checkbox_label %}
+{% endblock privacy_and_terms_checkbox_label %}
 
 {# Label checkboxu na zpracování osobních údajů #}
 {% block privacy_checkbox_label %}
@@ -175,7 +175,7 @@
 
 {# Tlačítko #}
 {% block button_widget -%}
-    {% set attr = attr|merge({class: (attr.class|default('btn-large light-blue') ~ ' waves-effect waves-light btn')|trim}) %}
+    {% set attr = attr|merge({class: (attr.class|default('btn-large blue') ~ ' waves-effect waves-light btn')|trim}) %}
     <div class="row center-align">
         {{ parent() }}
     </div>
@@ -219,7 +219,7 @@
             {% for key,choice in choices %}
                 <div>
                     <label>
-                        {{ form_widget(form[key], {'attr': {'class': 'filled-in checkbox-light-blue with-gap'}}) }}
+                        {{ form_widget(form[key], {'attr': {'class': 'filled-in checkbox-blue with-gap'}}) }}
                         {{ form_label(form[key], null) }}
                     </label>
                 </div>
@@ -227,7 +227,7 @@
         {% else %}
             <div>
                 <label>
-                    {{ form_widget(form[name], {'attr': {'class': 'filled-in checkbox-light-blue with-gap'}}) }}
+                    {{ form_widget(form[name], {'attr': {'class': 'filled-in checkbox-blue with-gap'}}) }}
                     {{ form_label(form[name], null) }}
                 </label>
             </div>
@@ -244,7 +244,7 @@
 {# Checkbox kategorie v produktovém filtru #}
 {% block _categories_entry_row %}
     <label class="input-field block">
-        {{ form_widget(form, {'attr': {'class': 'filled-in checkbox-light-blue'}}) }}
+        {{ form_widget(form, {'attr': {'class': 'filled-in checkbox-blue'}}) }}
         {{ form_label(form) }}
         {{ form_help(form) }}
         {{ form_errors(form) }}
@@ -260,7 +260,7 @@
 {# Řádek nahrávání souboru #}
 {% block file_widget %}
     <div class="file-field {{ block('widget_attributes') }}">
-        <div class="light-blue waves-effect waves-light btn">
+        <div class="blue waves-effect waves-light btn">
             <span>Vybrat soubor</span>
             {{ block('form_widget') }}
         </div>

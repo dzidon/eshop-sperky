@@ -103,39 +103,39 @@ main {
     Input, Textarea
 */
 .input-field input:focus ~ label, .materialize-textarea:focus:not([readonly]) ~ label {
-    color: #03a9f4 !important;
+    color: #2196f3 !important;
 }
 
 .input-field input:focus, .materialize-textarea:focus:not([readonly]) {
-    border-bottom: 1px solid #03a9f4 !important;
-    box-shadow: 0 1px 0 0 #03a9f4 !important;
+    border-bottom: 1px solid #2196f3 !important;
+    box-shadow: 0 1px 0 0 #2196f3 !important;
 }
 
 /*
     Datetime
 */
 input[type="datetime-local"]:focus {
-    border-bottom: 1px solid #03a9f4 !important;
-    box-shadow: 0 1px 0 0 #03a9f4 !important;
+    border-bottom: 1px solid #2196f3 !important;
+    box-shadow: 0 1px 0 0 #2196f3 !important;
 }
 
 /*
     Checkbox
 */
-.checkbox-light-blue[type="checkbox"].filled-in:checked+span:not(.lever):after {
-    border: 2px solid #03a9f4 !important;
-    background-color: #03a9f4 !important;
+.checkbox-blue[type="checkbox"].filled-in:checked+span:not(.lever):after {
+    border: 2px solid #2196f3 !important;
+    background-color: #2196f3 !important;
 }
 
 /*
     Radio button
 */
 [type="radio"]:checked+span:after, [type="radio"].with-gap:checked+span:after {
-    background-color: #03a9f4;
+    background-color: #2196f3;
 }
 [type="radio"]:checked+span:after, [type="radio"].with-gap:checked+span:before,
 [type="radio"].with-gap:checked+span:after {
-    border: 2px solid #03a9f4;
+    border: 2px solid #2196f3;
 }
 
 .radio-label {
@@ -146,25 +146,25 @@ input[type="datetime-local"]:focus {
     Select
 */
 ul.dropdown-content.select-dropdown li span {
-    color: #03a9f4;
+    color: #2196f3;
 }
 
 .select-wrapper input.select-dropdown:focus {
-    border-bottom: 1px solid #03a9f4;
+    border-bottom: 1px solid #2196f3;
 }
 
 /*
     Obsah dropdownu (např. autocomplete)
 */
 .dropdown-content li>span {
-    color: #03a9f4;
+    color: #2196f3;
 }
 
 /*
     Tabs
  */
 .tabs .tab a, .tabs .tab a:hover, .tabs .tab a.active {
-    color: #03a9f4;
+    color: #2196f3;
 }
 
 .tabs .tab a:focus, .tabs .tab a:focus.active {
@@ -172,14 +172,14 @@ ul.dropdown-content.select-dropdown li span {
 }
 
 .tabs .indicator {
-    background-color: #03a9f4;
+    background-color: #2196f3;
 }
 
 /*
     Pagination
 */
 .pagination li.active {
-    background-color: #03a9f4;
+    background-color: #2196f3;
 }
 
 /* === */
@@ -200,17 +200,21 @@ ul.dropdown-content.select-dropdown li span {
     margin-right: 5px;
 }
 
+a {
+    color: #2196f3;
+}
+
 a.collection-item {
-    color: #03a9f4 !important;
+    color: #2196f3 !important;
 }
 
 a.collection-item.active {
     color: white !important;
-    background-color: #03a9f4 !important;
+    background-color: #2196f3 !important;
 }
 
 a.secondary-content {
-    color: #03a9f4;
+    color: #2196f3;
 }
 
 .no-mar-top {
@@ -326,13 +330,13 @@ a.secondary-content {
 }
 
 .noUi-connect {
-    background: #03a9f4;
+    background: #2196f3;
 }
 .noUi-horizontal .noUi-handle, .noUi-vertical .noUi-handle {
-    background: #03a9f4;
+    background: #2196f3;
 }
 .noUi-target.noUi-horizontal .noUi-tooltip {
-    background-color: #03a9f4;
+    background-color: #2196f3;
 }
 [disabled] .noUi-handle {
     background-color: gray;

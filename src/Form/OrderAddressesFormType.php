@@ -5,6 +5,7 @@ namespace App\Form;
 use App\Entity\Address;
 use App\Entity\Order;
 use App\Form\EventSubscriber\OrderAddressesSubscriber;
+use App\Form\Type\AgreePrivacyAndTermsType;
 use libphonenumber\PhoneNumberFormat;
 use Misd\PhoneNumberBundle\Form\Type\PhoneNumberType;
 use Symfony\Component\Form\AbstractType;
@@ -32,10 +33,16 @@ class OrderAddressesFormType extends AbstractType
 
             // Doručovací adresa
             ->add('addressDeliveryNameFirst', TextType::class, [
-                'attr' => ['autofocus' => 'autofocus'],
+                'attr' => [
+                    'autofocus' => 'autofocus',
+                    'class' => 'addressDeliveryNameFirst',
+                ],
                 'label' => 'Jméno',
             ])
             ->add('addressDeliveryNameLast', TextType::class, [
+                'attr' => [
+                    'class' => 'addressDeliveryNameLast',
+                ],
                 'label' => 'Příjmení',
             ])
             ->add('email', EmailType::class, [
@@ -57,45 +64,75 @@ class OrderAddressesFormType extends AbstractType
             ])
             ->add('addressBillingCompany', TextType::class, [
                 'required' => false,
+                'attr' => [
+                    'class' => 'addressBillingCompany',
+                ],
                 'label' => 'Název firmy',
             ])
             ->add('addressBillingIc', TextType::class, [
+                'attr' => [
+                    'class' => 'addressBillingIc',
+                ],
                 'label' => 'IČ',
             ])
             ->add('addressBillingDic', TextType::class, [
+                'attr' => [
+                    'class' => 'addressBillingDic',
+                ],
                 'label' => 'DIČ',
             ])
 
             // Fakturační adresa
             ->add('billingAddressChecked', CheckboxType::class, [
                 'required' => false,
-                'label' => 'Chci zadat jinou fakturační adresu',
+                'label' => 'Chci zadat fakturační adresu (liší se od dodací)',
                 'attr' => [
                     'class' => 'billing-address-checkbox',
                 ],
             ])
             ->add('addressBillingNameFirst', TextType::class, [
                 'label' => 'Jméno',
+                'attr' => [
+                    'class' => 'addressBillingNameFirst',
+                ],
             ])
             ->add('addressBillingNameLast', TextType::class, [
                 'label' => 'Příjmení',
+                'attr' => [
+                    'class' => 'addressBillingNameLast',
+                ],
             ])
             ->add('addressBillingCountry', ChoiceType::class, [
                 'choices' => Address::COUNTRY_NAMES_DROPDOWN,
                 'label' => 'Země',
+                'attr' => [
+                    'class' => 'addressBillingCountry',
+                ],
             ])
             ->add('addressBillingStreet', TextType::class, [
                 'label' => 'Ulice a číslo popisné',
+                'attr' => [
+                    'class' => 'addressBillingStreet',
+                ],
             ])
             ->add('addressBillingAdditionalInfo', TextType::class, [
                 'required' => false,
                 'label' => 'Doplněk adresy',
+                'attr' => [
+                    'class' => 'addressBillingAdditionalInfo',
+                ],
             ])
             ->add('addressBillingTown', TextType::class, [
                 'label' => 'Obec',
+                'attr' => [
+                    'class' => 'addressBillingTown',
+                ],
             ])
             ->add('addressBillingZip', TextType::class, [
                 'label' => 'PSČ',
+                'attr' => [
+                    'class' => 'addressBillingZip',
+                ],
             ])
 
             // Poznámka
@@ -112,6 +149,7 @@ class OrderAddressesFormType extends AbstractType
                 ],
                 'label' => 'Poznámka',
             ])
+            ->add('agreePrivacyAndTerms', AgreePrivacyAndTermsType::class)
             ->addEventSubscriber($this->addressesSubscriber)
         ;
     }

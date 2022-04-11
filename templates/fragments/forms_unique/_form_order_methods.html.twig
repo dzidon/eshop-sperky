@@ -15,9 +15,9 @@
 
                                     <div class="col s9 valign-wrapper">
                                         <div class="col no-padding valign-wrapper">
-                                            {% set attributes = {class: 'filled-in checkbox-light-blue with-gap method-delivery delivery-normal'} %}
+                                            {% set attributes = {class: 'filled-in checkbox-blue with-gap method-delivery delivery-normal'} %}
                                             {% if methodData.type is same as (constant('App\\Entity\\DeliveryMethod::TYPE_PACKETA_CZ')) %}
-                                                {% set attributes = {'class': 'filled-in checkbox-light-blue with-gap method-delivery delivery-packeta-cz', 'data-packeta-key': packeta_key} %}
+                                                {% set attributes = {'class': 'filled-in checkbox-blue with-gap method-delivery delivery-packeta-cz', 'data-packeta-key': packeta_key} %}
                                             {% endif %}
 
                                             {{ form_widget(orderMethodsForm.children.deliveryMethod.children[methodKey], {attr: attributes}) }}
@@ -73,7 +73,7 @@
 
                                     <div class="col s9 valign-wrapper">
                                         <div class="col no-padding valign-wrapper">
-                                            {{ form_widget(orderMethodsForm.children.paymentMethod.children[methodKey], {attr: {class: 'filled-in checkbox-light-blue with-gap method-payment'}}) }}
+                                            {{ form_widget(orderMethodsForm.children.paymentMethod.children[methodKey], {attr: {class: 'filled-in checkbox-blue with-gap method-payment'}}) }}
                                             <span></span>
                                         </div>
 
@@ -122,7 +122,7 @@
                         {% endif %}
                     </div>
 
-                    <button class="btn-large waves-effect waves-light light-blue" type="submit">Pokračovat</button>
+                    <button class="btn-large waves-effect waves-light blue" type="submit">Pokračovat</button>
                 </div>
             </div>
         </div>

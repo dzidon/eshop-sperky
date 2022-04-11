@@ -44,7 +44,7 @@
                             <li><a href="{{ path('products') }}" class="black-text"> <i class="material-icons left">filter_vintage</i> Produkty</a></li>
                         {% endif %}
 
-                        <li><a href="{{ path_order_cart }}" class="black-text"> <i class="material-icons left">shopping_cart</i> Košík <span class="cart-badge light-blue white-text navbar-cart-total-products">{{ cart_service.totalQuantityForNavbar }}</span></a></li>
+                        <li><a href="{{ path_order_cart }}" class="black-text"> <i class="material-icons left">shopping_cart</i> Košík <span class="cart-badge blue white-text navbar-cart-total-products">{{ cart_service.totalQuantityForNavbar }}</span></a></li>
 
                         {% if is_authenticated_remembered %}
                             {% if can_enter_admin %}
@@ -78,7 +78,7 @@
                 <li><a href="{{ path('products') }}"> <i class="material-icons left">filter_vintage</i> Produkty</a></li>
             {% endif %}
 
-            <li><a href="{{ path_order_cart }}"> <i class="material-icons left">shopping_cart</i> Košík <span class="cart-badge light-blue white-text navbar-cart-total-products">{{ cart_service.totalQuantityForNavbar }}</span></a></li>
+            <li><a href="{{ path_order_cart }}"> <i class="material-icons left">shopping_cart</i> Košík <span class="cart-badge blue white-text navbar-cart-total-products">{{ cart_service.totalQuantityForNavbar }}</span></a></li>
 
             {% if is_authenticated_remembered %}
                 {% if can_enter_admin %}
@@ -129,8 +129,8 @@
                         </div>
 
                         <div class="col s8 right-align">
-                            <a href="{{ path_order_cart }}" class="btn-large waves-effect light-blue white-text hide-on-small-and-down">Pokračovat do košíku</a>
-                            <a href="{{ path_order_cart }}" class="btn-floating btn-large waves-effect light-blue white-text hide-on-med-and-up">
+                            <a href="{{ path_order_cart }}" class="btn-large waves-effect blue white-text hide-on-small-and-down">Pokračovat do košíku</a>
+                            <a href="{{ path_order_cart }}" class="btn-floating btn-large waves-effect blue white-text hide-on-med-and-up">
                                 <i class="material-icons">shopping_cart</i>
                             </a>
                         </div>
@@ -144,7 +144,7 @@
                     <p id="modal-error-text">Něco se pokazilo.</p>
                 </div>
                 <div class="modal-footer">
-                    <a href="javascript:void(0);" class="modal-close waves-effect light-blue-text btn-flat">Zavřít</a>
+                    <a href="javascript:void(0);" class="modal-close waves-effect blue-text btn-flat">Zavřít</a>
                 </div>
             </div>
         </main>

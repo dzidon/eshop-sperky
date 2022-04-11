@@ -2,6 +2,7 @@
 
 namespace App\Controller\User;
 
+use App\Entity\Address;
 use App\Form\CartFormType;
 use App\Form\OrderAddressesFormType;
 use App\Form\OrderMethodsFormType;
@@ -171,5 +172,48 @@ class OrderController extends AbstractController
             'token'=> $token,
             'orderAddressesForm' => $form->createView(),
         ]);
+    }
+
+    /**
+     * @Route("/objednavka/nacist-adresu", name="order_address_load", methods={"POST"})
+     */
+    public function loadAddress(JsonResponseService $jsonResponse): Response
+    {
+        $user = $this->getUser();
+        if ($user === null)
+        {
+            $jsonResponse->addResponseError('Nejste přihlášený.');
+            return $jsonResponse->createJsonResponse();
+        }
+
+        $addressId = $this->request->request->get('addressId');
+        if ($addressId === null)
+        {
+            $jsonResponse->addResponseError('Musíte vybrat platnou adresu.');
+            return $jsonResponse->createJsonResponse();
+        }
+
+        /** @var Address $address */
+        $address = $this->getDoctrine()->getManager()->getRepository(Address::class)->findOneBy(['id' => $addressId, 'user' => $user]);
+        if ($address === null)
+        {
+            $jsonResponse->addResponseError('Vybraná adresa nebyla nalezena.');
+            return $jsonResponse->createJsonResponse();
+        }
+
+        $addressData = [
+            'nameFirst' => $address->getNameFirst(),
+            'nameLast' => $address->getNameLast(),
+            'country' => $address->getCountry(),
+            'street' => $address->getStreet(),
+            'additionalInfo' => $address->getAdditionalInfo(),
+            'town' => $address->getTown(),
+            'zip' => $address->getZip(),
+            'company' => $address->getCompany(),
+            'ic' => $address->getIc(),
+            'dic' => $address->getDic(),
+        ];
+        $jsonResponse->setResponseData('addressData', $addressData);
+        return $jsonResponse->createJsonResponse();
     }
 }

@@ -111,7 +111,7 @@ class UserController extends AbstractController
         if($this->isGranted('user_edit_credentials'))
         {
             $formCredentials = $this->createForm(PersonalInfoFormType::class, $userEdited);
-            $formCredentials->add('submit', SubmitType::class, ['label' => 'Uložit', 'attr' => ['class' => 'btn-large light-blue left']]);
+            $formCredentials->add('submit', SubmitType::class, ['label' => 'Uložit', 'attr' => ['class' => 'btn-large blue left']]);
             $formCredentials->handleRequest($this->request);
 
             if ($formCredentials->isSubmitted() && $formCredentials->isValid())
@@ -139,7 +139,7 @@ class UserController extends AbstractController
         if($this->isGranted('user_set_permissions'))
         {
             $formPermissions = $this->createForm(AdminPermissionsFormType::class, $userEdited);
-            $formPermissions->add('submit', SubmitType::class, ['label' => 'Uložit', 'attr' => ['class' => 'btn-large light-blue left']]);
+            $formPermissions->add('submit', SubmitType::class, ['label' => 'Uložit', 'attr' => ['class' => 'btn-large blue left']]);
             $formPermissions->handleRequest($this->request);
 
             if ($formPermissions->isSubmitted() && $formPermissions->isValid())

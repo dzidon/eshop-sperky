@@ -177,3 +177,16 @@ export function errorModalOpen(htmlContent, headerText = 'Chyba')
     $('#modal-error-heading').text(headerText);
     M.Modal.getInstance($('#modal-error')).open();
 }
+
+export function errorModalOpenBasedOnResponse(data, defaultMessage)
+{
+    if (typeof(data) != "undefined" && Array.isArray(data['errors']) && data['errors'].length > 0)
+    {
+        const errors = data['errors'].join('<br>');
+        errorModalOpen(errors);
+    }
+    else
+    {
+        errorModalOpen(defaultMessage);
+    }
+}

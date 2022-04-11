@@ -44,6 +44,14 @@
 
                     <div class="row">
                         <h4>Dodací adresa</h4>
+
+                        {% if not order.addressDeliveryLocked and app.user is not null %}
+                            <div class="col s12">
+                                <div class="row">
+                                    <a id="load-address-delivery" href="javascript:void(0);">Načíst z uložených adres</a>
+                                </div>
+                            </div>
+                        {% endif %}
                     </div>
 
                     {% if order.addressDeliveryLocked %}
@@ -112,6 +120,14 @@
 
                     <div class="row">
                         <h4>Fakturační adresa</h4>
+
+                        {% if app.user is not null %}
+                            <div class="col s12">
+                                <div class="row">
+                                    <a id="load-address-billing" href="javascript:void(0);">Načíst z uložených adres</a>
+                                </div>
+                            </div>
+                        {% endif %}
                     </div>
 
                     {{ form_row(orderAddressesForm.billingAddressChecked) }}
@@ -150,6 +166,12 @@
                     <div id="note-container">
                         {{ form_row(orderAddressesForm.note) }}
                     </div>
+
+                    <div class="row">
+                        <h4>Souhlas</h4>
+                    </div>
+
+                    {{ form_row(orderAddressesForm.agreePrivacyAndTerms) }}
                 </div>
 
                 <div class="col s12 l4 container-sticky-bottom offset-l1 offset-xl1">
@@ -162,13 +184,43 @@
                                 <a href="{{ path('order_methods', {'token': token}) }}">Zpět</a>
                             </div>
 
-                            <button class="btn-large waves-effect waves-light light-blue" type="submit">Objednat</button>
+                            <button class="btn-large waves-effect waves-light blue" type="submit">Objednat</button>
                         </div>
                     </div>
                 </div>
             </div>
         {{ form_end(orderAddressesForm) }}
     </div>
+
+    {% if app.user is not null %}
+        <div id="modal-addresses" class="modal">
+            <div class="modal-content">
+                <h4 id="modal-error-heading">Vaše uložené adresy</h4>
+
+                {% set addresses = app.user.addresses %}
+                {% if addresses is empty %}
+                    <p>Nemáte uložené žádné adresy.</p>
+                {% else %}
+                    <div class="col s12 section">
+                        <div class="row">
+                            <div class="input-field col s12">
+                                <select id="addresses-select" data-url="{{ path('order_address_load') }}">
+                                    <option value="" disabled selected>-- vyberte adresu --</option>
+                                    {% for address in addresses %}
+                                        <option value="{{ address.id }}">{{ address.alias }}</option>
+                                    {% endfor %}
+                                </select>
+                                <label>Adresy</label>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+            <div class="modal-footer">
+                <a href="javascript:void(0);" class="modal-close waves-effect blue-text btn-flat">Zavřít</a>
+            </div>
+        </div>
+    {% endif %}
 
 {% endblock %}
 
