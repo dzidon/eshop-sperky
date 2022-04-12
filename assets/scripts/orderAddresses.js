@@ -1,6 +1,4 @@
-import { loaderOpen } from './app';
-import { loaderClose } from './app';
-import { errorModalOpenBasedOnResponse } from './app';
+import { loaderOpen, loaderClose, errorModalOpenBasedOnResponse } from './app';
 
 /*
     Elementy

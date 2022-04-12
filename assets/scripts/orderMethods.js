@@ -1,6 +1,4 @@
-import { loaderOpen } from './app';
-import { loaderClose } from './app';
-import { errorModalOpen } from './app';
+import { errorModalOpenBasedOnResponse, loaderOpen, loaderClose } from './app';
 require('./packetaLibrary');
 
 const formOrderMethods = $('#form-order-methods');
@@ -81,7 +79,7 @@ function ajaxUpdateOrderMethods(url, data)
     })
     .fail(function (jqXHR)
     {
-        renderErrors(jqXHR['responseJSON']);
+        errorModalOpenBasedOnResponse(jqXHR['responseJSON'], 'Nepodařilo se aktualizovat dopravu a platbu, zkuste to prosím později.');
         renderOrderMethods(jqXHR['responseJSON']);
     })
     .always(function ()
@@ -102,19 +100,6 @@ function renderOrderMethods(data)
     if (typeof(data['totalProducts']) != "undefined" && data['totalProducts'] !== null)
     {
         $('.navbar-cart-total-products').text(data['totalProducts']);
-    }
-}
-
-function renderErrors(data)
-{
-    if (typeof(data) != "undefined" && Array.isArray(data['errors']) && data['errors'].length > 0)
-    {
-        const errors = data['errors'].join('<br>');
-        errorModalOpen(errors);
-    }
-    else
-    {
-        errorModalOpen('Nepodařilo se aktualizovat dopravu a platbu, zkuste to prosím později.');
     }
 }
 

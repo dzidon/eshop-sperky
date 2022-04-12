@@ -1,6 +1,4 @@
-import { loaderOpen } from './app';
-import { loaderClose } from './app';
-import { errorModalOpen } from './app';
+import { loaderOpen, loaderClose, errorModalOpenBasedOnResponse } from './app';
 
 let requestInProgress = false;
 
@@ -60,7 +58,7 @@ function ajaxUpdateCart(url, data)
     })
     .fail(function (jqXHR)
     {
-        renderErrors(jqXHR['responseJSON']);
+        errorModalOpenBasedOnResponse(jqXHR['responseJSON'], 'Nepodařilo se aktualizovat košík, zkuste to prosím znovu.');
         renderCart(jqXHR['responseJSON']);
     })
     .always(function ()
@@ -82,19 +80,6 @@ function renderCart(data)
     if (typeof(data['totalProducts']) != "undefined" && data['totalProducts'] !== null)
     {
         $('.navbar-cart-total-products').text(data['totalProducts']);
-    }
-}
-
-function renderErrors(data)
-{
-    if (typeof(data) != "undefined" && Array.isArray(data['errors']) && data['errors'].length > 0)
-    {
-        const errors = data['errors'].join('<br>');
-        errorModalOpen(errors);
-    }
-    else
-    {
-        errorModalOpen('Nepodařilo se aktualizovat košík, zkuste to prosím znovu.');
     }
 }
 

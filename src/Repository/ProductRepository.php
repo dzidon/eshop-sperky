@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Product;
+use App\Entity\ProductOptionGroup;
 use App\Entity\ProductSection;
 use App\Service\ProductCatalogFilterService;
 use App\Service\SortingService;
@@ -33,21 +34,11 @@ class ProductRepository extends ServiceEntityRepository
 
     public function findOneAndFetchEverything(array $criteria, bool $visibleOnly)
     {
+        // produkt, sekce
         $queryBuilder = $this->createQueryBuilder('p')
-            ->select('p, ps, pc, pcg, pog, pogo, pi, pig, pimg')
+            ->select('p, ps')
             ->leftJoin('p.section', 'ps')
-            ->leftJoin('p.categories', 'pc')
-            ->leftJoin('pc.productCategoryGroup', 'pcg')
-            ->leftJoin('p.optionGroups', 'pog')
-            ->leftJoin('pog.options', 'pogo')
-            ->leftJoin('p.info', 'pi')
-            ->leftJoin('pi.productInformationGroup', 'pig')
-            ->leftJoin('p.images', 'pimg')
-            ->addOrderBy('pimg.priority', 'DESC')
-            ->addOrderBy('pc.name', 'ASC')
-            ->addOrderBy('pcg.name', 'ASC')
-            ->addOrderBy('pig.name', 'ASC')
-            ->addOrderBy('pogo.id', 'ASC');
+        ;
 
         foreach ($criteria as $name => $value)
         {
@@ -62,9 +53,102 @@ class ProductRepository extends ServiceEntityRepository
                 ->getQueryBuilder();
         }
 
-        return $queryBuilder
+        /** @var Product|null $product */
+        $product = $queryBuilder
             ->getQuery()
             ->getOneOrNullResult();
+
+        if ($product === null)
+        {
+            return null;
+        }
+
+        // kategorie produktu a ke každé kategorii její skupina
+        $this->_em->createQuery('
+            SELECT PARTIAL
+                p.{id}, pc, pcg
+            FROM 
+                App\Entity\Product p
+            LEFT JOIN
+                p.categories pc
+            LEFT JOIN
+                pc.productCategoryGroup pcg
+            WHERE
+                p.id = :id
+        ')
+        ->setParameter('id', $product->getId())
+        ->setHint(Query::HINT_FORCE_PARTIAL_LOAD, 1)
+        ->getResult();
+
+        // informace o produktu a ke každé její skupina
+        $this->_em->createQuery('
+            SELECT PARTIAL
+                p.{id}, pi, pig
+            FROM 
+                App\Entity\Product p
+            LEFT JOIN
+                p.info pi
+            LEFT JOIN
+                pi.productInformationGroup pig
+            WHERE
+                p.id = :id
+        ')
+        ->setParameter('id', $product->getId())
+        ->setHint(Query::HINT_FORCE_PARTIAL_LOAD, 1)
+        ->getResult();
+
+        // obrázky
+        $this->_em->createQuery('
+            SELECT PARTIAL
+                p.{id}, pimg
+            FROM 
+                App\Entity\Product p
+            LEFT JOIN
+                p.images pimg
+            WHERE
+                p.id = :id
+            ORDER BY
+                pimg.priority DESC
+        ')
+        ->setParameter('id', $product->getId())
+        ->setHint(Query::HINT_FORCE_PARTIAL_LOAD, 1)
+        ->getResult();
+
+        // skupiny produktových voleb
+        $this->_em->createQuery('
+            SELECT PARTIAL
+                p.{id}, pog
+            FROM 
+                App\Entity\Product p
+            LEFT JOIN
+                p.optionGroups pog
+            WHERE
+                p.id = :id
+        ')
+        ->setParameter('id', $product->getId())
+        ->setHint(Query::HINT_FORCE_PARTIAL_LOAD, 1)
+        ->getResult();
+
+        $optionGroupIds = array_map(function (ProductOptionGroup $optionGroup) {
+            return $optionGroup->getId();
+        }, $product->getOptionGroups()->getValues());
+
+        // produktové volby
+        $this->_em->createQuery('
+            SELECT PARTIAL
+                pog.{id}, pogo
+            FROM 
+                App\Entity\ProductOptionGroup pog
+            LEFT JOIN
+                pog.options pogo
+            WHERE
+                pog.id IN (:ids)
+        ')
+        ->setParameter('ids', $optionGroupIds)
+        ->setHint(Query::HINT_FORCE_PARTIAL_LOAD, 1)
+        ->getResult();
+
+        return $product;
     }
 
     public function findLatest(int $count)

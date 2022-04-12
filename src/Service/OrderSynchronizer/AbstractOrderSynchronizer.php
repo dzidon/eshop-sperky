@@ -77,6 +77,14 @@ abstract class AbstractOrderSynchronizer
     }
 
     /**
+     * @return bool
+     */
+    public function hasWarnings(): bool
+    {
+        return $this->hasWarnings;
+    }
+
+    /**
      * Přidá varování do flash bagu
      */
     public function addWarningsToFlashBag(): void

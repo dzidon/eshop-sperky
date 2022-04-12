@@ -33,6 +33,11 @@ class CustomOrderService
         return $this->order;
     }
 
+    public function getSynchronizer(): CustomOrderSynchronizer
+    {
+        return $this->synchronizer;
+    }
+
     /**
      * Načte objednávku vytvořenou na míru podle tokenu.
      *

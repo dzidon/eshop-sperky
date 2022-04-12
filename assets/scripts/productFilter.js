@@ -1,8 +1,5 @@
 import * as noUiSlider from 'materialize-css/extras/noUiSlider/nouislider';
-import { initializeAddToCartLinks } from './app';
-import { errorModalOpen } from './app';
-import { loaderOpen } from './app';
-import { loaderClose } from './app';
+import { initializeAddToCartLinks, errorModalOpen, loaderOpen, loaderClose } from './app';
 
 let searchPhraseInput;
 let priceMinInput;

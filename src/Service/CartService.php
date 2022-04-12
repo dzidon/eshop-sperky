@@ -62,6 +62,11 @@ class CartService
         return $this->order;
     }
 
+    public function getSynchronizer(): OrderCartSynchronizer
+    {
+        return $this->synchronizer;
+    }
+
     public function getOrderCookie()
     {
         return $this->orderCookie;

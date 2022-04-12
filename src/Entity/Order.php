@@ -6,7 +6,6 @@ use DateTime;
 use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\Persistence\Proxy;
 use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Validator\Constraints as Assert;
 use App\Validation\Compound as AssertCompound;
@@ -52,6 +51,7 @@ class Order
      *
      * @AssertCustom\CartOccurenceQuantity(groups={"cart"})
      * @Assert\Valid(groups={"cart"})
+     * @Assert\Count(min=1, groups={"addresses"}, minMessage="Musíte mít alespoň 1 produkt v košíku.")
      */
     private $cartOccurences;
 
@@ -68,12 +68,16 @@ class Order
     /**
      * @ORM\ManyToOne(targetEntity=DeliveryMethod::class, inversedBy="orders")
      * @ORM\JoinColumn(onDelete="SET NULL")
+     *
+     * @Assert\NotBlank(groups={"addresses"}, message="Vraťte se na předchozí krok a vyberte způsob doručení.")
      */
     private $deliveryMethod;
 
     /**
      * @ORM\ManyToOne(targetEntity=PaymentMethod::class, inversedBy="orders")
      * @ORM\JoinColumn(onDelete="SET NULL")
+     *
+     * @Assert\NotBlank(groups={"addresses"}, message="Vraťte se na předchozí krok a vyberte způsob platby.")
      */
     private $paymentMethod;
 
