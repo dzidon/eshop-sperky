@@ -4,7 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Order;
 use App\Entity\Product;
-use Doctrine\ORM\Query;
+use DateTime;
 use Symfony\Component\Uid\Uuid;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -97,6 +97,19 @@ class OrderRepository extends ServiceEntityRepository
         ->getResult();
 
         return $order;
+    }
+
+    public function deleteInactiveCartOrders()
+    {
+        return $this->createQueryBuilder('o')
+            ->andWhere('o.createdManually = false')
+            ->andWhere('o.finished = false')
+            ->andWhere('o.expireAt IS NULL OR o.expireAt <= :now')
+            ->setParameter('now', new DateTime('now'))
+            ->delete()
+            ->getQuery()
+            ->execute()
+        ;
     }
 
     public function getCartTotalQuantity(Uuid $token)

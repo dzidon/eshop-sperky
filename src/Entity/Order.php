@@ -53,7 +53,7 @@ class Order
     private $token;
 
     /**
-     * @ORM\Column(type="datetime")
+     * @ORM\Column(type="datetime", nullable=true)
      */
     private $expireAt;
 
@@ -364,7 +364,7 @@ class Order
         return $this->expireAt;
     }
 
-    public function setExpireAt(DateTimeInterface $expireAt): self
+    public function setExpireAt(?DateTimeInterface $expireAt): self
     {
         $this->expireAt = $expireAt;
 
