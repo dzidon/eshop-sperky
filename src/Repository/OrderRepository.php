@@ -49,7 +49,6 @@ class OrderRepository extends ServiceEntityRepository
             ->andWhere('o.token = :token')
             ->setParameter('token', $token, 'uuid')
             ->getQuery()
-            ->setHint(Query::HINT_FORCE_PARTIAL_LOAD, 1)
             ->getResult()
         ;
 
@@ -81,7 +80,6 @@ class OrderRepository extends ServiceEntityRepository
                 oc.id IN (:ids)
         ')
         ->setParameter('ids', $cartOccurenceIds)
-        ->setHint(Query::HINT_FORCE_PARTIAL_LOAD, 1)
         ->getResult();
 
         // ke každému produktu jeho skupiny options
@@ -96,7 +94,6 @@ class OrderRepository extends ServiceEntityRepository
                 ocp.id IN (:ids)
         ')
         ->setParameter('ids', $productIds)
-        ->setHint(Query::HINT_FORCE_PARTIAL_LOAD, 1)
         ->getResult();
 
         return $order;

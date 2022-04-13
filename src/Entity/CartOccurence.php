@@ -28,7 +28,7 @@ class CartOccurence
     private $order_;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Product::class, inversedBy="cartOccurences")
+     * @ORM\ManyToOne(targetEntity=Product::class, inversedBy="cartOccurences", cascade={"persist"})
      * @ORM\JoinColumn(onDelete="SET NULL")
      */
     private $product;

@@ -45,7 +45,7 @@ class ProductRepository extends ServiceEntityRepository
             $queryBuilder->andWhere(sprintf('p.%s = :%s', $name, $name))->setParameter($name, $value);
         }
 
-        if($visibleOnly)
+        if ($visibleOnly)
         {
             $queryBuilder = $this->filter
                 ->initialize($queryBuilder)
@@ -77,7 +77,6 @@ class ProductRepository extends ServiceEntityRepository
                 p.id = :id
         ')
         ->setParameter('id', $product->getId())
-        ->setHint(Query::HINT_FORCE_PARTIAL_LOAD, 1)
         ->getResult();
 
         // informace o produktu a ke každé její skupina
@@ -94,7 +93,6 @@ class ProductRepository extends ServiceEntityRepository
                 p.id = :id
         ')
         ->setParameter('id', $product->getId())
-        ->setHint(Query::HINT_FORCE_PARTIAL_LOAD, 1)
         ->getResult();
 
         // obrázky
@@ -111,7 +109,6 @@ class ProductRepository extends ServiceEntityRepository
                 pimg.priority DESC
         ')
         ->setParameter('id', $product->getId())
-        ->setHint(Query::HINT_FORCE_PARTIAL_LOAD, 1)
         ->getResult();
 
         // skupiny produktových voleb
@@ -126,7 +123,6 @@ class ProductRepository extends ServiceEntityRepository
                 p.id = :id
         ')
         ->setParameter('id', $product->getId())
-        ->setHint(Query::HINT_FORCE_PARTIAL_LOAD, 1)
         ->getResult();
 
         $optionGroupIds = array_map(function (ProductOptionGroup $optionGroup) {
@@ -145,7 +141,6 @@ class ProductRepository extends ServiceEntityRepository
                 pog.id IN (:ids)
         ')
         ->setParameter('ids', $optionGroupIds)
-        ->setHint(Query::HINT_FORCE_PARTIAL_LOAD, 1)
         ->getResult();
 
         return $product;

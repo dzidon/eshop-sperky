@@ -111,18 +111,6 @@
                     {% endif %}
 
                     <div class="row">
-                        <h4>Firma</h4>
-                    </div>
-
-                    {{ form_row(orderAddressesForm.companyChecked) }}
-
-                    <div id="company-fields">
-                        {{ form_row(orderAddressesForm.addressBillingCompany) }}
-                        {{ form_row(orderAddressesForm.addressBillingIc) }}
-                        {{ form_row(orderAddressesForm.addressBillingDic) }}
-                    </div>
-
-                    <div class="row">
                         <h4>Fakturační adresa</h4>
 
                         {% if app.user is not null %}
@@ -159,6 +147,18 @@
                         {{ form_row(orderAddressesForm.addressBillingAdditionalInfo) }}
                         {{ form_row(orderAddressesForm.addressBillingTown) }}
                         {{ form_row(orderAddressesForm.addressBillingZip) }}
+                    </div>
+
+                    <div class="row">
+                        <h4>Firma</h4>
+                    </div>
+
+                    {{ form_row(orderAddressesForm.companyChecked) }}
+
+                    <div id="company-fields">
+                        {{ form_row(orderAddressesForm.addressBillingCompany) }}
+                        {{ form_row(orderAddressesForm.addressBillingIc) }}
+                        {{ form_row(orderAddressesForm.addressBillingDic) }}
                     </div>
 
                     <div class="row">

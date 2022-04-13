@@ -162,12 +162,17 @@ class OrderController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid() && !$synchronizerHasWarnings)
         {
-            // order->finish
+            $targetOrder->finish();
             $this->getDoctrine()->getManager()->persist($targetOrder);
             $this->getDoctrine()->getManager()->flush();
+            $this->addFlash('success', 'Objednávka vytvořena!');
 
-            $this->addFlash('success', 'saved');
-            return $this->redirectToRoute('order_addresses', ['token' => $token]);
+            $response = $this->redirectToRoute('home');
+            if (!$targetOrder->isCreatedManually())
+            {
+                $response->headers->clearCookie(CartService::COOKIE_NAME);
+            }
+            return $response;
         }
 
         return $this->render('order/addresses.html.twig', [

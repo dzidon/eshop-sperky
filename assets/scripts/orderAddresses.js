@@ -188,8 +188,13 @@ function fillAddressFields(addressData)
             {
                 companyCheckbox.prop('checked', true);
                 companyCheckbox.checked = true;
-                hideOrShowFields(companyCheckbox, 'company-fields');
             }
+            else
+            {
+                companyCheckbox.prop('checked', false);
+                companyCheckbox.checked = false;
+            }
+            hideOrShowFields(companyCheckbox, 'company-fields');
 
             break;
         }

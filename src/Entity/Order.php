@@ -6,6 +6,7 @@ use DateTime;
 use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use LogicException;
 use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Validator\Constraints as Assert;
 use App\Validation\Compound as AssertCompound;
@@ -24,6 +25,16 @@ class Order
 {
     public const LIFETIME_IN_DAYS = 60;
     public const REFRESH_WINDOW_IN_DAYS = 30;
+
+    const SHIPMENT_STATE_NOT_READY = 'NOT_READY';
+    const SHIPMENT_STATE_READY = 'READY';
+    const SHIPMENT_STATE_SHIPPED = 'SHIPPED';
+
+    const SHIPMENT_STATES = [
+        self::SHIPMENT_STATE_NOT_READY => true,
+        self::SHIPMENT_STATE_READY => true,
+        self::SHIPMENT_STATE_SHIPPED => true,
+    ];
 
     const DELIVERY_METHODS_THAT_LOCK_ADDRESS = [
         DeliveryMethod::TYPE_PACKETA_CZ => true,
@@ -291,6 +302,25 @@ class Order
      * @Assert\NotBlank(groups={"addresses_note"})
      */
     private $note;
+
+    /*
+     * Používané po dokončení objednávky
+     */
+
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     */
+    private $cashOnDelivery = 0.0;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $finishedAt;
+
+    /**
+     * @ORM\Column(type="string", length=32)
+     */
+    private string $shipmentState = self::SHIPMENT_STATE_NOT_READY;
 
     private bool $companyChecked = false;
     private bool $billingAddressChecked = false;
@@ -807,6 +837,77 @@ class Order
         return $this;
     }
 
+    public function getCashOnDelivery(): ?float
+    {
+        return $this->cashOnDelivery;
+    }
+
+    public function setCashOnDelivery(float $cashOnDelivery): self
+    {
+        $this->cashOnDelivery = $cashOnDelivery;
+
+        return $this;
+    }
+
+    public function getFinishedAt(): ?DateTimeInterface
+    {
+        return $this->finishedAt;
+    }
+
+    public function setFinishedAt(DateTimeInterface $finishedAt): self
+    {
+        $this->finishedAt = $finishedAt;
+
+        return $this;
+    }
+
+    public function getShipmentState(): string
+    {
+        return $this->shipmentState;
+    }
+
+    public function setShipmentState(string $shipmentState): self
+    {
+        if (!isset(self::SHIPMENT_STATES[$shipmentState]))
+        {
+            throw new LogicException(sprintf('Objednávce (App\Entity\Order) nejde nastavit shipmentState %s.', $shipmentState));
+        }
+        $this->shipmentState = $shipmentState;
+
+        return $this;
+    }
+
+    public function finish(): void
+    {
+        // částka dobírky + objednávka na dobírku bude rovnou připravená na odeslání
+        if ($this->paymentMethod !== null && $this->paymentMethod->getType() === PaymentMethod::TYPE_ON_DELIVERY)
+        {
+            $cashOnDelivery = $this->getTotalPriceWithVat($withMethods = true);
+            $this->setCashOnDelivery($cashOnDelivery);
+            $this->setShipmentState(self::SHIPMENT_STATE_READY);
+        }
+
+        // nezaškrtl, že chce zadat jinou fakturační adresu, takže se nastaví na hodnoty doručovací
+        if (!$this->billingAddressChecked)
+        {
+            $this->loadAddressBillingFromDelivery();
+        }
+
+        // odečtení počtu produktů na skladě
+        /** @var CartOccurence $cartOccurence */
+        foreach ($this->cartOccurences as $cartOccurence)
+        {
+            $product = $cartOccurence->getProduct();
+            $productInventory = $product->getInventory();
+            $cartOccurenceQuantity = $cartOccurence->getQuantity();
+            $product->setInventory($productInventory - $cartOccurenceQuantity);
+        }
+
+        $this->token = Uuid::v4();
+        $this->finishedAt = new DateTime('now');
+        $this->finished = true;
+    }
+
     public function getStaticAddressDeliveryAdditionalInfo(): ?string
     {
         return $this->staticAddressDeliveryAdditionalInfo;
@@ -916,11 +1017,11 @@ class Order
 
     public function injectStaticAddressDelivery(): void
     {
-        $this->staticAddressDeliveryAdditionalInfo = $this->addressDeliveryAdditionalInfo;
-        $this->staticAddressDeliveryCountry = $this->addressDeliveryCountry;
-        $this->staticAddressDeliveryStreet = $this->addressDeliveryStreet;
-        $this->staticAddressDeliveryTown = $this->addressDeliveryTown;
-        $this->staticAddressDeliveryZip = $this->addressDeliveryZip;
+        $this->setStaticAddressDeliveryAdditionalInfo($this->addressDeliveryAdditionalInfo);
+        $this->setStaticAddressDeliveryCountry($this->addressDeliveryCountry);
+        $this->setStaticAddressDeliveryStreet($this->addressDeliveryStreet);
+        $this->setStaticAddressDeliveryTown($this->addressDeliveryTown);
+        $this->setStaticAddressDeliveryZip($this->addressDeliveryZip);
     }
 
     private function loadAddressDeliveryFromStatic(): void
@@ -934,29 +1035,44 @@ class Order
 
     private function resetAddressDelivery(): void
     {
-        $this->addressDeliveryAdditionalInfo = null;
-        $this->addressDeliveryCountry = null;
-        $this->addressDeliveryStreet = null;
-        $this->addressDeliveryTown = null;
-        $this->addressDeliveryZip = null;
+        $this->setStaticAddressDeliveryAdditionalInfo(null);
+        $this->setStaticAddressDeliveryCountry(null);
+        $this->setStaticAddressDeliveryStreet(null);
+        $this->setStaticAddressDeliveryTown(null);
+        $this->setStaticAddressDeliveryZip(null);
+    }
+
+    private function loadAddressBillingFromDelivery(): void
+    {
+        if ($this->deliveryMethod === null || !isset(self::DELIVERY_METHODS_THAT_LOCK_ADDRESS[$this->deliveryMethod->getType()]))
+        {
+            $this->setAddressBillingAdditionalInfo($this->addressDeliveryAdditionalInfo);
+        }
+
+        $this->setAddressBillingNameFirst($this->addressDeliveryNameFirst);
+        $this->setAddressBillingNameLast($this->addressDeliveryNameLast);
+        $this->setAddressBillingCountry($this->addressDeliveryCountry);
+        $this->setAddressBillingStreet($this->addressDeliveryStreet);
+        $this->setAddressBillingTown($this->addressDeliveryTown);
+        $this->setAddressBillingZip($this->addressDeliveryZip);
     }
 
     public function resetAddressBilling(): void
     {
-        $this->addressBillingNameFirst = null;
-        $this->addressBillingNameLast = null;
-        $this->addressBillingCountry = null;
-        $this->addressBillingStreet = null;
-        $this->addressBillingAdditionalInfo = null;
-        $this->addressBillingTown = null;
-        $this->addressBillingZip = null;
+        $this->setAddressBillingNameFirst(null);
+        $this->setAddressBillingNameLast(null);
+        $this->setAddressBillingCountry(null);
+        $this->setAddressBillingStreet(null);
+        $this->setAddressBillingAdditionalInfo(null);
+        $this->setAddressBillingTown(null);
+        $this->setAddressBillingZip(null);
     }
 
     public function resetDataCompany(): void
     {
-        $this->addressBillingCompany = null;
-        $this->addressBillingIc = null;
-        $this->addressBillingDic = null;
+        $this->setAddressBillingCompany(null);
+        $this->setAddressBillingIc(null);
+        $this->setAddressBillingDic(null);
     }
 
     /**
