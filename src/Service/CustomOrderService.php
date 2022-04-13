@@ -52,7 +52,7 @@ class CustomOrderService
 
             /** @var Order|null $order */
             $order = $this->entityManager->getRepository(Order::class)->findOneAndFetchEverything($uuid);
-            if ($order !== null && $order->isCreatedManually() && !$order->isFinished())
+            if ($order !== null && $order->isCreatedManually() && $this->order->getLifecycleChapter() === Order::LIFECYCLE_FRESH)
             {
                 $this->order = $order;
 

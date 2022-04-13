@@ -103,8 +103,9 @@ class OrderRepository extends ServiceEntityRepository
     {
         return $this->createQueryBuilder('o')
             ->andWhere('o.createdManually = false')
-            ->andWhere('o.finished = false')
+            ->andWhere('o.lifecycleChapter = :lifecycleCart')
             ->andWhere('o.expireAt IS NULL OR o.expireAt <= :now')
+            ->setParameter('lifecycleCart', Order::LIFECYCLE_FRESH)
             ->setParameter('now', new DateTime('now'))
             ->delete()
             ->getQuery()
@@ -119,8 +120,9 @@ class OrderRepository extends ServiceEntityRepository
             ->leftJoin('o.cartOccurences', 'oc')
             ->andWhere('o.token = :token')
             ->andWhere('o.createdManually = false')
-            ->andWhere('o.finished = false')
+            ->andWhere('o.lifecycleChapter = :lifecycleCart')
             ->setParameter('token', $token, 'uuid')
+            ->setParameter('lifecycleCart', Order::LIFECYCLE_FRESH)
             ->getQuery()
             ->getScalarResult()[0]
         ;

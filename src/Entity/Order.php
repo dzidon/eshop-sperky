@@ -26,14 +26,18 @@ class Order
     public const LIFETIME_IN_DAYS = 60;
     public const REFRESH_WINDOW_IN_DAYS = 30;
 
-    const SHIPMENT_STATE_NOT_READY = 'NOT_READY';
-    const SHIPMENT_STATE_READY = 'READY';
-    const SHIPMENT_STATE_SHIPPED = 'SHIPPED';
+    const LIFECYCLE_FRESH = 0;
+    const LIFECYCLE_AWAITING_PAYMENT = 1;
+    const LIFECYCLE_PAID = 2;
+    const LIFECYCLE_SHIPPED = 3;
+    const LIFECYCLE_CANCELLED = 4;
 
-    const SHIPMENT_STATES = [
-        self::SHIPMENT_STATE_NOT_READY => true,
-        self::SHIPMENT_STATE_READY => true,
-        self::SHIPMENT_STATE_SHIPPED => true,
+    const LIFECYCLE_CHAPTERS = [
+        self::LIFECYCLE_FRESH => true,
+        self::LIFECYCLE_AWAITING_PAYMENT => true,
+        self::LIFECYCLE_PAID => true,
+        self::LIFECYCLE_SHIPPED => true,
+        self::LIFECYCLE_CANCELLED => true,
     ];
 
     const DELIVERY_METHODS_THAT_LOCK_ADDRESS = [
@@ -72,9 +76,19 @@ class Order
     private bool $createdManually = false;
 
     /**
-     * @ORM\Column(type="boolean")
+     * @ORM\Column(type="float", nullable=true)
      */
-    private bool $finished = false;
+    private $cashOnDelivery = 0.0;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $finishedAt;
+
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private int $lifecycleChapter = self::LIFECYCLE_FRESH;
 
     /**
      * @ORM\ManyToOne(targetEntity=DeliveryMethod::class, inversedBy="orders")
@@ -303,25 +317,6 @@ class Order
      */
     private $note;
 
-    /*
-     * Používané po dokončení objednávky
-     */
-
-    /**
-     * @ORM\Column(type="float", nullable=true)
-     */
-    private $cashOnDelivery = 0.0;
-
-    /**
-     * @ORM\Column(type="datetime", nullable=true)
-     */
-    private $finishedAt;
-
-    /**
-     * @ORM\Column(type="string", length=32)
-     */
-    private string $shipmentState = self::SHIPMENT_STATE_NOT_READY;
-
     private bool $companyChecked = false;
     private bool $billingAddressChecked = false;
     private bool $noteChecked = false;
@@ -423,18 +418,6 @@ class Order
     public function setCreatedManually(bool $createdManually): self
     {
         $this->createdManually = $createdManually;
-
-        return $this;
-    }
-
-    public function isFinished(): bool
-    {
-        return $this->finished;
-    }
-
-    public function setFinished(bool $finished): self
-    {
-        $this->finished = $finished;
 
         return $this;
     }
@@ -861,30 +844,32 @@ class Order
         return $this;
     }
 
-    public function getShipmentState(): string
+    public function getLifecycleChapter(): int
     {
-        return $this->shipmentState;
+        return $this->lifecycleChapter;
     }
 
-    public function setShipmentState(string $shipmentState): self
+    public function setLifecycleChapter(int $lifecycleChapter): self
     {
-        if (!isset(self::SHIPMENT_STATES[$shipmentState]))
+        if (!isset(self::LIFECYCLE_CHAPTERS[$lifecycleChapter]))
         {
-            throw new LogicException(sprintf('Objednávce (App\Entity\Order) nejde nastavit shipmentState %s.', $shipmentState));
+            throw new LogicException(sprintf('Objednávce (App\Entity\Order) nejde nastavit lifecycleChapter %d.', $lifecycleChapter));
         }
-        $this->shipmentState = $shipmentState;
+        $this->lifecycleChapter = $lifecycleChapter;
 
         return $this;
     }
 
     public function finish(): void
     {
-        // částka dobírky + objednávka na dobírku bude rovnou připravená na odeslání
+        $this->setLifecycleChapter(self::LIFECYCLE_AWAITING_PAYMENT);
+
+        // nastavení částky dobírky + objednávka na dobírku bude rovnou připravená na odeslání
         if ($this->paymentMethod !== null && $this->paymentMethod->getType() === PaymentMethod::TYPE_ON_DELIVERY)
         {
             $cashOnDelivery = $this->getTotalPriceWithVat($withMethods = true);
             $this->setCashOnDelivery($cashOnDelivery);
-            $this->setShipmentState(self::SHIPMENT_STATE_READY);
+            $this->setLifecycleChapter(self::LIFECYCLE_PAID);
         }
 
         // nezaškrtl, že chce zadat jinou fakturační adresu, takže se nastaví na hodnoty doručovací
@@ -905,7 +890,6 @@ class Order
 
         $this->token = Uuid::v4();
         $this->finishedAt = new DateTime('now');
-        $this->finished = true;
     }
 
     public function getStaticAddressDeliveryAdditionalInfo(): ?string

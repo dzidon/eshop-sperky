@@ -101,7 +101,7 @@ class CartService
                 $uuid = Uuid::fromString($tokenInCookie);
                 $this->order = $this->entityManager->getRepository(Order::class)->findOneAndFetchEverything($uuid);
 
-                if ($this->order === null || $this->order->isCreatedManually() || $this->order->isFinished())
+                if ($this->order === null || $this->order->isCreatedManually() || $this->order->getLifecycleChapter() > Order::LIFECYCLE_FRESH)
                 {
                     $this->createNewOrder();
                 }
