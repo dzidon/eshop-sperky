@@ -87,6 +87,10 @@ main {
     width: 100%;
 }
 
+.width-20px {
+    width: 20px;
+}
+
 .width200px {
     width: 200px;
 }

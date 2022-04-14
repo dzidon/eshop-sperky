@@ -6,6 +6,7 @@ use App\Entity\Detached\ContactEmail;
 use App\Entity\Product;
 use App\Entity\Review;
 use App\Form\ContactFormType;
+use App\Form\CustomOrderFormType;
 use App\Service\BreadcrumbsService;
 use App\Service\ContactEmailService;
 use Psr\Log\LoggerInterface;
@@ -62,21 +63,60 @@ class MainController extends AbstractController
                     ->initialize($emailData)
                     ->send();
 
-                $this->addFlash('success', 'E-mail odeslán, brzy se ozveme!');
-                $logger->info(sprintf("Someone has sent a contact email with a subject '%s' from %s.", $contactEmailService->getSubject(), $contactEmailService->getSenderEmail()));
+                $this->addFlash('success', sprintf('E-mail odeslán, brzy se ozveme na %s!', $contactEmailService->getSenderEmail()));
+                $logger->info(sprintf("Someone has sent a contact email with a subject '%s' as %s.", $contactEmailService->getSubject(), $contactEmailService->getSenderEmail()));
 
                 return $this->redirectToRoute('contact');
             }
             catch (TransportExceptionInterface $exception)
             {
                 $this->addFlash('failure', 'E-mail se nepodařilo odeslat, zkuste to znovu.');
-                $logger->error(sprintf("Someone has tried to send a contact email from %s, but the following error occurred in send: %s", $contactEmailService->getSenderEmail(), $exception->getMessage()));
+                $logger->error(sprintf("Someone has tried to send a contact email as %s, but the following error occurred in send: %s", $contactEmailService->getSenderEmail(), $exception->getMessage()));
             }
         }
 
         $this->breadcrumbs->addRoute('contact');
 
         return $this->render('main/contact.html.twig', [
+            'contactForm' => $form->createView(),
+        ]);
+    }
+
+    /**
+     * @Route("/objednavka-na-miru", name="order_custom_new")
+     */
+    public function orderCustomNew(Request $request, LoggerInterface $logger, ContactEmailService $contactEmailService): Response
+    {
+        $emailData = new ContactEmail();
+        $emailData->setSubject('Objednávka na míru');
+
+        $form = $this->createForm(CustomOrderFormType::class, $emailData);
+        $form->add('submit', SubmitType::class, ['label' => 'Odeslat']);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid())
+        {
+            try
+            {
+                $contactEmailService
+                    ->initialize($emailData)
+                    ->send();
+
+                $this->addFlash('success', sprintf('Nezávazná poptávka odeslána, brzy se ozveme na %s!', $contactEmailService->getSenderEmail()));
+                $logger->info(sprintf("Someone has sent a custom order request as %s.", $contactEmailService->getSenderEmail()));
+
+                return $this->redirectToRoute('order_custom_new');
+            }
+            catch (TransportExceptionInterface $exception)
+            {
+                $this->addFlash('failure', 'E-mail se nepodařilo odeslat, zkuste to znovu.');
+                $logger->error(sprintf("Someone has tried to send a contact email as %s, but the following error occurred in send: %s", $contactEmailService->getSenderEmail(), $exception->getMessage()));
+            }
+        }
+
+        $this->breadcrumbs->addRoute('order_custom_new');
+
+        return $this->render('main/order_custom_new.html.twig', [
             'contactForm' => $form->createView(),
         ]);
     }
