@@ -3,6 +3,7 @@
 namespace App\Controller\User;
 
 use App\Entity\Address;
+use App\Entity\Order;
 use App\Form\CartFormType;
 use App\Form\OrderAddressesFormType;
 use App\Form\OrderMethodsFormType;
@@ -13,6 +14,8 @@ use App\Service\JsonResponseService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Routing\Annotation\Route;
 
 class OrderController extends AbstractController
@@ -223,5 +226,38 @@ class OrderController extends AbstractController
         ];
         $jsonResponse->setResponseData('addressData', $addressData);
         return $jsonResponse->createJsonResponse();
+    }
+
+    /**
+     * @Route("/objednavka/prehled/{token}", name="order_overview")
+     */
+    public function orderOverview($token = null): Response
+    {
+        if ($token !== null)
+        {
+            $this->request->getSession()->set('OrderPublicToken', $token);
+            return $this->redirectToRoute('order_overview');
+        }
+
+        $token = $this->request->getSession()->get('OrderPublicToken');
+        if ($token === null || !UUid::isValid($token))
+        {
+            throw new NotFoundHttpException('Neplatný token.');
+        }
+
+        $uuid = Uuid::fromString($token);
+        /** @var Order|null $order */
+        $order = $this->getDoctrine()->getRepository(Order::class)->findOneAndFetchCartOccurences($uuid);
+        if ($order === null || $order->getLifecycleChapter() < Order::LIFECYCLE_AWAITING_PAYMENT)
+        {
+            throw new NotFoundHttpException('Objednávka nenalezena.');
+        }
+
+        $order->calculateTotals();
+        $this->breadcrumbs->addRoute('order_overview', ['token' => $token]);
+
+        return $this->render('order/overview.html.twig', [
+            'order' => $order,
+        ]);
     }
 }

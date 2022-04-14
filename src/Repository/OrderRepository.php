@@ -99,6 +99,18 @@ class OrderRepository extends ServiceEntityRepository
         return $order;
     }
 
+    public function findOneAndFetchCartOccurences(Uuid $token)
+    {
+        return $this->createQueryBuilder('o')
+            ->select('o, oc')
+            ->leftJoin('o.cartOccurences', 'oc')
+            ->andWhere('o.token = :token')
+            ->setParameter('token', $token, 'uuid')
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
+
     public function deleteInactiveCartOrders()
     {
         return $this->createQueryBuilder('o')

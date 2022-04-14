@@ -26,18 +26,18 @@ class Order
     public const LIFETIME_IN_DAYS = 60;
     public const REFRESH_WINDOW_IN_DAYS = 30;
 
-    const LIFECYCLE_FRESH = 0;
-    const LIFECYCLE_AWAITING_PAYMENT = 1;
-    const LIFECYCLE_PAID = 2;
-    const LIFECYCLE_SHIPPED = 3;
-    const LIFECYCLE_CANCELLED = 4;
+    public const LIFECYCLE_FRESH = 0;
+    public const LIFECYCLE_AWAITING_PAYMENT = 1;
+    public const LIFECYCLE_PAID = 2;
+    public const LIFECYCLE_SHIPPED = 3;
+    public const LIFECYCLE_CANCELLED = 4;
 
-    const LIFECYCLE_CHAPTERS = [
-        self::LIFECYCLE_FRESH => true,
-        self::LIFECYCLE_AWAITING_PAYMENT => true,
-        self::LIFECYCLE_PAID => true,
-        self::LIFECYCLE_SHIPPED => true,
-        self::LIFECYCLE_CANCELLED => true,
+    public const LIFECYCLE_CHAPTERS = [
+        self::LIFECYCLE_FRESH => 'Neúplná',
+        self::LIFECYCLE_AWAITING_PAYMENT => 'Čeká na zaplacení',
+        self::LIFECYCLE_PAID => 'Zaplacená',
+        self::LIFECYCLE_SHIPPED => 'Odeslaná',
+        self::LIFECYCLE_CANCELLED => 'Zrušená',
     ];
 
     const DELIVERY_METHODS_THAT_LOCK_ADDRESS = [
@@ -422,11 +422,16 @@ class Order
         return $this;
     }
 
-    public function hasAllRequirements(): bool
+    public function getTypeName(): string
     {
-        // platební metoda, doručovací metoda a alespoň jeden cart occurence s quantity > 0
-
-        return true;
+        if ($this->createdManually)
+        {
+            return 'Vytvořená na míru';
+        }
+        else
+        {
+            return 'Vytvořená z katalogu';
+        }
     }
 
     public function getDeliveryMethod(): ?DeliveryMethod
@@ -847,6 +852,11 @@ class Order
     public function getLifecycleChapter(): int
     {
         return $this->lifecycleChapter;
+    }
+
+    public function getLifecycleChapterName(): string
+    {
+        return self::LIFECYCLE_CHAPTERS[$this->lifecycleChapter];
     }
 
     public function setLifecycleChapter(int $lifecycleChapter): self

@@ -1,11 +1,9 @@
 {{ form_start(orderMethodsForm) }}
     <div class="row flex-wrap">
         <div class="col s12 l7">
-            <div class="row">
-                <h4>{{ orderMethodsForm.children.deliveryMethod.vars.label }}</h4>
-            </div>
-
             <div class="row no-mar-bot">
+                <h4>{{ orderMethodsForm.children.deliveryMethod.vars.label }}</h4>
+
                 <div class="collection z-depth-1">
                     {% for methodKey, methodChoiceView in orderMethodsForm.children.deliveryMethod.vars.choices %}
                         <div class="collection-item">
@@ -59,11 +57,9 @@
                 {{ form_errors(orderMethodsForm.deliveryMethod) }}
             </div>
 
-            <div class="row">
-                <h4>{{ orderMethodsForm.children.paymentMethod.vars.label }}</h4>
-            </div>
-
             <div class="row no-mar-bot">
+                <h4>{{ orderMethodsForm.children.paymentMethod.vars.label }}</h4>
+
                 <div class="collection z-depth-1">
                     {% for methodKey, methodChoiceView in orderMethodsForm.children.paymentMethod.vars.choices %}
                         <div class="collection-item">
