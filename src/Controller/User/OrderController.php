@@ -11,10 +11,13 @@ use App\Service\BreadcrumbsService;
 use App\Service\CartService;
 use App\Service\CustomOrderService;
 use App\Service\JsonResponseService;
+use App\Service\OrderEmailService;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -133,7 +136,7 @@ class OrderController extends AbstractController
     /**
      * @Route("/objednavka/dodaci-udaje/{token}", name="order_addresses")
      */
-    public function orderAddresses($token = null): Response
+    public function orderAddresses(OrderEmailService $orderEmailService, LoggerInterface $logger, $token = null): Response
     {
         $targetOrder = $this->cart->getOrder();
         $synchronizerHasWarnings = $this->cart->getSynchronizer()->hasWarnings();
@@ -166,9 +169,20 @@ class OrderController extends AbstractController
         if ($form->isSubmitted() && $form->isValid() && !$synchronizerHasWarnings)
         {
             $targetOrder->finish();
+
+            try
+            {
+                $orderEmailService->initialize($targetOrder)->send();
+            }
+            catch (TransportExceptionInterface $exception)
+            {
+                $logger->error(sprintf('Failed to send a confirmation e-mail for order ID %d, the following error occurred in method send: %s', $targetOrder->getId(), $exception->getMessage()));
+            }
+
             $this->getDoctrine()->getManager()->persist($targetOrder);
             $this->getDoctrine()->getManager()->flush();
             $this->addFlash('success', 'Objednávka vytvořena!');
+            $logger->info(sprintf('Order ID %d has been finished. Current state: %d.', $targetOrder->getId(), $targetOrder->getLifecycleChapter()));
 
             $response = $this->redirectToRoute('home');
             if (!$targetOrder->isCreatedManually())

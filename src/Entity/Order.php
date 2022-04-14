@@ -28,14 +28,14 @@ class Order
 
     public const LIFECYCLE_FRESH = 0;
     public const LIFECYCLE_AWAITING_PAYMENT = 1;
-    public const LIFECYCLE_PAID = 2;
+    public const LIFECYCLE_AWAITING_SHIPPING = 2;
     public const LIFECYCLE_SHIPPED = 3;
     public const LIFECYCLE_CANCELLED = 4;
 
     public const LIFECYCLE_CHAPTERS = [
         self::LIFECYCLE_FRESH => 'Neúplná',
         self::LIFECYCLE_AWAITING_PAYMENT => 'Čeká na zaplacení',
-        self::LIFECYCLE_PAID => 'Zaplacená',
+        self::LIFECYCLE_AWAITING_SHIPPING => 'Čeká na odeslání',
         self::LIFECYCLE_SHIPPED => 'Odeslaná',
         self::LIFECYCLE_CANCELLED => 'Zrušená',
     ];
@@ -879,7 +879,7 @@ class Order
         {
             $cashOnDelivery = $this->getTotalPriceWithVat($withMethods = true);
             $this->setCashOnDelivery($cashOnDelivery);
-            $this->setLifecycleChapter(self::LIFECYCLE_PAID);
+            $this->setLifecycleChapter(self::LIFECYCLE_AWAITING_SHIPPING);
         }
 
         // nezaškrtl, že chce zadat jinou fakturační adresu, takže se nastaví na hodnoty doručovací

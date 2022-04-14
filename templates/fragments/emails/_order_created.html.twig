@@ -1,0 +1,10 @@
+<p>Vážený zákazníku,</p>
+
+<p>
+    Vaše objednávka č. {{ order.id }} byla úspěšně vytvořena a nyní čeká na zaplacení:<br>
+    TODO: link na platební bránu
+</p>
+
+<p>
+    Stav objednávky můžete sledovat <a href="{{ absolute_url(path('order_overview', {token: order.token})) }}"><strong>zde</strong></a>.
+</p>
