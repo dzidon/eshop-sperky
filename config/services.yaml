@@ -22,6 +22,8 @@ parameters:
     app_page_title.contact: 'Kontakt'
     app_page_title.profile: 'Osobní údaje'
     app_page_title.profile_change_password: 'Změna hesla'
+    app_page_title.profile_orders: 'Historie objednávek'
+    app_page_title.profile_order: 'Objednávka'
     app_page_title.profile_addresses: 'Adresy'
     app_page_title.profile_address:
         new: 'Nová adresa'

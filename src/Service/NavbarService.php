@@ -67,6 +67,11 @@ class NavbarService
                 'title'     => $this->parameterBag->get('app_page_title.profile')
             ],
             [
+                'path'      => $this->router->generate('profile_orders'),
+                'isActive'  => $this->currentRoute === 'profile_orders' || $this->currentRoute === 'profile_order',
+                'title'     => $this->parameterBag->get('app_page_title.profile_orders')
+            ],
+            [
                 'path'      => $this->router->generate('profile_addresses'),
                 'isActive'  => $this->currentRoute === 'profile_addresses' || $this->currentRoute === 'profile_address' || $this->currentRoute === 'profile_address_delete',
                 'title'     => $this->parameterBag->get('app_page_title.profile_addresses')

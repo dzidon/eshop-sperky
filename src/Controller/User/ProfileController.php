@@ -3,6 +3,8 @@
 namespace App\Controller\User;
 
 use App\Entity\Address;
+use App\Entity\Order;
+use App\Entity\User;
 use App\Form\AddressFormType;
 use App\Form\ChangePasswordLoggedInFormType;
 use App\Form\HiddenTrueFormType;
@@ -46,6 +48,7 @@ class ProfileController extends AbstractController
      */
     public function overview(): Response
     {
+        /** @var User|null $user */
         $user = $this->getUser();
 
         $form = $this->createForm(PersonalInfoFormType::class, $user);
@@ -80,6 +83,7 @@ class ProfileController extends AbstractController
      */
     public function passwordChange(): Response
     {
+        /** @var User|null $user */
         $user = $this->getUser();
         if ($user->getPassword() === null)
         {
@@ -115,6 +119,7 @@ class ProfileController extends AbstractController
      */
     public function addresses(FormFactoryInterface $formFactory, PaginatorService $paginatorService): Response
     {
+        /** @var User|null $user */
         $user = $this->getUser();
 
         $form = $formFactory->createNamed('', SearchTextAndSortFormType::class, null, ['sort_choices' => Address::getSortData()]);
@@ -153,6 +158,7 @@ class ProfileController extends AbstractController
      */
     public function address($id = null): Response
     {
+        /** @var User|null $user */
         $user = $this->getUser();
         $this->breadcrumbs->addRoute('profile_addresses');
 
@@ -203,6 +209,7 @@ class ProfileController extends AbstractController
      */
     public function addressDelete($id): Response
     {
+        /** @var User|null $user */
         $user = $this->getUser();
 
         $address = $this->getDoctrine()->getRepository(Address::class)->findOneBy(['id' => $id]);
@@ -241,6 +248,78 @@ class ProfileController extends AbstractController
         return $this->render('profile/profile_address_delete.html.twig', [
             'addressDeleteForm' => $form->createView(),
             'addressInstance' => $address,
+        ]);
+    }
+
+    /**
+     * @Route("/objednavky", name="profile_orders")
+     */
+    public function orders(FormFactoryInterface $formFactory, PaginatorService $paginatorService): Response
+    {
+        /** @var User|null $user */
+        $user = $this->getUser();
+
+        $form = $formFactory->createNamed('', SearchTextAndSortFormType::class, null, ['sort_choices' => Order::getSortData()]);
+        //button je přidáván v šabloně, aby se nezobrazoval v odkazu
+        $form->handleRequest($this->request);
+
+        if ($form->isSubmitted() && $form->isValid())
+        {
+            $queryForPagination = $this->getDoctrine()->getRepository(Order::class)->getQueryForProfileSearchAndPagination($user->getEmail(), $form->get('searchPhrase')->getData(), $form->get('sortBy')->getData());
+        }
+        else
+        {
+            $queryForPagination = $this->getDoctrine()->getRepository(Order::class)->getQueryForProfileSearchAndPagination($user->getEmail());
+        }
+
+        $orders = $paginatorService
+            ->initialize($queryForPagination, 1)
+            ->getCurrentPageObjects();
+
+        if($paginatorService->isCurrentPageOutOfBounds())
+        {
+            throw new NotFoundHttpException('Na této stránce nebyly nalezeny žádné objednávky.');
+        }
+
+        $this->breadcrumbs->addRoute('profile_orders');
+
+        return $this->render('profile/profile_orders.html.twig', [
+            'searchForm' => $form->createView(),
+            'orders' => $orders,
+            'pagination' => $paginatorService->createViewData(),
+        ]);
+    }
+
+    /**
+     * @Route("/objednavka/{id}", name="profile_order")
+     */
+    public function order(int $id): Response
+    {
+        /** @var User|null $user */
+        $user = $this->getUser();
+
+        /** @var Order|null $order */
+        $order = $this->getDoctrine()->getRepository(Order::class)->findOneCompletedAndFetchCartOccurences([
+            'id' => [
+                'value' => $id,
+                'type' => null,
+            ],
+            'email' => [
+                'value' => $user->getEmail(),
+                'type' => null,
+            ]
+        ]);
+
+        if ($order === null)
+        {
+            throw new NotFoundHttpException('Objednávka nenalezena.');
+        }
+
+        $order->calculateTotals();
+        $this->breadcrumbs->addRoute('profile_order', ['id' => $id]);
+
+        return $this->render('profile/profile_order.html.twig', [
+            'order' => $order,
         ]);
     }
 }

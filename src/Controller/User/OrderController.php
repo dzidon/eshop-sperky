@@ -245,7 +245,7 @@ class OrderController extends AbstractController
     /**
      * @Route("/objednavka/prehled/{token}", name="order_overview")
      */
-    public function orderOverview($token = null): Response
+    public function orderPublicOverview($token = null): Response
     {
         if ($token !== null)
         {
@@ -261,14 +261,20 @@ class OrderController extends AbstractController
 
         $uuid = Uuid::fromString($token);
         /** @var Order|null $order */
-        $order = $this->getDoctrine()->getRepository(Order::class)->findOneAndFetchCartOccurences($uuid);
-        if ($order === null || $order->getLifecycleChapter() < Order::LIFECYCLE_AWAITING_PAYMENT)
+        $order = $this->getDoctrine()->getRepository(Order::class)->findOneCompletedAndFetchCartOccurences([
+            'token' => [
+                'value' => $uuid,
+                'type' => 'uuid',
+            ]
+        ]);
+
+        if ($order === null)
         {
             throw new NotFoundHttpException('Objednávka nenalezena.');
         }
 
         $order->calculateTotals();
-        $this->breadcrumbs->addRoute('order_overview', ['token' => $token]);
+        $this->breadcrumbs->addRoute('order_overview');
 
         return $this->render('order/overview.html.twig', [
             'order' => $order,

@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Service\SortingService;
 use DateTime;
 use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -1128,5 +1129,15 @@ class Order
             $this->paymentPriceWithVat = $this->paymentMethod->getPriceWithVat();
             $this->paymentMethodName = $this->paymentMethod->getName();
         }
+    }
+
+    public static function getSortData(): array
+    {
+        return [
+            'ID (sestupně)' => 'id'.SortingService::ATTRIBUTE_TAG_DESC,
+            'ID (vzestupně)' => 'id'.SortingService::ATTRIBUTE_TAG_ASC,
+            'Od nejdříve dokončených' => 'finishedAt'.SortingService::ATTRIBUTE_TAG_ASC,
+            'Od naposledy dokončených' => 'finishedAt'.SortingService::ATTRIBUTE_TAG_DESC,
+        ];
     }
 }

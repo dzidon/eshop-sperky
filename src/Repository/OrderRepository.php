@@ -4,7 +4,9 @@ namespace App\Repository;
 
 use App\Entity\Order;
 use App\Entity\Product;
+use App\Service\SortingService;
 use DateTime;
+use Doctrine\ORM\Query;
 use Symfony\Component\Uid\Uuid;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -17,9 +19,34 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class OrderRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    private SortingService $sorting;
+
+    public function __construct(ManagerRegistry $registry, SortingService $sorting)
     {
         parent::__construct($registry, Order::class);
+
+        $this->sorting = $sorting;
+    }
+
+    public function getQueryForProfileSearchAndPagination(string $email, $searchPhrase = null, string $sortAttribute = null): Query
+    {
+        $sortData = $this->sorting->createSortData($sortAttribute, Order::getSortData());
+
+        return $this->createQueryBuilder('o')
+            ->andWhere('o.email = :email')
+            ->setParameter('email', $email)
+
+            ->andWhere('o.lifecycleChapter > :lifecycleFresh')
+            ->setParameter('lifecycleFresh', Order::LIFECYCLE_FRESH)
+
+            //vyhledavani
+            ->andWhere('o.id LIKE :searchPhrase')
+            ->setParameter('searchPhrase', '%' . $searchPhrase . '%')
+
+            //razeni
+            ->orderBy('o.' . $sortData['attribute'], $sortData['order'])
+            ->getQuery()
+        ;
     }
 
     public function findOneAndFetchEverything(Uuid $token)
@@ -99,13 +126,23 @@ class OrderRepository extends ServiceEntityRepository
         return $order;
     }
 
-    public function findOneAndFetchCartOccurences(Uuid $token)
+    public function findOneCompletedAndFetchCartOccurences(array $orderConditions)
     {
-        return $this->createQueryBuilder('o')
+        $queryBuilder = $this->createQueryBuilder('o')
             ->select('o, oc')
             ->leftJoin('o.cartOccurences', 'oc')
-            ->andWhere('o.token = :token')
-            ->setParameter('token', $token, 'uuid')
+            ->andWhere('o.lifecycleChapter > :lifecycleFresh')
+            ->setParameter('lifecycleFresh', Order::LIFECYCLE_FRESH)
+        ;
+
+        foreach ($orderConditions as $name => $data)
+        {
+            $queryBuilder
+                ->andWhere(sprintf('o.%s = :%s', $name, $name))
+                ->setParameter($name, $data['value'], $data['type']);
+        }
+
+        return $queryBuilder
             ->getQuery()
             ->getOneOrNullResult()
         ;
