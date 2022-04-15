@@ -79,6 +79,11 @@ class DeliveryMethod
     private $vat;
 
     /**
+     * @ORM\Column(type="boolean")
+     */
+    private bool $locksDeliveryAddress = false;
+
+    /**
      * @ORM\OneToMany(targetEntity=Order::class, mappedBy="deliveryMethod")
      */
     private $orders;
@@ -187,6 +192,18 @@ class DeliveryMethod
     public function getImageFile(): ?File
     {
         return $this->imageFile;
+    }
+
+    public function locksDeliveryAddress(): bool
+    {
+        return $this->locksDeliveryAddress;
+    }
+
+    public function setLocksDeliveryAddress(bool $locksDeliveryAddress): self
+    {
+        $this->locksDeliveryAddress = $locksDeliveryAddress;
+
+        return $this;
     }
 
     /**

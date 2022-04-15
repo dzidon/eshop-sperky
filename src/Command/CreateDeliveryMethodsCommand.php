@@ -40,6 +40,7 @@ class CreateDeliveryMethodsCommand extends Command
             ->setPriceWithoutVat(65.0)
             ->setPriceWithVat(65.0)
             ->setVat(Product::VAT_NONE)
+            ->setLocksDeliveryAddress(false)
         ;
 
         $deliveryMethods[] = (new DeliveryMethod())
@@ -48,6 +49,7 @@ class CreateDeliveryMethodsCommand extends Command
             ->setPriceWithoutVat(65.0)
             ->setPriceWithVat(65.0)
             ->setVat(Product::VAT_NONE)
+            ->setLocksDeliveryAddress(true)
         ;
 
         $created = [];

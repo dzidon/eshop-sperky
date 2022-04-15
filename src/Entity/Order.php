@@ -40,10 +40,6 @@ class Order
         self::LIFECYCLE_CANCELLED => 'Zrušená',
     ];
 
-    const DELIVERY_METHODS_THAT_LOCK_ADDRESS = [
-        DeliveryMethod::TYPE_PACKETA_CZ => true,
-    ];
-
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
@@ -688,7 +684,11 @@ class Order
 
     public function setAddressDeliveryZip(?string $addressDeliveryZip): self
     {
-        $this->addressDeliveryZip = preg_replace('/\s+/', '', $addressDeliveryZip);
+        $this->addressDeliveryZip = $addressDeliveryZip;
+        if ($this->addressDeliveryZip !== null)
+        {
+            $this->addressDeliveryZip = preg_replace('/\s+/', '', $this->addressDeliveryZip);
+        }
 
         return $this;
     }
@@ -992,16 +992,21 @@ class Order
         $this->noteChecked = $noteChecked;
     }
 
+    public function deliveryMethodLocksDeliveryAddress(): bool
+    {
+        return ($this->deliveryMethod !== null && $this->deliveryMethod->locksDeliveryAddress());
+    }
+
     public function determineAddressDelivery(): self
     {
         // přechod na null/Českou poštu
-        if ($this->addressDeliveryLocked && ($this->deliveryMethod === null || !isset(self::DELIVERY_METHODS_THAT_LOCK_ADDRESS[$this->deliveryMethod->getType()])))
+        if ($this->addressDeliveryLocked && !$this->deliveryMethodLocksDeliveryAddress())
         {
             $this->resetAddressDelivery();
         }
 
         // přechod na Zásilkovnu
-        if ($this->staticAddressDeliveryAdditionalInfo !== null && $this->deliveryMethod !== null && isset(self::DELIVERY_METHODS_THAT_LOCK_ADDRESS[$this->deliveryMethod->getType()]))
+        if ($this->staticAddressDeliveryAdditionalInfo !== null && $this->deliveryMethodLocksDeliveryAddress())
         {
             $this->loadAddressDeliveryFromStatic();
         }
@@ -1029,16 +1034,16 @@ class Order
 
     private function resetAddressDelivery(): void
     {
-        $this->setStaticAddressDeliveryAdditionalInfo(null);
-        $this->setStaticAddressDeliveryCountry(null);
-        $this->setStaticAddressDeliveryStreet(null);
-        $this->setStaticAddressDeliveryTown(null);
-        $this->setStaticAddressDeliveryZip(null);
+        $this->setAddressDeliveryAdditionalInfo(null);
+        $this->setAddressDeliveryCountry(null);
+        $this->setAddressDeliveryStreet(null);
+        $this->setAddressDeliveryTown(null);
+        $this->setAddressDeliveryZip(null);
     }
 
     private function loadAddressBillingFromDelivery(): void
     {
-        if ($this->deliveryMethod === null || !isset(self::DELIVERY_METHODS_THAT_LOCK_ADDRESS[$this->deliveryMethod->getType()]))
+        if (!$this->deliveryMethodLocksDeliveryAddress())
         {
             $this->setAddressBillingAdditionalInfo($this->addressDeliveryAdditionalInfo);
         }
@@ -1094,7 +1099,7 @@ class Order
             $this->deliveryMethodName = $this->deliveryMethod->getName();
 
             /* Zamykání/odemykání doručovací adresy */
-            if (isset(self::DELIVERY_METHODS_THAT_LOCK_ADDRESS[$this->deliveryMethod->getType()]))
+            if ($this->deliveryMethodLocksDeliveryAddress())
             {
                 $this->addressDeliveryLocked = true;
             }
