@@ -126,11 +126,12 @@ class OrderRepository extends ServiceEntityRepository
         return $order;
     }
 
-    public function findOneCompletedAndFetchCartOccurences(array $orderConditions)
+    public function findOneAndFetchForOverview(array $orderConditions)
     {
         $queryBuilder = $this->createQueryBuilder('o')
-            ->select('o, oc')
-            ->leftJoin('o.cartOccurences', 'oc')
+            ->select('o, dm, pm')
+            ->leftJoin('o.deliveryMethod', 'dm')
+            ->leftJoin('o.paymentMethod', 'pm')
             ->andWhere('o.lifecycleChapter > :lifecycleFresh')
             ->setParameter('lifecycleFresh', Order::LIFECYCLE_FRESH)
         ;
@@ -139,13 +140,31 @@ class OrderRepository extends ServiceEntityRepository
         {
             $queryBuilder
                 ->andWhere(sprintf('o.%s = :%s', $name, $name))
-                ->setParameter($name, $data['value'], $data['type']);
+                ->setParameter($name, $data['value'], $data['type'])
+            ;
         }
 
-        return $queryBuilder
+        $order = $queryBuilder
             ->getQuery()
             ->getOneOrNullResult()
         ;
+
+        if ($order === null)
+        {
+            return null;
+        }
+
+        $this->createQueryBuilder('o')
+            ->select('PARTIAL o.{id}, oc, ocp')
+            ->leftJoin('o.cartOccurences', 'oc')
+            ->leftJoin('oc.product', 'ocp')
+            ->andWhere('o.id = :id')
+            ->setParameter('id', $order->getId())
+            ->getQuery()
+            ->getResult()
+        ;
+
+        return $order;
     }
 
     public function deleteInactiveCartOrders()

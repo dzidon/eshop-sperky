@@ -219,13 +219,30 @@
             <div class="collection-item">
                 <div class="row no-mar-bot valign-wrapper flex-wrap section">
 
-                    {# Název a volby #}
-                    <div class="col s12 l8">
-                        <div>
-                            <strong class="margin-0">{{ cartOccurence.quantity }}x {{ cartOccurence.name }}</strong>
+                    {# Obrázek, název, volby #}
+                    {% if cartOccurence.product is null %}
+                        <div class="col s12 l8">
+                            <div>
+                                <strong class="margin-0">{{ cartOccurence.quantity }}x {{ cartOccurence.name }}</strong>
+                                <em>(ID nenalezeno)</em>
+                            </div>
+                            <span class="grey-text">{{ cartOccurence.optionsString }}</span>
                         </div>
-                        <span class="grey-text">{{ cartOccurence.optionsString }}</span>
-                    </div>
+                    {% else %}
+                        {% set product_path = path('product', {slug: cartOccurence.product.slug}) %}
+
+                        <div class="col s12 l8 valign-wrapper">
+                            <a href="{{ product_path }}" class="margin-right15px">
+                                <div class="img-cart-product">
+                                    <img alt="Obrázek produktu" class="responsive-img" src="{% if cartOccurence.product.mainImageName %} {{ asset(cartOccurence.product.mainImageName, 'product_images') }}  {% else %} {{ asset('no-image.png', 'images') }} {% endif %}">
+                                </div>
+                            </a>
+                            <a href="{{ product_path }}">
+                                <strong class="margin-0">{{ cartOccurence.quantity }}x {{ cartOccurence.name }} (ID: {{ cartOccurence.product.id }})</strong>
+                                <div class="grey-text">{{ cartOccurence.optionsString }}</div>
+                            </a>
+                        </div>
+                    {% endif %}
 
                     {# Cena za kus #}
                     <div class="col s6 l2">

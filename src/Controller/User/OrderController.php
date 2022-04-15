@@ -251,7 +251,7 @@ class OrderController extends AbstractController
 
         $uuid = Uuid::fromString($token);
         /** @var Order|null $order */
-        $order = $this->getDoctrine()->getRepository(Order::class)->findOneCompletedAndFetchCartOccurences([
+        $order = $this->getDoctrine()->getRepository(Order::class)->findOneAndFetchForOverview([
             'token' => [
                 'value' => $uuid,
                 'type' => 'uuid',

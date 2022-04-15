@@ -299,7 +299,7 @@ class ProfileController extends AbstractController
         $user = $this->getUser();
 
         /** @var Order|null $order */
-        $order = $this->getDoctrine()->getRepository(Order::class)->findOneCompletedAndFetchCartOccurences([
+        $order = $this->getDoctrine()->getRepository(Order::class)->findOneAndFetchForOverview([
             'id' => [
                 'value' => $id,
                 'type' => null,
