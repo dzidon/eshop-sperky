@@ -251,13 +251,7 @@ class OrderController extends AbstractController
 
         $uuid = Uuid::fromString($token);
         /** @var Order|null $order */
-        $order = $this->getDoctrine()->getRepository(Order::class)->findOneAndFetchForOverview([
-            'token' => [
-                'value' => $uuid,
-                'type' => 'uuid',
-            ]
-        ]);
-
+        $order = $this->getDoctrine()->getRepository(Order::class)->findOneForPublicOverview($uuid);
         if ($order === null)
         {
             throw new NotFoundHttpException('Objednávka nenalezena.');

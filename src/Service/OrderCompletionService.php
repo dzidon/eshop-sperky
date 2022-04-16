@@ -3,10 +3,12 @@
 namespace App\Service;
 
 use App\Entity\Order;
+use App\Entity\User;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Security\Core\Security;
 
 /**
  * Třída řešící dokončení objednávky
@@ -17,12 +19,14 @@ class OrderCompletionService
 {
     private Order $order;
 
+    private Security $security;
     private LoggerInterface $logger;
     private RouterInterface $router;
     private OrderEmailService $orderEmailService;
 
-    public function __construct(LoggerInterface $logger, RouterInterface $router, OrderEmailService $orderEmailService)
+    public function __construct(Security $security, LoggerInterface $logger, RouterInterface $router, OrderEmailService $orderEmailService)
     {
+        $this->security = $security;
         $this->logger = $logger;
         $this->router = $router;
         $this->orderEmailService = $orderEmailService;
@@ -48,7 +52,9 @@ class OrderCompletionService
      */
     public function finishOrder(): self
     {
-        $this->order->finish();
+        /** @var User|null $user */
+        $user = $this->security->getUser();
+        $this->order->finish($user);
 
         return $this;
     }

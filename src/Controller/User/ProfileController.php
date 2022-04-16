@@ -265,11 +265,11 @@ class ProfileController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid())
         {
-            $queryForPagination = $this->getDoctrine()->getRepository(Order::class)->getQueryForProfileSearchAndPagination($user->getEmail(), $form->get('searchPhrase')->getData(), $form->get('sortBy')->getData());
+            $queryForPagination = $this->getDoctrine()->getRepository(Order::class)->getQueryForProfileSearchAndPagination($user->getEmail(), $user, $form->get('searchPhrase')->getData(), $form->get('sortBy')->getData());
         }
         else
         {
-            $queryForPagination = $this->getDoctrine()->getRepository(Order::class)->getQueryForProfileSearchAndPagination($user->getEmail());
+            $queryForPagination = $this->getDoctrine()->getRepository(Order::class)->getQueryForProfileSearchAndPagination($user->getEmail(), $user);
         }
 
         $orders = $paginatorService
@@ -299,17 +299,7 @@ class ProfileController extends AbstractController
         $user = $this->getUser();
 
         /** @var Order|null $order */
-        $order = $this->getDoctrine()->getRepository(Order::class)->findOneAndFetchForOverview([
-            'id' => [
-                'value' => $id,
-                'type' => null,
-            ],
-            'email' => [
-                'value' => $user->getEmail(),
-                'type' => null,
-            ]
-        ]);
-
+        $order = $this->getDoctrine()->getRepository(Order::class)->findOneForProfileOverview($id, $user->getEmail(), $user);
         if ($order === null)
         {
             throw new NotFoundHttpException('Objednávka nenalezena.');

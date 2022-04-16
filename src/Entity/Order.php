@@ -303,7 +303,7 @@ class Order
     private $addressBillingZip;
 
     /*
-     * Popis
+     * Ostatní
      */
 
     /**
@@ -313,6 +313,12 @@ class Order
      * @Assert\NotBlank(groups={"addresses_note"})
      */
     private $note;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=User::class)
+     * @ORM\JoinColumn(nullable=true, onDelete="SET NULL")
+     */
+    private $user;
 
     private bool $companyChecked = false;
     private bool $billingAddressChecked = false;
@@ -871,7 +877,19 @@ class Order
         return $this;
     }
 
-    public function finish(): void
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): self
+    {
+        $this->user = $user;
+
+        return $this;
+    }
+
+    public function finish(?User $user): void
     {
         $this->setLifecycleChapter(self::LIFECYCLE_AWAITING_PAYMENT);
 
@@ -899,6 +917,7 @@ class Order
             $product->setInventory($productInventory - $cartOccurenceQuantity);
         }
 
+        $this->user = $user;
         $this->token = Uuid::v4();
         $this->finishedAt = new DateTime('now');
     }

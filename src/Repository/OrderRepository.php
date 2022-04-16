@@ -4,9 +4,11 @@ namespace App\Repository;
 
 use App\Entity\Order;
 use App\Entity\Product;
+use App\Entity\User;
 use App\Service\SortingService;
 use DateTime;
 use Doctrine\ORM\Query;
+use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\Uid\Uuid;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -28,15 +30,15 @@ class OrderRepository extends ServiceEntityRepository
         $this->sorting = $sorting;
     }
 
-    public function getQueryForProfileSearchAndPagination(string $email, $searchPhrase = null, string $sortAttribute = null): Query
+    public function getQueryForProfileSearchAndPagination(string $email, User $user, $searchPhrase = null, string $sortAttribute = null): Query
     {
         $sortData = $this->sorting->createSortData($sortAttribute, Order::getSortData());
 
         return $this->createQueryBuilder('o')
-            ->andWhere('o.email = :email')
-            ->setParameter('email', $email)
-
+            ->andWhere('o.email = :email OR o.user = :user')
             ->andWhere('o.lifecycleChapter > :lifecycleFresh')
+            ->setParameter('email', $email)
+            ->setParameter('user', $user)
             ->setParameter('lifecycleFresh', Order::LIFECYCLE_FRESH)
 
             //vyhledavani
@@ -126,25 +128,11 @@ class OrderRepository extends ServiceEntityRepository
         return $order;
     }
 
-    public function findOneAndFetchForOverview(array $orderConditions)
+    public function findOneForPublicOverview(Uuid $token)
     {
-        $queryBuilder = $this->createQueryBuilder('o')
-            ->select('o, dm, pm')
-            ->leftJoin('o.deliveryMethod', 'dm')
-            ->leftJoin('o.paymentMethod', 'pm')
-            ->andWhere('o.lifecycleChapter > :lifecycleFresh')
-            ->setParameter('lifecycleFresh', Order::LIFECYCLE_FRESH)
-        ;
-
-        foreach ($orderConditions as $name => $data)
-        {
-            $queryBuilder
-                ->andWhere(sprintf('o.%s = :%s', $name, $name))
-                ->setParameter($name, $data['value'], $data['type'])
-            ;
-        }
-
-        $order = $queryBuilder
+        $order = $this->getOverviewQueryBuilder()
+            ->andWhere('o.token = :token')
+            ->setParameter('token', $token, 'uuid')
             ->getQuery()
             ->getOneOrNullResult()
         ;
@@ -154,15 +142,29 @@ class OrderRepository extends ServiceEntityRepository
             return null;
         }
 
-        $this->createQueryBuilder('o')
-            ->select('PARTIAL o.{id}, oc, ocp')
-            ->leftJoin('o.cartOccurences', 'oc')
-            ->leftJoin('oc.product', 'ocp')
+        $this->partialllyLoadCartOccurences($order);
+
+        return $order;
+    }
+
+    public function findOneForProfileOverview(int $id, string $email, User $user)
+    {
+        $order = $this->getOverviewQueryBuilder()
             ->andWhere('o.id = :id')
-            ->setParameter('id', $order->getId())
+            ->andWhere('o.email = :email OR o.user = :user')
+            ->setParameter('id', $id)
+            ->setParameter('email', $email)
+            ->setParameter('user', $user)
             ->getQuery()
-            ->getResult()
+            ->getOneOrNullResult()
         ;
+
+        if ($order === null)
+        {
+            return null;
+        }
+
+        $this->partialllyLoadCartOccurences($order);
 
         return $order;
     }
@@ -193,6 +195,30 @@ class OrderRepository extends ServiceEntityRepository
             ->setParameter('lifecycleCart', Order::LIFECYCLE_FRESH)
             ->getQuery()
             ->getScalarResult()[0]
+        ;
+    }
+
+    private function getOverviewQueryBuilder(): QueryBuilder
+    {
+        return $this->createQueryBuilder('o')
+            ->select('o, dm, pm')
+            ->leftJoin('o.deliveryMethod', 'dm')
+            ->leftJoin('o.paymentMethod', 'pm')
+            ->andWhere('o.lifecycleChapter > :lifecycleFresh')
+            ->setParameter('lifecycleFresh', Order::LIFECYCLE_FRESH)
+        ;
+    }
+
+    private function partialllyLoadCartOccurences(Order $order): void
+    {
+        $this->createQueryBuilder('o')
+            ->select('PARTIAL o.{id}, oc, ocp')
+            ->leftJoin('o.cartOccurences', 'oc')
+            ->leftJoin('oc.product', 'ocp')
+            ->andWhere('o.id = :id')
+            ->setParameter('id', $order->getId())
+            ->getQuery()
+            ->getResult()
         ;
     }
 }
