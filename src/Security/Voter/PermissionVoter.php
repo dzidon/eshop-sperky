@@ -10,6 +10,7 @@ class PermissionVoter implements VoterInterface
 {
     const CATEGORY_REVIEWS = 'Recenze';
     const CATEGORY_USERS = 'Uživatelé';
+    const CATEGORY_ORDERS = 'Objednávky';
     const CATEGORY_PRODUCTS = 'Produkty';
     const CATEGORY_PRODUCT_SECTIONS = 'Produktové sekce';
     const CATEGORY_PRODUCT_CATEGORIES = 'Produktové kategore';
@@ -104,6 +105,24 @@ class PermissionVoter implements VoterInterface
         'payment_method_edit' => [
             'name' => 'Editace platebních metod',
             'category' => self::CATEGORY_DELIVERY_PAYMENT_METHODS,
+        ],
+
+        // objednávky
+        'order_edit' => [
+            'name' => 'Editace objednávek',
+            'category' => self::CATEGORY_ORDERS,
+        ],
+        'order_cancel' => [
+            'name' => 'Rušení objednávek',
+            'category' => self::CATEGORY_ORDERS,
+        ],
+        'order_edit_custom' => [
+            'name' => 'Tvorba a editace objednávek na míru',
+            'category' => self::CATEGORY_ORDERS,
+        ],
+        'order_delete_custom' => [
+            'name' => 'Mazání objednávek na míru',
+            'category' => self::CATEGORY_ORDERS,
         ],
     ];
 

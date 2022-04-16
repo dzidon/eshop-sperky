@@ -79,6 +79,13 @@ parameters:
     app_page_title.admin_delivery_method_edit: 'Upravit doručovací metodu'
     app_page_title.admin_payment_methods: 'Platební metody'
     app_page_title.admin_payment_method_edit: 'Upravit platební metodu'
+    app_page_title.admin_orders: 'Objednávky'
+    app_page_title.admin_order_overview: 'Objednávka'
+    app_page_title.admin_order_cancel: 'Zrušit objednávku'
+    app_page_title.admin_order_custom_delete: 'Smazat objednávku na míru'
+    app_page_title.admin_order_custom:
+        new: 'Nová objednávka na míru'
+        edit: 'Upravit objednávku na míru'
 
 services:
     # default configuration for services in *this* file

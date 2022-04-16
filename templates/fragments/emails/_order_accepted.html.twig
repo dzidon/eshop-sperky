@@ -1,8 +1,8 @@
 <p>Vážený zákazníku,</p>
 
 <p>
-    Vaše objednávka č. {{ order.id }} byla zařazena do systému a začínáme pracovat na jejím doručení.<br>
-    Stav objednávky můžete sledovat <a href="{{ absolute_url(path('order_overview', {token: order.token})) }}"><strong>zde</strong></a>.
+    Vaše objednávka č. {{ orderId }} byla zařazena do systému a začínáme pracovat na jejím doručení.<br>
+    Stav objednávky můžete sledovat <a href="{{ absolute_url(path('order_overview', {token: orderToken})) }}"><strong>zde</strong></a>.
 </p>
 
 <p>

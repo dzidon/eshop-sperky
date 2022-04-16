@@ -72,7 +72,7 @@ class OrderEmailService
             $this->addPaidContent();
         }
 
-        $this->addOrderToContext();
+        $this->addOrderDataToContext();
         $this->mailer->send($this->email);
 
         return $this;
@@ -103,10 +103,11 @@ class OrderEmailService
     /**
      * Zajistí, aby Twig šablona měla přístup k objednávce
      */
-    private function addOrderToContext(): void
+    private function addOrderDataToContext(): void
     {
         $context = $this->email->getContext();
-        $context['order'] = $this->order;
+        $context['orderId'] = $this->order->getId();
+        $context['orderToken'] = $this->order->getToken();
         $this->email->context($context);
     }
 }
