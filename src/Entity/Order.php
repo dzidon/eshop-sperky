@@ -62,8 +62,8 @@ class Order
      * @ORM\OneToMany(targetEntity=CartOccurence::class, mappedBy="order_", orphanRemoval=true, cascade={"persist"})
      *
      * @AssertCustom\CartOccurenceQuantity(groups={"cart"})
-     * @Assert\Valid(groups={"cart"})
-     * @Assert\Count(min=1, groups={"addresses"}, minMessage="Musíte mít alespoň 1 produkt v košíku.")
+     * @Assert\Valid(groups={"cart", "onDemandCreation"})
+     * @Assert\Count(min=1, groups={"addresses", "onDemandCreation"}, minMessage="Objednávka musí mít alespoň 1 produkt.")
      */
     private $cartOccurences;
 
@@ -320,6 +320,16 @@ class Order
      */
     private $user;
 
+    /**
+     * @ORM\Column(type="datetime")
+     */
+    private $created;
+
+    /**
+     * @ORM\Column(type="datetime")
+     */
+    private $updated;
+
     private bool $companyChecked = false;
     private bool $billingAddressChecked = false;
     private bool $noteChecked = false;
@@ -338,6 +348,9 @@ class Order
     {
         $this->token = Uuid::v4();
         $this->cartOccurences = new ArrayCollection();
+
+        $this->created = new DateTime('now');
+        $this->updated = $this->created;
     }
 
     public function getId(): ?int
@@ -856,6 +869,16 @@ class Order
         return $this;
     }
 
+    public function isFresh(): bool
+    {
+        return $this->lifecycleChapter === self::LIFECYCLE_FRESH;
+    }
+
+    public function isCancelled(): bool
+    {
+        return $this->lifecycleChapter === self::LIFECYCLE_CANCELLED;
+    }
+
     public function getLifecycleChapter(): int
     {
         return $this->lifecycleChapter;
@@ -885,6 +908,30 @@ class Order
     public function setUser(?User $user): self
     {
         $this->user = $user;
+
+        return $this;
+    }
+
+    public function getCreated(): ?DateTimeInterface
+    {
+        return $this->created;
+    }
+
+    public function setCreated(DateTimeInterface $created): self
+    {
+        $this->created = $created;
+
+        return $this;
+    }
+
+    public function getUpdated(): ?DateTimeInterface
+    {
+        return $this->updated;
+    }
+
+    public function setUpdated(DateTimeInterface $updated): self
+    {
+        $this->updated = $updated;
 
         return $this;
     }
@@ -1148,6 +1195,14 @@ class Order
             $this->paymentPriceWithVat = $this->paymentMethod->getPriceWithVat();
             $this->paymentMethodName = $this->paymentMethod->getName();
         }
+    }
+
+    /**
+     * @ORM\PreUpdate
+     */
+    public function setUpdatedNow(): void
+    {
+        $this->updated = new DateTime('now');
     }
 
     public static function getSortData(): array

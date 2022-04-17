@@ -6,7 +6,7 @@ use App\Entity\Detached\ContactEmail;
 use App\Entity\Product;
 use App\Entity\Review;
 use App\Form\ContactFormType;
-use App\Form\CustomOrderFormType;
+use App\Form\CustomOrderDemandFormType;
 use App\Service\BreadcrumbsService;
 use App\Service\ContactEmailService;
 use Psr\Log\LoggerInterface;
@@ -90,7 +90,7 @@ class MainController extends AbstractController
         $emailData = new ContactEmail();
         $emailData->setSubject('Objednávka na míru');
 
-        $form = $this->createForm(CustomOrderFormType::class, $emailData);
+        $form = $this->createForm(CustomOrderDemandFormType::class, $emailData);
         $form->add('submit', SubmitType::class, ['label' => 'Odeslat']);
         $form->handleRequest($request);
 

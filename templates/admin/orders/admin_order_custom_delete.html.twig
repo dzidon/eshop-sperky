@@ -1,0 +1,8 @@
+{% extends 'admin/admin_base.html.twig' %}
+
+{% block admin_body %}
+
+    <div class="row">Opravdu si přejete smazat objednávku na míru ID {{ orderCustomInstance.id }}? Tato akce je nevratná.</div>
+    {{ form(orderCustomDeleteForm) }}
+
+{% endblock %}

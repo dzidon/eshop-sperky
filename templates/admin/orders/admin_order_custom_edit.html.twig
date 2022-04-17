@@ -1,0 +1,27 @@
+{% extends 'admin/admin_base.html.twig' %}
+
+{% block admin_subheading_extra %}
+
+    {% if orderInstance.id is not null %}
+        <a href="{{ path('order_custom', {token: orderInstance.token}) }}" class="btn-floating btn-medium waves-effect waves-light blue"><i class="material-icons">visibility</i></a>
+    {% endif %}
+
+{% endblock %}
+
+{% block admin_body %}
+
+    {# Časy vytvoření a aktualizace #}
+    {{ include('fragments/_instance_created_updated.html.twig', {instance: orderInstance}) }}
+
+    {{ form_start(orderCustomForm) }}
+        {{ form_row(orderCustomForm.cartOccurences, { 'attr': {'data-index': orderCustomForm.cartOccurences|length > 0 ? orderCustomForm.cartOccurences|last.vars.name + 1 : 0} }) }}
+        {{ form_rest(orderCustomForm) }}
+    {{ form_end(orderCustomForm) }}
+
+    {% if orderInstance.id is not null and is_granted('order_delete_custom') %}
+        <div class="row center-align">
+            <a href="{{ path('admin_order_custom_delete', {id: orderInstance.id}) }}">Smazat</a>
+        </div>
+    {% endif %}
+
+{% endblock %}

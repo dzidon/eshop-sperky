@@ -30,22 +30,62 @@ class OrderRepository extends ServiceEntityRepository
         $this->sorting = $sorting;
     }
 
-    public function getQueryForProfileSearchAndPagination(string $email, User $user, $searchPhrase = null, string $sortAttribute = null): Query
+    public function getQueryForProfileSearchAndPagination(string $email, User $user, $searchPhrase = null, string $sortAttribute = null, int $lifecycle = null): Query
     {
         $sortData = $this->sorting->createSortData($sortAttribute, Order::getSortData());
 
-        return $this->createQueryBuilder('o')
+        $queryBuilder = $this->createQueryBuilder('o')
             ->andWhere('o.email = :email OR o.user = :user')
             ->andWhere('o.lifecycleChapter > :lifecycleFresh')
             ->setParameter('email', $email)
             ->setParameter('user', $user)
             ->setParameter('lifecycleFresh', Order::LIFECYCLE_FRESH)
 
-            //vyhledavani
+            // vyhledavani
             ->andWhere('o.id LIKE :searchPhrase')
             ->setParameter('searchPhrase', '%' . $searchPhrase . '%')
+        ;
 
-            //razeni
+        if ($lifecycle !== null)
+        {
+            $queryBuilder
+                // lifecycle
+                ->andWhere('o.lifecycleChapter = :lifecycle')
+                ->setParameter('lifecycle', $lifecycle)
+            ;
+        }
+
+        return $queryBuilder
+            // razeni
+            ->orderBy('o.' . $sortData['attribute'], $sortData['order'])
+            ->getQuery()
+        ;
+    }
+
+    public function getQueryForAdminSearchAndPagination(string $searchPhrase = null, string $sortAttribute = null, int $lifecycle = null): Query
+    {
+        $sortData = $this->sorting->createSortData($sortAttribute, Order::getSortData());
+
+        $queryBuilder = $this->createQueryBuilder('o')
+            ->andWhere('o.lifecycleChapter > :lifecycleFresh OR (o.createdManually = true AND o.lifecycleChapter = :lifecycleFresh)')
+            ->setParameter('lifecycleFresh', Order::LIFECYCLE_FRESH)
+
+            // vyhledavani
+            ->andWhere('o.id LIKE :searchPhrase')
+            ->setParameter('searchPhrase', '%' . $searchPhrase . '%')
+        ;
+
+        if ($lifecycle !== null)
+        {
+            $queryBuilder
+                // lifecycle
+                ->andWhere('o.lifecycleChapter = :lifecycle')
+                ->setParameter('lifecycle', $lifecycle)
+            ;
+        }
+
+        return $queryBuilder
+            // razeni
             ->orderBy('o.' . $sortData['attribute'], $sortData['order'])
             ->getQuery()
         ;
@@ -155,6 +195,28 @@ class OrderRepository extends ServiceEntityRepository
             ->setParameter('id', $id)
             ->setParameter('email', $email)
             ->setParameter('user', $user)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+
+        if ($order === null)
+        {
+            return null;
+        }
+
+        $this->partialllyLoadCartOccurences($order);
+
+        return $order;
+    }
+
+    public function findOneForCustomEdit(int $id)
+    {
+        $order = $this->createQueryBuilder('o')
+            ->andWhere('o.id = :id')
+            ->andWhere('o.lifecycleChapter = :lifecycleFresh')
+            ->andWhere('o.createdManually = true')
+            ->setParameter('id', $id)
+            ->setParameter('lifecycleFresh', Order::LIFECYCLE_FRESH)
             ->getQuery()
             ->getOneOrNullResult()
         ;

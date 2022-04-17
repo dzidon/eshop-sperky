@@ -1,0 +1,31 @@
+{{ form_start(form) }}
+    <div class="row">
+        <div class="input-field col s12 l8">
+            {{ form_widget(form.searchPhrase) }}
+            {{ form_label(form.searchPhrase) }}
+            {{ form_help(form.searchPhrase) }}
+            {{ form_errors(form.searchPhrase) }}
+        </div>
+        <div class="input-field col s12 l4">
+            {{ form_widget(form.sortBy) }}
+            {{ form_label(form.sortBy) }}
+            {{ form_help(form.sortBy) }}
+            {{ form_errors(form.sortBy) }}
+        </div>
+        <div class="input-field col s12 l8">
+            {{ form_widget(form.lifecycle) }}
+            {{ form_label(form.lifecycle) }}
+            {{ form_help(form.lifecycle) }}
+            {{ form_errors(form.lifecycle) }}
+        </div>
+        <div class="input-field col s12 l4">
+            <div class="col s12">
+                <div class="row">
+                    <button class="btn waves-effect waves-light blue width-max no-padding center-align" type="submit">
+                        Hledat
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+{{ form_end(form) }}

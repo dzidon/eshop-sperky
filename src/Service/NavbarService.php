@@ -105,12 +105,12 @@ class NavbarService
                 'isActive'  => $this->currentRoute === 'admin_user_management' || $this->currentRoute === 'admin_user_management_specific',
                 'title'     => $this->parameterBag->get('app_page_title.admin_user_management')
             ],
-            /*[
+            [
                 'granted'   => $this->security->isGranted('admin_orders'),
                 'path'      => $this->router->generate('admin_orders'),
-                'isActive'  => $this->currentRoute === 'admin_orders' || $this->currentRoute === 'admin_order_overview' || $this->currentRoute === 'admin_order_cancel' || $this->currentRoute === 'admin_order_custom_delete' || $this->currentRoute === 'admin_order_custom',
+                'isActive'  => $this->currentRoute === 'admin_orders' || $this->currentRoute === 'admin_order_overview' || $this->currentRoute === 'admin_order_cancel' || $this->currentRoute === 'admin_order_custom_delete' || $this->currentRoute === 'admin_order_custom_edit',
                 'title'     => $this->parameterBag->get('app_page_title.admin_orders')
-            ],*/
+            ],
             [
                 'granted'   => $this->security->isGranted('admin_products'),
                 'path'      => $this->router->generate('admin_products'),

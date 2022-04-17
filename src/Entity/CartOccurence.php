@@ -42,13 +42,17 @@ class CartOccurence
     /**
      * @ORM\Column(type="integer")
      *
-     * @AssertCompound\ProductQuantityRequirements
-     * @Assert\GreaterThanOrEqual(0)
+     * @AssertCompound\ProductQuantityRequirements(groups={"Default", "onDemandCreation"})
+     * @Assert\GreaterThanOrEqual(value=0, groups={"Default"})
+     * @Assert\GreaterThanOrEqual(value=1, groups={"onDemandCreation"})
      */
     private $quantity;
 
     /**
      * @ORM\Column(type="float")
+     *
+     * @Assert\Type("numeric", groups={"onDemandCreation"}, message="Musíte zadat číselnou hodnotu.")
+     * @Assert\NotBlank(groups={"onDemandCreation"})
      */
     private $priceWithoutVat;
 
@@ -59,13 +63,25 @@ class CartOccurence
 
     /**
      * @ORM\Column(type="string", length=255)
+     *
+     * @Assert\Length(max=255, groups={"onDemandCreation"}, maxMessage="Maximální počet znaků v názvu produktu: {{ limit }}")
+     * @Assert\NotBlank(groups={"onDemandCreation"})
      */
     private $name;
 
     /**
      * @ORM\Column(type="string", length=500, nullable=true)
+     *
+     * @Assert\Length(max=500, groups={"onDemandCreation"}, maxMessage="Maximální počet znaků v názvu produktu: {{ limit }}")
      */
     private $optionsString;
+
+    /**
+     * @AssertCompound\VatRequirements(groups={"onDemandCreation"})
+     */
+    private $vat;
+
+    private bool $markedForRemoval;
 
     public function getId(): ?int
     {
@@ -176,6 +192,13 @@ class CartOccurence
         return $this;
     }
 
+    public function calculatePriceWithVat(): self
+    {
+        $this->priceWithVat = $this->priceWithoutVat * (1 + $this->vat);
+
+        return $this;
+    }
+
     public function getName(): ?string
     {
         return $this->name;
@@ -214,6 +237,30 @@ class CartOccurence
                 $this->optionsString .= sprintf(', %s: %s', $option->getProductOptionGroup()->getName(), $option->getName());
             }
         }
+
+        return $this;
+    }
+
+    public function getVat(): ?float
+    {
+        return $this->vat;
+    }
+
+    public function setVat(float $vat): self
+    {
+        $this->vat = $vat;
+
+        return $this;
+    }
+
+    public function isMarkedForRemoval(): bool
+    {
+        return $this->markedForRemoval;
+    }
+
+    public function setMarkedForRemoval(bool $markedForRemoval): self
+    {
+        $this->markedForRemoval = $markedForRemoval;
 
         return $this;
     }

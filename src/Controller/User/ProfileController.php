@@ -8,6 +8,7 @@ use App\Entity\User;
 use App\Form\AddressFormType;
 use App\Form\ChangePasswordLoggedInFormType;
 use App\Form\HiddenTrueFormType;
+use App\Form\OrderSearchFormType;
 use App\Form\PersonalInfoFormType;
 use App\Form\SearchTextAndSortFormType;
 use App\Service\BreadcrumbsService;
@@ -259,13 +260,13 @@ class ProfileController extends AbstractController
         /** @var User|null $user */
         $user = $this->getUser();
 
-        $form = $formFactory->createNamed('', SearchTextAndSortFormType::class, null, ['sort_choices' => Order::getSortData()]);
+        $form = $formFactory->createNamed('', OrderSearchFormType::class, null, ['sort_choices' => Order::getSortData()]);
         //button je přidáván v šabloně, aby se nezobrazoval v odkazu
         $form->handleRequest($this->request);
 
         if ($form->isSubmitted() && $form->isValid())
         {
-            $queryForPagination = $this->getDoctrine()->getRepository(Order::class)->getQueryForProfileSearchAndPagination($user->getEmail(), $user, $form->get('searchPhrase')->getData(), $form->get('sortBy')->getData());
+            $queryForPagination = $this->getDoctrine()->getRepository(Order::class)->getQueryForProfileSearchAndPagination($user->getEmail(), $user, $form->get('searchPhrase')->getData(), $form->get('sortBy')->getData(), $form->get('lifecycle')->getData());
         }
         else
         {

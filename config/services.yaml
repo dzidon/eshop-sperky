@@ -83,7 +83,7 @@ parameters:
     app_page_title.admin_order_overview: 'Objednávka'
     app_page_title.admin_order_cancel: 'Zrušit objednávku'
     app_page_title.admin_order_custom_delete: 'Smazat objednávku na míru'
-    app_page_title.admin_order_custom:
+    app_page_title.admin_order_custom_edit:
         new: 'Nová objednávka na míru'
         edit: 'Upravit objednávku na míru'
 
