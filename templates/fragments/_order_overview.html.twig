@@ -39,6 +39,26 @@
     </div>
 </div>
 
+{% if order.isCancelled() %}
+    <div class="row">
+        <h4>Důvod zrušení</h4>
+
+        <div class="card white black-text">
+            <div class="card-content">
+                <div class="row margin-0">
+                    <div class="col s12 no-padding">
+                        {% if order.cancellationReason is null %}
+                            <em>Důvod neuveden</em>
+                        {% else %}
+                            <span>{{ order.cancellationReason }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endif %}
+
 <div class="row">
     <h4>Kontaktní údaje</h4>
 

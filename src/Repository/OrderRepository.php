@@ -209,7 +209,28 @@ class OrderRepository extends ServiceEntityRepository
         return $order;
     }
 
-    public function findOneForCustomEdit(int $id)
+    public function findOneForAdminEdit(int $id)
+    {
+        $order = $this->createQueryBuilder('o')
+            ->andWhere('o.id = :id')
+            ->andWhere('o.lifecycleChapter > :lifecycleFresh')
+            ->setParameter('id', $id)
+            ->setParameter('lifecycleFresh', Order::LIFECYCLE_FRESH)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+
+        if ($order === null)
+        {
+            return null;
+        }
+
+        $this->partialllyLoadCartOccurences($order);
+
+        return $order;
+    }
+
+    public function findOneForAdminCustomEdit(int $id)
     {
         $order = $this->createQueryBuilder('o')
             ->andWhere('o.id = :id')

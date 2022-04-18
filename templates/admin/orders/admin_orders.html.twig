@@ -56,8 +56,8 @@
                                 {% endif %}
 
                                 {% if can_cancel and not order.isCancelled() %}
-                                    <a href="b">
-                                        <i class="fas fa-trash-alt"></i>
+                                    <a href="{{ path('admin_order_cancel', {id: order.id}) }}">
+                                        <i class="fas fa-ban"></i>
                                     </a>
                                 {% endif %}
                             {% endif %}

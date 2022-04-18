@@ -1,0 +1,14 @@
+<p>Vážený zákazníku,</p>
+
+<p>
+    Vaše objednávka č. {{ orderId }} byla zrušena. Důvod:<br><br>
+    {% if reason is null %}
+        <em>Důvod neuveden</em>
+    {% else %}
+        {{ reason }}
+    {% endif %}
+</p>
+
+<p>
+    Objednávku si můžete zobrazit <a href="{{ absolute_url(path('order_overview', {token: orderToken})) }}"><strong>zde</strong></a>.
+</p>

@@ -67,7 +67,11 @@ class OrderEmailService
         {
             $this->addAwaitingPaymentContent();
         }
-        else if ($this->order->getLifecycleChapter() > Order::LIFECYCLE_AWAITING_PAYMENT)
+        else if ($this->order->getLifecycleChapter() === Order::LIFECYCLE_CANCELLED)
+        {
+            $this->addCancelledContent();
+        }
+        else
         {
             $this->addPaidContent();
         }
@@ -101,6 +105,17 @@ class OrderEmailService
     }
 
     /**
+     * Přidá do e-mailu předmět a obsah pro zrušenou objednávku
+     */
+    private function addCancelledContent(): void
+    {
+        $this->email
+            ->subject(sprintf('Zrušena objednávka č. %s', $this->order->getId()))
+            ->htmlTemplate('fragments/emails/_order_cancelled.html.twig')
+        ;
+    }
+
+    /**
      * Zajistí, aby Twig šablona měla přístup k objednávce
      */
     private function addOrderDataToContext(): void
@@ -108,6 +123,7 @@ class OrderEmailService
         $context = $this->email->getContext();
         $context['orderId'] = $this->order->getId();
         $context['orderToken'] = $this->order->getToken();
+        $context['reason'] = $this->order->getCancellationReason();
         $this->email->context($context);
     }
 }

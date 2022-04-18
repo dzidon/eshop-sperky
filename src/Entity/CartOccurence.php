@@ -82,6 +82,7 @@ class CartOccurence
     private $vat;
 
     private bool $markedForRemoval;
+    private bool $markedForInventoryReplenishment;
 
     public function getId(): ?int
     {
@@ -261,6 +262,18 @@ class CartOccurence
     public function setMarkedForRemoval(bool $markedForRemoval): self
     {
         $this->markedForRemoval = $markedForRemoval;
+
+        return $this;
+    }
+
+    public function isMarkedForInventoryReplenishment(): bool
+    {
+        return $this->markedForInventoryReplenishment;
+    }
+
+    public function setMarkedForInventoryReplenishment(bool $markedForInventoryReplenishment): self
+    {
+        $this->markedForInventoryReplenishment = $markedForInventoryReplenishment;
 
         return $this;
     }

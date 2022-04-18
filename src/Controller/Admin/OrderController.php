@@ -5,6 +5,7 @@ namespace App\Controller\Admin;
 use App\Entity\Order;
 use App\Form\CustomOrderFormType;
 use App\Form\HiddenTrueFormType;
+use App\Form\OrderCancelFormType;
 use App\Form\OrderSearchFormType;
 use App\Service\BreadcrumbsService;
 use App\Service\PaginatorService;
@@ -87,9 +88,9 @@ class OrderController extends AbstractController
     {
         $user = $this->getUser();
 
-        if($id !== null) // zadal id do url, snazi se editovat existujici
+        if ($id !== null) // zadal id do url, snazi se editovat existujici
         {
-            $order = $this->getDoctrine()->getRepository(Order::class)->findOneForCustomEdit($id);
+            $order = $this->getDoctrine()->getRepository(Order::class)->findOneForAdminCustomEdit($id);
             if($order === null) // nenaslo to zadnou objednavku na miru
             {
                 throw new NotFoundHttpException('Objednávka nenalezena.');
@@ -135,8 +136,8 @@ class OrderController extends AbstractController
     {
         $user = $this->getUser();
 
-        $order = $this->getDoctrine()->getRepository(Order::class)->findOneForCustomEdit($id);
-        if($order === null) // nenaslo to zadnou objednavku
+        $order = $this->getDoctrine()->getRepository(Order::class)->findOneForAdminCustomEdit($id);
+        if ($order === null) // nenaslo to zadnou objednavku
         {
             throw new NotFoundHttpException('Objednávka nenalezena.');
         }
@@ -165,6 +166,49 @@ class OrderController extends AbstractController
         return $this->render('admin/orders/admin_order_custom_delete.html.twig', [
             'orderCustomDeleteForm' => $form->createView(),
             'orderCustomInstance' => $order,
+        ]);
+    }
+
+    /**
+     * @Route("/objednavka/{id}/zrusit", name="admin_order_cancel", requirements={"id"="\d+"})
+     *
+     * @IsGranted("order_cancel")
+     */
+    public function orderCancel($id): Response
+    {
+        $user = $this->getUser();
+
+        /** @var Order|null $order */
+        $order = $this->getDoctrine()->getRepository(Order::class)->findOneForAdminEdit($id);
+        if ($order === null || $order->isCancelled()) // nenaslo to zadnou objednavku nebo uz je cancelled
+        {
+            throw new NotFoundHttpException('Objednávka nenalezena.');
+        }
+
+        $form = $this->createForm(OrderCancelFormType::class, $order);
+        $form->add('submit', SubmitType::class, [
+            'label' => 'Zrušit',
+            'attr' => ['class' => 'btn-large red left'],
+        ]);
+        $form->handleRequest($this->request);
+
+        if ($form->isSubmitted() && $form->isValid())
+        {
+            $this->logger->info(sprintf("Admin %s (ID: %s) has cancelled an order ID %s.", $user->getUserIdentifier(), $user->getId(), $order->getId()));
+
+            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager->persist($order);
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Objednávka zrušena!');
+            return $this->redirectToRoute('admin_orders');
+        }
+
+        $this->breadcrumbs->addRoute('admin_order_cancel', ['id' => $order->getId()]);
+
+        return $this->render('admin/orders/admin_order_cancel.html.twig', [
+            'orderCancelForm' => $form->createView(),
+            'orderInstance' => $order,
         ]);
     }
 }

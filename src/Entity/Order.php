@@ -315,6 +315,14 @@ class Order
     private $note;
 
     /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     *
+     * @Assert\Length(max=255, groups={"cancellation"}, maxMessage="Maximální počet znaků v důvodu zrušení: {{ limit }}")
+     * @Assert\NotBlank(groups={"cancellation"})
+     */
+    private $cancellationReason;
+
+    /**
      * @ORM\ManyToOne(targetEntity=User::class)
      * @ORM\JoinColumn(nullable=true, onDelete="SET NULL")
      */
@@ -329,6 +337,8 @@ class Order
      * @ORM\Column(type="datetime")
      */
     private $updated;
+
+    private $cartOccurencesWithProduct;
 
     private bool $companyChecked = false;
     private bool $billingAddressChecked = false;
@@ -424,6 +434,36 @@ class Order
         $this->cartOccurences = new ArrayCollection($this->cartOccurences->getValues());
 
         return $this;
+    }
+
+    public function setCartOccurencesWithProduct(?Collection $cartOccurencesWithProduct): self
+    {
+        $this->cartOccurencesWithProduct = $cartOccurencesWithProduct;
+
+        return $this;
+    }
+
+    /**
+     * @param bool $forceReload
+     * @return Collection|CartOccurence[]
+     */
+    public function getCartOccurencesWithProduct(bool $forceReload = false): Collection
+    {
+        if ($this->cartOccurencesWithProduct === null || $forceReload)
+        {
+            $this->cartOccurencesWithProduct = new ArrayCollection();
+
+            /** @var CartOccurence $cartOccurence */
+            foreach ($this->cartOccurences as $cartOccurence)
+            {
+                if ($cartOccurence->getProduct() !== null)
+                {
+                    $this->cartOccurencesWithProduct->add($cartOccurence);
+                }
+            }
+        }
+
+        return $this->cartOccurencesWithProduct;
     }
 
     public function isCreatedManually(): bool
@@ -845,6 +885,18 @@ class Order
         return $this;
     }
 
+    public function getCancellationReason(): ?string
+    {
+        return $this->cancellationReason;
+    }
+
+    public function setCancellationReason(?string $cancellationReason): self
+    {
+        $this->cancellationReason = $cancellationReason;
+
+        return $this;
+    }
+
     public function getCashOnDelivery(): ?float
     {
         return $this->cashOnDelivery;
@@ -967,6 +1019,24 @@ class Order
         $this->user = $user;
         $this->token = Uuid::v4();
         $this->finishedAt = new DateTime('now');
+    }
+
+    public function cancel(bool $forceInventoryReplenish): void
+    {
+        $this->setLifecycleChapter(self::LIFECYCLE_CANCELLED);
+
+        // přidání počtu produktů zpět na sklad
+        /** @var CartOccurence $cartOccurence */
+        foreach ($this->cartOccurences as $cartOccurence)
+        {
+            if ($forceInventoryReplenish || $cartOccurence->isMarkedForInventoryReplenishment())
+            {
+                $product = $cartOccurence->getProduct();
+                $productInventory = $product->getInventory();
+                $cartOccurenceQuantity = $cartOccurence->getQuantity();
+                $product->setInventory($productInventory + $cartOccurenceQuantity);
+            }
+        }
     }
 
     public function getStaticAddressDeliveryAdditionalInfo(): ?string

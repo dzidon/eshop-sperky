@@ -11,7 +11,7 @@ use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Security;
 
 /**
- * Třída řešící dokončení objednávky
+ * Třída manipulující s dokončenou objednávkou
  *
  * @package App\Service
  */
@@ -60,7 +60,20 @@ class OrderCompletionService
     }
 
     /**
-     * Pošle potvrzovací e-mail o dokončení objednávky
+     * Nastaví objednávku do zrušeného stavu
+     *
+     * @param bool $forceInventoryReplenish
+     * @return $this
+     */
+    public function cancelOrder(bool $forceInventoryReplenish): self
+    {
+        $this->order->cancel($forceInventoryReplenish);
+
+        return $this;
+    }
+
+    /**
+     * Pošle potvrzovací e-mail o změně stavu objednávky
      *
      * @return $this
      */
