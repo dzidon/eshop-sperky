@@ -2,23 +2,25 @@
 
 namespace App\Security;
 
+use App\Entity\User;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
-use Symfony\Component\Security\Core\User\UserInterface;
 use SymfonyCasts\Bundle\VerifyEmail\Exception\VerifyEmailExceptionInterface;
 use SymfonyCasts\Bundle\VerifyEmail\VerifyEmailHelperInterface;
 
 /**
- * Třída EmailVerifier řeší potvrzovací emaily uživatele
+ * Třída EmailVerifier řeší odesílání e-mailů pro dokončení registrace
  *
  * @package App\Security
  */
 class EmailVerifier
 {
+    const VERIFICATION_ROUTE_NAME = 'verify_email';
+
     private VerifyEmailHelperInterface $verifyEmailHelper;
     private MailerInterface $mailer;
     private ParameterBagInterface $parameterBag;
@@ -33,15 +35,14 @@ class EmailVerifier
     /**
      * Odešle odkaz na ověření emailu
      *
-     * @param string $verifyEmailRouteName
-     * @param null|UserInterface $user Pokud je null, jedná se ověřovací e-mail, který se nikam nepošle, protože
-     *                                 uživatel (útočník?) zkouší zaregistrovat e-mail, který už je ověřený.
-     *                                 Také je možné, že ještě neuplynul čas uvedený v app_email_verify_throttling_interval
-     *                                 od posledního odeslaného odkazu.
+     * @param null|User $user Pokud je null, jedná se ověřovací e-mail, který se nikam nepošle, protože
+     *                        uživatel (útočník?) zkouší zaregistrovat e-mail, který už je ověřený.
+     *                        Také je možné, že ještě neuplynul čas uvedený v app_email_verify_throttling_interval
+     *                        od posledního odeslaného odkazu.
      *
      * @throws TransportExceptionInterface
      */
-    public function sendEmailConfirmation(string $verifyEmailRouteName, ?UserInterface $user): void
+    public function sendEmailConfirmation(?User $user): void
     {
         $usedId = ($user !== null ? $user->getId() : '1');
         $usedEmail = ($user !== null ? $user->getEmail() : 'fake@email.com');
@@ -53,7 +54,7 @@ class EmailVerifier
             ->htmlTemplate('fragments/emails/_verify_account.html.twig');
 
         $signatureComponents = $this->verifyEmailHelper->generateSignature(
-            $verifyEmailRouteName,
+            self::VERIFICATION_ROUTE_NAME,
             $usedId,
             $usedEmail
         );
@@ -75,11 +76,11 @@ class EmailVerifier
      * Řeší aktivaci účtu po kliknutí na ověřovací odkaz
      *
      * @param Request $request
-     * @param UserInterface $user
+     * @param User $user
      *
      * @throws VerifyEmailExceptionInterface
      */
-    public function handleEmailConfirmation(Request $request, UserInterface $user): void
+    public function handleEmailConfirmation(Request $request, User $user): void
     {
         $this->verifyEmailHelper->validateEmailConfirmation($request->getUri(), $user->getId(), $user->getEmail());
     }
