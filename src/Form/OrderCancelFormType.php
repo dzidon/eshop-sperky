@@ -3,7 +3,6 @@
 namespace App\Form;
 
 use App\Entity\Order;
-use App\Form\EventSubscriber\OrderCancelSubscriber;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -12,13 +11,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class OrderCancelFormType extends AbstractType
 {
-    private OrderCancelSubscriber $orderCancelSubscriber;
-
-    public function __construct(OrderCancelSubscriber $orderCancelSubscriber)
-    {
-        $this->orderCancelSubscriber = $orderCancelSubscriber;
-    }
-
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
@@ -32,7 +24,6 @@ class OrderCancelFormType extends AbstractType
                 ],
                 'label' => 'Důvod zrušení',
             ])
-            ->addEventSubscriber($this->orderCancelSubscriber)
         ;
     }
 

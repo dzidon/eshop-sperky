@@ -21,6 +21,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\HasLifecycleCallbacks()
  *
  * @AssertCustom\PacketaId(groups={"methods"})
+ * @AssertCustom\PacketaCreation(groups={"admin_state"})
  */
 class Order
 {
@@ -39,6 +40,12 @@ class Order
         self::LIFECYCLE_AWAITING_SHIPPING => 'Čeká na odeslání',
         self::LIFECYCLE_SHIPPED => 'Odeslaná',
         self::LIFECYCLE_CANCELLED => 'Zrušená',
+    ];
+
+    public const LIFECYCLE_CHAPTERS_ADMIN_EDIT = [
+        self::LIFECYCLE_CHAPTERS[self::LIFECYCLE_AWAITING_PAYMENT] => self::LIFECYCLE_AWAITING_PAYMENT,
+        self::LIFECYCLE_CHAPTERS[self::LIFECYCLE_AWAITING_SHIPPING] => self::LIFECYCLE_AWAITING_SHIPPING,
+        self::LIFECYCLE_CHAPTERS[self::LIFECYCLE_SHIPPED] => self::LIFECYCLE_SHIPPED,
     ];
 
     /**
@@ -84,6 +91,9 @@ class Order
 
     /**
      * @ORM\Column(type="integer")
+     *
+     * @Assert\Choice(choices=Order::LIFECYCLE_CHAPTERS_ADMIN_EDIT, groups={"admin_state"}, message="Zvolte platný stav.")
+     * @Assert\NotBlank(groups={"admin_state"})
      */
     private int $lifecycleChapter = self::LIFECYCLE_FRESH;
 
@@ -339,6 +349,7 @@ class Order
     private $updated;
 
     private $cartOccurencesWithProduct;
+    private $weight;
 
     private bool $companyChecked = false;
     private bool $billingAddressChecked = false;
@@ -464,6 +475,18 @@ class Order
         }
 
         return $this->cartOccurencesWithProduct;
+    }
+
+    public function getWeight(): ?float
+    {
+        return $this->weight;
+    }
+
+    public function setWeight(?float $weight): self
+    {
+        $this->weight = $weight;
+
+        return $this;
     }
 
     public function isCreatedManually(): bool
@@ -996,7 +1019,7 @@ class Order
         if ($this->paymentMethod !== null && $this->paymentMethod->getType() === PaymentMethod::TYPE_ON_DELIVERY)
         {
             $cashOnDelivery = $this->getTotalPriceWithVat($withMethods = true);
-            $this->setCashOnDelivery($cashOnDelivery);
+            $this->setCashOnDelivery(ceil($cashOnDelivery));
             $this->setLifecycleChapter(self::LIFECYCLE_AWAITING_SHIPPING);
         }
 

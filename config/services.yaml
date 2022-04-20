@@ -7,6 +7,7 @@ parameters:
     app_site_instagram: 'https://www.instagram.com'
     app_email_noreply: 'noreply@prysky.cz'
     app_email_verify_throttling_interval: 300 # sekund (5 minut)
+    app_packeta_api_url: 'https://www.zasilkovna.cz/api/soap-php-bugfix.wsdl'
     app_packeta_key: '%env(PACKETA_KEY)%'
     app_packeta_secret: '%env(PACKETA_SECRET)%'
 
@@ -105,7 +106,10 @@ services:
         class: App\Service\CartService
     app.breadcrumbs_service:
         class: App\Service\BreadcrumbsService
+    app.packeta_service:
+        class: App\Service\PacketaApiService
 
     App\Service\NavbarService: '@app.navbar_service'
     App\Service\CartService: '@app.cart_service'
     App\Service\BreadcrumbsService: '@app.breadcrumbs_service'
+    App\Service\PacketaApiService: '@app.packeta_service'

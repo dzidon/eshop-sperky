@@ -211,6 +211,25 @@ class OrderRepository extends ServiceEntityRepository
 
     public function findOneForAdminEdit(int $id)
     {
+        $order = $this->getOverviewQueryBuilder() // <- o.lifecycleChapter > :lifecycleFresh
+            ->andWhere('o.id = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+
+        if ($order === null)
+        {
+            return null;
+        }
+
+        $this->partialllyLoadCartOccurences($order);
+
+        return $order;
+    }
+
+    public function findOneForAdminCancellation(int $id)
+    {
         $order = $this->createQueryBuilder('o')
             ->andWhere('o.id = :id')
             ->andWhere('o.lifecycleChapter > :lifecycleFresh')

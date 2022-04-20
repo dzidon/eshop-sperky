@@ -50,7 +50,7 @@
                                 {% endif %}
                             {% elseif not order.isFresh() %}
                                 {% if can_edit %}
-                                    <a href="b">
+                                    <a href="{{ path('admin_order_overview', {id: order.id}) }}">
                                         <i class="fas fa-edit"></i>
                                     </a>
                                 {% endif %}

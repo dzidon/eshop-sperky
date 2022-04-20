@@ -30,7 +30,7 @@ class CartService
     /**
      * @var Cookie|null
      */
-    private $orderCookie = null;
+    private $newOrderCookie = null;
 
     private bool $isOrderNew = false;
     private int $totalQuantityForNavbar = 0;
@@ -67,9 +67,9 @@ class CartService
         return $this->synchronizer;
     }
 
-    public function getOrderCookie()
+    public function getNewOrderCookie()
     {
-        return $this->orderCookie;
+        return $this->newOrderCookie;
     }
 
     /**
@@ -117,7 +117,7 @@ class CartService
 
             $this->order->calculateTotals();
             $this->totalQuantityForNavbar = $this->order->getTotalQuantity();
-            $this->orderCookieObtain();
+            $this->obtainNewOrderCookie();
 
             $this->entityManager->persist($this->order);
             $this->entityManager->flush();
@@ -274,9 +274,9 @@ class CartService
     /**
      * Vrátí novou cookie s tokenem aktivní objednávky, pokud je objednávka nová, nebo se blíží k expiraci.
      */
-    private function orderCookieObtain(): void
+    private function obtainNewOrderCookie(): void
     {
-        $this->orderCookie = null;
+        $this->newOrderCookie = null;
 
         if ($this->isOrderNew || (($this->order->getExpireAt()->getTimestamp() - time()) < (86400 * Order::REFRESH_WINDOW_IN_DAYS)))
         {
@@ -284,7 +284,7 @@ class CartService
             $expires = time() + (86400 * Order::LIFETIME_IN_DAYS);
             $token = $this->getOrderToken();
 
-            $this->orderCookie = (new Cookie(self::COOKIE_NAME))
+            $this->newOrderCookie = (new Cookie(self::COOKIE_NAME))
                 ->withValue($token)
                 ->withExpires($expires)
                 ->withSecure(true)

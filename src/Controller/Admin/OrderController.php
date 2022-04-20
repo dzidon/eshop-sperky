@@ -6,8 +6,10 @@ use App\Entity\Order;
 use App\Form\CustomOrderFormType;
 use App\Form\HiddenTrueFormType;
 use App\Form\OrderCancelFormType;
+use App\Form\OrderEditFormType;
 use App\Form\OrderSearchFormType;
 use App\Service\BreadcrumbsService;
+use App\Service\OrderCompletionService;
 use App\Service\PaginatorService;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -170,16 +172,69 @@ class OrderController extends AbstractController
     }
 
     /**
-     * @Route("/objednavka/{id}/zrusit", name="admin_order_cancel", requirements={"id"="\d+"})
+     * @Route("/objednavka/{id}", name="admin_order_overview", requirements={"id"="\d+"})
      *
-     * @IsGranted("order_cancel")
+     * @IsGranted("order_edit")
      */
-    public function orderCancel($id): Response
+    public function order(int $id = null): Response
     {
         $user = $this->getUser();
 
         /** @var Order|null $order */
         $order = $this->getDoctrine()->getRepository(Order::class)->findOneForAdminEdit($id);
+        if ($order === null) // nenaslo to zadnou objednavku
+        {
+            throw new NotFoundHttpException('Objednávka nenalezena.');
+        }
+
+        $order->calculateTotals();
+
+        /*
+         * Formulář pro změnu stavu
+         */
+        $formLifecycleChapterView = null;
+        if (!$order->isCancelled())
+        {
+            $formLifecycleChapter = $this->createForm(OrderEditFormType::class, $order);
+            $formLifecycleChapter->add('submit', SubmitType::class, [
+                'label' => 'Nastavit',
+                'attr' => ['class' => 'btn-large blue left'],
+            ]);
+            $formLifecycleChapter->handleRequest($this->request);
+            $formLifecycleChapterView = $formLifecycleChapter->createView();
+
+            if ($formLifecycleChapter->isSubmitted() && $formLifecycleChapter->isValid())
+            {
+                $entityManager = $this->getDoctrine()->getManager();
+                $entityManager->persist($order);
+                $entityManager->flush();
+
+                $this->logger->info(sprintf("Admin %s (ID: %s) has changed the state of order ID %s to %s.", $user->getUserIdentifier(), $user->getId(), $order->getId(), $order->getLifecycleChapter()));
+                $this->addFlash('success', 'Stav změněn!');
+
+                return $this->redirectToRoute('admin_order_overview', ['id' => $order->getId()]);
+            }
+        }
+
+        $this->breadcrumbs->addRoute('order_overview');
+
+        return $this->render('admin/orders/admin_order_overview.html.twig', [
+            'order' => $order,
+            'formLifecycleChapter' => $formLifecycleChapterView,
+        ]);
+    }
+
+    /**
+     * @Route("/objednavka/{id}/zrusit", name="admin_order_cancel", requirements={"id"="\d+"})
+     *
+     * @IsGranted("order_cancel")
+     */
+    public function orderCancel(OrderCompletionService $orderCompletionService, $id): Response
+    {
+        $user = $this->getUser();
+
+        /** @var Order|null $order */
+        $order = $this->getDoctrine()->getRepository(Order::class)->findOneForAdminCancellation($id);
         if ($order === null || $order->isCancelled()) // nenaslo to zadnou objednavku nebo uz je cancelled
         {
             throw new NotFoundHttpException('Objednávka nenalezena.');
@@ -194,13 +249,19 @@ class OrderController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid())
         {
-            $this->logger->info(sprintf("Admin %s (ID: %s) has cancelled an order ID %s.", $user->getUserIdentifier(), $user->getId(), $order->getId()));
+            $orderCompletionService
+                ->setOrder($order)
+                ->cancelOrder($forceInventoryReplenish = false)
+                ->sendConfirmationEmail()
+            ;
 
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($order);
             $entityManager->flush();
 
+            $this->logger->info(sprintf("Admin %s (ID: %s) has cancelled an order ID %s.", $user->getUserIdentifier(), $user->getId(), $order->getId()));
             $this->addFlash('success', 'Objednávka zrušena!');
+
             return $this->redirectToRoute('admin_orders');
         }
 
