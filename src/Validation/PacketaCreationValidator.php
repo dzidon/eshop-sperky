@@ -40,8 +40,7 @@ class PacketaCreationValidator extends ConstraintValidator
             return;
         }
 
-        $this->packetaApiService->setOrder($order);
-        if ($order->getLifecycleChapter() === Order::LIFECYCLE_SHIPPED && !$this->packetaApiService->packetStatus())
+        if ($order->getLifecycleChapter() === Order::LIFECYCLE_SHIPPED && !$this->packetaApiService->packetStatus($order))
         {
             $this->context
                 ->buildViolation($constraint->message)

@@ -27,7 +27,8 @@ class CartSubscriber implements EventSubscriberInterface
 
     public function onKernelController(ControllerEvent $event)
     {
-        // načtení aktivní objednávky a případná synchronizace
+        // na většině stránek načte jen počet produktů v košíku, na některých stránkách načte kompletní objednávku a
+        // provede synchronizaci
         $currentRoute = $event->getRequest()->attributes->get('_route');
         $loadFully = isset(OrderCartSynchronizer::SYNCHRONIZATION_ROUTES[$currentRoute]);
         $this->cart->initialize($loadFully);
@@ -35,6 +36,7 @@ class CartSubscriber implements EventSubscriberInterface
 
     public function onKernelResponse(ResponseEvent $event)
     {
+        // pokud se jedná o novou objednávku, nebo došlo k prodloužení platnosti, nastaví se token objednávky do cookie
         $newTokenCookie = $this->cart->getNewOrderCookie();
         if ($newTokenCookie !== null)
         {

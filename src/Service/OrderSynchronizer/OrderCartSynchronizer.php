@@ -2,6 +2,8 @@
 
 namespace App\Service\OrderSynchronizer;
 
+use App\Entity\Order;
+
 /**
  * Synchronizuje stav aktivní objednávky v košíku se stavem ostatních entit
  *
@@ -32,19 +34,19 @@ class OrderCartSynchronizer extends AbstractOrderSynchronizer
     /**
      * {@inheritdoc}
      */
-    public function synchronize(): void
+    public function synchronize(Order $order): void
     {
-        parent::synchronize();
+        parent::synchronize($order);
 
         $productsTotalQuantity = [];
 
-        foreach ($this->order->getCartOccurences() as $cartOccurence)
+        foreach ($order->getCartOccurences() as $cartOccurence)
         {
             $product = $cartOccurence->getProduct();
 
             if ($product === null || !$product->isVisible())
             {
-                $this->order->removeCartOccurence($cartOccurence);
+                $order->removeCartOccurence($cartOccurence);
                 $this->addWarning(
                     sprintf('productnull_%s', $cartOccurence->getName()),
                     sprintf('Produkt "%s" byl odstraněn, protože přestal existovat v katalogu.', $cartOccurence->getName())
@@ -55,7 +57,7 @@ class OrderCartSynchronizer extends AbstractOrderSynchronizer
                 // vložený počet ks je 0
                 if($cartOccurence->getQuantity() <= 0)
                 {
-                    $this->order->removeCartOccurence($cartOccurence);
+                    $order->removeCartOccurence($cartOccurence);
                     $this->addWarning(
                         sprintf('quantityzero_%d', $product->getId()),
                         sprintf('Produkt "%s" byl odstraněn, protože měl nastavený počet kusů na 0.', $cartOccurence->getName())
@@ -72,7 +74,7 @@ class OrderCartSynchronizer extends AbstractOrderSynchronizer
 
                 if ($productsTotalQuantity[$product->getId()]+$cartOccurence->getQuantity() > $product->getInventory())
                 {
-                    $this->order->removeCartOccurence($cartOccurence);
+                    $order->removeCartOccurence($cartOccurence);
                     $this->addWarning(
                         sprintf('quantity_%d', $product->getId()),
                         sprintf('Produkt "%s" byl odstraněn, protože už nemáme tolik kusů na skladě.', $cartOccurence->getName())

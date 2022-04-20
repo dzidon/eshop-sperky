@@ -250,8 +250,7 @@ class OrderController extends AbstractController
         if ($form->isSubmitted() && $form->isValid())
         {
             $orderCompletionService
-                ->setOrder($order)
-                ->cancelOrder($forceInventoryReplenish = false)
+                ->cancelOrder($order, $forceInventoryReplenish = false)
                 ->sendConfirmationEmail()
             ;
 

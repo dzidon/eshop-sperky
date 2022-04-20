@@ -3,7 +3,6 @@
 namespace App\Service\OrderSynchronizer;
 
 use App\Entity\Order;
-use LogicException;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
@@ -13,7 +12,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 abstract class AbstractOrderSynchronizer
 {
-    protected Order $order;
     protected bool $hasWarnings = false;
     private array $warnings = [];
 
@@ -25,53 +23,37 @@ abstract class AbstractOrderSynchronizer
     }
 
     /**
-     * Nastaví objednávku, jejíž stav se má synchronizovat.
+     * Synchronizuje stav objednávky.
      *
      * @param Order $order
-     * @return AbstractOrderSynchronizer
      */
-    public function setOrder(Order $order): self
+    public function synchronize(Order $order): void
     {
-        $this->order = $order;
-
-        return $this;
-    }
-
-    /**
-     * Synchronizuje stav objednávky.
-     */
-    public function synchronize(): void
-    {
-        if($this->order === null)
-        {
-            throw new LogicException( sprintf('%s nedostal objednávku přes setOrder.', static::class) );
-        }
-
         // cena doručovací metody
-        $deliveryMethod = $this->order->getDeliveryMethod();
+        $deliveryMethod = $order->getDeliveryMethod();
         if ($deliveryMethod !== null)
         {
-            if (($this->order->getDeliveryPriceWithoutVat() !== $deliveryMethod->getPriceWithoutVat())
-              || $this->order->getDeliveryPriceWithVat()    !== $deliveryMethod->getPriceWithVat())
+            if (($order->getDeliveryPriceWithoutVat() !== $deliveryMethod->getPriceWithoutVat())
+              || $order->getDeliveryPriceWithVat()    !== $deliveryMethod->getPriceWithVat())
             {
-                $this->order->setDeliveryPriceWithoutVat( $deliveryMethod->getPriceWithoutVat() );
-                $this->order->setDeliveryPriceWithVat( $deliveryMethod->getPriceWithVat() );
+                $order->setDeliveryPriceWithoutVat( $deliveryMethod->getPriceWithoutVat() );
+                $order->setDeliveryPriceWithVat( $deliveryMethod->getPriceWithVat() );
 
-                $this->addWarning('delivery_method_price', sprintf('Cena doručovací metody "%s" je nyní %.2f Kč vč. DPH (%.2f Kč bez DPH).', $deliveryMethod->getName(), $this->order->getDeliveryPriceWithVat(), $this->order->getDeliveryPriceWithoutVat()));
+                $this->addWarning('delivery_method_price', sprintf('Cena doručovací metody "%s" je nyní %.2f Kč vč. DPH (%.2f Kč bez DPH).', $deliveryMethod->getName(), $order->getDeliveryPriceWithVat(), $order->getDeliveryPriceWithoutVat()));
             }
         }
 
         // cena platební metody
-        $paymentMethod = $this->order->getPaymentMethod();
+        $paymentMethod = $order->getPaymentMethod();
         if ($paymentMethod !== null)
         {
-            if (($this->order->getPaymentPriceWithoutVat() !== $paymentMethod->getPriceWithoutVat())
-              || $this->order->getPaymentPriceWithVat()    !== $paymentMethod->getPriceWithVat())
+            if (($order->getPaymentPriceWithoutVat() !== $paymentMethod->getPriceWithoutVat())
+              || $order->getPaymentPriceWithVat()    !== $paymentMethod->getPriceWithVat())
             {
-                $this->order->setPaymentPriceWithoutVat( $paymentMethod->getPriceWithoutVat() );
-                $this->order->setPaymentPriceWithVat( $paymentMethod->getPriceWithVat() );
+                $order->setPaymentPriceWithoutVat( $paymentMethod->getPriceWithoutVat() );
+                $order->setPaymentPriceWithVat( $paymentMethod->getPriceWithVat() );
 
-                $this->addWarning('payment_method_price', sprintf('Cena platební metody "%s" je nyní %.2f Kč vč. DPH (%.2f Kč bez DPH).', $paymentMethod->getName(), $this->order->getPaymentPriceWithVat(), $this->order->getPaymentPriceWithoutVat()));
+                $this->addWarning('payment_method_price', sprintf('Cena platební metody "%s" je nyní %.2f Kč vč. DPH (%.2f Kč bez DPH).', $paymentMethod->getName(), $order->getPaymentPriceWithVat(), $order->getPaymentPriceWithoutVat()));
             }
         }
     }

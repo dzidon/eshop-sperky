@@ -87,6 +87,7 @@ class UserRegistrationService
     private function saveNewUser(): void
     {
         $this->newUser->setVerifyLinkLastSent($this->registrationDateTime);
+
         $this->entityManager->persist($this->newUser);
         $this->entityManager->flush();
 
@@ -99,9 +100,9 @@ class UserRegistrationService
      */
     private function saveExistingUser(): void
     {
-        $this->existingUser->setVerifyLinkLastSent($this->registrationDateTime);
-        $this->existingUser->setRegistered($this->registrationDateTime);
-        $this->existingUser->setPassword($this->newUser->getPassword());
+        $this->existingUser->setVerifyLinkLastSent($this->registrationDateTime)
+            ->setRegistered($this->registrationDateTime)
+            ->setPassword($this->newUser->getPassword());
 
         $this->entityManager->persist($this->existingUser);
         $this->entityManager->flush();

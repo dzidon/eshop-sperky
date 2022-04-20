@@ -40,14 +40,14 @@ class PacketaApiService
      * @param Order $order
      * @return $this
      */
-    public function setOrder(Order $order): self
+    private function initialize(Order $order): self
     {
         $this->order = $order;
 
         // objednávka musí mít ID
         if ($this->order->getId() === null)
         {
-            throw new LogicException('App\Service\PacketaApiService nesmí dostat do metody setOrder objednávku s null ID.');
+            throw new LogicException(sprintf('Služba App\Service\PacketaApiService dostala do metody initialize objednávku s null ID.'));
         }
         $this->errors = [];
         $this->hasErrors = false;
@@ -58,15 +58,17 @@ class PacketaApiService
     /**
      * Vrátí data o zásilce, nebo null pokud nastala chyba.
      *
+     * @param Order $order
      * @return object|null
      */
-    public function packetStatus(): ?object
+    public function packetStatus(Order $order): ?object
     {
+        $this->initialize($order);
         $data = null;
 
         try
         {
-            $data = $this->client->packetStatus($this->secret, $this->order->getId());
+            $data = $this->client->packetStatus($this->secret, (string) $this->order->getId());
         }
         catch (SoapFault $exception)
         {
@@ -79,10 +81,12 @@ class PacketaApiService
     /**
      * Pokusí se vytvořit zásilku. Po úspěšném vytvoření vrátí data o vytvořené zásilce, jinak null.
      *
+     * @param Order $order
      * @return object|null
      */
-    public function createPacket(): ?object
+    public function createPacket(Order $order): ?object
     {
+        $this->initialize($order);
         $data = null;
 
         try

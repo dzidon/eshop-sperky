@@ -7,6 +7,12 @@ use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Events;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 
+/**
+ * Subscriber, který přepne Doctrine tracking policy na DEFERRED_EXPLICIT u všech entit. Díky tomu je nutné vždy
+ * volat persist pro každou entitu, která má být uložena do DB.
+ *
+ * @package App\EventSubscriber
+ */
 class DoctrineTrackingPolicySubscriber implements EventSubscriber
 {
     public function getSubscribedEvents()

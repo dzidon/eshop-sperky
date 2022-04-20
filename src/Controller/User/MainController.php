@@ -59,19 +59,15 @@ class MainController extends AbstractController
         {
             try
             {
-                $contactEmailService
-                    ->initialize($emailData)
-                    ->send();
-
-                $this->addFlash('success', sprintf('E-mail odeslán, brzy se ozveme na %s!', $contactEmailService->getSenderEmail()));
-                $logger->info(sprintf("Someone has sent a contact email with a subject '%s' as %s.", $contactEmailService->getSubject(), $contactEmailService->getSenderEmail()));
+                $contactEmailService->send($emailData);
+                $this->addFlash('success', sprintf('E-mail odeslán, brzy se ozveme na %s!', $emailData->getEmail()));
 
                 return $this->redirectToRoute('contact');
             }
             catch (TransportExceptionInterface $exception)
             {
                 $this->addFlash('failure', 'E-mail se nepodařilo odeslat, zkuste to znovu.');
-                $logger->error(sprintf("Someone has tried to send a contact email as %s, but the following error occurred in send: %s", $contactEmailService->getSenderEmail(), $exception->getMessage()));
+                $logger->error(sprintf("Someone has tried to send a contact email as %s, but the following error occurred in send: %s", $emailData->getEmail(), $exception->getMessage()));
             }
         }
 
@@ -98,19 +94,15 @@ class MainController extends AbstractController
         {
             try
             {
-                $contactEmailService
-                    ->initialize($emailData)
-                    ->send();
-
-                $this->addFlash('success', sprintf('Nezávazná poptávka odeslána, brzy se ozveme na %s!', $contactEmailService->getSenderEmail()));
-                $logger->info(sprintf("Someone has sent a custom order request as %s.", $contactEmailService->getSenderEmail()));
+                $contactEmailService->send($emailData);
+                $this->addFlash('success', sprintf('Nezávazná poptávka odeslána, brzy se ozveme na %s!', $emailData->getEmail()));
 
                 return $this->redirectToRoute('order_custom_new');
             }
             catch (TransportExceptionInterface $exception)
             {
                 $this->addFlash('failure', 'E-mail se nepodařilo odeslat, zkuste to znovu.');
-                $logger->error(sprintf("Someone has tried to send a contact email as %s, but the following error occurred in send: %s", $contactEmailService->getSenderEmail(), $exception->getMessage()));
+                $logger->error(sprintf("Someone has tried to send a contact email as %s, but the following error occurred in send: %s", $emailData->getEmail(), $exception->getMessage()));
             }
         }
 

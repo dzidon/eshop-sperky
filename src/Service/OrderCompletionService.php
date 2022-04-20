@@ -33,25 +33,15 @@ class OrderCompletionService
     }
 
     /**
-     * Načte objednávku
+     * Nastaví objednávku do dokončeného stavu
      *
      * @param Order $order
      * @return $this
      */
-    public function setOrder(Order $order): self
+    public function finishOrder(Order $order): self
     {
         $this->order = $order;
 
-        return $this;
-    }
-
-    /**
-     * Nastaví objednávku do dokončeného stavu
-     *
-     * @return $this
-     */
-    public function finishOrder(): self
-    {
         /** @var User|null $user */
         $user = $this->security->getUser();
         $this->order->finish($user);
@@ -62,11 +52,13 @@ class OrderCompletionService
     /**
      * Nastaví objednávku do zrušeného stavu
      *
+     * @param Order $order
      * @param bool $forceInventoryReplenish
      * @return $this
      */
-    public function cancelOrder(bool $forceInventoryReplenish): self
+    public function cancelOrder(Order $order, bool $forceInventoryReplenish): self
     {
+        $this->order = $order;
         $this->order->cancel($forceInventoryReplenish);
 
         return $this;
@@ -81,9 +73,7 @@ class OrderCompletionService
     {
         try
         {
-            $this->orderEmailService
-                ->initialize($this->order)
-                ->send();
+            $this->orderEmailService->send($this->order);
         }
         catch (TransportExceptionInterface $exception)
         {

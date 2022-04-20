@@ -30,35 +30,17 @@ class OrderEmailService
     }
 
     /**
-     * Připraví e-mail pro odeslání
+     * Pošle e-mail tvůrci objednávky podle aktuálního stavu objednávky
      *
      * @param Order $order
      * @return $this
-     */
-    public function initialize(Order $order): self
-    {
-        $this->order = $order;
-        $senderEmail = $this->parameterBag->get('app_email_noreply');
-        $senderName = $this->parameterBag->get('app_site_name');
-        $recipientEmail = (string) $this->order->getEmail();
-
-        $this->email = new TemplatedEmail();
-        $this->email
-            ->from(new Address($senderEmail, $senderName))
-            ->to(new Address($recipientEmail))
-        ;
-
-        return $this;
-    }
-
-    /**
-     * Pošle e-mail podle aktuálního stavu objednávky
-     *
-     * @return $this
      * @throws TransportExceptionInterface
      */
-    public function send(): self
+    public function send(Order $order): self
     {
+        $this->order = $order;
+        $this->createEmail();
+
         if ($this->order->getLifecycleChapter() < Order::LIFECYCLE_AWAITING_PAYMENT)
         {
             throw new LogicException('App\Service\OrderEmailService nemůže poslat potvrzovací e-mail pro objednávku, která má lifecycleChapter menší než App\Entity\Order::LIFECYCLE_AWAITING_PAYMENT.');
@@ -80,6 +62,22 @@ class OrderEmailService
         $this->mailer->send($this->email);
 
         return $this;
+    }
+
+    /**
+     * Vytvoří minimální podobu e-mailu pro odeslání
+     */
+    private function createEmail(): void
+    {
+        $senderEmail = $this->parameterBag->get('app_email_noreply');
+        $senderName = $this->parameterBag->get('app_site_name');
+        $recipientEmail = (string) $this->order->getEmail();
+
+        $this->email = new TemplatedEmail();
+        $this->email
+            ->from(new Address($senderEmail, $senderName))
+            ->to(new Address($recipientEmail))
+        ;
     }
 
     /**
@@ -116,7 +114,7 @@ class OrderEmailService
     }
 
     /**
-     * Zajistí, aby Twig šablona měla přístup k objednávce
+     * Předá Twig šabloně data potřebná pro vykreslení
      */
     private function addOrderDataToContext(): void
     {

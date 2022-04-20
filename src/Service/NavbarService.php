@@ -37,13 +37,15 @@ class NavbarService
 
     /**
      * Vrátí všechny viditelné produktové sekce. První zavolání selectuje z databáze a ukládá výsledky
-     * do pole $sections. Další zavolání vrátí pole $sections.
+     * do pole $sections. Další zavolání vrátí pole sections. Můžeme vynutit nové načtení z databáze nastavením
+     * parametru forceReload = true.
      *
+     * @param bool $forceReload
      * @return array
      */
-    public function getVisibleSections(): array
+    public function getVisibleSections($forceReload = false): array
     {
-        if (!$this->sectionsLoaded)
+        if (!$this->sectionsLoaded || $forceReload)
         {
             $this->sections = $this->entityManager->getRepository(ProductSection::class)->findAllVisible();
             $this->sectionsLoaded = true;

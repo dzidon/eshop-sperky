@@ -168,8 +168,7 @@ class OrderController extends AbstractController
         if ($form->isSubmitted() && $form->isValid() && !$synchronizerHasWarnings)
         {
             $orderCompletionService
-                ->setOrder($targetOrder)
-                ->finishOrder()
+                ->finishOrder($targetOrder)
                 ->sendConfirmationEmail()
             ;
 

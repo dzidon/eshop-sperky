@@ -21,7 +21,7 @@ class EntityCollectionService
      *
      * @var array
      */
-    private array $collections;
+    private array $collections = [];
 
     private EntityManagerInterface $entityManager;
 
@@ -35,17 +35,14 @@ class EntityCollectionService
      *
      * @param string $name Nějaký název této kolekce, který je uložen v klíči arraye collections
      * @param Collection $collection
-     * @return $this
      */
-    private function loadOldCollection(string $name, Collection $collection): self
+    private function loadOldCollection(string $name, Collection $collection): void
     {
         $this->collections[$name]['old'] = new ArrayCollection();
         foreach ($collection as $item)
         {
             $this->collections[$name]['old']->add($item);
         }
-
-        return $this;
     }
 
     /**
@@ -53,13 +50,10 @@ class EntityCollectionService
      *
      * @param string $name Nějaký název této kolekce, který je uložen v klíči arraye collections
      * @param Collection $collection
-     * @return $this
      */
-    private function loadNewCollection(string $name, Collection $collection): self
+    private function loadNewCollection(string $name, Collection $collection): void
     {
         $this->collections[$name]['new'] = $collection;
-
-        return $this;
     }
 
     /**
@@ -94,11 +88,9 @@ class EntityCollectionService
     }
 
     /**
-     * Smaže entity, které chybí v nových kolekcích
-     *
-     * @return $this
+     * Smaže entity, které chybí v nových kolekcích.
      */
-    public function removeElementsMissingFromNewCollections(): self
+    public function removeElementsMissingFromNewCollections(): void
     {
         foreach ($this->collections as $collectionPair)
         {
@@ -116,6 +108,6 @@ class EntityCollectionService
             }
         }
 
-        return $this;
+        $this->collections = [];
     }
 }

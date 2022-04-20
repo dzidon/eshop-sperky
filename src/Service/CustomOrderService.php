@@ -8,7 +8,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Uid\Uuid;
 
 /**
- * Třída řešící načítání objednávky vytvořené na míru
+ * Třída řešící načítání objednávky podle tokenu vytvořené na míru
  *
  * @package App\Service
  */
@@ -56,9 +56,7 @@ class CustomOrderService
             {
                 $this->order = $order;
 
-                $this->synchronizer
-                    ->setOrder($this->order)
-                    ->synchronize();
+                $this->synchronizer->synchronize($this->order);
                 $this->synchronizer->addWarningsToFlashBag();
 
                 $this->order->calculateTotals();

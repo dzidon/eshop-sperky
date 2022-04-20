@@ -20,6 +20,7 @@ class SortingService
      * Příklad vráceného pole:
      *      ['attribute' => 'email',
      *       'order'     => 'ASC'],
+     * Další příklad:
      *      ['attribute' => 'price',
      *       'order'     => 'DESC'],
      *

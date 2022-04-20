@@ -2,9 +2,9 @@
 
 namespace App\Service;
 
+use DateTime;
 use App\Entity\ProductCategory;
 use App\Entity\ProductSection;
-use DateTime;
 use Doctrine\ORM\QueryBuilder;
 
 /**

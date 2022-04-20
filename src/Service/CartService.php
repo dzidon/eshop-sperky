@@ -111,8 +111,7 @@ class CartService
                 $this->createNewOrder();
             }
 
-            $this->synchronizer->setOrder($this->order);
-            $this->synchronizer->synchronize();
+            $this->synchronizer->synchronize($this->order);
             $this->synchronizer->addWarningsToFlashBag();
 
             $this->order->calculateTotals();
