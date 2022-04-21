@@ -94,7 +94,7 @@ services:
             - '../src/DependencyInjection/'
             - '../src/Entity/'
             - '../src/Pagination/'
-            - '../src/EntityManagement/'
+            - '../src/EntityCollectionManagement/'
             - '../src/Exception/'
             - '../src/Kernel.php'
             - '../src/Tests/'

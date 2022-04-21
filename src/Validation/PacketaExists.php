@@ -7,7 +7,7 @@ use Symfony\Component\Validator\Constraint;
 /**
  * @Annotation
  */
-class PacketaCreation extends Constraint
+class PacketaExists extends Constraint
 {
     public $message = 'Nejdříve pošlete zásilku do systému Zásilkovny.';
 

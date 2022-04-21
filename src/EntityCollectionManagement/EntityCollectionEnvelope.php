@@ -1,6 +1,6 @@
 <?php
 
-namespace App\EntityManagement;
+namespace App\EntityCollectionManagement;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use LogicException;
@@ -8,7 +8,7 @@ use LogicException;
 /**
  * Třída držící elementy kolekce nějaké entity. Jde použít pro orphan removal.
  *
- * @package App\EntityManagement
+ * @package App\EntityCollectionManagement
  */
 class EntityCollectionEnvelope
 {

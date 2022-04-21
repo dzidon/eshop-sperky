@@ -22,7 +22,8 @@
         <div class="navbar-fixed">
             <nav class="white lighten-1" role="navigation">
                 <div class="nav-wrapper container">
-                    <a id="logo-container" href="{{ path('home') }}" class="black-text brand-logo bold">ŠPERKY</a>
+                    <a id="logo-container" href="{{ path('home') }}" class="black-text brand-logo bold">PRYSKY</a>
+
                     <ul class="right hide-on-med-and-down">
                         {% set path_order_cart = path('order_cart') %}
                         {% set is_authenticated_remembered = is_granted('IS_AUTHENTICATED_REMEMBERED') %}
@@ -154,20 +155,20 @@
                 <div class="col s12">
                     <div class="row">
                         <div class="col l6 s12">
-                            <h5 class="white-text">Company Bio</h5>
-                            <p class="grey-text">We are a team of college students working on this project like it's our full time job. Any amount would help support and continue development on this project and is greatly appreciated.</p>
+                            <h5 class="white-text">Nadpis</h5>
+                            <p class="grey-text">Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Mauris metus. Nunc tincidunt ante vitae massa. In enim a arcu imperdiet malesuada. Curabitur vitae diam non enim vestibulum interdum. Nunc dapibus tortor vel mi dapibus sollicitudin.</p>
                         </div>
                         <div class="col l3 s12">
-                            <h5 class="white-text">Settings</h5>
+                            <h5 class="white-text">Nadpis</h5>
                             <ul>
-                                <li><a class="grey-text" href="#">Link 1</a></li>
-                                <li><a class="grey-text" href="#">Link 2</a></li>
-                                <li><a class="grey-text" href="#">Link 3</a></li>
-                                <li><a class="grey-text" href="#">Link 4</a></li>
+                                <li><a class="grey-text" href="{{ path('home') }}">Domů</a></li>
+                                <li><a class="grey-text" href="{{ path('products') }}">Produkty</a></li>
+                                <li><a class="grey-text" href="{{ path('order_custom') }}">Objednávka na míru</a></li>
+                                <li><a class="grey-text" href="{{ path('contact') }}">Kontakt</a></li>
                             </ul>
                         </div>
                         <div class="col l3 s12">
-                            <h5 class="white-text">Connect</h5>
+                            <h5 class="white-text">Nadpis</h5>
                             <ul>
                                 <li><a class="grey-text" href="#">Link 1</a></li>
                                 <li><a class="grey-text" href="#">Link 2</a></li>

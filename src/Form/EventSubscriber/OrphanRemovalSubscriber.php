@@ -2,7 +2,7 @@
 
 namespace App\Form\EventSubscriber;
 
-use App\EntityManagement\EntityCollectionEnvelope;
+use App\EntityCollectionManagement\EntityCollectionEnvelope;
 use App\Service\EntityCollectionService;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvent;

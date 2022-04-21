@@ -4,14 +4,13 @@ namespace App\Validation;
 
 use App\Entity\DeliveryMethod;
 use App\Entity\Order;
-use App\Exception\PacketaException;
 use App\Service\PacketaApiService;
 use LogicException;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Constraint;
 
-class PacketaCreationValidator extends ConstraintValidator
+class PacketaExistsValidator extends ConstraintValidator
 {
     private PacketaApiService $packetaApiService;
 
@@ -26,14 +25,14 @@ class PacketaCreationValidator extends ConstraintValidator
      */
     public function validate($order, Constraint $constraint)
     {
-        if (!$constraint instanceof PacketaCreation)
+        if (!$constraint instanceof PacketaExists)
         {
-            throw new UnexpectedTypeException($constraint, PacketaCreation::class);
+            throw new UnexpectedTypeException($constraint, PacketaExists::class);
         }
 
         if (!$order instanceof Order)
         {
-            throw new LogicException('PacketaCreationValidator jde použít jen na objektech třídy App\Entity\Order.');
+            throw new LogicException('PacketaExistsValidator jde použít jen na objektech třídy App\Entity\Order.');
         }
 
         if ($order->getDeliveryMethod() === null || $order->getDeliveryMethod()->getType() !== DeliveryMethod::TYPE_PACKETA_CZ)
@@ -41,20 +40,13 @@ class PacketaCreationValidator extends ConstraintValidator
             return;
         }
 
-        if ($order->getLifecycleChapter() === Order::LIFECYCLE_SHIPPED)
+        if ($order->getLifecycleChapter() === Order::LIFECYCLE_SHIPPED && !$this->packetaApiService->packetExists($order))
         {
-            try
-            {
-                $this->packetaApiService->packetStatus($order);
-            }
-            catch (PacketaException $exception)
-            {
-                $this->context
-                    ->buildViolation($constraint->message)
-                    ->atPath('lifecycleChapter')
-                    ->addViolation()
-                ;
-            }
+            $this->context
+                ->buildViolation($constraint->message)
+                ->atPath('lifecycleChapter')
+                ->addViolation()
+            ;
         }
     }
 }

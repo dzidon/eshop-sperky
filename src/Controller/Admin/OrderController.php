@@ -2,14 +2,18 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\DeliveryMethod;
 use App\Entity\Order;
+use App\Exception\PacketaException;
 use App\Form\CustomOrderFormType;
 use App\Form\HiddenTrueFormType;
 use App\Form\OrderCancelFormType;
 use App\Form\OrderEditFormType;
+use App\Form\OrderPacketaFormType;
 use App\Form\OrderSearchFormType;
 use App\Service\BreadcrumbsService;
 use App\Service\OrderCompletionService;
+use App\Service\PacketaApiService;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -171,7 +175,7 @@ class OrderController extends AbstractController
      *
      * @IsGranted("order_edit")
      */
-    public function order(int $id = null): Response
+    public function order(PacketaApiService $packetaApiService, int $id = null): Response
     {
         $user = $this->getUser();
 
@@ -184,16 +188,18 @@ class OrderController extends AbstractController
 
         $order->calculateTotals();
 
-        /*
-         * Formulář pro změnu stavu
-         */
         $formLifecycleChapterView = null;
+        $formPacketaView = null;
+        $packetaMessage = null;
         if (!$order->isCancelled())
         {
+            /*
+             * Formulář pro změnu stavu
+             */
             $formLifecycleChapter = $this->createForm(OrderEditFormType::class, $order);
             $formLifecycleChapter->add('submit', SubmitType::class, [
                 'label' => 'Nastavit',
-                'attr' => ['class' => 'btn-large blue left'],
+                'attr' => ['class' => 'btn-medium blue left'],
             ]);
             $formLifecycleChapter->handleRequest($this->request);
             $formLifecycleChapterView = $formLifecycleChapter->createView();
@@ -209,6 +215,45 @@ class OrderController extends AbstractController
 
                 return $this->redirectToRoute('admin_order_overview', ['id' => $order->getId()]);
             }
+
+            /*
+             * Formulář pro odeslání do Zásilkovny
+             */
+            if ($order->getLifecycleChapter() > Order::LIFECYCLE_AWAITING_PAYMENT && $order->getDeliveryMethod() !== null && $order->getDeliveryMethod()->getType() === DeliveryMethod::TYPE_PACKETA_CZ)
+            {
+                if ($packetaApiService->packetExists($order))
+                {
+                    $packetaMessage = 'Zásilka je připravena v systému Zásilkovny.';
+                }
+                else
+                {
+                    $formPacketa = $this->createForm(OrderPacketaFormType::class, $order);
+                    $formPacketa->add('submit', SubmitType::class, [
+                        'label' => 'Vytvořit',
+                        'attr' => ['class' => 'btn-medium blue left'],
+                    ]);
+                    $formPacketa->handleRequest($this->request);
+                    $formPacketaView = $formPacketa->createView();
+
+                    if ($formPacketa->isSubmitted() && $formPacketa->isValid())
+                    {
+                        try
+                        {
+                            $packetaApiService->createPacket($order);
+                            $this->addFlash('success', 'Zásilka vytvořena!');
+                        }
+                        catch (PacketaException $exception)
+                        {
+                            foreach ($exception->getErrors() as $error)
+                            {
+                                $this->addFlash('failure', $error);
+                            }
+                        }
+
+                        return $this->redirectToRoute('admin_order_overview', ['id' => $order->getId()]);
+                    }
+                }
+            }
         }
 
         $this->breadcrumbs->addRoute('order_overview');
@@ -216,6 +261,8 @@ class OrderController extends AbstractController
         return $this->render('admin/orders/admin_order_overview.html.twig', [
             'order' => $order,
             'formLifecycleChapter' => $formLifecycleChapterView,
+            'formPacketa' => $formPacketaView,
+            'packetaMessage' => $packetaMessage,
         ]);
     }
 

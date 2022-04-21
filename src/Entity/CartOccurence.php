@@ -52,6 +52,7 @@ class CartOccurence
      * @ORM\Column(type="float")
      *
      * @Assert\Type("numeric", groups={"onDemandCreation"}, message="Musíte zadat číselnou hodnotu.")
+     * @Assert\GreaterThanOrEqual(value=0, groups={"onDemandCreation"})
      * @Assert\NotBlank(groups={"onDemandCreation"})
      */
     private $priceWithoutVat;

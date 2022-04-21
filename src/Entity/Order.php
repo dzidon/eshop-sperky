@@ -21,7 +21,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\HasLifecycleCallbacks()
  *
  * @AssertCustom\PacketaId(groups={"methods"})
- * @AssertCustom\PacketaCreation(groups={"admin_state"})
+ * @AssertCustom\PacketaExists(groups={"admin_state"})
  */
 class Order
 {
@@ -349,6 +349,12 @@ class Order
     private $updated;
 
     private $cartOccurencesWithProduct;
+
+    /**
+     * @Assert\Type("numeric", groups={"admin_packeta"}, message="Musíte zadat číselnou hodnotu.")
+     * @Assert\GreaterThan(value=0, groups={"admin_packeta"})
+     * @Assert\NotBlank(groups={"admin_packeta"})
+     */
     private $weight;
 
     private bool $companyChecked = false;

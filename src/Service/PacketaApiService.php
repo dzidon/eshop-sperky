@@ -19,19 +19,39 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 class PacketaApiService
 {
     private Order $order;
+    private ?SoapClient $client = null;
     private string $secret;
     private string $eshopName;
-    private SoapClient $client;
 
     private PhoneNumberUtil $phoneNumberUtil;
+    private ParameterBagInterface $parameterBag;
 
     public function __construct(PhoneNumberUtil $phoneNumberUtil, ParameterBagInterface $parameterBag)
     {
         $this->phoneNumberUtil = $phoneNumberUtil;
+        $this->parameterBag = $parameterBag;
 
-        $this->eshopName = (string) $parameterBag->get('app_site_name');
-        $this->secret = (string) $parameterBag->get('app_packeta_secret');
-        $this->client = new SoapClient($parameterBag->get('app_packeta_api_url'));
+        $this->eshopName = (string) $this->parameterBag->get('app_site_name');
+        $this->secret = (string) $this->parameterBag->get('app_packeta_secret');
+    }
+
+    /**
+     * Vrátí true, pokud v systému Zásilkovny existuje zásilka pro danou objednávku.
+     *
+     * @param Order $order
+     * @return bool
+     */
+    public function packetExists(Order $order): bool
+    {
+        try
+        {
+            $this->packetStatus($order);
+            return true;
+        }
+        catch (PacketaException $exception)
+        {
+            return false;
+        }
     }
 
     /**
@@ -43,19 +63,16 @@ class PacketaApiService
      */
     public function packetStatus(Order $order): ?object
     {
-        $this->setOrder($order);
-        $data = null;
+        $this->initialize($order);
 
         try
         {
-            $data = $this->client->packetStatus($this->secret, (string) $this->order->getId());
+            return $this->client->packetStatus($this->secret, (string) $this->order->getId());
         }
         catch (SoapFault $exception)
         {
             throw new PacketaException([$exception->getMessage()]);
         }
-
-        return $data;
     }
 
     /**
@@ -67,25 +84,23 @@ class PacketaApiService
      */
     public function createPacket(Order $order): ?object
     {
-        $this->setOrder($order);
-        $data = null;
+        $this->initialize($order);
 
         try
         {
-            $data = $this->client->createPacket($this->secret, $this->getPacketAttributes());
+            return $this->client->createPacket($this->secret, $this->getPacketAttributes());
         }
         catch (SoapFault $exception)
         {
             throw new PacketaException( $this->getPacketAttributesFaults($exception->detail->PacketAttributesFault) );
         }
-
-        return $data;
     }
 
     /**
      * @param Order $order
+     * @throws PacketaException
      */
-    private function setOrder(Order $order): void
+    private function initialize(Order $order): void
     {
         $this->order = $order;
 
@@ -93,6 +108,30 @@ class PacketaApiService
         if ($this->order->getId() === null)
         {
             throw new LogicException(sprintf('Služba App\Service\PacketaApiService dostala do metody initialize objednávku s null ID.'));
+        }
+
+        if ($this->client === null)
+        {
+            $this->connect();
+        }
+    }
+
+    /**
+     * Vytvoří SoapClient
+     *
+     * @throws PacketaException
+     */
+    private function connect(): void
+    {
+        try
+        {
+            $this->client = new SoapClient($this->parameterBag->get('app_packeta_api_url'), [
+                'cache_wsdl'   => WSDL_CACHE_MEMORY
+            ]);
+        }
+        catch (SoapFault $exception)
+        {
+            throw new PacketaException(['Nepodařilo se připojit do systému Zásilkovny, zkuste to prosím znovu.']);
         }
     }
 

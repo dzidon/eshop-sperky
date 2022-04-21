@@ -2,7 +2,7 @@
 
 namespace App\Service;
 
-use App\EntityManagement\EntityCollectionEnvelope;
+use App\EntityCollectionManagement\EntityCollectionEnvelope;
 use Doctrine\ORM\EntityManagerInterface;
 
 /**

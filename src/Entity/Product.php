@@ -64,6 +64,7 @@ class Product
      * @ORM\Column(type="float")
      *
      * @Assert\Type("numeric", message="Musíte zadat číselnou hodnotu.")
+     * @Assert\GreaterThanOrEqual(value=0)
      * @Assert\NotBlank
      */
     private $priceWithoutVat;

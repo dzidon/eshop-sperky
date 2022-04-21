@@ -7,7 +7,7 @@ use App\Entity\ProductSection;
 use Doctrine\ORM\QueryBuilder;
 
 /**
- * Třída řešící produktový filtr
+ * Třída řešící filtrování produktů pro produktový katalog
  *
  * @package App\Service
  */

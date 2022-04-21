@@ -7,7 +7,7 @@ use DateTime;
 use App\Entity\ProductCategory;
 
 /**
- * Třída řešící produktový filtr
+ * Třída řešící kategorie v produktovém filtru
  *
  * @package App\Service
  */

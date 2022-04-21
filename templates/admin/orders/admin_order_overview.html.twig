@@ -2,6 +2,38 @@
 
 {% block admin_content %}
 
+    <div>
+        <span>Vytvořeno: {{ order.created|date('d. m. Y H:i:s') }}</span>
+    </div>
+
+    {% if order.created != order.updated and order.updated is not null %}
+        <div>
+            <span>Upraveno: {{ order.updated|date('d. m. Y H:i:s') }}</span>
+        </div>
+    {% endif %}
+
+    {% if formPacketa is not null or packetaMessage is not null %}
+        <div class="row">
+            <h4>Zásilkovna</h4>
+
+            <div class="card white black-text">
+                <div class="card-content">
+                    {% if formPacketa is not null %}
+                        <div>
+                            <span>Vytvořte zásilku v systému Zásilkovny:</span>
+                        </div>
+
+                        <div class="section no-pad-bot">
+                            {{ form(formPacketa) }}
+                        </div>
+                    {% else %}
+                        <span>{{ packetaMessage }}</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
     {% if formLifecycleChapter is not null %}
         <div class="row">
             <h4>Nastavení stavu</h4>
