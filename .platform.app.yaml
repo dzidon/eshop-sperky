@@ -1,4 +1,4 @@
-name: app
+name: Prysky
 
 type: php:7.4
 
@@ -9,6 +9,7 @@ runtime:
         - sodium
         - ctype
         - iconv
+        - soap
         
 
 variables:
@@ -17,7 +18,10 @@ variables:
         opcache.preload: /app/config/preload.php
 
 build:
-    flavor: none
+    flavor: composer
+
+relationships:
+    mysql_database: 'database:mysql'
 
 disk: 512
 
