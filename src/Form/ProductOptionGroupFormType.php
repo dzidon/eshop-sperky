@@ -4,6 +4,7 @@ namespace App\Form;
 
 use App\Entity\ProductOption;
 use App\Entity\ProductOptionGroup;
+use App\Form\EventSubscriber\OrphanRemovalSubscriber;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
@@ -15,10 +16,16 @@ use Symfony\Component\Security\Core\Security;
 class ProductOptionGroupFormType extends AbstractType
 {
     private Security $security;
+    private OrphanRemovalSubscriber $orphanRemovalSubscriber;
 
-    public function __construct(Security $security)
+    public function __construct(Security $security, OrphanRemovalSubscriber $orphanRemovalSubscriber)
     {
         $this->security = $security;
+        $this->orphanRemovalSubscriber = $orphanRemovalSubscriber;
+
+        $this->orphanRemovalSubscriber->setCollectionGetters([
+            ['getterForCollection' => 'getOptions', 'getterForParent' => 'getProductOptionGroup']
+        ]);
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -35,7 +42,7 @@ class ProductOptionGroupFormType extends AbstractType
                 'error_bubbling' => false,
                 'allow_add' => true,
                 'allow_delete' => $this->security->isGranted('product_option_delete'),
-                'label' => 'Kategorie',
+                'label' => 'Volby',
                 'delete_empty' => function (ProductOption $option = null) {
                     return $option === null || $option->getName() === null;
                 },
@@ -50,6 +57,7 @@ class ProductOptionGroupFormType extends AbstractType
                 ],
                 'label' => 'Přidat volbu',
             ])
+            ->addEventSubscriber($this->orphanRemovalSubscriber)
         ;
     }
 

@@ -41,7 +41,7 @@ class ProductCategoryGroup
     private $name;
 
     /**
-     * @ORM\OneToMany(targetEntity=ProductCategory::class, mappedBy="productCategoryGroup", orphanRemoval=true, cascade={"persist"})
+     * @ORM\OneToMany(targetEntity=ProductCategory::class, mappedBy="productCategoryGroup", cascade={"persist"})
      *
      * @Assert\Valid
      */

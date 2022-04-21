@@ -33,7 +33,7 @@ class ProductOptionGroup
     private $name;
 
     /**
-     * @ORM\OneToMany(targetEntity=ProductOption::class, mappedBy="productOptionGroup", orphanRemoval=true, cascade={"persist"})
+     * @ORM\OneToMany(targetEntity=ProductOption::class, mappedBy="productOptionGroup", cascade={"persist"})
      *
      * @Assert\Count(min = 1, minMessage = "Musíte přidat alespoň jednu produktovou volbu.")
      * @Assert\Valid

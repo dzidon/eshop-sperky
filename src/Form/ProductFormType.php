@@ -8,7 +8,7 @@ use App\Entity\ProductImage;
 use App\Entity\ProductInformation;
 use App\Entity\ProductOptionGroup;
 use App\Entity\ProductSection;
-use App\Form\EventSubscriber\EntityCollectionRemovalSubscriber;
+use App\Form\EventSubscriber\OrphanRemovalSubscriber;
 use App\Form\EventSubscriber\ProductCategorySubscriber;
 use App\Form\EventSubscriber\ProductInformationSubscriber;
 use App\Form\EventSubscriber\SlugSubscriber;
@@ -32,21 +32,22 @@ class ProductFormType extends AbstractType
     private ProductInformationSubscriber $productInformationSubscriber;
     private ProductCategorySubscriber $productCategorySubscriber;
     private SlugSubscriber $slugSubscriber;
-    private EntityCollectionRemovalSubscriber $collectionRemovalSubscriber;
+    private OrphanRemovalSubscriber $orphanRemovalSubscriber;
 
-    public function __construct(ProductInformationSubscriber $productInformationSubscriber, ProductCategorySubscriber $productCategorySubscriber, SlugSubscriber $slugSubscriber, EntityCollectionRemovalSubscriber $collectionRemovalSubscriber)
+    public function __construct(ProductInformationSubscriber $productInformationSubscriber, ProductCategorySubscriber $productCategorySubscriber, SlugSubscriber $slugSubscriber, OrphanRemovalSubscriber $orphanRemovalSubscriber)
     {
         $this->productInformationSubscriber = $productInformationSubscriber;
         $this->productCategorySubscriber = $productCategorySubscriber;
 
         $this->slugSubscriber = $slugSubscriber;
-        $this->slugSubscriber
-            ->setGettersForAutoGenerate(['getName'])
+        $this->slugSubscriber->setGettersForAutoGenerate(['getName'])
             ->setExtraDataForAutoGenerate([date("HisdmY")]);
 
-        $this->collectionRemovalSubscriber = $collectionRemovalSubscriber;
-        $this->collectionRemovalSubscriber
-            ->addCollectionGetter('getInfo');
+        $this->orphanRemovalSubscriber = $orphanRemovalSubscriber;
+        $this->orphanRemovalSubscriber->setCollectionGetters([
+            ['getterForCollection' => 'getInfo', 'getterForParent' => 'getProduct'],
+            ['getterForCollection' => 'getImages', 'getterForParent' => 'getProduct']
+        ]);
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -185,7 +186,7 @@ class ProductFormType extends AbstractType
             ->addEventSubscriber($this->slugSubscriber)
             ->addEventSubscriber($this->productInformationSubscriber)
             ->addEventSubscriber($this->productCategorySubscriber)
-            ->addEventSubscriber($this->collectionRemovalSubscriber)
+            ->addEventSubscriber($this->orphanRemovalSubscriber)
         ;
     }
 

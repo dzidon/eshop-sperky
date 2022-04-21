@@ -5,7 +5,11 @@
     {# Časy vytvoření a aktualizace #}
     {{ include('fragments/_instance_created_updated.html.twig', {instance: productOptionGroupInstance}) }}
 
-    {{ form(productOptionGroupForm) }}
+    {{ form_start(productOptionGroupForm) }}
+        {{ form_row(productOptionGroupForm.name) }}
+        {{ form_row(productOptionGroupForm.options, { 'attr': {'data-index': productOptionGroupForm.options|length > 0 ? productOptionGroupForm.options|last.vars.name + 1 : 0} }) }}
+        {{ form_rest(productOptionGroupForm) }}
+    {{ form_end(productOptionGroupForm) }}
 
     {% if productOptionGroupInstance.getId() is not null and is_granted('product_option_delete') %}
         <div class="row center-align">

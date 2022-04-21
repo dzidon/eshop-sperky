@@ -4,6 +4,7 @@ namespace App\Form;
 
 use App\Entity\ProductCategory;
 use App\Entity\ProductCategoryGroup;
+use App\Form\EventSubscriber\OrphanRemovalSubscriber;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
@@ -15,10 +16,16 @@ use Symfony\Component\Security\Core\Security;
 class ProductCategoryGroupFormType extends AbstractType
 {
     private Security $security;
+    private OrphanRemovalSubscriber $orphanRemovalSubscriber;
 
-    public function __construct(Security $security)
+    public function __construct(Security $security, OrphanRemovalSubscriber $orphanRemovalSubscriber)
     {
         $this->security = $security;
+        $this->orphanRemovalSubscriber = $orphanRemovalSubscriber;
+
+        $this->orphanRemovalSubscriber->setCollectionGetters([
+            ['getterForCollection' => 'getCategories', 'getterForParent' => 'getProductCategoryGroup']
+        ]);
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -50,6 +57,7 @@ class ProductCategoryGroupFormType extends AbstractType
                 ],
                 'label' => 'Přidat kategorii',
             ])
+            ->addEventSubscriber($this->orphanRemovalSubscriber)
         ;
     }
 

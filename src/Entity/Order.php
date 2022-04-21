@@ -66,7 +66,7 @@ class Order
     private $expireAt;
 
     /**
-     * @ORM\OneToMany(targetEntity=CartOccurence::class, mappedBy="order_", orphanRemoval=true, cascade={"persist"})
+     * @ORM\OneToMany(targetEntity=CartOccurence::class, mappedBy="order_", cascade={"persist"})
      *
      * @AssertCustom\CartOccurenceQuantity(groups={"cart"})
      * @Assert\Valid(groups={"cart", "onDemandCreation"})
