@@ -118,8 +118,11 @@ class CartService
             $this->totalQuantityForNavbar = $this->order->getTotalQuantity();
             $this->obtainNewOrderCookie();
 
-            $this->entityManager->persist($this->order);
-            $this->entityManager->flush();
+            if ($this->isOrderNew || $this->synchronizer->hasWarnings())
+            {
+                $this->entityManager->persist($this->order);
+                $this->entityManager->flush();
+            }
         }
         else
         {

@@ -7,7 +7,6 @@ use App\Form\HiddenTrueFormType;
 use App\Form\ProductFormType;
 use App\Form\SearchTextAndSortFormType;
 use App\Service\BreadcrumbsService;
-use App\Service\PaginatorService;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -46,7 +45,7 @@ class ProductController extends AbstractController
      *
      * @IsGranted("admin_products")
      */
-    public function products(FormFactoryInterface $formFactory, PaginatorService $paginatorService): Response
+    public function products(FormFactoryInterface $formFactory): Response
     {
         $form = $formFactory->createNamed('', SearchTextAndSortFormType::class, null, ['sort_choices' => Product::getSortDataForAdmin()]);
         //button je přidáván v šabloně, aby se nezobrazoval v odkazu
@@ -54,26 +53,22 @@ class ProductController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid())
         {
-            $queryForPagination = $this->getDoctrine()->getRepository(Product::class)->getQueryForSearchAndPagination($inAdmin = true, null, $form->get('searchPhrase')->getData(), $form->get('sortBy')->getData());
+            $pagination = $this->getDoctrine()->getRepository(Product::class)->getSearchPagination($inAdmin = true, $section = null, $form->get('searchPhrase')->getData(), $form->get('sortBy')->getData());
         }
         else
         {
-            $queryForPagination = $this->getDoctrine()->getRepository(Product::class)->getQueryForSearchAndPagination($inAdmin = true);
+            $pagination = $this->getDoctrine()->getRepository(Product::class)->getSearchPagination($inAdmin = true);
         }
 
-        $products = $paginatorService
-            ->initialize($queryForPagination, 1)
-            ->getCurrentPageObjects();
-
-        if($paginatorService->isCurrentPageOutOfBounds())
+        if($pagination->isCurrentPageOutOfBounds())
         {
             throw new NotFoundHttpException('Na této stránce nebyly nalezeny žádné produkty.');
         }
 
         return $this->render('admin/products/admin_product_management.html.twig', [
             'searchForm' => $form->createView(),
-            'products' => $products,
-            'pagination' => $paginatorService->createViewData(),
+            'products' => $pagination->getCurrentPageObjects(),
+            'pagination' => $pagination->createView(),
         ]);
     }
 

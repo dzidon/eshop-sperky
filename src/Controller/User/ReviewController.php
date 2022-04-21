@@ -3,11 +3,11 @@
 namespace App\Controller\User;
 
 use App\Entity\Review;
+use App\Entity\User;
 use App\Form\HiddenTrueFormType;
 use App\Form\ReviewFormType;
 use App\Form\SearchTextAndSortFormType;
 use App\Service\BreadcrumbsService;
-use App\Service\PaginatorService;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -40,7 +40,7 @@ class ReviewController extends AbstractController
     /**
      * @Route("/vsechny", name="reviews")
      */
-    public function reviews(FormFactoryInterface $formFactory, PaginatorService $paginatorService): Response
+    public function reviews(FormFactoryInterface $formFactory): Response
     {
         $form = $formFactory->createNamed('', SearchTextAndSortFormType::class, null, ['sort_choices' => Review::getSortData()]);
         //button je přidáván v šabloně, aby se nezobrazoval v odkazu
@@ -48,26 +48,22 @@ class ReviewController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid())
         {
-            $queryForPagination = $this->getDoctrine()->getRepository(Review::class)->getQueryForSearchAndPagination($form->get('searchPhrase')->getData(), $form->get('sortBy')->getData());
+            $pagination = $this->getDoctrine()->getRepository(Review::class)->getSearchPagination($form->get('searchPhrase')->getData(), $form->get('sortBy')->getData());
         }
         else
         {
-            $queryForPagination = $this->getDoctrine()->getRepository(Review::class)->getQueryForSearchAndPagination();
+            $pagination = $this->getDoctrine()->getRepository(Review::class)->getSearchPagination();
         }
 
-        $reviews = $paginatorService
-            ->initialize($queryForPagination, 8)
-            ->getCurrentPageObjects();
-
-        if($paginatorService->isCurrentPageOutOfBounds())
+        if($pagination->isCurrentPageOutOfBounds())
         {
             throw new NotFoundHttpException('Na této stránce nebyly nalezeny žádné recenze.');
         }
 
         return $this->render('reviews/reviews_overview.html.twig', [
             'searchForm' => $form->createView(),
-            'reviews' => $reviews,
-            'pagination' => $paginatorService->createViewData(),
+            'reviews' => $pagination->getCurrentPageObjects(),
+            'pagination' => $pagination->createView(),
         ]);
     }
 
@@ -78,6 +74,7 @@ class ReviewController extends AbstractController
      */
     public function reviewEdit($id = null): Response
     {
+        /** @var User $user */
         $user = $this->getUser();
 
         if($id !== null) //zadal id do url

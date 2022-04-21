@@ -10,7 +10,6 @@ use App\Form\OrderEditFormType;
 use App\Form\OrderSearchFormType;
 use App\Service\BreadcrumbsService;
 use App\Service\OrderCompletionService;
-use App\Service\PaginatorService;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -50,7 +49,7 @@ class OrderController extends AbstractController
      *
      * @IsGranted("admin_orders")
      */
-    public function orders(FormFactoryInterface $formFactory, PaginatorService $paginatorService): Response
+    public function orders(FormFactoryInterface $formFactory): Response
     {
         $form = $formFactory->createNamed('', OrderSearchFormType::class, null, ['sort_choices' => Order::getSortData()]);
         // button je přidáván v šabloně, aby se nezobrazoval v odkazu
@@ -58,26 +57,22 @@ class OrderController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid())
         {
-            $queryForPagination = $this->getDoctrine()->getRepository(Order::class)->getQueryForAdminSearchAndPagination($form->get('searchPhrase')->getData(), $form->get('sortBy')->getData(), $form->get('lifecycle')->getData());
+            $pagination = $this->getDoctrine()->getRepository(Order::class)->getAdminSearchPagination($form->get('searchPhrase')->getData(), $form->get('sortBy')->getData(), $form->get('lifecycle')->getData());
         }
         else
         {
-            $queryForPagination = $this->getDoctrine()->getRepository(Order::class)->getQueryForAdminSearchAndPagination();
+            $pagination = $this->getDoctrine()->getRepository(Order::class)->getAdminSearchPagination();
         }
 
-        $orders = $paginatorService
-            ->initialize($queryForPagination, 20)
-            ->getCurrentPageObjects();
-
-        if($paginatorService->isCurrentPageOutOfBounds())
+        if($pagination->isCurrentPageOutOfBounds())
         {
             throw new NotFoundHttpException('Na této stránce nebyly nalezeny žádné objednávky.');
         }
 
         return $this->render('admin/orders/admin_orders.html.twig', [
             'searchForm' => $form->createView(),
-            'orders' => $orders,
-            'pagination' => $paginatorService->createViewData(),
+            'orders' => $pagination->getCurrentPageObjects(),
+            'pagination' => $pagination->createView(),
         ]);
     }
 
@@ -249,10 +244,7 @@ class OrderController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid())
         {
-            $orderCompletionService
-                ->cancelOrder($order, $forceInventoryReplenish = false)
-                ->sendConfirmationEmail()
-            ;
+            $orderCompletionService->cancelOrder($order, $forceInventoryReplenish = false);
 
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($order);

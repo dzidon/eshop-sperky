@@ -93,6 +93,8 @@ services:
         exclude:
             - '../src/DependencyInjection/'
             - '../src/Entity/'
+            - '../src/Pagination/'
+            - '../src/Exception/'
             - '../src/Kernel.php'
             - '../src/Tests/'
 

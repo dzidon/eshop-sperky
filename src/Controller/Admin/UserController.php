@@ -8,7 +8,6 @@ use App\Form\HiddenTrueFormType;
 use App\Form\PersonalInfoFormType;
 use App\Form\SearchTextAndSortFormType;
 use App\Service\BreadcrumbsService;
-use App\Service\PaginatorService;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -48,7 +47,7 @@ class UserController extends AbstractController
      *
      * @IsGranted("admin_user_management")
      */
-    public function users(FormFactoryInterface $formFactory, PaginatorService $paginatorService): Response
+    public function users(FormFactoryInterface $formFactory): Response
     {
         $form = $formFactory->createNamed('', SearchTextAndSortFormType::class, null, ['sort_choices' => User::getSortData()]);
         //button je přidáván v šabloně, aby se nezobrazoval v odkazu
@@ -56,18 +55,14 @@ class UserController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid())
         {
-            $queryForPagination = $this->getDoctrine()->getRepository(User::class)->getQueryForSearchAndPagination($form->get('searchPhrase')->getData(), $form->get('sortBy')->getData());
+            $pagination = $this->getDoctrine()->getRepository(User::class)->getSearchPagination($form->get('searchPhrase')->getData(), $form->get('sortBy')->getData());
         }
         else
         {
-            $queryForPagination = $this->getDoctrine()->getRepository(User::class)->getQueryForSearchAndPagination();
+            $pagination = $this->getDoctrine()->getRepository(User::class)->getSearchPagination();
         }
 
-        $users = $paginatorService
-            ->initialize($queryForPagination, 1)
-            ->getCurrentPageObjects();
-
-        if($paginatorService->isCurrentPageOutOfBounds())
+        if($pagination->isCurrentPageOutOfBounds())
         {
             throw new NotFoundHttpException('Na této stránce nebyli nalezeni žádní uživatelé.');
         }
@@ -75,9 +70,9 @@ class UserController extends AbstractController
         return $this->render('admin/users/admin_user_management.html.twig', [
             'searchForm' => $form->createView(),
             'userAdmin' => $this->getUser(),
-            'users' => $users,
             'userAdminCanEditThemself' => $this->getParameter('kernel.environment') === 'dev',
-            'pagination' => $paginatorService->createViewData(),
+            'users' => $pagination->getCurrentPageObjects(),
+            'pagination' => $pagination->createView(),
         ]);
     }
 

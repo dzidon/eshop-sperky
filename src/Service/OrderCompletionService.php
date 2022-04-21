@@ -11,7 +11,7 @@ use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Security;
 
 /**
- * Třída manipulující s dokončenou objednávkou
+ * Třída manipulující s dokončenou objednávkou.
  *
  * @package App\Service
  */
@@ -33,12 +33,12 @@ class OrderCompletionService
     }
 
     /**
-     * Nastaví objednávku do dokončeného stavu
+     * Dokončí objednávku a vrátí odpověď pro přesměrování.
      *
      * @param Order $order
-     * @return $this
+     * @return RedirectResponse
      */
-    public function finishOrder(Order $order): self
+    public function finishOrder(Order $order): RedirectResponse
     {
         $this->order = $order;
 
@@ -46,11 +46,13 @@ class OrderCompletionService
         $user = $this->security->getUser();
         $this->order->finish($user);
 
-        return $this;
+        $this->sendConfirmationEmail();
+
+        return $this->getRedirectResponse();
     }
 
     /**
-     * Nastaví objednávku do zrušeného stavu
+     * Nastaví objednávku do zrušeného stavu.
      *
      * @param Order $order
      * @param bool $forceInventoryReplenish
@@ -61,15 +63,17 @@ class OrderCompletionService
         $this->order = $order;
         $this->order->cancel($forceInventoryReplenish);
 
+        $this->sendConfirmationEmail();
+
         return $this;
     }
 
     /**
-     * Pošle potvrzovací e-mail o změně stavu objednávky
+     * Pošle potvrzovací e-mail o změně stavu objednávky.
      *
      * @return $this
      */
-    public function sendConfirmationEmail(): self
+    private function sendConfirmationEmail(): self
     {
         try
         {
@@ -84,11 +88,11 @@ class OrderCompletionService
     }
 
     /**
-     * Vytvoří odpověď pro přesměrování po dokončení objednávky
+     * Vytvoří odpověď pro přesměrování po dokončení objednávky.
      *
      * @return RedirectResponse
      */
-    public function getRedirectResponse(): RedirectResponse
+    private function getRedirectResponse(): RedirectResponse
     {
         $url = $this->router->generate('home');
 

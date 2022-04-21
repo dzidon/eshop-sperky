@@ -1,7 +1,7 @@
-{% if pagination.getCurrentPageObjects()|length > 0 %}
+{% if pagination.currentPageObjects|length > 0 %}
     <div class="row center-align">
         <ul class="pagination">
-            {% for pageData in pagination.getViewData() %}
+            {% for pageData in pagination.viewData %}
                 {% if pageData.isDivider %}
                     <li>
                         ...
@@ -9,8 +9,8 @@
                 {% else %}
                     <li class="{% if pageData.isCurrent %} active {% else %} waves-effect {% endif %}">
                         <a href="{{ path(app.request.get('_route'), pageData.queryParameters) }}">
-                            {% set page = constant('QUERY_PARAMETER_PAGE_NAME', pagination) %}
-                            {{ pageData.queryParameters[page] }}
+                            {% set pageParameterName = pagination.pageParameterName %}
+                            {{ pageData.queryParameters[pageParameterName] }}
                         </a>
                     </li>
                 {% endif %}

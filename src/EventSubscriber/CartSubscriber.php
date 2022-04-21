@@ -12,7 +12,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
 /**
  * Subscriber řešící:
  *  - načtení aktivní objednávky před každou controllerovou akcí a její případnou synchronizaci na některých cestách
- *  - nastavení tokenu aktivní objednávky do cookie po vrácení odpovědi
+ *  - nastavení tokenu nové aktivní objednávky do cookie po vrácení odpovědi
  *
  * @package App\EventSubscriber
  */

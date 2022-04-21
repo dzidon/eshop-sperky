@@ -3,10 +3,11 @@
 namespace App\Repository;
 
 use App\Entity\ProductInformationGroup;
+use App\Pagination\Pagination;
 use App\Service\SortingService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\ORM\Query;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * @method ProductInformationGroup|null find($id, $lockMode = null, $lockVersion = null)
@@ -17,19 +18,21 @@ use Doctrine\Persistence\ManagerRegistry;
 class ProductInformationGroupRepository extends ServiceEntityRepository
 {
     private SortingService $sorting;
+    private $request;
 
-    public function __construct(ManagerRegistry $registry, SortingService $sorting)
+    public function __construct(ManagerRegistry $registry, SortingService $sorting, RequestStack $requestStack)
     {
         parent::__construct($registry, ProductInformationGroup::class);
 
         $this->sorting = $sorting;
+        $this->request = $requestStack->getCurrentRequest();
     }
 
-    public function getQueryForSearchAndPagination($searchPhrase = null, string $sortAttribute = null): Query
+    public function getSearchPagination($searchPhrase = null, string $sortAttribute = null): Pagination
     {
         $sortData = $this->sorting->createSortData($sortAttribute, ProductInformationGroup::getSortData());
 
-        return $this->createQueryBuilder('pig')
+        $query = $this->createQueryBuilder('pig')
 
             //podminky
             ->orWhere('pig.name LIKE :name')
@@ -39,6 +42,8 @@ class ProductInformationGroupRepository extends ServiceEntityRepository
             ->orderBy('pig.' . $sortData['attribute'], $sortData['order'])
             ->getQuery()
         ;
+
+        return new Pagination($query, $this->request);
     }
 
     public function getArrayOfNames(): array

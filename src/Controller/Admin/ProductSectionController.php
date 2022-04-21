@@ -7,7 +7,6 @@ use App\Form\HiddenTrueFormType;
 use App\Form\ProductSectionFormType;
 use App\Form\SearchTextAndSortFormType;
 use App\Service\BreadcrumbsService;
-use App\Service\PaginatorService;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -47,7 +46,7 @@ class ProductSectionController extends AbstractController
      *
      * @IsGranted("admin_product_sections")
      */
-    public function productSections(FormFactoryInterface $formFactory, PaginatorService $paginatorService): Response
+    public function productSections(FormFactoryInterface $formFactory): Response
     {
         $form = $formFactory->createNamed('', SearchTextAndSortFormType::class, null, ['sort_choices' => ProductSection::getSortData()]);
         //button je přidáván v šabloně, aby se nezobrazoval v odkazu
@@ -55,26 +54,22 @@ class ProductSectionController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid())
         {
-            $queryForPagination = $this->getDoctrine()->getRepository(ProductSection::class)->getQueryForSearchAndPagination($form->get('searchPhrase')->getData(), $form->get('sortBy')->getData());
+            $pagination = $this->getDoctrine()->getRepository(ProductSection::class)->getSearchPagination($form->get('searchPhrase')->getData(), $form->get('sortBy')->getData());
         }
         else
         {
-            $queryForPagination = $this->getDoctrine()->getRepository(ProductSection::class)->getQueryForSearchAndPagination();
+            $pagination = $this->getDoctrine()->getRepository(ProductSection::class)->getSearchPagination();
         }
 
-        $sections = $paginatorService
-            ->initialize($queryForPagination, 1)
-            ->getCurrentPageObjects();
-
-        if($paginatorService->isCurrentPageOutOfBounds())
+        if($pagination->isCurrentPageOutOfBounds())
         {
             throw new NotFoundHttpException('Na této stránce nebyly nalezeny žádné sekce.');
         }
 
         return $this->render('admin/product_sections/admin_product_sections.html.twig', [
             'searchForm' => $form->createView(),
-            'sections' => $sections,
-            'pagination' => $paginatorService->createViewData(),
+            'sections' => $pagination->getCurrentPageObjects(),
+            'pagination' => $pagination->createView(),
         ]);
     }
 

@@ -1,20 +1,18 @@
 <?php
 
-namespace App\Service;
+namespace App\Pagination;
 
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Tools\Pagination\Paginator;
-use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Třída řešící stránkování
  *
- * @package App\Service
+ * @package App\Pagination
  */
-class PaginatorService
+class Pagination
 {
-    public const QUERY_PARAMETER_PAGE_NAME = 'page';
-
     private const VIEW_INNER_PAGES = 5;
     private const VIEW_INNER_CENTER = 3;
 
@@ -62,37 +60,32 @@ class PaginatorService
      */
     private array $queryAttributes;
 
-    public function __construct(RequestStack $requestStack)
+    /**
+     * Název GET parametru, ve kterém je číslo aktuální stránky
+     *
+     * @var string
+     */
+    private string $pageParameterName;
+
+    public function __construct(Query $query, Request $request, int $pageSize = 10, string $pageParameterName = 'page')
     {
-        $request = $requestStack->getCurrentRequest();
         $this->queryParameters = $request->query->all();
         $this->queryAttributes = $request->attributes->all();
+        $this->pageParameterName = $pageParameterName;
 
-        $page = (int) $request->query->get(PaginatorService::QUERY_PARAMETER_PAGE_NAME, '1');
+        $page = (int) $request->query->get($pageParameterName, '1');
         $this->setCurrentPageAndSanitize($page);
+        $this->paginate($query, $pageSize);
     }
 
     /**
-     * Vezme dotaz, požadovaný počet prvků na stránku, aktuální stránku a získá pouze prvky patřící na danou stránku.
-     * Zároveň sestaví data potřebná pro vykreslení stránkování.
+     * Vrátí název GET parametru, ve kterém je číslo aktuální stránky
      *
-     * @param Query $query
-     * @param int $pageSize
-     * @return $this
+     * @return string
      */
-    public function initialize(Query $query, int $pageSize): self
+    public function getPageParameterName(): string
     {
-        $this->pageSize = $pageSize;
-        $paginator = new Paginator($query);
-        $this->totalItems = count($paginator);
-        $this->pagesCount = ceil($this->totalItems / $this->pageSize);
-
-        $this->currentPageObjects = $paginator->getQuery()
-            ->setFirstResult($this->pageSize * ($this->currentPage-1))
-            ->setMaxResults($this->pageSize)
-            ->getResult();
-
-        return $this;
+        return $this->pageParameterName;
     }
 
     /**
@@ -192,7 +185,7 @@ class PaginatorService
     /**
      * Sestaví data pro view
      */
-    public function createViewData(): self
+    public function createView(): self
     {
         $maxSlotsSurroundingCenter = self::VIEW_INNER_PAGES - self::VIEW_INNER_CENTER; //2
         $slotsLeftToCenter = $this->currentPage - 1;
@@ -244,6 +237,27 @@ class PaginatorService
     }
 
     /**
+     * Vezme dotaz, požadovaný počet prvků na stránku, aktuální stránku a získá pouze prvky patřící na danou stránku.
+     * Zároveň sestaví data potřebná pro vykreslení stránkování.
+     *
+     * @param Query $query
+     * @param int $pageSize
+     */
+    private function paginate(Query $query, int $pageSize): void
+    {
+        $this->pageSize = $pageSize;
+        $paginator = new Paginator($query);
+        $this->totalItems = count($paginator);
+        $this->pagesCount = ceil($this->totalItems / $this->pageSize);
+
+        $this->currentPageObjects = $paginator->getQuery()
+            ->setFirstResult($this->pageSize * ($this->currentPage-1))
+            ->setMaxResults($this->pageSize)
+            ->getResult()
+        ;
+    }
+
+    /**
      * Nastaví aktuální stránku a zároveň zajistí, že nebude menší než 1
      *
      * @param int $page
@@ -283,7 +297,7 @@ class PaginatorService
             false => 'array_push',
         ];
 
-        $this->queryParameters[self::QUERY_PARAMETER_PAGE_NAME] = $page;
+        $this->queryParameters[$this->pageParameterName] = $page;
         $functionBasedOnPrepend[$prepend] ($this->viewData, [
             'queryParameters' => $this->queryParameters,
             'isCurrent' => $page === $this->currentPage,
@@ -303,7 +317,7 @@ class PaginatorService
     {
         foreach ($this->viewData as $pageData)
         {
-            if(isset($pageData['queryParameters'][self::QUERY_PARAMETER_PAGE_NAME]) && $pageData['queryParameters'][self::QUERY_PARAMETER_PAGE_NAME] === $page)
+            if(isset($pageData['queryParameters'][$this->pageParameterName]) && $pageData['queryParameters'][$this->pageParameterName] === $page)
             {
                 return true;
             }
@@ -317,9 +331,9 @@ class PaginatorService
     private function addAdditionalViewData()
     {
         //Divider a úplně první stránka (pokud má smysl to renderovat)
-        if(isset($this->viewData[array_key_first($this->viewData)]['queryParameters'][self::QUERY_PARAMETER_PAGE_NAME]))
+        if(isset($this->viewData[array_key_first($this->viewData)]['queryParameters'][$this->pageParameterName]))
         {
-            $difference = $this->viewData[array_key_first($this->viewData)]['queryParameters'][self::QUERY_PARAMETER_PAGE_NAME] - 1;
+            $difference = $this->viewData[array_key_first($this->viewData)]['queryParameters'][$this->pageParameterName] - 1;
             if($difference == 1)
             {
                 $this->addViewPage(1, true);
@@ -337,9 +351,9 @@ class PaginatorService
         }
 
         //Divider a úplně poslední stránka (pokud má smysl to renderovat)
-        if(isset($this->viewData[array_key_last($this->viewData)]['queryParameters'][self::QUERY_PARAMETER_PAGE_NAME]))
+        if(isset($this->viewData[array_key_last($this->viewData)]['queryParameters'][$this->pageParameterName]))
         {
-            $difference = $this->pagesCount - $this->viewData[array_key_last($this->viewData)]['queryParameters'][self::QUERY_PARAMETER_PAGE_NAME];
+            $difference = $this->pagesCount - $this->viewData[array_key_last($this->viewData)]['queryParameters'][$this->pageParameterName];
             if($difference == 1)
             {
                 $this->addViewPage($this->pagesCount, false);

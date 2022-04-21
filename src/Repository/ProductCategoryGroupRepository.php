@@ -3,10 +3,11 @@
 namespace App\Repository;
 
 use App\Entity\ProductCategoryGroup;
+use App\Pagination\Pagination;
 use App\Service\SortingService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\ORM\Query;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * @method ProductCategoryGroup|null find($id, $lockMode = null, $lockVersion = null)
@@ -17,12 +18,14 @@ use Doctrine\Persistence\ManagerRegistry;
 class ProductCategoryGroupRepository extends ServiceEntityRepository
 {
     private SortingService $sorting;
+    private $request;
 
-    public function __construct(ManagerRegistry $registry, SortingService $sorting)
+    public function __construct(ManagerRegistry $registry, SortingService $sorting, RequestStack $requestStack)
     {
         parent::__construct($registry, ProductCategoryGroup::class);
 
         $this->sorting = $sorting;
+        $this->request = $requestStack->getCurrentRequest();
     }
 
     public function findOneByIdAndFetchCategories($id)
@@ -49,11 +52,11 @@ class ProductCategoryGroupRepository extends ServiceEntityRepository
         ;
     }
 
-    public function getQueryForSearchAndPagination($searchPhrase = null, string $sortAttribute = null): Query
+    public function getSearchPagination($searchPhrase = null, string $sortAttribute = null): Pagination
     {
         $sortData = $this->sorting->createSortData($sortAttribute, ProductCategoryGroup::getSortData());
 
-        return $this->createQueryBuilder('pcg')
+        $query = $this->createQueryBuilder('pcg')
 
             //podminky
             ->orWhere('pcg.name LIKE :name')
@@ -63,6 +66,8 @@ class ProductCategoryGroupRepository extends ServiceEntityRepository
             ->orderBy('pcg.' . $sortData['attribute'], $sortData['order'])
             ->getQuery()
         ;
+
+        return new Pagination($query, $this->request);
     }
 
     public function getArrayOfNames(): array

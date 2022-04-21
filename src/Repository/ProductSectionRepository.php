@@ -3,11 +3,12 @@
 namespace App\Repository;
 
 use App\Entity\ProductSection;
+use App\Pagination\Pagination;
 use App\Service\SortingService;
 use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\ORM\Query;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * @method ProductSection|null find($id, $lockMode = null, $lockVersion = null)
@@ -18,12 +19,14 @@ use Doctrine\Persistence\ManagerRegistry;
 class ProductSectionRepository extends ServiceEntityRepository
 {
     private SortingService $sorting;
+    private $request;
 
-    public function __construct(ManagerRegistry $registry, SortingService $sorting)
+    public function __construct(ManagerRegistry $registry, SortingService $sorting, RequestStack $requestStack)
     {
         parent::__construct($registry, ProductSection::class);
 
         $this->sorting = $sorting;
+        $this->request = $requestStack->getCurrentRequest();
     }
 
     public function findAllVisible()
@@ -38,11 +41,11 @@ class ProductSectionRepository extends ServiceEntityRepository
         ;
     }
 
-    public function getQueryForSearchAndPagination($searchPhrase = null, string $sortAttribute = null): Query
+    public function getSearchPagination($searchPhrase = null, string $sortAttribute = null): Pagination
     {
         $sortData = $this->sorting->createSortData($sortAttribute, ProductSection::getSortData());
 
-        return $this->createQueryBuilder('ps')
+        $query = $this->createQueryBuilder('ps')
 
             //podminky
             ->orWhere('ps.name LIKE :name')
@@ -55,5 +58,7 @@ class ProductSectionRepository extends ServiceEntityRepository
             ->orderBy('ps.' . $sortData['attribute'], $sortData['order'])
             ->getQuery()
         ;
+
+        return new Pagination($query, $this->request);
     }
 }

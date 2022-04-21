@@ -9,7 +9,6 @@ use App\Entity\ProductSection;
 use App\Form\CartInsertFormType;
 use App\Form\ProductCatalogFilterFormType;
 use App\Service\BreadcrumbsService;
-use App\Service\PaginatorService;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -37,7 +36,7 @@ class ProductController extends AbstractController
     /**
      * @Route("/produkty/{slug}", name="products")
      */
-    public function products(FormFactoryInterface $formFactory, PaginatorService $paginatorService, string $slug = null): Response
+    public function products(FormFactoryInterface $formFactory, string $slug = null): Response
     {
         $section = null;
         if($slug)
@@ -59,19 +58,15 @@ class ProductController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid())
         {
-            $queryForPagination = $this->getDoctrine()->getRepository(Product::class)->getQueryForSearchAndPagination($inAdmin = false, $filterData->getSection(), $filterData->getSearchPhrase(), $filterData->getSortBy(), $filterData->getPriceMin(), $filterData->getPriceMax(), $filterData->getCategoriesGrouped());
+            $pagination = $this->getDoctrine()->getRepository(Product::class)->getSearchPagination($inAdmin = false, $filterData->getSection(), $filterData->getSearchPhrase(), $filterData->getSortBy(), $filterData->getPriceMin(), $filterData->getPriceMax(), $filterData->getCategoriesGrouped());
         }
         else
         {
-            $queryForPagination = $this->getDoctrine()->getRepository(Product::class)->getQueryForSearchAndPagination($inAdmin = false, $filterData->getSection());
+            $pagination = $this->getDoctrine()->getRepository(Product::class)->getSearchPagination($inAdmin = false, $filterData->getSection());
         }
 
-        $products = $paginatorService
-            ->initialize($queryForPagination, 2)
-            ->addAttributesToPathParameters(['slug'])
-            ->getCurrentPageObjects();
-
-        if($paginatorService->isCurrentPageOutOfBounds())
+        $pagination->addAttributesToPathParameters(['slug']);
+        if($pagination->isCurrentPageOutOfBounds())
         {
             throw new NotFoundHttpException('Na této stránce nebyly nalezeny žádné produkty.');
         }
@@ -80,8 +75,8 @@ class ProductController extends AbstractController
         {
             $response = $this->render('fragments/forms_unique/_form_product_catalog.html.twig', [
                 'filterForm' => $form->createView(),
-                'products' => $products,
-                'pagination' => $paginatorService->createViewData(),
+                'products' => $pagination->getCurrentPageObjects(),
+                'pagination' => $pagination->createView(),
             ]);
 
             $response->headers->add([
@@ -105,8 +100,8 @@ class ProductController extends AbstractController
 
             return $this->render('products/catalog.html.twig', [
                 'filterForm' => $form->createView(),
-                'products' => $products,
-                'pagination' => $paginatorService->createViewData(),
+                'products' => $pagination->getCurrentPageObjects(),
+                'pagination' => $pagination->createView(),
             ]);
         }
     }

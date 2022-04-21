@@ -2,12 +2,13 @@
 
 namespace App\Service;
 
-use libphonenumber\PhoneNumberFormat;
 use SoapFault;
 use SoapClient;
 use LogicException;
 use App\Entity\Order;
 use libphonenumber\PhoneNumberUtil;
+use libphonenumber\PhoneNumberFormat;
+use App\Exception\PacketaException;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 /**
@@ -18,9 +19,6 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 class PacketaApiService
 {
     private Order $order;
-    private array $errors = [];
-    private bool $hasErrors = false;
-
     private string $secret;
     private string $eshopName;
     private SoapClient $client;
@@ -37,33 +35,15 @@ class PacketaApiService
     }
 
     /**
-     * @param Order $order
-     * @return $this
-     */
-    private function initialize(Order $order): self
-    {
-        $this->order = $order;
-
-        // objednávka musí mít ID
-        if ($this->order->getId() === null)
-        {
-            throw new LogicException(sprintf('Služba App\Service\PacketaApiService dostala do metody initialize objednávku s null ID.'));
-        }
-        $this->errors = [];
-        $this->hasErrors = false;
-
-        return $this;
-    }
-
-    /**
      * Vrátí data o zásilce, nebo null pokud nastala chyba.
      *
      * @param Order $order
      * @return object|null
+     * @throws PacketaException
      */
     public function packetStatus(Order $order): ?object
     {
-        $this->initialize($order);
+        $this->setOrder($order);
         $data = null;
 
         try
@@ -72,7 +52,7 @@ class PacketaApiService
         }
         catch (SoapFault $exception)
         {
-            $this->addError($exception->getMessage());
+            throw new PacketaException([$exception->getMessage()]);
         }
 
         return $data;
@@ -83,10 +63,11 @@ class PacketaApiService
      *
      * @param Order $order
      * @return object|null
+     * @throws PacketaException
      */
     public function createPacket(Order $order): ?object
     {
-        $this->initialize($order);
+        $this->setOrder($order);
         $data = null;
 
         try
@@ -95,56 +76,50 @@ class PacketaApiService
         }
         catch (SoapFault $exception)
         {
-            $this->addPacketAttributesFaultToErrors($exception->detail->PacketAttributesFault);
+            throw new PacketaException( $this->getPacketAttributesFaults($exception->detail->PacketAttributesFault) );
         }
 
         return $data;
     }
 
     /**
-     * @return array
+     * @param Order $order
      */
-    public function getErrors(): array
+    private function setOrder(Order $order): void
     {
-        return $this->errors;
-    }
+        $this->order = $order;
 
-    /**
-     * @return bool
-     */
-    public function hasErrors(): bool
-    {
-        return $this->hasErrors;
-    }
-
-    /**
-     * @param string $error
-     */
-    private function addError(string $error): void
-    {
-        $this->hasErrors = true;
-        $this->errors[] = $error;
+        // objednávka musí mít ID
+        if ($this->order->getId() === null)
+        {
+            throw new LogicException(sprintf('Služba App\Service\PacketaApiService dostala do metody initialize objednávku s null ID.'));
+        }
     }
 
     /**
      * Vezme chyby z obdrženého PacketAttributesFault a vloží je do pole errors.
      *
      * @param $PacketAttributesFault
+     * @return array
      */
-    private function addPacketAttributesFaultToErrors($PacketAttributesFault): void
+    private function getPacketAttributesFaults($PacketAttributesFault): array
     {
+        $faults = [];
+
         $faultStructure = $PacketAttributesFault->attributes->fault;
         if (is_array($faultStructure))
         {
             foreach ($faultStructure as $fault)
             {
-                $this->addError($fault->fault);
+                $faults[] = $fault->fault;
             }
         }
         else
         {
-            $this->addError($faultStructure->fault);
+            $faults[] = $faultStructure->fault;
         }
+
+        return $faults;
     }
 
     /**

@@ -5,13 +5,14 @@ namespace App\Repository;
 use App\Entity\Product;
 use App\Entity\ProductOptionGroup;
 use App\Entity\ProductSection;
+use App\Pagination\Pagination;
 use App\Service\ProductCatalogFilterService;
 use App\Service\SortingService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Exception;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * @method Product|null find($id, $lockMode = null, $lockVersion = null)
@@ -23,16 +24,18 @@ class ProductRepository extends ServiceEntityRepository
 {
     private SortingService $sorting;
     private ProductCatalogFilterService $filter;
+    private $request;
 
-    public function __construct(ManagerRegistry $registry, SortingService $sorting, ProductCatalogFilterService $filter)
+    public function __construct(ManagerRegistry $registry, SortingService $sorting, ProductCatalogFilterService $filter, RequestStack $requestStack)
     {
         parent::__construct($registry, Product::class);
 
         $this->sorting = $sorting;
         $this->filter = $filter;
+        $this->request = $requestStack->getCurrentRequest();
     }
 
-    public function findOneAndFetchEverything(array $criteria, bool $visibleOnly)
+    public function findOneAndFetchEverything(array $criteria, bool $visibleOnly): ?Product
     {
         // produkt, sekce
         $queryBuilder = $this->createQueryBuilder('p')
@@ -179,7 +182,8 @@ class ProductRepository extends ServiceEntityRepository
             ->addProductVisibilityCondition()
             ->getQueryBuilder()
             ->getQuery()
-            ->getScalarResult()[0];
+            ->getScalarResult()[0]
+        ;
 
         foreach ($priceData as $key => &$value)
         {
@@ -242,7 +246,7 @@ class ProductRepository extends ServiceEntityRepository
         ;
     }
 
-    public function getQueryForSearchAndPagination(bool $inAdmin, ProductSection $section = null, string $searchPhrase = null, string $sortAttribute = null, float $priceMin = null, float $priceMax = null, array $categoriesGrouped = null): Query
+    public function getSearchPagination(bool $inAdmin, ProductSection $section = null, string $searchPhrase = null, string $sortAttribute = null, float $priceMin = null, float $priceMax = null, array $categoriesGrouped = null): Pagination
     {
         $queryBuilder = $this->createQueryBuilder('p');
 
@@ -263,11 +267,16 @@ class ProductRepository extends ServiceEntityRepository
             $queryBuilder = $this->filter
                 ->initialize($queryBuilder, $section, $searchPhrase, $priceMin, $priceMax, $categoriesGrouped)
                 ->addProductSearchConditions()
-                ->getQueryBuilder();
+                ->getQueryBuilder()
+            ;
         }
 
-        $queryBuilder->orderBy('p.' . $sortData['attribute'], $sortData['order']);
-        return $queryBuilder->getQuery();
+        $query = $queryBuilder
+            ->orderBy('p.' . $sortData['attribute'], $sortData['order'])
+            ->getQuery()
+        ;
+
+        return new Pagination($query, $this->request, 12);
     }
 
     private function getQueryForRelated(Product $product, int $quantity): QueryBuilder
@@ -284,6 +293,7 @@ class ProductRepository extends ServiceEntityRepository
             ->setParameter('viewedProductId', $product->getId())
             ->setParameter('viewedProductSection', $product->getSection())
             ->orderBy('p.created', 'DESC')
-            ->setMaxResults($quantity);
+            ->setMaxResults($quantity)
+        ;
     }
 }

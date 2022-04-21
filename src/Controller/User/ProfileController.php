@@ -12,7 +12,6 @@ use App\Form\OrderSearchFormType;
 use App\Form\PersonalInfoFormType;
 use App\Form\SearchTextAndSortFormType;
 use App\Service\BreadcrumbsService;
-use App\Service\PaginatorService;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -118,7 +117,7 @@ class ProfileController extends AbstractController
     /**
      * @Route("/adresy", name="profile_addresses")
      */
-    public function addresses(FormFactoryInterface $formFactory, PaginatorService $paginatorService): Response
+    public function addresses(FormFactoryInterface $formFactory): Response
     {
         /** @var User|null $user */
         $user = $this->getUser();
@@ -129,18 +128,14 @@ class ProfileController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid())
         {
-            $queryForPagination = $this->getDoctrine()->getRepository(Address::class)->getQueryForSearchAndPagination($user, $form->get('searchPhrase')->getData(), $form->get('sortBy')->getData());
+            $pagination = $this->getDoctrine()->getRepository(Address::class)->getSearchPagination($user, $form->get('searchPhrase')->getData(), $form->get('sortBy')->getData());
         }
         else
         {
-            $queryForPagination = $this->getDoctrine()->getRepository(Address::class)->getQueryForSearchAndPagination($user);
+            $pagination = $this->getDoctrine()->getRepository(Address::class)->getSearchPagination($user);
         }
 
-        $addresses = $paginatorService
-            ->initialize($queryForPagination, 5)
-            ->getCurrentPageObjects();
-
-        if($paginatorService->isCurrentPageOutOfBounds())
+        if($pagination->isCurrentPageOutOfBounds())
         {
             throw new NotFoundHttpException('Na této stránce nebyly nalezeny žádné adresy.');
         }
@@ -149,8 +144,8 @@ class ProfileController extends AbstractController
 
         return $this->render('profile/profile_addresses.html.twig', [
             'searchForm' => $form->createView(),
-            'addresses' => $addresses,
-            'pagination' => $paginatorService->createViewData(),
+            'addresses' => $pagination->getCurrentPageObjects(),
+            'pagination' => $pagination->createView(),
         ]);
     }
 
@@ -255,7 +250,7 @@ class ProfileController extends AbstractController
     /**
      * @Route("/objednavky", name="profile_orders")
      */
-    public function orders(FormFactoryInterface $formFactory, PaginatorService $paginatorService): Response
+    public function orders(FormFactoryInterface $formFactory): Response
     {
         /** @var User|null $user */
         $user = $this->getUser();
@@ -266,18 +261,14 @@ class ProfileController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid())
         {
-            $queryForPagination = $this->getDoctrine()->getRepository(Order::class)->getQueryForProfileSearchAndPagination($user->getEmail(), $user, $form->get('searchPhrase')->getData(), $form->get('sortBy')->getData(), $form->get('lifecycle')->getData());
+            $pagination = $this->getDoctrine()->getRepository(Order::class)->getProfileSearchPagination($user->getEmail(), $user, $form->get('searchPhrase')->getData(), $form->get('sortBy')->getData(), $form->get('lifecycle')->getData());
         }
         else
         {
-            $queryForPagination = $this->getDoctrine()->getRepository(Order::class)->getQueryForProfileSearchAndPagination($user->getEmail(), $user);
+            $pagination = $this->getDoctrine()->getRepository(Order::class)->getProfileSearchPagination($user->getEmail(), $user);
         }
 
-        $orders = $paginatorService
-            ->initialize($queryForPagination, 1)
-            ->getCurrentPageObjects();
-
-        if($paginatorService->isCurrentPageOutOfBounds())
+        if($pagination->isCurrentPageOutOfBounds())
         {
             throw new NotFoundHttpException('Na této stránce nebyly nalezeny žádné objednávky.');
         }
@@ -286,8 +277,8 @@ class ProfileController extends AbstractController
 
         return $this->render('profile/profile_orders.html.twig', [
             'searchForm' => $form->createView(),
-            'orders' => $orders,
-            'pagination' => $paginatorService->createViewData(),
+            'orders' => $pagination->getCurrentPageObjects(),
+            'pagination' => $pagination->createView(),
         ]);
     }
 

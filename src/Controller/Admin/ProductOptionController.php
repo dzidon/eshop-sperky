@@ -7,7 +7,6 @@ use App\Form\HiddenTrueFormType;
 use App\Form\ProductOptionGroupFormType;
 use App\Form\SearchTextAndSortFormType;
 use App\Service\BreadcrumbsService;
-use App\Service\PaginatorService;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -46,7 +45,7 @@ class ProductOptionController extends AbstractController
      *
      * @IsGranted("admin_product_options")
      */
-    public function productOptionGroups(FormFactoryInterface $formFactory, PaginatorService $paginatorService): Response
+    public function productOptionGroups(FormFactoryInterface $formFactory): Response
     {
         $form = $formFactory->createNamed('', SearchTextAndSortFormType::class, null, ['sort_choices' => ProductOptionGroup::getSortData()]);
         //button je přidáván v šabloně, aby se nezobrazoval v odkazu
@@ -54,26 +53,22 @@ class ProductOptionController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid())
         {
-            $queryForPagination = $this->getDoctrine()->getRepository(ProductOptionGroup::class)->getQueryForSearchAndPagination($form->get('searchPhrase')->getData(), $form->get('sortBy')->getData());
+            $pagination = $this->getDoctrine()->getRepository(ProductOptionGroup::class)->getSearchPagination($form->get('searchPhrase')->getData(), $form->get('sortBy')->getData());
         }
         else
         {
-            $queryForPagination = $this->getDoctrine()->getRepository(ProductOptionGroup::class)->getQueryForSearchAndPagination();
+            $pagination = $this->getDoctrine()->getRepository(ProductOptionGroup::class)->getSearchPagination();
         }
 
-        $optionGroups = $paginatorService
-            ->initialize($queryForPagination, 3)
-            ->getCurrentPageObjects();
-
-        if($paginatorService->isCurrentPageOutOfBounds())
+        if($pagination->isCurrentPageOutOfBounds())
         {
             throw new NotFoundHttpException('Na této stránce nebyly nalezeny žádné skupiny produktových voleb.');
         }
 
         return $this->render('admin/product_options/admin_product_options.html.twig', [
             'searchForm' => $form->createView(),
-            'optionGroups' => $optionGroups,
-            'pagination' => $paginatorService->createViewData(),
+            'optionGroups' => $pagination->getCurrentPageObjects(),
+            'pagination' => $pagination->createView(),
         ]);
     }
 

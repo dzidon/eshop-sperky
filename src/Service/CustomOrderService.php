@@ -61,8 +61,11 @@ class CustomOrderService
 
                 $this->order->calculateTotals();
 
-                $this->entityManager->persist($this->order);
-                $this->entityManager->flush();
+                if ($this->synchronizer->hasWarnings())
+                {
+                    $this->entityManager->persist($this->order);
+                    $this->entityManager->flush();
+                }
             }
         }
 

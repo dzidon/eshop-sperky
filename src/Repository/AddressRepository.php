@@ -4,10 +4,11 @@ namespace App\Repository;
 
 use App\Entity\Address;
 use App\Entity\User;
+use App\Pagination\Pagination;
 use App\Service\SortingService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\ORM\Query;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * @method Address|null find($id, $lockMode = null, $lockVersion = null)
@@ -18,19 +19,21 @@ use Doctrine\Persistence\ManagerRegistry;
 class AddressRepository extends ServiceEntityRepository
 {
     private SortingService $sorting;
+    private $request;
 
-    public function __construct(ManagerRegistry $registry, SortingService $sorting)
+    public function __construct(ManagerRegistry $registry, SortingService $sorting, RequestStack $requestStack)
     {
         parent::__construct($registry, Address::class);
 
         $this->sorting = $sorting;
+        $this->request = $requestStack->getCurrentRequest();
     }
 
-    public function getQueryForSearchAndPagination(User $user, $searchPhrase = null, string $sortAttribute = null): Query
+    public function getSearchPagination(User $user, $searchPhrase = null, string $sortAttribute = null): Pagination
     {
         $sortData = $this->sorting->createSortData($sortAttribute, Address::getSortData());
 
-        return $this->createQueryBuilder('a')
+        $query = $this->createQueryBuilder('a')
 
             //jen pozadovany uzivatel
             ->andWhere('a.user = :user')
@@ -50,6 +53,9 @@ class AddressRepository extends ServiceEntityRepository
 
             //razeni
             ->orderBy('a.' . $sortData['attribute'], $sortData['order'])
-            ->getQuery();
+            ->getQuery()
+        ;
+
+        return new Pagination($query, $this->request);
     }
 }

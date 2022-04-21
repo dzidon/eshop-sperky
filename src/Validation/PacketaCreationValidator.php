@@ -4,6 +4,7 @@ namespace App\Validation;
 
 use App\Entity\DeliveryMethod;
 use App\Entity\Order;
+use App\Exception\PacketaException;
 use App\Service\PacketaApiService;
 use LogicException;
 use Symfony\Component\Validator\ConstraintValidator;
@@ -40,13 +41,20 @@ class PacketaCreationValidator extends ConstraintValidator
             return;
         }
 
-        if ($order->getLifecycleChapter() === Order::LIFECYCLE_SHIPPED && !$this->packetaApiService->packetStatus($order))
+        if ($order->getLifecycleChapter() === Order::LIFECYCLE_SHIPPED)
         {
-            $this->context
-                ->buildViolation($constraint->message)
-                ->atPath('lifecycleChapter')
-                ->addViolation()
-            ;
+            try
+            {
+                $this->packetaApiService->packetStatus($order);
+            }
+            catch (PacketaException $exception)
+            {
+                $this->context
+                    ->buildViolation($constraint->message)
+                    ->atPath('lifecycleChapter')
+                    ->addViolation()
+                ;
+            }
         }
     }
 }

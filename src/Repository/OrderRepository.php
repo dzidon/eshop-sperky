@@ -5,13 +5,14 @@ namespace App\Repository;
 use App\Entity\Order;
 use App\Entity\Product;
 use App\Entity\User;
+use App\Pagination\Pagination;
 use App\Service\SortingService;
 use DateTime;
-use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\Uid\Uuid;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * @method Order|null find($id, $lockMode = null, $lockVersion = null)
@@ -22,15 +23,17 @@ use Doctrine\Persistence\ManagerRegistry;
 class OrderRepository extends ServiceEntityRepository
 {
     private SortingService $sorting;
+    private $request;
 
-    public function __construct(ManagerRegistry $registry, SortingService $sorting)
+    public function __construct(ManagerRegistry $registry, SortingService $sorting, RequestStack $requestStack)
     {
         parent::__construct($registry, Order::class);
 
         $this->sorting = $sorting;
+        $this->request = $requestStack->getCurrentRequest();
     }
 
-    public function getQueryForProfileSearchAndPagination(string $email, User $user, $searchPhrase = null, string $sortAttribute = null, int $lifecycle = null): Query
+    public function getProfileSearchPagination(string $email, User $user, string $searchPhrase = null, string $sortAttribute = null, int $lifecycle = null): Pagination
     {
         $sortData = $this->sorting->createSortData($sortAttribute, Order::getSortData());
 
@@ -55,14 +58,16 @@ class OrderRepository extends ServiceEntityRepository
             ;
         }
 
-        return $queryBuilder
+        $query = $queryBuilder
             // razeni
             ->orderBy('o.' . $sortData['attribute'], $sortData['order'])
             ->getQuery()
         ;
+
+        return new Pagination($query, $this->request);
     }
 
-    public function getQueryForAdminSearchAndPagination(string $searchPhrase = null, string $sortAttribute = null, int $lifecycle = null): Query
+    public function getAdminSearchPagination(string $searchPhrase = null, string $sortAttribute = null, int $lifecycle = null): Pagination
     {
         $sortData = $this->sorting->createSortData($sortAttribute, Order::getSortData());
 
@@ -84,14 +89,16 @@ class OrderRepository extends ServiceEntityRepository
             ;
         }
 
-        return $queryBuilder
+        $query = $queryBuilder
             // razeni
             ->orderBy('o.' . $sortData['attribute'], $sortData['order'])
             ->getQuery()
         ;
+
+        return new Pagination($query, $this->request);
     }
 
-    public function findOneAndFetchEverything(Uuid $token)
+    public function findOneAndFetchEverything(Uuid $token): ?Order
     {
         // objednávka, její doručovací a platební metoda (1 nebo žádný řádek)
         /** @var Order|null $order */

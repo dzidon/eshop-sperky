@@ -7,7 +7,6 @@ use App\Form\HiddenTrueFormType;
 use App\Form\ProductCategoryGroupFormType;
 use App\Form\SearchTextAndSortFormType;
 use App\Service\BreadcrumbsService;
-use App\Service\PaginatorService;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -46,7 +45,7 @@ class ProductCategoryController extends AbstractController
      *
      * @IsGranted("admin_product_categories")
      */
-    public function productCategoryGroups(FormFactoryInterface $formFactory, PaginatorService $paginatorService): Response
+    public function productCategoryGroups(FormFactoryInterface $formFactory): Response
     {
         $form = $formFactory->createNamed('', SearchTextAndSortFormType::class, null, ['sort_choices' => ProductCategoryGroup::getSortData()]);
         //button je přidáván v šabloně, aby se nezobrazoval v odkazu
@@ -54,26 +53,22 @@ class ProductCategoryController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid())
         {
-            $queryForPagination = $this->getDoctrine()->getRepository(ProductCategoryGroup::class)->getQueryForSearchAndPagination($form->get('searchPhrase')->getData(), $form->get('sortBy')->getData());
+            $pagination = $this->getDoctrine()->getRepository(ProductCategoryGroup::class)->getSearchPagination($form->get('searchPhrase')->getData(), $form->get('sortBy')->getData());
         }
         else
         {
-            $queryForPagination = $this->getDoctrine()->getRepository(ProductCategoryGroup::class)->getQueryForSearchAndPagination();
+            $pagination = $this->getDoctrine()->getRepository(ProductCategoryGroup::class)->getSearchPagination();
         }
 
-        $categoryGroups = $paginatorService
-            ->initialize($queryForPagination, 1)
-            ->getCurrentPageObjects();
-
-        if($paginatorService->isCurrentPageOutOfBounds())
+        if($pagination->isCurrentPageOutOfBounds())
         {
             throw new NotFoundHttpException('Na této stránce nebyly nalezeny žádné skupiny produktových kategorií.');
         }
 
         return $this->render('admin/product_categories/admin_product_categories.html.twig', [
             'searchForm' => $form->createView(),
-            'categoryGroups' => $categoryGroups,
-            'pagination' => $paginatorService->createViewData(),
+            'categoryGroups' => $pagination->getCurrentPageObjects(),
+            'pagination' => $pagination->createView(),
         ]);
     }
 

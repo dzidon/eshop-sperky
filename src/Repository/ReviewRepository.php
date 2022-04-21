@@ -3,11 +3,12 @@
 namespace App\Repository;
 
 use App\Entity\Review;
+use App\Pagination\Pagination;
 use App\Service\SortingService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * @method Review|null find($id, $lockMode = null, $lockVersion = null)
@@ -18,15 +19,17 @@ use Doctrine\Persistence\ManagerRegistry;
 class ReviewRepository extends ServiceEntityRepository
 {
     private SortingService $sorting;
+    private $request;
 
-    public function __construct(ManagerRegistry $registry, SortingService $sorting)
+    public function __construct(ManagerRegistry $registry, SortingService $sorting, RequestStack $requestStack)
     {
         parent::__construct($registry, Review::class);
 
         $this->sorting = $sorting;
+        $this->request = $requestStack->getCurrentRequest();
     }
 
-    public function getQueryForSearchAndPagination($searchPhrase = null, string $sortAttribute = null): Query
+    public function getSearchPagination($searchPhrase = null, string $sortAttribute = null): Pagination
     {
         $sortData = $this->sorting->createSortData($sortAttribute, Review::getSortData());
 
@@ -43,9 +46,11 @@ class ReviewRepository extends ServiceEntityRepository
             ->orderBy('r.' . $sortData['attribute'], $sortData['order'])
         ;
 
-        return $this->addVisibilityConditions($queryBuilder)
+        $query = $this->addVisibilityConditions($queryBuilder)
             ->getQuery()
         ;
+
+        return new Pagination($query, $this->request);
     }
 
     public function findLatest(int $count)

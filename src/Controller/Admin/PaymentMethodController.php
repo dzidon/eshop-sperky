@@ -6,7 +6,6 @@ use App\Entity\PaymentMethod;
 use App\Form\PaymentMethodFormType;
 use App\Form\SearchTextAndSortFormType;
 use App\Service\BreadcrumbsService;
-use App\Service\PaginatorService;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -45,7 +44,7 @@ class PaymentMethodController extends AbstractController
      *
      * @IsGranted("admin_payment_methods")
      */
-    public function paymentMethods(FormFactoryInterface $formFactory, PaginatorService $paginatorService): Response
+    public function paymentMethods(FormFactoryInterface $formFactory): Response
     {
         $form = $formFactory->createNamed('', SearchTextAndSortFormType::class, null, ['sort_choices' => PaymentMethod::getSortData()]);
         //button je přidáván v šabloně, aby se nezobrazoval v odkazu
@@ -53,26 +52,22 @@ class PaymentMethodController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid())
         {
-            $queryForPagination = $this->getDoctrine()->getRepository(PaymentMethod::class)->getQueryForSearchAndPagination($form->get('searchPhrase')->getData(), $form->get('sortBy')->getData());
+            $pagination = $this->getDoctrine()->getRepository(PaymentMethod::class)->getSearchPagination($form->get('searchPhrase')->getData(), $form->get('sortBy')->getData());
         }
         else
         {
-            $queryForPagination = $this->getDoctrine()->getRepository(PaymentMethod::class)->getQueryForSearchAndPagination();
+            $pagination = $this->getDoctrine()->getRepository(PaymentMethod::class)->getSearchPagination();
         }
 
-        $paymentMethods = $paginatorService
-            ->initialize($queryForPagination, 1)
-            ->getCurrentPageObjects();
-
-        if($paginatorService->isCurrentPageOutOfBounds())
+        if($pagination->isCurrentPageOutOfBounds())
         {
             throw new NotFoundHttpException('Na této stránce nebyly nalezeny žádné platební metody.');
         }
 
         return $this->render('admin/payment_methods/admin_payment_methods.html.twig', [
             'searchForm' => $form->createView(),
-            'paymentMethods' => $paymentMethods,
-            'pagination' => $paginatorService->createViewData(),
+            'paymentMethods' => $pagination->getCurrentPageObjects(),
+            'pagination' => $pagination->createView(),
         ]);
     }
 

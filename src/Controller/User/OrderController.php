@@ -167,10 +167,7 @@ class OrderController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid() && !$synchronizerHasWarnings)
         {
-            $orderCompletionService
-                ->finishOrder($targetOrder)
-                ->sendConfirmationEmail()
-            ;
+            $redirectResponse = $orderCompletionService->finishOrder($targetOrder);
 
             $this->getDoctrine()->getManager()->persist($targetOrder);
             $this->getDoctrine()->getManager()->flush();
@@ -178,7 +175,7 @@ class OrderController extends AbstractController
             $this->addFlash('success', 'Objednávka dokončena!');
             $logger->info(sprintf('Order ID %d has been finished. Current lifecycle chapter: %d.', $targetOrder->getId(), $targetOrder->getLifecycleChapter()));
 
-            return $orderCompletionService->getRedirectResponse();
+            return $redirectResponse;
         }
 
         return $this->render('order/addresses.html.twig', [

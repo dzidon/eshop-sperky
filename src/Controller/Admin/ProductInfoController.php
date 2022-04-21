@@ -7,7 +7,6 @@ use App\Form\HiddenTrueFormType;
 use App\Form\ProductInformationGroupFormType;
 use App\Form\SearchTextAndSortFormType;
 use App\Service\BreadcrumbsService;
-use App\Service\PaginatorService;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -46,7 +45,7 @@ class ProductInfoController extends AbstractController
      *
      * @IsGranted("admin_product_info")
      */
-    public function productInfoGroups(FormFactoryInterface $formFactory, PaginatorService $paginatorService): Response
+    public function productInfoGroups(FormFactoryInterface $formFactory): Response
     {
         $form = $formFactory->createNamed('', SearchTextAndSortFormType::class, null, ['sort_choices' => ProductInformationGroup::getSortData()]);
         //button je přidáván v šabloně, aby se nezobrazoval v odkazu
@@ -54,26 +53,22 @@ class ProductInfoController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid())
         {
-            $queryForPagination = $this->getDoctrine()->getRepository(ProductInformationGroup::class)->getQueryForSearchAndPagination($form->get('searchPhrase')->getData(), $form->get('sortBy')->getData());
+            $pagination = $this->getDoctrine()->getRepository(ProductInformationGroup::class)->getSearchPagination($form->get('searchPhrase')->getData(), $form->get('sortBy')->getData());
         }
         else
         {
-            $queryForPagination = $this->getDoctrine()->getRepository(ProductInformationGroup::class)->getQueryForSearchAndPagination();
+            $pagination = $this->getDoctrine()->getRepository(ProductInformationGroup::class)->getSearchPagination();
         }
 
-        $infoGroups = $paginatorService
-            ->initialize($queryForPagination, 1)
-            ->getCurrentPageObjects();
-
-        if($paginatorService->isCurrentPageOutOfBounds())
+        if($pagination->isCurrentPageOutOfBounds())
         {
             throw new NotFoundHttpException('Na této stránce nebyly nalezeny žádné skupiny produktových informací.');
         }
 
         return $this->render('admin/product_info/admin_product_info.html.twig', [
             'searchForm' => $form->createView(),
-            'infoGroups' => $infoGroups,
-            'pagination' => $paginatorService->createViewData(),
+            'infoGroups' => $pagination->getCurrentPageObjects(),
+            'pagination' => $pagination->createView(),
         ]);
     }
 

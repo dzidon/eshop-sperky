@@ -33,10 +33,9 @@ class OrderEmailService
      * Pošle e-mail tvůrci objednávky podle aktuálního stavu objednávky
      *
      * @param Order $order
-     * @return $this
      * @throws TransportExceptionInterface
      */
-    public function send(Order $order): self
+    public function send(Order $order): void
     {
         $this->order = $order;
         $this->createEmail();
@@ -60,8 +59,6 @@ class OrderEmailService
 
         $this->addOrderDataToContext();
         $this->mailer->send($this->email);
-
-        return $this;
     }
 
     /**

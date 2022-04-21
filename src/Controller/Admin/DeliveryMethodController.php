@@ -6,7 +6,6 @@ use App\Entity\DeliveryMethod;
 use App\Form\DeliveryMethodFormType;
 use App\Form\SearchTextAndSortFormType;
 use App\Service\BreadcrumbsService;
-use App\Service\PaginatorService;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -45,7 +44,7 @@ class DeliveryMethodController extends AbstractController
      *
      * @IsGranted("admin_payment_methods")
      */
-    public function deliveryMethods(FormFactoryInterface $formFactory, PaginatorService $paginatorService): Response
+    public function deliveryMethods(FormFactoryInterface $formFactory): Response
     {
         $form = $formFactory->createNamed('', SearchTextAndSortFormType::class, null, ['sort_choices' => DeliveryMethod::getSortData()]);
         //button je přidáván v šabloně, aby se nezobrazoval v odkazu
@@ -53,26 +52,22 @@ class DeliveryMethodController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid())
         {
-            $queryForPagination = $this->getDoctrine()->getRepository(DeliveryMethod::class)->getQueryForSearchAndPagination($form->get('searchPhrase')->getData(), $form->get('sortBy')->getData());
+            $pagination = $this->getDoctrine()->getRepository(DeliveryMethod::class)->getSearchPagination($form->get('searchPhrase')->getData(), $form->get('sortBy')->getData());
         }
         else
         {
-            $queryForPagination = $this->getDoctrine()->getRepository(DeliveryMethod::class)->getQueryForSearchAndPagination();
+            $pagination = $this->getDoctrine()->getRepository(DeliveryMethod::class)->getSearchPagination();
         }
 
-        $deliveryMethods = $paginatorService
-            ->initialize($queryForPagination, 1)
-            ->getCurrentPageObjects();
-
-        if($paginatorService->isCurrentPageOutOfBounds())
+        if($pagination->isCurrentPageOutOfBounds())
         {
             throw new NotFoundHttpException('Na této stránce nebyly nalezeny žádné doručovací metody.');
         }
 
         return $this->render('admin/delivery_methods/admin_delivery_methods.html.twig', [
             'searchForm' => $form->createView(),
-            'deliveryMethods' => $deliveryMethods,
-            'pagination' => $paginatorService->createViewData(),
+            'deliveryMethods' => $pagination->getCurrentPageObjects(),
+            'pagination' => $pagination->createView(),
         ]);
     }
 
