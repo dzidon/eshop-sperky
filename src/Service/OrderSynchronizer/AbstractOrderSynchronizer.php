@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 /**
  * Abstraktní třída pro synchronizátory, které zajišťují aktuálnost stavu objednávky.
  *
- * @package App\Utils\OrderSynchronizer
+ * @package App\Service\OrderSynchronizer
  */
 abstract class AbstractOrderSynchronizer
 {
@@ -29,6 +29,9 @@ abstract class AbstractOrderSynchronizer
      */
     public function synchronize(Order $order): void
     {
+        $this->hasWarnings = false;
+        $this->warnings = [];
+
         // cena doručovací metody
         $deliveryMethod = $order->getDeliveryMethod();
         if ($deliveryMethod !== null)

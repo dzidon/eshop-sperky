@@ -7,7 +7,7 @@ use App\Entity\Order;
 /**
  * Synchronizuje stav aktivní objednávky v košíku se stavem ostatních entit
  *
- * @package App\Utils\OrderSynchronizer
+ * @package App\Service\OrderSynchronizer
  */
 class OrderCartSynchronizer extends AbstractOrderSynchronizer
 {

@@ -2,16 +2,16 @@
 
 namespace App\Repository;
 
+use Exception;
 use App\Entity\Product;
 use App\Entity\ProductOptionGroup;
 use App\Entity\ProductSection;
 use App\Pagination\Pagination;
-use App\Service\ProductCatalogFilterService;
+use App\Service\CatalogProductFilterService;
 use App\Service\SortingService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
-use Exception;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
@@ -23,10 +23,10 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class ProductRepository extends ServiceEntityRepository
 {
     private SortingService $sorting;
-    private ProductCatalogFilterService $filter;
+    private CatalogProductFilterService $filter;
     private $request;
 
-    public function __construct(ManagerRegistry $registry, SortingService $sorting, ProductCatalogFilterService $filter, RequestStack $requestStack)
+    public function __construct(ManagerRegistry $registry, SortingService $sorting, CatalogProductFilterService $filter, RequestStack $requestStack)
     {
         parent::__construct($registry, Product::class);
 
@@ -165,7 +165,7 @@ class ProductRepository extends ServiceEntityRepository
         ;
     }
 
-    public function getMinAndMaxPrice(ProductSection $section = null)
+    public function getMinAndMaxPrice(?ProductSection $section)
     {
         $queryBuilder = $this->createQueryBuilder('p')
             ->select('min(p.priceWithVat) as priceMin, max(p.priceWithVat) as priceMax');
@@ -227,23 +227,50 @@ class ProductRepository extends ServiceEntityRepository
         return $products;
     }
 
-    public function findOneForCartInsert($id)
+    public function findOneForCartInsert(int $id): ?Product
     {
         $queryBuilder = $this->createQueryBuilder('p')
-            ->select('p, pog, pogo')
+            ->select('p, pog')
             ->leftJoin('p.optionGroups', 'pog')
-            ->leftJoin('pog.options', 'pogo')
             ->andWhere('p.id LIKE :id')
             ->setParameter('id', $id)
         ;
 
-        return $this->filter
+        /** @var Product|null $product */
+        $product = $this->filter
             ->initialize($queryBuilder)
             ->addProductVisibilityCondition()
             ->getQueryBuilder()
             ->getQuery()
             ->getOneOrNullResult()
         ;
+
+        if ($product === null)
+        {
+            return null;
+        }
+
+        $optionGroupIds = [];
+        foreach ($product->getOptionGroups() as $optionGroup)
+        {
+            $optionGroupIds[] = $optionGroup->getId();
+        }
+
+        // ke každé skupině voleb její volby
+        $this->_em->createQuery('
+            SELECT PARTIAL
+                pog.{id}, pogo
+            FROM 
+                App\Entity\ProductOptionGroup pog
+            LEFT JOIN
+                pog.options pogo
+            WHERE
+                pog.id IN (:ids)
+        ')
+        ->setParameter('ids', $optionGroupIds)
+        ->getResult();
+
+        return $product;
     }
 
     public function getSearchPagination(bool $inAdmin, ProductSection $section = null, string $searchPhrase = null, string $sortAttribute = null, float $priceMin = null, float $priceMax = null, array $categoriesGrouped = null): Pagination

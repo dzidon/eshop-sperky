@@ -33,15 +33,14 @@ class CartController extends AbstractController
         $this->request = $requestStack->getCurrentRequest();
     }
 
-    private function getProductIdFromRequest(string $formName): string
+    private function getProductIdFromRequest(string $formName): ?int
     {
-        $productId = '';
-        if(isset($this->request->request->all()[$formName]['productId']))
+        if(isset($this->request->request->all()[$formName]['productId']) && is_numeric($this->request->request->all()[$formName]['productId']))
         {
-            $productId = $this->request->request->all()[$formName]['productId'];
+            return (int) $this->request->request->all()[$formName]['productId'];
         }
 
-        return $productId;
+        return null;
     }
 
     private function getCartOccurenceIdFromRequest(): ?int
@@ -66,46 +65,52 @@ class CartController extends AbstractController
         }
 
         $productId = $this->getProductIdFromRequest('cart_insert_form');
-        /** @var Product|null $product */
-        $product = $this->getDoctrine()->getRepository(Product::class)->findOneForCartInsert($productId);
-
-        if($product !== null)
+        if ($productId !== null)
         {
-            $cartInsertRequest = new CartInsert();
-            $cartInsertRequest->setProduct($product);
-            $form = $this->createForm(CartInsertFormType::class, $cartInsertRequest);
-            $form->handleRequest($this->request);
-
-            if ($form->isSubmitted() && $form->isValid())
+            /** @var Product|null $product */
+            $product = $this->getDoctrine()->getRepository(Product::class)->findOneForCartInsert($productId);
+            if($product !== null)
             {
-                try
+                $cartInsertRequest = new CartInsert();
+                $cartInsertRequest->setProduct($product);
+                $form = $this->createForm(CartInsertFormType::class, $cartInsertRequest);
+                $form->handleRequest($this->request);
+
+                if ($form->isSubmitted() && $form->isValid())
                 {
-                    $this->cart->insertProduct($cartInsertRequest->getProduct(), $cartInsertRequest->getQuantity(), $cartInsertRequest->getOptionGroups());
-                    $this->jsonResponse->setResponseHtml(
-                        $this->renderView('fragments/_cart_insert_modal_content.html.twig', [
-                            'cart'              => $this->cart,
-                            'product'           => $cartInsertRequest->getProduct(),
-                            'submittedQuantity' => $cartInsertRequest->getQuantity(),
-                        ])
-                    )
-                    ->setResponseData('totalProducts', $this->cart->getOrder()->getTotalQuantity());
+                    try
+                    {
+                        $this->cart->insertProduct($cartInsertRequest->getProduct(), $cartInsertRequest->getQuantity(), $cartInsertRequest->getOptionGroups());
+                        $this->jsonResponse->setResponseHtml(
+                            $this->renderView('fragments/_cart_insert_modal_content.html.twig', [
+                                'cart'              => $this->cart,
+                                'product'           => $cartInsertRequest->getProduct(),
+                                'submittedQuantity' => $cartInsertRequest->getQuantity(),
+                            ])
+                        )
+                        ->setResponseData('totalProducts', $this->cart->getOrder()->getTotalQuantity());
+                    }
+                    catch(CartException $exception)
+                    {
+                        $this->jsonResponse->addResponseError($exception->getMessage());
+                    }
                 }
-                catch(CartException $exception)
+                else if ($form->isSubmitted() && !$form->isValid())
                 {
-                    $this->jsonResponse->addResponseError($exception->getMessage());
+                    foreach ($form->getErrors() as $formError)
+                    {
+                        $this->jsonResponse->addResponseError($formError->getMessage());
+                    }
                 }
             }
-            else if ($form->isSubmitted() && !$form->isValid())
+            else
             {
-                foreach ($form->getErrors() as $formError)
-                {
-                    $this->jsonResponse->addResponseError($formError->getMessage());
-                }
+                $this->jsonResponse->addResponseError('Tento produkt už nejde vložit do košíku.');
             }
         }
         else
         {
-            $this->jsonResponse->addResponseError('Tento produkt už nejde vložit do košíku.');
+            $this->jsonResponse->addResponseError('Neplatné ID produktu.');
         }
 
         return $this->jsonResponse->createJsonResponse();

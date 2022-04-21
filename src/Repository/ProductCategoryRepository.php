@@ -4,7 +4,8 @@ namespace App\Repository;
 
 use App\Entity\ProductCategory;
 use App\Entity\ProductSection;
-use App\Service\ProductCatalogFilterService;
+use App\Service\CatalogProductFilterService;
+use App\Service\CatalogCategoryFilterService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
@@ -17,25 +18,24 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class ProductCategoryRepository extends ServiceEntityRepository
 {
-    private ProductCatalogFilterService $filter;
+    private CatalogProductFilterService $productFilter;
+    private CatalogCategoryFilterService $categoryFilter;
 
-    public function __construct(ManagerRegistry $registry, ProductCatalogFilterService $filter)
+    public function __construct(ManagerRegistry $registry, CatalogProductFilterService $productFilter, CatalogCategoryFilterService $categoryFilter)
     {
         parent::__construct($registry, ProductCategory::class);
 
-        $this->filter = $filter;
+        $this->productFilter = $productFilter;
+        $this->categoryFilter = $categoryFilter;
     }
 
-    public function getNumberOfProductsForFilter(ProductCategory $category, $categoriesChosen, ProductSection $section, $searchPhrase = null, $priceMin = null, $priceMax = null)
+    public function getNumberOfProductsForFilter(ProductCategory $category, ProductSection $section, string $searchPhrase = null, float $priceMin = null, float $priceMax = null, array $categoriesChosen = null)
     {
         $conn = $this->getEntityManager()->getConnection();
 
-        $this->filter
-            ->initialize(null, $section, $searchPhrase, $priceMin, $priceMax, $categoriesChosen)
-            ->createDataForCategoryProductCount($category);
-
-        $placeholderData = $this->filter->getProductCountPlaceholders();
-        $clauseData = $this->filter->getProductCountClauses();
+        $this->categoryFilter->createDataForCategoryProductCountQuery($category, $section, $searchPhrase, $priceMin, $priceMax, $categoriesChosen);
+        $placeholderData = $this->categoryFilter->getProductCountPlaceholders();
+        $clauseData = $this->categoryFilter->getProductCountClauses();
 
         $sql = sprintf('
             SELECT COUNT(*) FROM (
@@ -62,7 +62,7 @@ class ProductCategoryRepository extends ServiceEntityRepository
         return $resultSet->fetchOne();
     }
 
-    public function qbFindCategoriesInSection($section = null): QueryBuilder
+    public function qbFindCategoriesInSection(?ProductSection $section): QueryBuilder
     {
         $queryBuilder = $this->createQueryBuilder('pc')
             ->select('pc', 'pcg', 'p')
@@ -70,7 +70,7 @@ class ProductCategoryRepository extends ServiceEntityRepository
             ->innerJoin('pc.products', 'p')
         ;
 
-        return $this->filter
+        return $this->productFilter
             ->initialize($queryBuilder, $section)
             ->addProductSearchConditions()
             ->getQueryBuilder()

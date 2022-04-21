@@ -5,7 +5,7 @@ namespace App\Service\OrderSynchronizer;
 /**
  * Synchronizuje stav objednávky na míru
  *
- * @package App\Utils\OrderSynchronizer
+ * @package App\Service\OrderSynchronizer
  */
 class CustomOrderSynchronizer extends AbstractOrderSynchronizer
 {

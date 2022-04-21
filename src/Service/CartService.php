@@ -32,7 +32,14 @@ class CartService
      */
     private $newOrderCookie = null;
 
+    /**
+     * @var bool
+     */
     private bool $isOrderNew = false;
+
+    /**
+     * @var int
+     */
     private int $totalQuantityForNavbar = 0;
 
     /** @var Request */
@@ -47,6 +54,9 @@ class CartService
         $this->request = $requestStack->getCurrentRequest();
     }
 
+    /**
+     * @return int
+     */
     public function getTotalQuantityForNavbar(): int
     {
         return $this->totalQuantityForNavbar;
@@ -62,12 +72,18 @@ class CartService
         return $this->order;
     }
 
+    /**
+     * @return OrderCartSynchronizer
+     */
     public function getSynchronizer(): OrderCartSynchronizer
     {
         return $this->synchronizer;
     }
 
-    public function getNewOrderCookie()
+    /**
+     * @return Cookie|null
+     */
+    public function getNewOrderCookie(): ?Cookie
     {
         return $this->newOrderCookie;
     }

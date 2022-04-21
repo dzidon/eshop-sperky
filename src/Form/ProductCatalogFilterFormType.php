@@ -96,17 +96,17 @@ class ProductCatalogFilterFormType extends AbstractType
                 {
                     /** @var ProductCategory $category */
                     $category = $choiceView->data;
-                    $repository = $count = $this->entityManager->getRepository(ProductCategory::class);
+                    $repository = $this->entityManager->getRepository(ProductCategory::class);
 
                     if(!$filterData->getCategories()->contains($category))
                     {
                         if($form->isSubmitted() && $form->isValid())
                         {
-                            $count = $repository->getNumberOfProductsForFilter($category, $categoriesChosen, $section, $searchPhrase, $priceMin, $priceMax);
+                            $count = $repository->getNumberOfProductsForFilter($category, $section, $searchPhrase, $priceMin, $priceMax, $categoriesChosen);
                         }
                         else
                         {
-                            $count = $repository->getNumberOfProductsForFilter($category, [], $section);
+                            $count = $repository->getNumberOfProductsForFilter($category, $section);
                         }
 
                         if($count > 0)
