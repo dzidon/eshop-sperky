@@ -18,7 +18,7 @@ variables:
         opcache.preload: /app/config/preload.php
 
 build:
-    flavor: none
+    flavor: composer
 
 disk: 512
 
