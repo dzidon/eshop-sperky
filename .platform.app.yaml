@@ -50,6 +50,7 @@ hooks:
         set -x -e
 
         yarn install --ignore-engines
+        yarn add jquery
 
         curl -fs https://get.symfony.com/cloud/configurator | (>&2 bash)
 
