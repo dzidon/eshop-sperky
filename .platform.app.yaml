@@ -59,6 +59,4 @@ hooks:
     deploy: |
         set -x -e
 
-        rm -rf var/cache/*
-
         (>&2 symfony-deploy)
