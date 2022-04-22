@@ -49,7 +49,7 @@ hooks:
     build: |
         set -x -e
 
-        yarn install
+        yarn install --ignore-engines
 
         curl -fs https://get.symfony.com/cloud/configurator | (>&2 bash)
 
