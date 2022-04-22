@@ -70,7 +70,7 @@
                 <a href="{{ path('review_edit') }}" class="btn-floating btn-medium waves-effect waves-light grey"><i class="material-icons">mode_edit</i></a>
             </h2>
 
-            {% if totalAndAverageRating.total is not empty %}
+            {% if totalAndAverageRating.total > 0 %}
                 <div class="row">
                     <div class="card white margin-0">
                         <div class="card-content valign-wrapper">

@@ -76,7 +76,8 @@ class ReviewRepository extends ServiceEntityRepository
 
         return $this->addVisibilityConditions($queryBuilder)
             ->getQuery()
-            ->getScalarResult()[0];
+            ->getScalarResult()[0]
+        ;
     }
 
     private function addVisibilityConditions(QueryBuilder $queryBuilder): QueryBuilder
