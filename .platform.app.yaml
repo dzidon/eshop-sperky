@@ -33,7 +33,7 @@ web:
             passthru: "/index.php"
 
 relationships:
-    mysql_database: "database:mysql"
+    mysql_database: "db:mysql"
 
 dependencies:
     php:
