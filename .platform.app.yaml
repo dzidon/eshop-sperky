@@ -56,8 +56,6 @@ hooks:
 
         (>&2 symfony-build)
 
-        yarn build
-
     deploy: |
         set -x -e
 
