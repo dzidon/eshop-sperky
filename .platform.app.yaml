@@ -33,14 +33,17 @@ relationships:
     mysql_database: "database:mysql"
 
 mounts:
-    "/var": { source: local, source_path: var }
+    # "/var": { source: local, source_path: var }
+    '/var/cache': 'shared:files/cache'
+    '/var/logs': 'shared:files/logs'
+    '/var/sessions': 'shared:files/sessions'
 
 hooks:
     build: |
         set -x -e
 
         curl -fs https://get.symfony.com/cloud/configurator | (>&2 bash)
-        
+
         (>&2 symfony-build)
 
     deploy: |
