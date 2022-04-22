@@ -13,12 +13,15 @@ runtime:
         
 
 variables:
+    env:
+        APP_ENV: 'prod'
+        APP_DEBUG: 0
     php:
         # uncomment on PHP 7.4+
         opcache.preload: /app/config/preload.php
 
 build:
-    flavor: none
+    flavor: composer
 
 disk: 512
 
@@ -32,15 +35,19 @@ web:
 relationships:
     mysql_database: "database:mysql"
 
+dependencies:
+    nodejs:
+        yarn: "*"
+
 mounts:
-    # "/var": { source: local, source_path: var }
-    '/var/cache': 'shared:files/cache'
-    '/var/logs': 'shared:files/logs'
-    '/var/sessions': 'shared:files/sessions'
+    "/var": { source: local, source_path: var }
+    "/public/images": "shared:files/images"
 
 hooks:
     build: |
         set -x -e
+
+        yarn install
 
         curl -fs https://get.symfony.com/cloud/configurator | (>&2 bash)
 
@@ -48,5 +55,7 @@ hooks:
 
     deploy: |
         set -x -e
+
+        rm -rf var/cache/*
 
         (>&2 symfony-deploy)
