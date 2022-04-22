@@ -36,6 +36,8 @@ relationships:
     mysql_database: "database:mysql"
 
 dependencies:
+    php:
+        composer/composer: '^2'
     nodejs:
         yarn: "*"
 
@@ -48,6 +50,7 @@ hooks:
         set -x -e
 
         yarn install
+        yarn build
 
         curl -fs https://get.symfony.com/cloud/configurator | (>&2 bash)
 
