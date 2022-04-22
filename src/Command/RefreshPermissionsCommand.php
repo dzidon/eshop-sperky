@@ -47,7 +47,7 @@ class RefreshPermissionsCommand extends Command
                            ->setName(PermissionVoter::PERMISSIONS[$attribute]['name'])
                            ->setCategory(PermissionVoter::PERMISSIONS[$attribute]['category']);
 
-            if($permissionInDb === null) //neexistuje opravneni s hledanym kodem
+            if($permissionInDb === null) // neexistuje opravneni s hledanym kodem
             {
                 $this->entityManager->persist($permissionHere);
 
@@ -68,11 +68,11 @@ class RefreshPermissionsCommand extends Command
         $numberOfUpdated = count($stats['updated']);
         if(($numberOfCreated + $numberOfUpdated) === 0)
         {
-            $output->writeln('Nothing has been updated, your table "permission" is up-to-date!');
+            $output->writeln('All permissions are up-to-date!');
         }
         else
         {
-            $output->writeln(['Your table "permission" has been successfully updated!', '']);
+            $output->writeln(['Permissions have been updated!', '']);
             if($numberOfCreated > 0)
             {
                 $output->writeln(sprintf('Permissions created: %s', implode(', ', $stats['created'])));

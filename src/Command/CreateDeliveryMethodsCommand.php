@@ -68,11 +68,10 @@ class CreateDeliveryMethodsCommand extends Command
 
         if(count($created) === 0)
         {
-            $output->writeln('Nothing has been created, your table "delivery_method" is up-to-date!');
+            $output->writeln('No new delivery methods have been created.');
         }
         else
         {
-            $output->writeln(['Your table "delivery_method" has been successfully updated!', '']);
             $output->writeln(sprintf('Delivery methods created: %s', implode(', ', $created)));
         }
 

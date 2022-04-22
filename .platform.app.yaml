@@ -59,4 +59,8 @@ hooks:
     deploy: |
         set -x -e
 
+        bin/console app:refresh-permissions
+        bin/console app:create-delivery-methods
+        bin/console app:create-payment-methods
+
         (>&2 symfony-deploy)

@@ -74,11 +74,10 @@ class CreatePaymentMethodsCommand extends Command
 
         if(count($created) === 0)
         {
-            $output->writeln('Nothing has been created, your table "payment_method" is up-to-date!');
+            $output->writeln('No new payment methods have been created.');
         }
         else
         {
-            $output->writeln(['Your table "payment_method" has been successfully updated!', '']);
             $output->writeln(sprintf('Payment methods created: %s', implode(', ', $created)));
         }
 
