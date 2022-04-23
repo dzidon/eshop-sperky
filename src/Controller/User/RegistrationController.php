@@ -3,8 +3,8 @@
 namespace App\Controller\User;
 
 use App\Entity\User;
-use App\Form\LoginFormType;
 use App\Form\RegistrationFormType;
+use App\Form\VerificationFormType;
 use App\Security\EmailVerifier;
 use App\Service\BreadcrumbsService;
 use App\Service\UserRegistrationService;
@@ -15,7 +15,6 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\Component\Routing\Annotation\Route;
@@ -83,7 +82,7 @@ class RegistrationController extends AbstractController
             return $this->redirectToRoute('home');
         }
 
-        if(!$this->request->query->has('expires') || !$this->request->query->has('signature') || !$this->request->query->has('token'))
+        if(!$this->request->query->has('email') || !$this->request->query->has('expires') || !$this->request->query->has('signature') || !$this->request->query->has('token'))
         {
             throw new NotFoundHttpException('Nemáte platný odkaz pro ověření účtu.');
         }
@@ -94,10 +93,8 @@ class RegistrationController extends AbstractController
             $this->addFlash('failure', $this->translator->trans($error->getMessageKey()));
         }
 
-        $form = $formFactory->createNamed('', LoginFormType::class, null, ['csrf_token_id' => 'form_verification', 'last_email' => $authenticationUtils->getLastUsername()]);
+        $form = $formFactory->createNamed('', VerificationFormType::class, null, ['default_email' => $this->request->query->get('email', '')]);
         $form->add('submit', SubmitType::class, ['label' => 'Ověřit']);
-
-        $this->request->getSession()->remove(Security::LAST_USERNAME);
 
         $this->breadcrumbs
             ->addRoute('home')

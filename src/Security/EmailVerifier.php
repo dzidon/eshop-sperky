@@ -56,7 +56,8 @@ class EmailVerifier
         $signatureComponents = $this->verifyEmailHelper->generateSignature(
             self::VERIFICATION_ROUTE_NAME,
             $usedId,
-            $usedEmail
+            $usedEmail,
+            ['email' => $usedEmail]
         );
 
         $context = $email->getContext();
@@ -73,7 +74,7 @@ class EmailVerifier
     }
 
     /**
-     * Řeší aktivaci účtu po kliknutí na ověřovací odkaz
+     * Řeší aktivaci účtu
      *
      * @param Request $request
      * @param User $user

@@ -24,7 +24,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
 use SymfonyCasts\Bundle\VerifyEmail\Exception\VerifyEmailExceptionInterface;
 
 /**
- * Třída LoginFormAuthenticator řeší autentizaci přes ověřovací formulář (email, heslo, signature z odkazu).
+ * Třída VerificationFormAuthenticator řeší autentizaci přes ověřovací formulář (email, heslo, signature z odkazu).
  *
  * @package App\Security
  */
@@ -62,8 +62,6 @@ class VerificationFormAuthenticator extends AbstractLoginFormAuthenticator
         $email = $request->request->get('email', '');
         $password = $request->request->get('password', '');
         $token = $request->request->get('_token');
-
-        $request->getSession()->set(Security::LAST_USERNAME, $email);
 
         return new Passport(
             new UserBadge($email, function($userIdentifier) use ($request)
@@ -111,6 +109,7 @@ class VerificationFormAuthenticator extends AbstractLoginFormAuthenticator
     protected function getLoginUrl(Request $request): string
     {
         return $this->urlGenerator->generate(self::VERIFICATION_ROUTE, [
+            'email' => $request->query->get('email', ''),
             'expires' => $request->query->get('expires', ''),
             'signature' => $request->query->get('signature', ''),
             'token' => $request->query->get('token', ''),
