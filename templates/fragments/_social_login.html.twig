@@ -1,6 +1,6 @@
 <div class="row center-align">
     <p>Také se můžete {{ actionName }} přes Facebook nebo Google:</p>
 
-    <a href="{{ path('login_social', {service: 'facebook'}) }}" class="btn-floating btn-large waves-effect waves-light blue margin-right15px"><i class="fab fa-facebook-f"></i></a>
-    <a href="{{ path('login_social', {service: 'google'}) }}" class="btn-floating btn-large waves-effect waves-light blue"><i class="fab fa-google"></i></a>
+    <a href="{{ path('login_social', {service: 'facebook'}) }}" class="btn-floating btn-large waves-effect waves-light blue margin-right15px tooltipped" data-position="bottom" data-tooltip="Facebook"><i class="fab fa-facebook-f"></i></a>
+    <a href="{{ path('login_social', {service: 'google'}) }}" class="btn-floating btn-large waves-effect waves-light blue tooltipped" data-position="bottom" data-tooltip="Google"><i class="fab fa-google"></i></a>
 </div>

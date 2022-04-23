@@ -12,7 +12,7 @@
             <div class="row valign-wrapper">
                 <a href="{{ product_path }}" class="margin-right15px">
                     <div class="img-cart-product">
-                        <img alt="Obrázek produktu" class="responsive-img" src="{% if cartOccurence.product.mainImageName %} {{ asset(cartOccurence.product.mainImageName, 'product_images') }}  {% else %} {{ asset('no-image.png', 'images') }} {% endif %}">
+                        <img alt="Obrázek produktu {{ cartOccurence.product.name }}" class="responsive-img" src="{% if cartOccurence.product.mainImageName %} {{ asset(cartOccurence.product.mainImageName, 'product_images') }}  {% else %} {{ asset('no-image.png', 'images') }} {% endif %}">
                     </div>
                 </a>
                 <a href="{{ product_path }}">

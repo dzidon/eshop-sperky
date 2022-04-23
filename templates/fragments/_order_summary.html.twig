@@ -11,7 +11,7 @@
                         <div class="col no-padding margin-right15px">
                             <a href="{{ product_path }}">
                                 <div class="img-cart-overview">
-                                    <img alt="Obrázek produktu" class="responsive-img" src="{% if cartOccurence.product.mainImageName %} {{ asset(cartOccurence.product.mainImageName, 'product_images') }}  {% else %} {{ asset('no-image.png', 'images') }} {% endif %}">
+                                    <img alt="Obrázek produktu {{ cartOccurence.product.name }}" class="responsive-img" src="{% if cartOccurence.product.mainImageName %} {{ asset(cartOccurence.product.mainImageName, 'product_images') }}  {% else %} {{ asset('no-image.png', 'images') }} {% endif %}">
                                 </div>
                             </a>
                         </div>

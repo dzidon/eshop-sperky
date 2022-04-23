@@ -6,7 +6,7 @@
 {% block admin_subheading_extra %}
 
     {% if can_edit %}
-        <a href=" {{ path('admin_product_option_edit') }} " class="btn-floating btn-medium waves-effect waves-light blue"><i class="material-icons">add</i></a>
+        <a href=" {{ path('admin_product_option_edit') }} " class="btn-floating btn-medium waves-effect waves-light blue tooltipped" data-position="bottom" data-tooltip="Nová"><i class="material-icons">add</i></a>
     {% endif %}
 
 {% endblock %}
@@ -35,13 +35,13 @@
 
                         <div class="col s3 no-padding right-align">
                             {% if can_edit %}
-                                <a href="{{ path('admin_product_option_edit', {id: optionGroup.getId()}) }}">
+                                <a href="{{ path('admin_product_option_edit', {id: optionGroup.getId()}) }}" class="tooltipped" data-position="bottom" data-tooltip="Upravit">
                                     <i class="fas fa-edit"></i>
                                 </a>
                             {% endif %}
 
                             {% if can_delete %}
-                                <a href="{{ path('admin_product_option_delete', {id: optionGroup.getId()}) }}">
+                                <a href="{{ path('admin_product_option_delete', {id: optionGroup.getId()}) }}" class="tooltipped" data-position="bottom" data-tooltip="Smazat">
                                     <i class="fas fa-trash-alt"></i>
                                 </a>
                             {% endif %}

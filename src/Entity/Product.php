@@ -151,7 +151,7 @@ class Product
     private $info;
 
     /**
-     * @ORM\OneToMany(targetEntity=ProductImage::class, mappedBy="product", cascade={"persist"})
+     * @ORM\OneToMany(targetEntity=ProductImage::class, mappedBy="product", cascade={"persist", "remove"})
      *
      * @Assert\Valid
      */

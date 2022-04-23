@@ -39,10 +39,10 @@
                                 {% endfor %}
                             </ul>
                             <li>
-                                <a href="#!" class="dropdown-trigger black-text" data-target="dropdown_sections_desktop"> <i class="material-icons left">filter_vintage</i> Produkty <i class="material-icons right">arrow_drop_down</i></a>
+                                <a href="#!" class="dropdown-trigger black-text" data-target="dropdown_sections_desktop"> <i class="material-icons left">local_florist</i> Produkty <i class="material-icons right">arrow_drop_down</i></a>
                             </li>
                         {% else %}
-                            <li><a href="{{ path('products') }}" class="black-text"> <i class="material-icons left">filter_vintage</i> Produkty</a></li>
+                            <li><a href="{{ path('products') }}" class="black-text"> <i class="material-icons left">local_florist</i> Produkty</a></li>
                         {% endif %}
 
                         <li><a href="{{ path_order_cart }}" class="black-text"> <i class="material-icons left">shopping_cart</i> Košík <span class="cart-badge blue white-text navbar-cart-total-products">{{ cart_service.totalQuantityForNavbar }}</span></a></li>
@@ -73,10 +73,10 @@
                     {% endfor %}
                 </ul>
                 <li>
-                    <a href="#!" class="dropdown-trigger" data-target="dropdown_sections_mobile"> <i class="material-icons left">filter_vintage</i> Produkty <i class="material-icons right margin-0">arrow_drop_down</i></a>
+                    <a href="#!" class="dropdown-trigger" data-target="dropdown_sections_mobile"> <i class="material-icons left">local_florist</i> Produkty <i class="material-icons right margin-0">arrow_drop_down</i></a>
                 </li>
             {% else %}
-                <li><a href="{{ path('products') }}"> <i class="material-icons left">filter_vintage</i> Produkty</a></li>
+                <li><a href="{{ path('products') }}"> <i class="material-icons left">local_florist</i> Produkty</a></li>
             {% endif %}
 
             <li><a href="{{ path_order_cart }}"> <i class="material-icons left">shopping_cart</i> Košík <span class="cart-badge blue white-text navbar-cart-total-products">{{ cart_service.totalQuantityForNavbar }}</span></a></li>
@@ -124,14 +124,14 @@
                     <div class="row no-mar-bot valign-wrapper flex-wrap">
                         <div class="col s4 left-align">
                             <a href="javascript:void(0);" class="btn-large waves-effect grey lighten-2 black-text modal-close hide-on-small-and-down">Zavřít</a>
-                            <a href="javascript:void(0);" class="btn-floating btn-large waves-effect grey lighten-2 modal-close hide-on-med-and-up">
+                            <a href="javascript:void(0);" class="btn-floating btn-large waves-effect grey lighten-2 modal-close hide-on-med-and-up tooltipped" data-position="bottom" data-tooltip="Zavřít">
                                 <i class="material-icons black-text">arrow_back</i>
                             </a>
                         </div>
 
                         <div class="col s8 right-align">
                             <a href="{{ path_order_cart }}" class="btn-large waves-effect blue white-text hide-on-small-and-down">Pokračovat do košíku</a>
-                            <a href="{{ path_order_cart }}" class="btn-floating btn-large waves-effect blue white-text hide-on-med-and-up">
+                            <a href="{{ path_order_cart }}" class="btn-floating btn-large waves-effect blue white-text hide-on-med-and-up tooltipped" data-position="bottom" data-tooltip="Do košíku">
                                 <i class="material-icons">shopping_cart</i>
                             </a>
                         </div>

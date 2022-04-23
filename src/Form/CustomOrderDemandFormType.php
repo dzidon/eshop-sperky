@@ -25,7 +25,6 @@ class CustomOrderDemandFormType extends AbstractType
     {
         $builder
             ->add('email', EmailType::class, [
-                'attr' => ['autofocus' => 'autofocus'],
                 'label' => 'Váš email',
             ])
             ->add('text', TextareaType::class, [

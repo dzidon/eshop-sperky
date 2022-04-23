@@ -1,7 +1,7 @@
 {% extends 'profile/profile_base.html.twig' %}
 
 {% block profile_subheading_extra %}
-    <a href="{{ path('profile_address') }}" class="btn-floating btn-medium waves-effect waves-light blue"><i class="material-icons">add</i></a>
+    <a href="{{ path('profile_address') }}" class="btn-floating btn-medium waves-effect waves-light blue tooltipped" data-position="bottom" data-tooltip="Nová"><i class="material-icons">add</i></a>
 {% endblock %}
 
 {% block profile_body %}

@@ -289,6 +289,11 @@ a.secondary-content {
     bottom: 20px;
 }
 
+.sticky-card-action {
+    position: sticky;
+    margin-top: auto;
+}
+
 /*
     ======== RATING ========
 */

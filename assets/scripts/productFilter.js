@@ -110,10 +110,6 @@ function initialize()
             slider.noUiSlider.on('update', inputsUpdate);
             slider.noUiSlider.on('change', inputsUpdate);
 
-            // nastavení focusu na odpovídající input
-            slider.noUiSlider.on('start', priceInputSetFocus);
-            slider.noUiSlider.on('change', priceInputSetFocus);
-
             // odeslani formulare s filtrem po posunuti slideru
             slider.noUiSlider.on('change', catalogResetUsingForm);
         }
@@ -147,18 +143,6 @@ function sliderUpdate(slider, priceMin, priceMax)
         }
 
         slider.noUiSlider.set([priceMinToSet, priceMaxToSet]);
-    }
-}
-
-function priceInputSetFocus(values, handle)
-{
-    if (handle === 0 && priceMinInput)
-    {
-        priceMinInput.focus();
-    }
-    else if (handle === 1 && priceMaxInput)
-    {
-        priceMaxInput.focus();
     }
 }
 

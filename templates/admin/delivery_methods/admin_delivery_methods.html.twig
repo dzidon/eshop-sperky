@@ -26,7 +26,7 @@
 
                         <div class="col s3 no-padding right-align">
                             {% if can_edit %}
-                                <a href="{{ path('admin_delivery_method_edit', {id: deliveryMethod.id}) }}">
+                                <a href="{{ path('admin_delivery_method_edit', {id: deliveryMethod.id}) }}" class="tooltipped" data-position="bottom" data-tooltip="Upravit">
                                     <i class="fas fa-edit"></i>
                                 </a>
                             {% endif %}

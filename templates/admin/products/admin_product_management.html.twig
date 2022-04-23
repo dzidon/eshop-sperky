@@ -6,7 +6,7 @@
 {% block admin_subheading_extra %}
 
     {% if can_edit %}
-        <a href="{{ path('admin_product_edit') }}" class="btn-floating btn-medium waves-effect waves-light blue"><i class="material-icons">add</i></a>
+        <a href="{{ path('admin_product_edit') }}" class="btn-floating btn-medium waves-effect waves-light blue tooltipped" data-position="bottom" data-tooltip="Nový"><i class="material-icons">add</i></a>
     {% endif %}
 
 {% endblock %}

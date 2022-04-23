@@ -26,7 +26,6 @@ class ContactFormType extends AbstractType
     {
         $builder
             ->add('email', EmailType::class, [
-                'attr' => ['autofocus' => 'autofocus'],
                 'label' => 'Váš email',
             ])
             ->add('subject', TextType::class, [

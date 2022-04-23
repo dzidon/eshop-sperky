@@ -8,7 +8,7 @@
 {% block admin_subheading_extra %}
 
     {% if can_edit_custom %}
-        <a href="{{ path('admin_order_custom_edit') }}" class="btn-floating btn-medium waves-effect waves-light blue"><i class="material-icons">add</i></a>
+        <a href="{{ path('admin_order_custom_edit') }}" class="btn-floating btn-medium waves-effect waves-light blue tooltipped" data-position="bottom" data-tooltip="Vytvořit na míru"><i class="material-icons">add</i></a>
     {% endif %}
 
 {% endblock %}
@@ -38,25 +38,25 @@
                         <div class="col s3 no-padding right-align">
                             {% if order.isCreatedManually and order.isFresh() %}
                                 {% if can_edit_custom %}
-                                    <a href="{{ path('admin_order_custom_edit', {id: order.id}) }}">
+                                    <a href="{{ path('admin_order_custom_edit', {id: order.id}) }}" class="tooltipped" data-position="bottom" data-tooltip="Upravit">
                                         <i class="fas fa-edit"></i>
                                     </a>
                                 {% endif %}
 
                                 {% if can_delete_custom %}
-                                    <a href="{{ path('admin_order_custom_delete', {id: order.id}) }}">
+                                    <a href="{{ path('admin_order_custom_delete', {id: order.id}) }}" class="tooltipped" data-position="bottom" data-tooltip="Smazat">
                                         <i class="fas fa-trash-alt"></i>
                                     </a>
                                 {% endif %}
                             {% elseif not order.isFresh() %}
                                 {% if can_edit %}
-                                    <a href="{{ path('admin_order_overview', {id: order.id}) }}">
+                                    <a href="{{ path('admin_order_overview', {id: order.id}) }}" class="tooltipped" data-position="bottom" data-tooltip="Upravit">
                                         <i class="fas fa-edit"></i>
                                     </a>
                                 {% endif %}
 
                                 {% if can_cancel and not order.isCancelled() %}
-                                    <a href="{{ path('admin_order_cancel', {id: order.id}) }}">
+                                    <a href="{{ path('admin_order_cancel', {id: order.id}) }}" class="tooltipped" data-position="bottom" data-tooltip="Zrušit">
                                         <i class="fas fa-ban"></i>
                                     </a>
                                 {% endif %}

@@ -104,14 +104,10 @@ class ProductController extends AbstractController
         if ($form->isSubmitted() && $form->isValid())
         {
             $entityManager = $this->getDoctrine()->getManager();
-            foreach ($product->getImages() as $image)
-            {
-                $entityManager->persist($image);
-            }
             $entityManager->persist($product);
             $entityManager->flush();
 
-            // workaround bugu (asi) ve vichuploader
+            // workaround bugu ve vichuploader
             $oldMainImageName = $product->getMainImageName();
             $product->determineMainImageName();
             if($oldMainImageName !== $product->getMainImageName())

@@ -37,7 +37,7 @@
 
                                 <a href="{{ product_path }}" class="margin-right15px">
                                     <div class="img-cart-product">
-                                        <img alt="Obrázek produktu" class="responsive-img" src="{% if cartOccurenceData.product.mainImageName %} {{ asset(cartOccurenceData.product.mainImageName, 'product_images') }}  {% else %} {{ asset('no-image.png', 'images') }} {% endif %}">
+                                        <img alt="Obrázek produktu {{ cartOccurenceData.product.name }}" class="responsive-img" src="{% if cartOccurenceData.product.mainImageName %} {{ asset(cartOccurenceData.product.mainImageName, 'product_images') }}  {% else %} {{ asset('no-image.png', 'images') }} {% endif %}">
                                     </div>
                                 </a>
                                 <a href="{{ product_path }}">
@@ -48,7 +48,7 @@
 
                             {# Tlačítko pro smazání - velká obrazovka #}
                             <div class="col m2 right-align hide-on-small-and-down hide-on-large-only hide-on-extra-large-only">
-                                <a href="javascript:void(0);" class="btn-floating btn-medium waves-effect waves-light grey lighten-2 button-cart-remove" data-cart-occurence-id="{{ cartOccurenceData.id }}">
+                                <a href="javascript:void(0);" class="btn-floating btn-medium waves-effect waves-light grey lighten-2 button-cart-remove tooltipped" data-position="bottom" data-tooltip="Vyndat" data-cart-occurence-id="{{ cartOccurenceData.id }}">
                                     <i class="material-icons black-text">close</i>
                                 </a>
                             </div>
@@ -81,7 +81,7 @@
 
                             {# Tlačítko pro smazání - velká obrazovka #}
                             <div class="col l1 right-align hide-on-med-and-down">
-                                <a href="javascript:void(0);" class="btn-floating btn-medium waves-effect waves-light grey lighten-2 button-cart-remove" data-cart-occurence-id="{{ cartOccurenceData.id }}">
+                                <a href="javascript:void(0);" class="btn-floating btn-medium waves-effect waves-light grey lighten-2 button-cart-remove tooltipped" data-position="bottom" data-tooltip="Vyndat" data-cart-occurence-id="{{ cartOccurenceData.id }}">
                                     <i class="material-icons black-text">close</i>
                                 </a>
                             </div>

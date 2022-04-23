@@ -14,8 +14,8 @@
             {% endif %}
 
             {% for review in reviews %}
-                <div class="col s12 l{{ large_size }} margin-0">
-                    <div class="card white">
+                <div class="col s12 l{{ large_size }} margin-0 flex-wrap">
+                    <div class="card white container-sticky-bottom width-max">
                         <div class="card-content black-text">
                             <span class="card-title">
                                 {# Klikatelné jméno, pokud je oprávněn nějak upravovat ostatní uživatele #}
@@ -37,6 +37,9 @@
                             {% if review.getText() is not null %}
                                 <br><br>
                                 <p>{{ review.getText() }}</p>
+                            {% else %}
+                                <br><br>
+                                <em>Uživatel nic nenapsal.</em>
                             {% endif %}
                         </div>
 
@@ -44,7 +47,7 @@
                         {% set can_delete = is_granted('review_delete', review) %}
 
                         {% if can_edit or can_delete %}
-                            <div class="card-action">
+                            <div class="card-action sticky-card-action">
                                 {% if can_edit %}
                                     <a href="{{ path('review_edit', {id: review.getId()}) }}">Upravit</a>
                                 {% endif %}

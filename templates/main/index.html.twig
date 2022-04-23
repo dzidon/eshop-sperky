@@ -10,7 +10,7 @@
                 <h5 class="header col s12 light white-text">Každý náš produkt je přírodní originál</h5>
             </div>
             <div class="row center">
-                <a href="{{ path('products') }}" class="btn-large waves-effect waves-light blue">Nakupovat</a>
+                <a href="{{ path('products') }}" class="btn-large waves-effect waves-light blue"><i class="material-icons left">shopping_cart</i>Nakupovat</a>
             </div>
             <br><br>
         </div>
@@ -60,7 +60,7 @@
 
             <h2>
                 Novinky
-                <a href="{{ path('products') }}" class="btn-floating btn-medium waves-effect waves-light blue"><i class="material-icons">more_horiz</i></a>
+                <a href="{{ path('products') }}" class="btn-floating btn-medium waves-effect waves-light blue tooltipped" data-position="bottom" data-tooltip="Více"><i class="material-icons">more_horiz</i></a>
             </h2>
 
             {# Produkty #}
@@ -68,8 +68,8 @@
 
             <h2>
                 Recenze
-                <a href="{{ path('reviews') }}" class="btn-floating btn-medium waves-effect waves-light blue"><i class="material-icons">more_horiz</i></a>
-                <a href="{{ path('review_edit') }}" class="btn-floating btn-medium waves-effect waves-light grey"><i class="material-icons">mode_edit</i></a>
+                <a href="{{ path('reviews') }}" class="btn-floating btn-medium waves-effect waves-light blue tooltipped" data-position="bottom" data-tooltip="Více"><i class="material-icons">more_horiz</i></a>
+                <a href="{{ path('review_edit') }}" class="btn-floating btn-medium waves-effect waves-light grey tooltipped" data-position="bottom" data-tooltip="Napsat"><i class="material-icons">mode_edit</i></a>
             </h2>
 
             {% if totalAndAverageRating.total > 0 %}

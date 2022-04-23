@@ -4,11 +4,11 @@
     {% else %}
         <div class="row flex-wrap insertable-products-wrapper" data-cart-insert-url="{{ path('cart_insert') }}" data-cart-insert-csrf-token="{{ csrf_token('form_cart_insert') }}">
             {% for product in products %}
-                <div class="col s6 l4 {% if large %}xl3{% endif %} margin-0">
-                    <div class="card">
+                <div class="col s6 l4 {% if large %}xl3{% endif %} margin-0 flex-wrap">
+                    <div class="card container-sticky-bottom width-max">
                         {# Obrázek #}
                         <a href="{{ path('product', {slug: product.getSlug()}) }}" class="card-image waves-effect waves-block waves-light">
-                            <img alt="Obrázek produktu" src="{% if product.getMainImageName() %} {{ asset(product.getMainImageName(), 'product_images') }}  {% else %} {{ asset('no-image.png', 'images') }} {% endif %}">
+                            <img alt="Obrázek produktu {{ product.getName() }}" src="{% if product.getMainImageName() %} {{ asset(product.getMainImageName(), 'product_images') }}  {% else %} {{ asset('no-image.png', 'images') }} {% endif %}">
                         </a>
 
                         {# Obsah #}
@@ -52,7 +52,7 @@
 
                         {# Dolní část - tlačítka #}
                         {% if admin %}
-                            <div class="card-action">
+                            <div class="card-action sticky-card-action">
                                 {% if can_edit %}
                                     <a href="{{ path('admin_product_edit', {id: product.getId()}) }}">
                                         Upravit
@@ -66,7 +66,7 @@
                                 {% endif %}
                             </div>
                         {% else %}
-                            <div class="card-action bold">
+                            <div class="card-action bold sticky-card-action">
                                 <a href="javascript:void(0);" class="margin-0 valign-wrapper cart-insert-link" data-product-id="{{ product.getId() }}">
                                     <div class="margin-right15px valign-wrapper">
                                         <i class="material-icons small">add_shopping_cart</i>
