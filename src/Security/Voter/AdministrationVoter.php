@@ -56,15 +56,11 @@ class AdministrationVoter implements VoterInterface
     public function vote(TokenInterface $token, $subject, array $attributes): int
     {
         $user = $token->getUser();
-        if (!$user instanceof User)
-        {
-            return self::ACCESS_DENIED;
-        }
-
         $vote = self::ACCESS_ABSTAIN;
+
         foreach ($attributes as $attribute)
         {
-            if (isset(self::REQUIRED_PERMISSIONS[$attribute]))
+            if ($user instanceof User && isset(self::REQUIRED_PERMISSIONS[$attribute]))
             {
                 $vote = self::ACCESS_DENIED;
                 $acceptablePermissions = self::REQUIRED_PERMISSIONS[$attribute];
