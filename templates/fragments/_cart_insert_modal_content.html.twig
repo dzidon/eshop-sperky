@@ -24,7 +24,7 @@
                 Celkem produktů:
             </div>
             <div class="col no-padding s6 right-align">
-                <strong>{{ cart.order.totalQuantity }}</strong>
+                <strong>{{ order.totalQuantity }}</strong>
             </div>
         </div>
 
@@ -33,7 +33,7 @@
                 Celková cena:
             </div>
             <div class="col no-padding s6 right-align">
-                <strong>{{ cart.order.totalPriceWithVat }} Kč {% if vat_payer %}vč. DPH{% endif %}</strong>
+                <strong>{{ order.totalPriceWithVat }} Kč {% if vat_payer %}vč. DPH{% endif %}</strong>
             </div>
         </div>
     </div>

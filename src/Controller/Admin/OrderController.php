@@ -12,7 +12,7 @@ use App\Form\OrderEditFormType;
 use App\Form\OrderPacketaFormType;
 use App\Form\OrderSearchFormType;
 use App\Service\BreadcrumbsService;
-use App\Service\OrderCompletionService;
+use App\Service\OrderPostCompletionService;
 use App\Service\PacketaApiService;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -271,7 +271,7 @@ class OrderController extends AbstractController
      *
      * @IsGranted("order_cancel")
      */
-    public function orderCancel(OrderCompletionService $orderCompletionService, $id): Response
+    public function orderCancel(OrderPostCompletionService $orderPostCompletionService, $id): Response
     {
         $user = $this->getUser();
 
@@ -291,7 +291,8 @@ class OrderController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid())
         {
-            $orderCompletionService->cancelOrder($order, $forceInventoryReplenish = false);
+            $order->cancel($forceInventoryReplenish = false);
+            $orderPostCompletionService->sendConfirmationEmail($order);
 
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($order);

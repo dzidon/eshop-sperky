@@ -55,7 +55,7 @@ class PacketaApiService
     }
 
     /**
-     * Vrátí data o zásilce, nebo null pokud nastala chyba.
+     * Vrátí data o zásilce.
      *
      * @param Order $order
      * @return object|null
@@ -76,7 +76,7 @@ class PacketaApiService
     }
 
     /**
-     * Pokusí se vytvořit zásilku. Po úspěšném vytvoření vrátí data o vytvořené zásilce, jinak null.
+     * Pokusí se vytvořit zásilku. Po úspěšném vytvoření vrátí data o vytvořené zásilce.
      *
      * @param Order $order
      * @return object|null

@@ -3,8 +3,9 @@
 namespace App\Service;
 
 use App\Entity\Order;
-use App\Service\OrderSynchronizer\CustomOrderSynchronizer;
+use App\OrderSynchronizer\CustomOrderSynchronizer;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Uid\Uuid;
 
 /**
@@ -14,23 +15,13 @@ use Symfony\Component\Uid\Uuid;
  */
 class CustomOrderService
 {
-    /**
-     * @var Order|null
-     */
-    private $order = null;
-
     private CustomOrderSynchronizer $synchronizer;
     private EntityManagerInterface $entityManager;
 
-    public function __construct(CustomOrderSynchronizer $synchronizer, EntityManagerInterface $entityManager)
+    public function __construct(EntityManagerInterface $entityManager, RequestStack $requestStack)
     {
-        $this->synchronizer = $synchronizer;
+        $this->synchronizer = new CustomOrderSynchronizer($requestStack->getCurrentRequest());
         $this->entityManager = $entityManager;
-    }
-
-    public function getOrder(): ?Order
-    {
-        return $this->order;
     }
 
     public function getSynchronizer(): CustomOrderSynchronizer
@@ -46,6 +37,7 @@ class CustomOrderService
      */
     public function loadCustomOrder(?string $token): ?Order
     {
+        $order = null;
         if ($token !== null && UUid::isValid($token))
         {
             $uuid = Uuid::fromString($token);
@@ -54,21 +46,19 @@ class CustomOrderService
             $order = $this->entityManager->getRepository(Order::class)->findOneAndFetchEverything($uuid);
             if ($order !== null && $order->isCreatedManually() && $order->getLifecycleChapter() === Order::LIFECYCLE_FRESH)
             {
-                $this->order = $order;
-
-                $this->synchronizer->synchronize($this->order);
+                $this->synchronizer->synchronize($order);
                 $this->synchronizer->addWarningsToFlashBag();
 
-                $this->order->calculateTotals();
+                $order->calculateTotals();
 
                 if ($this->synchronizer->hasWarnings())
                 {
-                    $this->entityManager->persist($this->order);
+                    $this->entityManager->persist($order);
                     $this->entityManager->flush();
                 }
             }
         }
 
-        return $this->order;
+        return $order;
     }
 }

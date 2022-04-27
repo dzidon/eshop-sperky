@@ -6,7 +6,7 @@ use App\Entity\CartOccurence;
 use App\Entity\Order;
 use App\Entity\Product;
 use App\Exception\CartException;
-use App\Service\OrderSynchronizer\OrderCartSynchronizer;
+use App\OrderSynchronizer\OrderCartSynchronizer;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
@@ -47,11 +47,12 @@ class CartService
     private EntityManagerInterface $entityManager;
     private OrderCartSynchronizer $synchronizer;
 
-    public function __construct(RequestStack $requestStack, EntityManagerInterface $entityManager, OrderCartSynchronizer $synchronizer)
+    public function __construct(EntityManagerInterface $entityManager, RequestStack $requestStack)
     {
-        $this->synchronizer = $synchronizer;
         $this->entityManager = $entityManager;
         $this->request = $requestStack->getCurrentRequest();
+
+        $this->synchronizer = new OrderCartSynchronizer($this->request);
     }
 
     /**
@@ -102,13 +103,14 @@ class CartService
      * Tato metoda se volá jako první před vyvoláním každé controllerové akce.
      * Buď zajístí existenci aktivní objednávky nebo jen zjistí počet produktů v košíku
      * pro zobrazení v navigaci.
-     *
-     * @param bool $loadFully
      */
-    public function initialize(bool $loadFully): void
+    public function load(): void
     {
         $tokenInCookie = (string) $this->request->cookies->get(self::COOKIE_NAME);
         $tokenIsValid = UUid::isValid($tokenInCookie);
+
+        $currentRoute = $this->request->attributes->get('_route');
+        $loadFully = isset(OrderCartSynchronizer::SYNCHRONIZATION_ROUTES[$currentRoute]);
 
         if ($loadFully)
         {
@@ -140,17 +142,14 @@ class CartService
                 $this->entityManager->flush();
             }
         }
-        else
+        else if ($tokenIsValid)
         {
-            if ($tokenIsValid)
-            {
-                $uuid = Uuid::fromString($tokenInCookie);
-                $result = $this->entityManager->getRepository(Order::class)->getCartTotalQuantity($uuid);
+            $uuid = Uuid::fromString($tokenInCookie);
+            $result = $this->entityManager->getRepository(Order::class)->getCartTotalQuantity($uuid);
 
-                if (isset($result['quantity']) && $result['quantity'] !== null)
-                {
-                    $this->totalQuantityForNavbar = (int) $result['quantity'];
-                }
+            if (isset($result['quantity']) && $result['quantity'] !== null)
+            {
+                $this->totalQuantityForNavbar = (int) $result['quantity'];
             }
         }
     }
@@ -208,7 +207,8 @@ class CartService
                 ->setQuantity($submittedQuantity)
                 ->setName($submittedProduct->getName())
                 ->setPriceWithoutVat($submittedProduct->getPriceWithoutVat())
-                ->setPriceWithVat($submittedProduct->getPriceWithVat());
+                ->setPriceWithVat($submittedProduct->getPriceWithVat())
+            ;
 
             foreach ($submittedOptions as $submittedOption)
             {

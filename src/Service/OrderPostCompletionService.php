@@ -11,14 +11,12 @@ use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Security;
 
 /**
- * Třída manipulující s dokončenou objednávkou.
+ * Třída manipulující s objednávkou od dokončení.
  *
  * @package App\Service
  */
-class OrderCompletionService
+class OrderPostCompletionService
 {
-    private Order $order;
-
     private Security $security;
     private LoggerInterface $logger;
     private RouterInterface $router;
@@ -38,50 +36,30 @@ class OrderCompletionService
      * @param Order $order
      * @return RedirectResponse
      */
-    public function finishOrder(Order $order): RedirectResponse
+    public function finishOrderAndGetResponse(Order $order): RedirectResponse
     {
-        $this->order = $order;
-
         /** @var User|null $user */
         $user = $this->security->getUser();
-        $this->order->finish($user);
+        $order->finish($user);
 
-        $this->sendConfirmationEmail();
-
-        return $this->getRedirectResponse();
-    }
-
-    /**
-     * Nastaví objednávku do zrušeného stavu.
-     *
-     * @param Order $order
-     * @param bool $forceInventoryReplenish
-     * @return $this
-     */
-    public function cancelOrder(Order $order, bool $forceInventoryReplenish): self
-    {
-        $this->order = $order;
-        $this->order->cancel($forceInventoryReplenish);
-
-        $this->sendConfirmationEmail();
-
-        return $this;
+        return $this->getCompletionRedirectResponse($order);
     }
 
     /**
      * Pošle potvrzovací e-mail o změně stavu objednávky.
      *
+     * @param Order $order
      * @return $this
      */
-    private function sendConfirmationEmail(): self
+    public function sendConfirmationEmail(Order $order): self
     {
         try
         {
-            $this->orderEmailService->send($this->order);
+            $this->orderEmailService->send($order);
         }
         catch (TransportExceptionInterface $exception)
         {
-            $this->logger->error(sprintf('Failed to send a confirmation e-mail for order ID %d, the following error occurred in method send: %s', $this->order->getId(), $exception->getMessage()));
+            $this->logger->error(sprintf('Failed to send a confirmation e-mail for order ID %d, the following error occurred in method send: %s', $order->getId(), $exception->getMessage()));
         }
 
         return $this;
@@ -90,14 +68,15 @@ class OrderCompletionService
     /**
      * Vytvoří odpověď pro přesměrování po dokončení objednávky.
      *
+     * @param Order $order
      * @return RedirectResponse
      */
-    private function getRedirectResponse(): RedirectResponse
+    private function getCompletionRedirectResponse(Order $order): RedirectResponse
     {
         $url = $this->router->generate('home');
 
         $redirectResponse = new RedirectResponse($url);
-        if (!$this->order->isCreatedManually())
+        if (!$order->isCreatedManually())
         {
             $redirectResponse->headers->clearCookie(CartService::COOKIE_NAME);
         }

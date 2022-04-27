@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Service\OrderSynchronizer;
+namespace App\OrderSynchronizer;
 
 /**
  * Synchronizuje stav objednávky na míru
  *
- * @package App\Service\OrderSynchronizer
+ * @package App\OrderSynchronizer
  */
 class CustomOrderSynchronizer extends AbstractOrderSynchronizer
 {

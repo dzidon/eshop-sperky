@@ -105,11 +105,11 @@
 
     <div class="row right-align">
         {% if vat_payer %}
-            <h5 class="no-mar-bot">{{ cart_service.totalPriceWithoutVat }} Kč celkem bez DPH</h5>
+            <h5 class="no-mar-bot">{{ order.totalPriceWithoutVat }} Kč celkem bez DPH</h5>
         {% endif %}
 
         <h5 class="no-mar-bot">
-            <strong>{{ cart_service.order.totalPriceWithVat }} Kč {% if vat_payer %}vč. DPH {% endif %}celkem</strong>
+            <strong>{{ order.totalPriceWithVat }} Kč {% if vat_payer %}vč. DPH {% endif %}celkem</strong>
         </h5>
     </div>
 

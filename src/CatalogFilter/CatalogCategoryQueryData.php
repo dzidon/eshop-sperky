@@ -1,40 +1,22 @@
 <?php
 
-namespace App\Service;
+namespace App\CatalogFilter;
 
-use App\Entity\ProductSection;
 use DateTime;
+use App\Entity\ProductSection;
 use App\Entity\ProductCategory;
 
 /**
- * Třída řešící kategorie v produktovém filtru
+ * Sestaví data potřebná pro vyvolání SQL dotazu potřebného na zjištění počtu produktů v kategorii
  *
- * @package App\Service
+ * @package App\CatalogFilter
  */
-class CatalogCategoryFilterService
+class CatalogCategoryQueryData
 {
-    private array $productCountPlaceholders = [];
-    private array $productCountClauses = [];
+    private array $productCountPlaceholders;
+    private array $productCountClauses;
 
     /**
-     * @return array
-     */
-    public function getProductCountPlaceholders(): array
-    {
-        return $this->productCountPlaceholders;
-    }
-
-    /**
-     * @return array
-     */
-    public function getProductCountClauses(): array
-    {
-        return $this->productCountClauses;
-    }
-
-    /**
-     * Sestaví data potřebná pro vyvolání SQL dotazu potřebného na zjištění počtu produktů v kategorii
-     *
      * @param ProductCategory $category
      * @param ProductSection $section
      * @param string|null $searchPhrase
@@ -42,7 +24,7 @@ class CatalogCategoryFilterService
      * @param float|null $priceMax
      * @param array|null $categoriesChosen
      */
-    public function createDataForCategoryProductCountQuery(ProductCategory $category, ProductSection $section, ?string $searchPhrase, ?float $priceMin, ?float $priceMax, ?array $categoriesChosen): void
+    public function __construct(ProductCategory $category, ProductSection $section, ?string $searchPhrase, ?float $priceMin, ?float $priceMax, ?array $categoriesChosen)
     {
         $this->productCountPlaceholders = [];
         $this->productCountClauses = [];
@@ -72,6 +54,22 @@ class CatalogCategoryFilterService
             $this->productCountClauses['priceMax'] = 'AND price_with_vat <= :price_max';
             $this->productCountPlaceholders['price_max'] = $priceMax;
         }
+    }
+
+    /**
+     * @return array
+     */
+    public function getProductCountPlaceholders(): array
+    {
+        return $this->productCountPlaceholders;
+    }
+
+    /**
+     * @return array
+     */
+    public function getProductCountClauses(): array
+    {
+        return $this->productCountClauses;
     }
 
     /**

@@ -1,25 +1,25 @@
 <?php
 
-namespace App\Service\OrderSynchronizer;
+namespace App\OrderSynchronizer;
 
 use App\Entity\Order;
-use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Abstraktní třída pro synchronizátory, které zajišťují aktuálnost stavu objednávky.
  *
- * @package App\Service\OrderSynchronizer
+ * @package App\OrderSynchronizer
  */
 abstract class AbstractOrderSynchronizer
 {
     protected bool $hasWarnings = false;
     private array $warnings = [];
 
-    private $request;
+    private Request $request;
 
-    public function __construct(RequestStack $requestStack)
+    public function __construct(Request $request)
     {
-        $this->request = $requestStack->getCurrentRequest();
+        $this->request = $request;
     }
 
     /**

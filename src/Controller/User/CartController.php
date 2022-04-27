@@ -7,8 +7,8 @@ use App\Entity\Product;
 use App\Exception\CartException;
 use App\Form\CartFormType;
 use App\Form\CartInsertFormType;
+use App\Response\Json;
 use App\Service\CartService;
-use App\Service\JsonResponseService;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -23,13 +23,11 @@ class CartController extends AbstractController
     private $request;
     private CartService $cart;
     private LoggerInterface $logger;
-    private JsonResponseService $jsonResponse;
 
-    public function __construct(LoggerInterface $logger, RequestStack $requestStack, CartService $cart, JsonResponseService $jsonResponse)
+    public function __construct(LoggerInterface $logger, RequestStack $requestStack, CartService $cart)
     {
         $this->cart = $cart;
         $this->logger = $logger;
-        $this->jsonResponse = $jsonResponse;
         $this->request = $requestStack->getCurrentRequest();
     }
 
@@ -64,6 +62,7 @@ class CartController extends AbstractController
             throw $this->createNotFoundException();
         }
 
+        $jsonResponse = new Json();
         $productId = $this->getProductIdFromRequest('cart_insert_form');
         if ($productId !== null)
         {
@@ -81,9 +80,9 @@ class CartController extends AbstractController
                     try
                     {
                         $this->cart->insertProduct($cartInsertRequest->getProduct(), $cartInsertRequest->getQuantity(), $cartInsertRequest->getOptionGroups());
-                        $this->jsonResponse->setResponseHtml(
+                        $jsonResponse->setResponseHtml(
                             $this->renderView('fragments/_cart_insert_modal_content.html.twig', [
-                                'cart'              => $this->cart,
+                                'order'             => $this->cart->getOrder(),
                                 'product'           => $cartInsertRequest->getProduct(),
                                 'submittedQuantity' => $cartInsertRequest->getQuantity(),
                             ])
@@ -92,28 +91,28 @@ class CartController extends AbstractController
                     }
                     catch(CartException $exception)
                     {
-                        $this->jsonResponse->addResponseError($exception->getMessage());
+                        $jsonResponse->addResponseError($exception->getMessage());
                     }
                 }
                 else if ($form->isSubmitted() && !$form->isValid())
                 {
                     foreach ($form->getErrors() as $formError)
                     {
-                        $this->jsonResponse->addResponseError($formError->getMessage());
+                        $jsonResponse->addResponseError($formError->getMessage());
                     }
                 }
             }
             else
             {
-                $this->jsonResponse->addResponseError('Tento produkt už nejde vložit do košíku.');
+                $jsonResponse->addResponseError('Tento produkt už nejde vložit do košíku.');
             }
         }
         else
         {
-            $this->jsonResponse->addResponseError('Neplatné ID produktu.');
+            $jsonResponse->addResponseError('Neplatné ID produktu.');
         }
 
-        return $this->jsonResponse->createJsonResponse();
+        return $jsonResponse->create();
     }
 
     /**
@@ -126,8 +125,11 @@ class CartController extends AbstractController
             throw $this->createNotFoundException();
         }
 
-        $form = $this->createForm(CartFormType::class, $this->cart->getOrder());
-        $this->jsonResponse->setResponseHtml($this->renderView('fragments/forms_unique/_form_cart_update.html.twig', ['cartForm' => $form->createView()]));
+        $jsonResponse = new Json();
+        $order = $this->cart->getOrder();
+
+        $form = $this->createForm(CartFormType::class, $order);
+        $jsonResponse->setResponseHtml($this->renderView('fragments/forms_unique/_form_cart_update.html.twig', ['cartForm' => $form->createView(), 'order' => $order]));
         $form->handleRequest($this->request);
 
         if ($form->isSubmitted())
@@ -135,22 +137,22 @@ class CartController extends AbstractController
             if($form->isValid())
             {
                 $this->cart->updateQuantities();
-                $form = $this->createForm(CartFormType::class, $this->cart->getOrder());
-                $this->jsonResponse->setResponseHtml($this->renderView('fragments/forms_unique/_form_cart_update.html.twig', ['cartForm' => $form->createView()]));
+                $form = $this->createForm(CartFormType::class, $order);
+                $jsonResponse->setResponseHtml($this->renderView('fragments/forms_unique/_form_cart_update.html.twig', ['cartForm' => $form->createView(), 'order' => $order]));
             }
             else
             {
                 foreach ($form->getErrors() as $formError)
                 {
-                    $this->jsonResponse->addResponseError($formError->getMessage());
+                    $jsonResponse->addResponseError($formError->getMessage());
                 }
             }
         }
 
-        return $this->jsonResponse
+        return $jsonResponse
             ->setResponseData('flashHtml', $this->renderView('fragments/_flash_messages.html.twig'))
-            ->setResponseData('totalProducts', $this->cart->getOrder()->getTotalQuantity())
-            ->createJsonResponse()
+            ->setResponseData('totalProducts', $order->getTotalQuantity())
+            ->create()
         ;
     }
 
@@ -164,6 +166,7 @@ class CartController extends AbstractController
             throw $this->createNotFoundException();
         }
 
+        $jsonResponse = new Json();
         $cartOccurenceId = $this->getCartOccurenceIdFromRequest();
 
         try
@@ -172,16 +175,17 @@ class CartController extends AbstractController
         }
         catch(CartException $exception)
         {
-            $this->jsonResponse->addResponseError($exception->getMessage());
+            $jsonResponse->addResponseError($exception->getMessage());
         }
 
-        $form = $this->createForm(CartFormType::class, $this->cart->getOrder());
+        $order = $this->cart->getOrder();
+        $form = $this->createForm(CartFormType::class, $order);
 
-        return $this->jsonResponse
-            ->setResponseHtml($this->renderView('fragments/forms_unique/_form_cart_update.html.twig', ['cartForm' => $form->createView()]))
+        return $jsonResponse
+            ->setResponseHtml($this->renderView('fragments/forms_unique/_form_cart_update.html.twig', ['cartForm' => $form->createView(), 'order' => $order]))
             ->setResponseData('flashHtml', $this->renderView('fragments/_flash_messages.html.twig'))
             ->setResponseData('totalProducts', $this->cart->getOrder()->getTotalQuantity())
-            ->createJsonResponse()
+            ->create()
         ;
     }
 }

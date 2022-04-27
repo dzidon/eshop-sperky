@@ -7,11 +7,11 @@ use App\Entity\Order;
 use App\Form\CartFormType;
 use App\Form\OrderAddressesFormType;
 use App\Form\OrderMethodsFormType;
+use App\Response\Json;
 use App\Service\BreadcrumbsService;
 use App\Service\CartService;
 use App\Service\CustomOrderService;
-use App\Service\JsonResponseService;
-use App\Service\OrderCompletionService;
+use App\Service\OrderPostCompletionService;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -41,7 +41,7 @@ class OrderController extends AbstractController
      */
     public function orderCustom($token = null): Response
     {
-        if ($this->customOrderService->loadCustomOrder($token) === null)
+        if (($order = $this->customOrderService->loadCustomOrder($token)) === null)
         {
             throw $this->createNotFoundException('Objednávka nenalezena.');
         }
@@ -49,8 +49,7 @@ class OrderController extends AbstractController
         $this->breadcrumbs->addRoute('order_custom', ['token' => $token]);
 
         return $this->render('order/custom_overview.html.twig', [
-            'order' => $this->customOrderService->getOrder(),
-            'custom_order_service' => $this->customOrderService,
+            'order' => $order,
         ]);
     }
 
@@ -66,13 +65,14 @@ class OrderController extends AbstractController
 
         return $this->render('order/cart.html.twig', [
             'cartForm' => $form->createView(),
+            'order' => $order,
         ]);
     }
 
     /**
      * @Route("/objednavka/doprava-a-platba/{token}", name="order_methods")
      */
-    public function orderMethods(JsonResponseService $jsonResponse, $token = null): Response
+    public function orderMethods($token = null): Response
     {
         $targetOrder = $this->cart->getOrder();
 
@@ -113,13 +113,14 @@ class OrderController extends AbstractController
 
         if($this->request->isXmlHttpRequest())
         {
+            $jsonResponse = new Json();
             return $jsonResponse
                 ->setResponseHtml($this->renderView('fragments/forms_unique/_form_order_methods.html.twig', [
                     'order' => $targetOrder,
                     'token'=> $token,
                     'orderMethodsForm' => $form->createView()
                 ]))
-                ->createJsonResponse()
+                ->create()
             ;
         }
         else
@@ -135,7 +136,7 @@ class OrderController extends AbstractController
     /**
      * @Route("/objednavka/dodaci-udaje/{token}", name="order_addresses")
      */
-    public function orderAddresses(OrderCompletionService $orderCompletionService, LoggerInterface $logger, $token = null): Response
+    public function orderAddresses(OrderPostCompletionService $orderPostCompletionService, LoggerInterface $logger, $token = null): Response
     {
         $targetOrder = $this->cart->getOrder();
         $synchronizerHasWarnings = $this->cart->getSynchronizer()->hasWarnings();
@@ -167,7 +168,8 @@ class OrderController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid() && !$synchronizerHasWarnings)
         {
-            $redirectResponse = $orderCompletionService->finishOrder($targetOrder);
+            $response = $orderPostCompletionService->finishOrderAndGetResponse($targetOrder);
+            $orderPostCompletionService->sendConfirmationEmail($targetOrder);
 
             $this->getDoctrine()->getManager()->persist($targetOrder);
             $this->getDoctrine()->getManager()->flush();
@@ -175,7 +177,7 @@ class OrderController extends AbstractController
             $this->addFlash('success', 'Objednávka dokončena!');
             $logger->info(sprintf('Order ID %d has been finished. Current lifecycle chapter: %d.', $targetOrder->getId(), $targetOrder->getLifecycleChapter()));
 
-            return $redirectResponse;
+            return $response;
         }
 
         return $this->render('order/addresses.html.twig', [
@@ -188,20 +190,21 @@ class OrderController extends AbstractController
     /**
      * @Route("/objednavka/nacist-adresu", name="order_address_load", methods={"POST"})
      */
-    public function loadAddress(JsonResponseService $jsonResponse): Response
+    public function loadAddress(): Response
     {
+        $jsonResponse = new Json();
         $user = $this->getUser();
         if ($user === null)
         {
             $jsonResponse->addResponseError('Nejste přihlášený.');
-            return $jsonResponse->createJsonResponse();
+            return $jsonResponse->create();
         }
 
         $addressId = $this->request->request->get('addressId');
         if ($addressId === null)
         {
             $jsonResponse->addResponseError('Musíte vybrat platnou adresu.');
-            return $jsonResponse->createJsonResponse();
+            return $jsonResponse->create();
         }
 
         /** @var Address $address */
@@ -209,7 +212,7 @@ class OrderController extends AbstractController
         if ($address === null)
         {
             $jsonResponse->addResponseError('Vybraná adresa nebyla nalezena.');
-            return $jsonResponse->createJsonResponse();
+            return $jsonResponse->create();
         }
 
         $addressData = [
@@ -225,7 +228,7 @@ class OrderController extends AbstractController
             'dic' => $address->getDic(),
         ];
         $jsonResponse->setResponseData('addressData', $addressData);
-        return $jsonResponse->createJsonResponse();
+        return $jsonResponse->create();
     }
 
     /**
