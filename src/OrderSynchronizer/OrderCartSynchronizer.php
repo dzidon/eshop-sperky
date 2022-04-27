@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Service\OrderSynchronizer;
+namespace App\OrderSynchronizer;
 
 use App\Entity\Order;
 
 /**
  * Synchronizuje stav aktivní objednávky v košíku se stavem ostatních entit
  *
- * @package App\Service\OrderSynchronizer
+ * @package App\OrderSynchronizer
  */
 class OrderCartSynchronizer extends AbstractOrderSynchronizer
 {

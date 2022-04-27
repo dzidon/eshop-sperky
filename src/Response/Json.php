@@ -1,17 +1,17 @@
 <?php
 
-namespace App\Service;
+namespace App\Response;
 
 use LogicException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Třída řešící JSON odpověď
+ * Třída řešící JSON odpověď.
  *
- * @package App\Service
+ * @package App\Response
  */
-class JsonResponseService
+class Json
 {
     private int $responseStatus = Response::HTTP_OK;
     private array $responseData = [
@@ -63,7 +63,7 @@ class JsonResponseService
     {
         if($key === 'errors' || $key === 'html' || $key === 'warnings')
         {
-            throw new LogicException('Do metody setResponseData v JsonResponseService nepatří klíče errors, html a warnings. Použijte metody addResponseError, addResponseWarning a setResponseHtml.');
+            throw new LogicException('Do metody setResponseData v App\Response\Json nepatří klíče errors, html a warnings. Použijte metody addResponseError, addResponseWarning a setResponseHtml.');
         }
 
         $this->responseData[$key] = $data;
@@ -71,7 +71,7 @@ class JsonResponseService
         return $this;
     }
 
-    public function createJsonResponse(): JsonResponse
+    public function create(): JsonResponse
     {
         return new JsonResponse($this->responseData, $this->responseStatus);
     }
