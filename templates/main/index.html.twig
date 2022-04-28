@@ -31,7 +31,7 @@
                 <div class="row">
                     <div class="col s12 m4">
                         <div class="icon-block">
-                            <h2 class="center blue-text"><i class="material-icons">local_florist</i></h2>
+                            <h2 class="center"><i class="material-icons">local_florist</i></h2>
                             <h5 class="center">Co děláme</h5>
 
                             <p class="light">Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Mauris metus. Nunc tincidunt ante vitae massa. In enim a arcu imperdiet malesuada. Curabitur vitae diam non enim vestibulum interdum. Nunc dapibus tortor vel mi dapibus sollicitudin.</p>
@@ -40,7 +40,7 @@
 
                     <div class="col s12 m4">
                         <div class="icon-block">
-                            <h2 class="center blue-text"><i class="material-icons">group</i></h2>
+                            <h2 class="center"><i class="material-icons">group</i></h2>
                             <h5 class="center">Kdo jsme</h5>
 
                             <p class="light">Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Mauris metus. Nunc tincidunt ante vitae massa. In enim a arcu imperdiet malesuada. Curabitur vitae diam non enim vestibulum interdum. Nunc dapibus tortor vel mi dapibus sollicitudin.</p>
@@ -49,7 +49,7 @@
 
                     <div class="col s12 m4">
                         <div class="icon-block">
-                            <h2 class="center blue-text"><i class="material-icons">favorite</i></h2>
+                            <h2 class="center"><i class="material-icons">favorite</i></h2>
                             <h5 class="center">Sledujte nás</h5>
 
                             <p class="light">Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Mauris metus. Nunc tincidunt ante vitae massa. In enim a arcu imperdiet malesuada. Curabitur vitae diam non enim vestibulum interdum. Nunc dapibus tortor vel mi dapibus sollicitudin.</p>
@@ -65,6 +65,12 @@
 
             {# Produkty #}
             {{ include('fragments/_products.html.twig', {products: latestProducts, admin: false, large: true, can_edit: false, can_delete: false}) }}
+
+            <div class="row center-align hide-on-large-only hide-on-extra-large-only">
+                <strong>
+                    <a href="{{ path('products') }}">Zobrazit všechny produkty</a>
+                </strong>
+            </div>
 
             <h2>
                 Recenze
@@ -105,6 +111,14 @@
                     {{ include('fragments/_reviews.html.twig', {reviews: latestReviews}) }}
                 </div>
             </div>
+
+            {% if totalAndAverageRating.total > 0 %}
+                <div class="row center-align hide-on-large-only hide-on-extra-large-only">
+                    <strong>
+                        <a href="{{ path('reviews') }}">Zobrazit všechny recenze</a>
+                    </strong>
+                </div>
+            {% endif %}
         </div>
     </div>
 

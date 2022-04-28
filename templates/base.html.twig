@@ -4,7 +4,7 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0">
         <title>
-            {% if breadcrumbs_service is defined and breadcrumbs_service.pageTitle|length > 0 %}
+            {% if breadcrumbs_service is defined and breadcrumbs_service.pageTitle|length > 0 and app.request.attributes.get('_route') is not same as('home') %}
                 {{ breadcrumbs_service.pageTitle }} -
             {% endif %}
             {{ site_name }}
@@ -48,11 +48,12 @@
                         <li><a href="{{ path_order_cart }}" class="black-text"> <i class="material-icons left">shopping_cart</i> Košík <span class="cart-badge blue white-text navbar-cart-total-products">{{ cart_service.totalQuantityForNavbar }}</span></a></li>
 
                         {% if is_authenticated_remembered %}
+                            <li><a href="{{ path('profile') }}" class="black-text"> <i class="material-icons left">account_circle</i> {{ app.user.email }}</a></li>
+
                             {% if can_enter_admin %}
                                 <li><a href="{{ path('admin_permission_overview') }}" class="black-text tooltipped" data-position="bottom" data-tooltip="Admin"> <i class="material-icons">build</i></a></li>
                             {% endif %}
 
-                            <li><a href="{{ path('profile') }}" class="black-text tooltipped" data-position="bottom" data-tooltip="Profil"> <i class="material-icons">account_circle</i></a></li>
                             <li><a href="{{ path('logout') }}" class="black-text tooltipped" data-position="bottom" data-tooltip="Odhlásit"><i class="material-icons">meeting_room</i></a></li>
                         {% else %}
                             <li><a href="{{ path('login') }}" class="black-text"> <i class="material-icons left">vpn_key</i> Přihlásit se</a></li>
@@ -86,7 +87,7 @@
                     <li><a href="{{ path('admin_permission_overview') }}"> <i class="material-icons left">build</i> Admin</a></li>
                 {% endif %}
 
-                <li><a href="{{ path('profile') }}"> <i class="material-icons left">account_circle</i> Profil</a></li>
+                <li><a href="{{ path('profile') }}"> <i class="material-icons left">account_circle</i> <span class="truncate">{{ app.user.email }}</span></a></li>
                 <li><a href="{{ path('logout') }}"> <i class="material-icons left">meeting_room</i> Odhlásit se</a></li>
             {% else %}
                 <li><a href="{{ path('login') }}"> <i class="material-icons left">vpn_key</i> Přihlásit se</a></li>
@@ -155,25 +156,38 @@
                 <div class="col s12">
                     <div class="row">
                         <div class="col l6 s12">
-                            <h5 class="white-text">Nadpis</h5>
+                            <h5 class="white-text">O nás</h5>
                             <p class="grey-text">Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Mauris metus. Nunc tincidunt ante vitae massa. In enim a arcu imperdiet malesuada. Curabitur vitae diam non enim vestibulum interdum. Nunc dapibus tortor vel mi dapibus sollicitudin.</p>
                         </div>
+
                         <div class="col l3 s12">
-                            <h5 class="white-text">Nadpis</h5>
+                            <h5 class="white-text">Navigace</h5>
                             <ul>
-                                <li><a class="grey-text" href="{{ path('home') }}">Domů</a></li>
-                                <li><a class="grey-text" href="{{ path('products') }}">Produkty</a></li>
-                                <li><a class="grey-text" href="{{ path('order_custom') }}">Objednávka na míru</a></li>
-                                <li><a class="grey-text" href="{{ path('contact') }}">Kontakt</a></li>
+                                <li><a class="grey-text white-on-hover" href="{{ path('home') }}">Domů</a></li>
+                                <li><a class="grey-text white-on-hover" href="{{ path('products') }}">Produkty</a></li>
+                                <li><a class="grey-text white-on-hover" href="{{ path('order_custom') }}">Objednávka na míru</a></li>
+                                <li><a class="grey-text white-on-hover" href="{{ path('contact') }}">Kontakt</a></li>
                             </ul>
                         </div>
+
                         <div class="col l3 s12">
-                            <h5 class="white-text">Nadpis</h5>
+                            <h5 class="white-text">Kontakt</h5>
                             <ul>
-                                <li><a class="grey-text" href="#">Link 1</a></li>
-                                <li><a class="grey-text" href="#">Link 2</a></li>
-                                <li><a class="grey-text" href="#">Link 3</a></li>
-                                <li><a class="grey-text" href="#">Link 4</a></li>
+                                <li>
+                                    <a href="tel:{{ site_phone }}" class="grey-text white-on-hover"><i class="fas fa-phone-alt margin-right15px"></i>{{ site_phone }}</a>
+                                </li>
+
+                                <li>
+                                    <a href="mailto:{{ site_email }}" class="grey-text white-on-hover"><i class="fas fa-envelope margin-right15px"></i>{{ site_email }}</a>
+                                </li>
+
+                                <li>
+                                    <a href="{{ site_facebook }}" class="grey-text white-on-hover"><i class="fab fa-facebook-square margin-right15px"></i>Facebook</a>
+                                </li>
+
+                                <li>
+                                    <a href="{{ site_instagram }}" class="grey-text white-on-hover"><i class="fab fa-instagram margin-right15px"></i>Instagram</a>
+                                </li>
                             </ul>
                         </div>
                     </div>

@@ -221,6 +221,10 @@ a.secondary-content {
     color: #2196f3;
 }
 
+.white-on-hover:hover {
+    color: white !important;
+}
+
 .no-mar-top {
     margin-top: 0;
 }
