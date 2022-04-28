@@ -15,13 +15,16 @@ use Symfony\Component\Uid\Uuid;
  */
 class CustomOrderService
 {
+    private RequestStack $requestStack;
     private CustomOrderSynchronizer $synchronizer;
     private EntityManagerInterface $entityManager;
 
     public function __construct(EntityManagerInterface $entityManager, RequestStack $requestStack)
     {
-        $this->synchronizer = new CustomOrderSynchronizer($requestStack->getCurrentRequest());
         $this->entityManager = $entityManager;
+        $this->requestStack = $requestStack;
+
+        $this->synchronizer = new CustomOrderSynchronizer();
     }
 
     public function getSynchronizer(): CustomOrderSynchronizer
@@ -47,7 +50,7 @@ class CustomOrderService
             if ($order !== null && $order->isCreatedManually() && $order->getLifecycleChapter() === Order::LIFECYCLE_FRESH)
             {
                 $this->synchronizer->synchronize($order);
-                $this->synchronizer->addWarningsToFlashBag();
+                $this->synchronizer->addWarningsToFlashBag($this->requestStack->getCurrentRequest());
 
                 $order->calculateTotals();
 

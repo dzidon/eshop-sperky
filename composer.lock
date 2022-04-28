@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "99fc5709b464de05642dea85e05cd6e8",
+    "content-hash": "8cb79f47e46df83f309f751de2dee8c9",
     "packages": [
         {
             "name": "composer/package-versions-deprecated",
@@ -8228,16 +8228,16 @@
         },
         {
             "name": "symfony/twig-bridge",
-            "version": "v5.3.7",
+            "version": "v5.3.14",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/twig-bridge.git",
-                "reference": "503e12aded4d5cbda4f8d1f3824c6a108119822f"
+                "reference": "5830022728b73b3a28877b3e2c03332a28294fe7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/twig-bridge/zipball/503e12aded4d5cbda4f8d1f3824c6a108119822f",
-                "reference": "503e12aded4d5cbda4f8d1f3824c6a108119822f",
+                "url": "https://api.github.com/repos/symfony/twig-bridge/zipball/5830022728b73b3a28877b3e2c03332a28294fe7",
+                "reference": "5830022728b73b3a28877b3e2c03332a28294fe7",
                 "shasum": ""
             },
             "require": {
@@ -8329,7 +8329,7 @@
             "description": "Provides integration for Twig with various Symfony components",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/twig-bridge/tree/v5.3.7"
+                "source": "https://github.com/symfony/twig-bridge/tree/v5.3.14"
             },
             "funding": [
                 {
@@ -8345,7 +8345,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-08-26T07:28:06+00:00"
+            "time": "2022-01-02T09:51:59+00:00"
         },
         {
             "name": "symfony/twig-bundle",

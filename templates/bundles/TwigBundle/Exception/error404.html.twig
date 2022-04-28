@@ -1,0 +1,9 @@
+{% extends 'bundles/TwigBundle/Exception/error_base.html.twig' %}
+
+{% block body %}
+    <div class="container">
+        <h1>Chyba {{ status_code }} - Stránka nenalezena</h1>
+
+        <p>Požadovaná stránka nebyla nalezena. Můžete přejít na <a href="{{ path('home') }}">domovskou stránku</a>.</p>
+    </div>
+{% endblock %}

@@ -9,7 +9,6 @@ use App\Exception\CartException;
 use App\OrderSynchronizer\OrderCartSynchronizer;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Cookie;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Uid\Uuid;
 
@@ -42,17 +41,16 @@ class CartService
      */
     private int $totalQuantityForNavbar = 0;
 
-    /** @var Request */
-    private $request;
+    private RequestStack $requestStack;
     private EntityManagerInterface $entityManager;
     private OrderCartSynchronizer $synchronizer;
 
     public function __construct(EntityManagerInterface $entityManager, RequestStack $requestStack)
     {
         $this->entityManager = $entityManager;
-        $this->request = $requestStack->getCurrentRequest();
+        $this->requestStack = $requestStack;
 
-        $this->synchronizer = new OrderCartSynchronizer($this->request);
+        $this->synchronizer = new OrderCartSynchronizer();
     }
 
     /**
@@ -106,10 +104,11 @@ class CartService
      */
     public function load(): void
     {
-        $tokenInCookie = (string) $this->request->cookies->get(self::COOKIE_NAME);
+        $request = $this->requestStack->getCurrentRequest();
+        $tokenInCookie = (string) $request->cookies->get(self::COOKIE_NAME);
         $tokenIsValid = UUid::isValid($tokenInCookie);
 
-        $currentRoute = $this->request->attributes->get('_route');
+        $currentRoute = $request->attributes->get('_route');
         $loadFully = isset(OrderCartSynchronizer::SYNCHRONIZATION_ROUTES[$currentRoute]);
 
         if ($loadFully)
@@ -130,7 +129,7 @@ class CartService
             }
 
             $this->synchronizer->synchronize($this->order);
-            $this->synchronizer->addWarningsToFlashBag();
+            $this->synchronizer->addWarningsToFlashBag($request);
 
             $this->order->calculateTotals();
             $this->totalQuantityForNavbar = $this->order->getTotalQuantity();

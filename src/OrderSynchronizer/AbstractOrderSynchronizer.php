@@ -15,13 +15,6 @@ abstract class AbstractOrderSynchronizer
     protected bool $hasWarnings = false;
     private array $warnings = [];
 
-    private Request $request;
-
-    public function __construct(Request $request)
-    {
-        $this->request = $request;
-    }
-
     /**
      * Synchronizuje stav objednávky.
      *
@@ -71,14 +64,16 @@ abstract class AbstractOrderSynchronizer
 
     /**
      * Přidá varování do flash bagu
+     *
+     * @param Request $request
      */
-    public function addWarningsToFlashBag(): void
+    public function addWarningsToFlashBag(Request $request): void
     {
         if($this->hasWarnings)
         {
             foreach ($this->warnings as $warning)
             {
-                $this->request->getSession()->getFlashBag()->add('warning', $warning);
+                $request->getSession()->getFlashBag()->add('warning', $warning);
             }
         }
     }

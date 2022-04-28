@@ -42,6 +42,7 @@
         "symfony/serializer": "5.3.*",
         "symfony/string": "5.3.*",
         "symfony/translation": "5.3.*",
+        "symfony/twig-bridge": "5.3.*",
         "symfony/twig-bundle": "5.3.*",
         "symfony/uid": "5.3.*",
         "symfony/validator": "5.3.*",
@@ -92,7 +93,7 @@
             "assets:install %PUBLIC_DIR%": "symfony-cmd"
         },
         "post-install-cmd": [
-            ""
+            "@auto-scripts"
         ],
         "post-update-cmd": [
             "@auto-scripts"
