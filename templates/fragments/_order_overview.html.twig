@@ -25,7 +25,7 @@
             </div>
 
             <div class="row margin-0">
-                <div class="col s6 m5 no-padding">Vytvořeno:</div>
+                <div class="col s6 m5 no-padding">Dokončeno:</div>
                 <div class="col s6 m7 no-padding">
                     <strong>{{ order.finishedAt|date('d. m. Y H:i:s') }}</strong>
                 </div>
@@ -172,7 +172,6 @@
                         <div class="col s6 m5 no-padding">Doplňek adresy:</div>
                         <div class="col s6 m7 no-padding">
                             <strong>{{ order.addressBillingAdditionalInfo }}</strong>
-                            <em>{% if order.deliveryMethodLocksDeliveryAddress and order.addressBillingAdditionalInfo is same as(order.addressDeliveryAdditionalInfo) %}(ID výdejního místa){% endif %}</em>
                         </div>
                     </div>
                 {% endif %}

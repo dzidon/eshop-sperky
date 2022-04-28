@@ -1,0 +1,12 @@
+User-agent: *
+Disallow: /admin
+Disallow: /profil
+Disallow: /recenze
+Allow: /recenze/vsechny
+Disallow: /obnova-hesla/zpracovani
+Disallow: /overeni-emailu
+Disallow: /kosik
+Disallow: /objednavka-na-miru/
+Disallow: /objednavka
+
+Sitemap: https://master-7rqtwti-c25idlfhe6buk.de-2.platformsh.site/sitemap.xml
