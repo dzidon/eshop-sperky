@@ -1163,6 +1163,22 @@ class Order
         return ($this->deliveryMethod !== null && $this->deliveryMethod->locksDeliveryAddress());
     }
 
+    public function addressesAreEqual(): bool
+    {
+        return
+            $this->addressBillingCompany === null &&
+            $this->addressBillingIc      === null &&
+            $this->addressBillingDic     === null &&
+            $this->addressDeliveryAdditionalInfo === $this->addressBillingAdditionalInfo &&
+            $this->addressDeliveryNameFirst      === $this->addressBillingNameFirst &&
+            $this->addressDeliveryNameLast       === $this->addressBillingNameLast &&
+            $this->addressDeliveryCountry        === $this->addressBillingCountry &&
+            $this->addressDeliveryStreet         === $this->addressBillingStreet &&
+            $this->addressDeliveryTown           === $this->addressBillingTown &&
+            $this->addressDeliveryZip            === $this->addressBillingZip
+        ;
+    }
+
     public function determineAddressDelivery(): self
     {
         // přechod na null/Českou poštu
@@ -1209,11 +1225,7 @@ class Order
 
     private function loadAddressBillingFromDelivery(): void
     {
-        if (!$this->deliveryMethodLocksDeliveryAddress())
-        {
-            $this->setAddressBillingAdditionalInfo($this->addressDeliveryAdditionalInfo);
-        }
-
+        $this->setAddressBillingAdditionalInfo($this->addressDeliveryAdditionalInfo);
         $this->setAddressBillingNameFirst($this->addressDeliveryNameFirst);
         $this->setAddressBillingNameLast($this->addressDeliveryNameLast);
         $this->setAddressBillingCountry($this->addressDeliveryCountry);
