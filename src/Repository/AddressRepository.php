@@ -40,15 +40,7 @@ class AddressRepository extends ServiceEntityRepository
             ->setParameter('user', $user)
 
             //vyhledavani
-            ->andWhere('a.alias LIKE :searchPhrase OR
-                        a.country LIKE :searchPhrase OR
-                        a.street LIKE :searchPhrase OR
-                        a.town LIKE :searchPhrase OR
-                        a.zip LIKE :searchPhrase OR
-                        a.company LIKE :searchPhrase OR
-                        a.ic LIKE :searchPhrase OR
-                        a.dic LIKE :searchPhrase OR
-                        a.additionalInfo LIKE :searchPhrase')
+            ->andWhere('a.alias LIKE :searchPhrase')
             ->setParameter('searchPhrase', '%' . $searchPhrase . '%')
 
             //razeni

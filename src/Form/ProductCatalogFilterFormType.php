@@ -41,7 +41,7 @@ class ProductCatalogFilterFormType extends AbstractType
         $builder
             ->add('searchPhrase', TextType::class, [
                 'required' => false,
-                'label' => 'Hledat název nebo ID produktu',
+                'label' => 'Hledat podle názvu',
             ])
             ->add('sortBy', ChoiceType::class, [
                 'choices' => Product::getSortDataForCatalog(),

@@ -44,8 +44,7 @@ class CatalogProductQueryBuilder
     public function addProductSearchConditions(ProductSection $section = null, string $searchPhrase = null, float $priceMin = null, float $priceMax = null, array $categoriesGrouped = null): self
     {
         $this->queryBuilder
-            ->andWhere('p.id LIKE :searchPhrase OR
-                        p.name LIKE :searchPhrase')
+            ->andWhere('p.name LIKE :searchPhrase')
             ->setParameter('searchPhrase', '%' . $searchPhrase . '%')
         ;
 
