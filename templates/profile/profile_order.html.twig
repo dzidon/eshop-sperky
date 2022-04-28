@@ -3,6 +3,6 @@
 {% block profile_body %}
 
     {# Přehled objednávky #}
-    {{ include('fragments/_order_overview.html.twig', {order: order}) }}
+    {{ include('fragments/_order_overview.html.twig', {order: order, showProductIds: false}) }}
 
 {% endblock %}

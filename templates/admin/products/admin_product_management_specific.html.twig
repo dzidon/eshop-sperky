@@ -2,6 +2,12 @@
 
 {% block admin_body %}
 
+    {% if productInstance.id is not null %}
+        <div class="row no-mar-bot">
+            <span>ID produktu: {{ productInstance.id }}</span>
+        </div>
+    {% endif %}
+
     {# Časy vytvoření a aktualizace #}
     {{ include('fragments/_instance_created_updated.html.twig', {instance: productInstance}) }}
 

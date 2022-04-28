@@ -263,6 +263,7 @@ class OrderController extends AbstractController
             'formLifecycleChapter' => $formLifecycleChapterView,
             'formPacketa' => $formPacketaView,
             'packetaMessage' => $packetaMessage,
+            'showProductIds' => true,
         ]);
     }
 

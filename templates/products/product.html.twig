@@ -81,13 +81,6 @@
                         </div>
                     {% endif %}
 
-                    <div class="row">
-                        <div class="col s12">
-                            <span class="bold">ID produktu: </span>
-                            {{ productInstance.getId() }}
-                        </div>
-                    </div>
-
                     {% if productInstance.getCategoryNamesGrouped()|length > 0 %}
                         <div class="row">
                             {% for categoryGroupName, categoryNames in productInstance.getCategoryNamesGrouped() %}

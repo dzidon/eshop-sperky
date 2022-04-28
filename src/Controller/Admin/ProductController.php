@@ -116,7 +116,7 @@ class ProductController extends AbstractController
                 $entityManager->flush();
             }
 
-            $this->addFlash('success', 'Produkt uložen!');
+            $this->addFlash('success', sprintf('Produkt ID %s uložen!', $product->getId()));
             $this->logger->info(sprintf("Admin %s (ID: %s) has saved a product %s (ID: %s).", $user->getUserIdentifier(), $user->getId(), $product->getName(), $product->getId()));
 
             return $this->redirectToRoute('admin_products');

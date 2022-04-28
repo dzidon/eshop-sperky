@@ -267,7 +267,7 @@
                                 </div>
                             </a>
                             <a href="{{ product_path }}">
-                                <strong class="margin-0">{{ cartOccurence.quantity }}x {{ cartOccurence.name }} (ID: {{ cartOccurence.product.id }})</strong>
+                                <strong class="margin-0">{{ cartOccurence.quantity }}x {{ cartOccurence.name }} {% if showProductIds %}(ID: {{ cartOccurence.product.id }}){% endif %}</strong>
                                 <div class="grey-text">{{ cartOccurence.optionsString }}</div>
                             </a>
                         </div>

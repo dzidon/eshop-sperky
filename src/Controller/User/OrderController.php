@@ -261,6 +261,7 @@ class OrderController extends AbstractController
 
         return $this->render('order/overview.html.twig', [
             'order' => $order,
+            'showProductIds' => false,
         ]);
     }
 }
