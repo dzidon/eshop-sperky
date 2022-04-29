@@ -118,7 +118,7 @@
                     <div class="col s6 m5 no-padding">Doplňek adresy:</div>
                     <div class="col s6 m7 no-padding">
                         <strong>{{ order.addressDeliveryAdditionalInfo }}</strong>
-                        <em>{% if order.deliveryMethodLocksDeliveryAddress %}(ID výdejního místa){% endif %}</em>
+                        <em>{% if order.addressDeliveryLocked %}(ID výdejního místa){% endif %}</em>
                     </div>
                 </div>
             {% endif %}

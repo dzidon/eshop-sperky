@@ -1179,12 +1179,10 @@ class Order
         ;
     }
 
-    public function saveHistoricalDataForMethods(): self
+    public function saveHistoricalDataForMethods(): void
     {
         $this->saveHistoricalDataForDeliveryMethod();
         $this->saveHistoricalDataForPaymentMethod();
-
-        return $this;
     }
 
     public function injectAddressDeliveryToStatic(): void

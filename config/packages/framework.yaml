@@ -19,6 +19,8 @@ framework:
 
     assets:
         packages:
+            favicon:
+                base_path: favicon/
             images:
                 base_path: images/
             product_images:

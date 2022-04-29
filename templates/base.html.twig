@@ -3,6 +3,18 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0">
+
+        {# Favicon #}
+        <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('apple-touch-icon.png', 'favicon') }}">
+        <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon-32x32.png', 'favicon') }}">
+        <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('favicon-16x16.png', 'favicon') }}">
+        <link rel="manifest" href="{{ asset('site.webmanifest', 'favicon') }}">
+        <link rel="mask-icon" href="{{ asset('safari-pinned-tab.svg', 'favicon') }}" color="#000000">
+        <meta name="apple-mobile-web-app-title" content="Prysky">
+        <meta name="application-name" content="Prysky">
+        <meta name="msapplication-TileColor" content="#000000">
+        <meta name="theme-color" content="#ffffff">
+
         <title>
             {% if breadcrumbs_service is defined and breadcrumbs_service.pageTitle|length > 0 and app.request.attributes.get('_route') is not same as('home') %}
                 {{ breadcrumbs_service.pageTitle }} -
@@ -10,7 +22,7 @@
             {{ site_name }}
         </title>
 
-        <!-- CSS -->
+        {# CSS #}
         {% block stylesheets %}
             <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
             <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css">
@@ -22,7 +34,9 @@
         <div class="navbar-fixed">
             <nav class="white lighten-1" role="navigation">
                 <div class="nav-wrapper container">
-                    <a id="logo-container" href="{{ path('home') }}" class="black-text brand-logo bold">PRYSKY</a>
+                    <a id="logo-container" href="{{ path('home') }}" class="black-text brand-logo height-max">
+                        <img src="{{ asset('prysky-logo.png', 'images') }}" class="img-navbar-logo" alt="Logo Prysky">
+                    </a>
 
                     <ul class="right hide-on-med-and-down">
                         {% set path_order_cart = path('order_cart') %}
@@ -200,7 +214,7 @@
             </div>
         </footer>
 
-        <!--  Scripts -->
+        {# Scripts #}
         {% block javascripts %}
             {{ encore_entry_script_tags('app') }}
         {% endblock %}
