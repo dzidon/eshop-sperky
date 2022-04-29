@@ -2,10 +2,10 @@
 
 namespace App\Form;
 
-use App\Entity\Detached\ProductCatalogFilter;
-use App\Entity\Product;
+use App\Entity\Detached\Search\SearchProduct;
 use App\Entity\ProductCategory;
 use App\Form\EventSubscriber\ProductFilterSubscriber;
+use App\Form\EventSubscriber\SearchSubscriber;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -18,38 +18,36 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ProductCatalogFilterFormType extends AbstractType
 {
+    private SearchSubscriber $searchSubscriber;
     private EntityManagerInterface $entityManager;
-    private ProductFilterSubscriber $categorySubscriber;
+    private ProductFilterSubscriber $filterSubscriber;
 
-    public function __construct(EntityManagerInterface $entityManager, ProductFilterSubscriber $categorySubscriber)
+    public function __construct(SearchSubscriber $searchSubscriber, EntityManagerInterface $entityManager, ProductFilterSubscriber $filterSubscriber)
     {
+        $this->searchSubscriber = $searchSubscriber;
         $this->entityManager = $entityManager;
-        $this->categorySubscriber = $categorySubscriber;
+        $this->filterSubscriber = $filterSubscriber;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        /** @var ProductCatalogFilter $filterData */
+        /** @var SearchProduct $filterData */
         $filterData = $builder->getData();
-        $priceData = $this->entityManager->getRepository(Product::class)->getMinAndMaxPrice( $filterData->getSection() );
 
-        $filterData->setPriceMin($priceData['priceMin']);
-        $filterData->setPriceMax($priceData['priceMax']);
-        $filterData->setSortBy( Product::getSortDataForCatalog()[array_key_first(Product::getSortDataForCatalog())] );
-
-        $builder->setData($filterData);
         $builder
             ->add('searchPhrase', TextType::class, [
+                'help' => $filterData->getSearchHelp(),
                 'required' => false,
-                'label' => 'Hledat podle názvu',
+                'label' => 'Hledat',
             ])
             ->add('sortBy', ChoiceType::class, [
-                'choices' => Product::getSortDataForCatalog(),
+                'choices' => $filterData->getAllSortData(),
+                'invalid_message' => 'Zvolte platný atribut řazení.',
                 'label' => 'Řazení',
             ])
             ->add('priceMin', NumberType::class, [
                 'attr' => [
-                    'data-price-min' => $priceData['priceMin'],
+                    'data-price-min' => $filterData->getPriceMin(),
                 ],
                 'required' => false,
                 'invalid_message' => 'Musíte zadat číselnou hodnotu.',
@@ -57,13 +55,14 @@ class ProductCatalogFilterFormType extends AbstractType
             ])
             ->add('priceMax', NumberType::class, [
                 'attr' => [
-                    'data-price-max' => $priceData['priceMax'],
+                    'data-price-max' => $filterData->getPriceMax(),
                 ],
                 'required' => false,
                 'invalid_message' => 'Musíte zadat číselnou hodnotu.',
                 'label' => 'Do',
             ])
-            ->addEventSubscriber($this->categorySubscriber)
+            ->addEventSubscriber($this->filterSubscriber)
+            ->addEventSubscriber($this->searchSubscriber)
         ;
     }
 
@@ -76,13 +75,13 @@ class ProductCatalogFilterFormType extends AbstractType
      */
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
-        /** @var ProductCatalogFilter $filterData */
+        /** @var SearchProduct $filterData */
         $filterData = $form->getData();
 
         if ($filterData->getSection() !== null)
         {
-            $section = $filterData->getSection();
             $searchPhrase = $filterData->getSearchPhrase();
+            $section = $filterData->getSection();
             $priceMin = $filterData->getPriceMin();
             $priceMax = $filterData->getPriceMax();
 
@@ -137,13 +136,12 @@ class ProductCatalogFilterFormType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => ProductCatalogFilter::class,
+            'data_class' => SearchProduct::class,
             'csrf_protection' => false,
             'csrf_field_name' => '_token',
             'csrf_token_id'   => 'form_product_catalog_filter',
             'method' => 'GET',
             'allow_extra_fields' => true,
-            'validation_groups' => false, // validace se řeší v ProductFilterSubscriber, aby neházela errory
             'attr' => [
                 'id' => 'form-product-catalog',
             ],

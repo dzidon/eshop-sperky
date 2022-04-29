@@ -3,6 +3,8 @@
 namespace App\Form;
 
 use App\Entity\Order;
+use App\Entity\Detached\Search\SearchOrder;
+use App\Form\EventSubscriber\SearchSubscriber;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -11,15 +13,26 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class OrderSearchFormType extends AbstractType
 {
+    private SearchSubscriber $searchSubscriber;
+
+    public function __construct(SearchSubscriber $searchSubscriber)
+    {
+        $this->searchSubscriber = $searchSubscriber;
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        /** @var SearchOrder $data */
+        $searchData = $builder->getForm()->getData();
+
         $builder
             ->add('searchPhrase', TextType::class, [
+                'help' => $searchData->getSearchHelp(),
                 'required' => false,
-                'label' => 'Hledat...',
+                'label' => 'Hledat',
             ])
             ->add('sortBy', ChoiceType::class, [
-                'choices' => $options['sort_choices'],
+                'choices' => $searchData->getAllSortData(),
                 'invalid_message' => 'Zvolte platný atribut řazení.',
                 'label' => 'Řazení',
             ])
@@ -30,18 +43,17 @@ class OrderSearchFormType extends AbstractType
                 'placeholder' => '-- všechny --',
                 'label' => 'Stav objednávky',
             ])
+            ->addEventSubscriber($this->searchSubscriber)
         ;
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'csrf_protection' => false,
-            'method' => 'GET',
+            'data_class'         => SearchOrder::class,
+            'method'             => 'GET',
+            'csrf_protection'    => false,
             'allow_extra_fields' => true,
-            'sort_choices' => [],
         ]);
-
-        $resolver->setAllowedTypes('sort_choices', 'array');
     }
 }

@@ -3,6 +3,8 @@
 namespace App\Controller\User;
 
 use App\Entity\Address;
+use App\Entity\Detached\Search\SearchAndSort;
+use App\Entity\Detached\Search\SearchOrder;
 use App\Entity\Order;
 use App\Entity\User;
 use App\Form\AddressFormType;
@@ -122,19 +124,12 @@ class ProfileController extends AbstractController
         /** @var User|null $user */
         $user = $this->getUser();
 
-        $form = $formFactory->createNamed('', SearchTextAndSortFormType::class, null, ['sort_choices' => Address::getSortData()]);
+        $searchData = new SearchAndSort(Address::getSortData(), 'Hledejte podle aliasu.');
+        $form = $formFactory->createNamed('', SearchTextAndSortFormType::class, $searchData);
         //button je přidáván v šabloně, aby se nezobrazoval v odkazu
         $form->handleRequest($this->request);
 
-        if ($form->isSubmitted() && $form->isValid())
-        {
-            $pagination = $this->getDoctrine()->getRepository(Address::class)->getSearchPagination($user, $form->get('searchPhrase')->getData(), $form->get('sortBy')->getData());
-        }
-        else
-        {
-            $pagination = $this->getDoctrine()->getRepository(Address::class)->getSearchPagination($user);
-        }
-
+        $pagination = $this->getDoctrine()->getRepository(Address::class)->getSearchPagination($user, $searchData);
         if($pagination->isCurrentPageOutOfBounds())
         {
             throw new NotFoundHttpException('Na této stránce nebyly nalezeny žádné adresy.');
@@ -255,19 +250,12 @@ class ProfileController extends AbstractController
         /** @var User|null $user */
         $user = $this->getUser();
 
-        $form = $formFactory->createNamed('', OrderSearchFormType::class, null, ['sort_choices' => Order::getSortData()]);
+        $searchData = new SearchOrder(Order::getSortData(), 'Hledejte podle ID.');
+        $form = $formFactory->createNamed('', OrderSearchFormType::class, $searchData);
         //button je přidáván v šabloně, aby se nezobrazoval v odkazu
         $form->handleRequest($this->request);
 
-        if ($form->isSubmitted() && $form->isValid())
-        {
-            $pagination = $this->getDoctrine()->getRepository(Order::class)->getProfileSearchPagination($user->getEmail(), $user, $form->get('searchPhrase')->getData(), $form->get('sortBy')->getData(), $form->get('lifecycle')->getData());
-        }
-        else
-        {
-            $pagination = $this->getDoctrine()->getRepository(Order::class)->getProfileSearchPagination($user->getEmail(), $user);
-        }
-
+        $pagination = $this->getDoctrine()->getRepository(Order::class)->getProfileSearchPagination($user->getEmail(), $user, $searchData);
         if($pagination->isCurrentPageOutOfBounds())
         {
             throw new NotFoundHttpException('Na této stránce nebyly nalezeny žádné objednávky.');

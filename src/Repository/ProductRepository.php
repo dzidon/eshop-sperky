@@ -2,12 +2,12 @@
 
 namespace App\Repository;
 
+use App\Entity\Detached\Search\SearchProduct;
 use Exception;
 use App\Entity\Product;
 use App\Entity\ProductSection;
 use App\Pagination\Pagination;
 use Doctrine\ORM\QueryBuilder;
-use App\Service\SortingService;
 use App\Entity\ProductOptionGroup;
 use Doctrine\Persistence\ManagerRegistry;
 use App\CatalogFilter\CatalogProductQueryBuilder;
@@ -22,14 +22,12 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
  */
 class ProductRepository extends ServiceEntityRepository
 {
-    private SortingService $sorting;
     private $request;
 
-    public function __construct(ManagerRegistry $registry, SortingService $sorting, RequestStack $requestStack)
+    public function __construct(ManagerRegistry $registry, RequestStack $requestStack)
     {
         parent::__construct($registry, Product::class);
 
-        $this->sorting = $sorting;
         $this->request = $requestStack->getCurrentRequest();
     }
 
@@ -167,13 +165,6 @@ class ProductRepository extends ServiceEntityRepository
         $queryBuilder = $this->createQueryBuilder('p')
             ->select('min(p.priceWithVat) as priceMin, max(p.priceWithVat) as priceMax');
 
-        /*if($section !== null)
-        {
-            $queryBuilder
-                ->andWhere('p.section = :section')
-                ->setParameter('section', $section);
-        }*/
-
         $priceData = (new CatalogProductQueryBuilder($queryBuilder))
             ->addProductVisibilityCondition()
             ->addProductSearchConditions($section)
@@ -271,27 +262,26 @@ class ProductRepository extends ServiceEntityRepository
         return $product;
     }
 
-    public function getSearchPagination(bool $inAdmin, ProductSection $section = null, string $searchPhrase = null, string $sortAttribute = null, float $priceMin = null, float $priceMax = null, array $categoriesGrouped = null): Pagination
+    public function getSearchPagination(bool $inAdmin, SearchProduct $searchData): Pagination
     {
+        $sortData = $searchData->getDqlSortData();
         $queryBuilder = $this->createQueryBuilder('p');
 
         if($inAdmin)
         {
-            $sortData = $this->sorting->createSortData($sortAttribute, Product::getSortDataForAdmin());
             $queryBuilder
                 // vyhledavani
                 ->andWhere('p.id LIKE :searchPhrase OR
                             p.name LIKE :searchPhrase OR
                             p.slug LIKE :searchPhrase')
-                ->setParameter('searchPhrase', '%' . $searchPhrase . '%')
+                ->setParameter('searchPhrase', '%' . $searchData->getSearchPhrase() . '%')
             ;
         }
         else
         {
-            $sortData = $this->sorting->createSortData($sortAttribute, Product::getSortDataForCatalog());
             $queryBuilder = (new CatalogProductQueryBuilder($queryBuilder))
                 ->addProductVisibilityCondition()
-                ->addProductSearchConditions($section, $searchPhrase, $priceMin, $priceMax, $categoriesGrouped)
+                ->addProductSearchConditions($searchData->getSection(), $searchData->getSearchPhrase(), $searchData->getPriceMin(), $searchData->getPriceMax(), $searchData->getCategoriesGrouped())
                 ->getQueryBuilder()
             ;
         }

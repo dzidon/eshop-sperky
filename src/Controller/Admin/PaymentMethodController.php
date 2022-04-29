@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\Detached\Search\SearchAndSort;
 use App\Entity\PaymentMethod;
 use App\Form\PaymentMethodFormType;
 use App\Form\SearchTextAndSortFormType;
@@ -46,19 +47,12 @@ class PaymentMethodController extends AbstractController
      */
     public function paymentMethods(FormFactoryInterface $formFactory): Response
     {
-        $form = $formFactory->createNamed('', SearchTextAndSortFormType::class, null, ['sort_choices' => PaymentMethod::getSortData()]);
+        $searchData = new SearchAndSort(PaymentMethod::getSortData(), 'Hledejte podle názvu.');
+        $form = $formFactory->createNamed('', SearchTextAndSortFormType::class, $searchData);
         //button je přidáván v šabloně, aby se nezobrazoval v odkazu
         $form->handleRequest($this->request);
 
-        if ($form->isSubmitted() && $form->isValid())
-        {
-            $pagination = $this->getDoctrine()->getRepository(PaymentMethod::class)->getSearchPagination($form->get('searchPhrase')->getData(), $form->get('sortBy')->getData());
-        }
-        else
-        {
-            $pagination = $this->getDoctrine()->getRepository(PaymentMethod::class)->getSearchPagination();
-        }
-
+        $pagination = $this->getDoctrine()->getRepository(PaymentMethod::class)->getSearchPagination($searchData);
         if($pagination->isCurrentPageOutOfBounds())
         {
             throw new NotFoundHttpException('Na této stránce nebyly nalezeny žádné platební metody.');

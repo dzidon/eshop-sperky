@@ -3,9 +3,9 @@
 namespace App\Repository;
 
 use App\Entity\Address;
+use App\Entity\Detached\Search\SearchAndSort;
 use App\Entity\User;
 use App\Pagination\Pagination;
-use App\Service\SortingService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -18,20 +18,18 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 class AddressRepository extends ServiceEntityRepository
 {
-    private SortingService $sorting;
     private $request;
 
-    public function __construct(ManagerRegistry $registry, SortingService $sorting, RequestStack $requestStack)
+    public function __construct(ManagerRegistry $registry, RequestStack $requestStack)
     {
         parent::__construct($registry, Address::class);
 
-        $this->sorting = $sorting;
         $this->request = $requestStack->getCurrentRequest();
     }
 
-    public function getSearchPagination(User $user, $searchPhrase = null, string $sortAttribute = null): Pagination
+    public function getSearchPagination(User $user, SearchAndSort $searchData): Pagination
     {
-        $sortData = $this->sorting->createSortData($sortAttribute, Address::getSortData());
+        $sortData = $searchData->getDqlSortData();
 
         $query = $this->createQueryBuilder('a')
 
@@ -41,7 +39,7 @@ class AddressRepository extends ServiceEntityRepository
 
             //vyhledavani
             ->andWhere('a.alias LIKE :searchPhrase')
-            ->setParameter('searchPhrase', '%' . $searchPhrase . '%')
+            ->setParameter('searchPhrase', '%' . $searchData->getSearchPhrase() . '%')
 
             //razeni
             ->orderBy('a.' . $sortData['attribute'], $sortData['order'])

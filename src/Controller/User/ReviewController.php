@@ -2,6 +2,7 @@
 
 namespace App\Controller\User;
 
+use App\Entity\Detached\Search\SearchAndSort;
 use App\Entity\Review;
 use App\Entity\User;
 use App\Form\HiddenTrueFormType;
@@ -42,19 +43,12 @@ class ReviewController extends AbstractController
      */
     public function reviews(FormFactoryInterface $formFactory): Response
     {
-        $form = $formFactory->createNamed('', SearchTextAndSortFormType::class, null, ['sort_choices' => Review::getSortData()]);
+        $searchData = new SearchAndSort(Review::getSortData(), 'Hledejte jméno autora nebo kus textu.');
+        $form = $formFactory->createNamed('', SearchTextAndSortFormType::class, $searchData);
         //button je přidáván v šabloně, aby se nezobrazoval v odkazu
         $form->handleRequest($this->request);
 
-        if ($form->isSubmitted() && $form->isValid())
-        {
-            $pagination = $this->getDoctrine()->getRepository(Review::class)->getSearchPagination($form->get('searchPhrase')->getData(), $form->get('sortBy')->getData());
-        }
-        else
-        {
-            $pagination = $this->getDoctrine()->getRepository(Review::class)->getSearchPagination();
-        }
-
+        $pagination = $this->getDoctrine()->getRepository(Review::class)->getSearchPagination($searchData);
         if($pagination->isCurrentPageOutOfBounds())
         {
             throw new NotFoundHttpException('Na této stránce nebyly nalezeny žádné recenze.');

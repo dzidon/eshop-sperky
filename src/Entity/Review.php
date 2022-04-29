@@ -2,8 +2,8 @@
 
 namespace App\Entity;
 
+use App\Entity\Detached\Search\SearchAndSort;
 use App\Repository\ReviewRepository;
-use App\Service\SortingService;
 use DateTime;
 use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
@@ -140,10 +140,10 @@ class Review
     public static function getSortData(): array
     {
         return [
-            'Od nejnovějších' => 'created'.SortingService::ATTRIBUTE_TAG_DESC,
-            'Od nejstarších' => 'created'.SortingService::ATTRIBUTE_TAG_ASC,
-            'Počet hvězd (vzestupně)' => 'stars'.SortingService::ATTRIBUTE_TAG_ASC,
-            'Počet hvězd (sestupně)' => 'stars'.SortingService::ATTRIBUTE_TAG_DESC,
+            'Od nejnovějších' => 'created'.SearchAndSort::ATTRIBUTE_TAG_DESC,
+            'Od nejstarších' => 'created'.SearchAndSort::ATTRIBUTE_TAG_ASC,
+            'Počet hvězd (vzestupně)' => 'stars'.SearchAndSort::ATTRIBUTE_TAG_ASC,
+            'Počet hvězd (sestupně)' => 'stars'.SearchAndSort::ATTRIBUTE_TAG_DESC,
         ];
     }
 }

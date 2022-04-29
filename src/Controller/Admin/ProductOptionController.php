@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\Detached\Search\SearchAndSort;
 use App\Entity\ProductOptionGroup;
 use App\Form\HiddenTrueFormType;
 use App\Form\ProductOptionGroupFormType;
@@ -47,19 +48,12 @@ class ProductOptionController extends AbstractController
      */
     public function productOptionGroups(FormFactoryInterface $formFactory): Response
     {
-        $form = $formFactory->createNamed('', SearchTextAndSortFormType::class, null, ['sort_choices' => ProductOptionGroup::getSortData()]);
+        $searchData = new SearchAndSort(ProductOptionGroup::getSortData(), 'Hledejte podle názvu.');
+        $form = $formFactory->createNamed('', SearchTextAndSortFormType::class, $searchData);
         //button je přidáván v šabloně, aby se nezobrazoval v odkazu
         $form->handleRequest($this->request);
 
-        if ($form->isSubmitted() && $form->isValid())
-        {
-            $pagination = $this->getDoctrine()->getRepository(ProductOptionGroup::class)->getSearchPagination($form->get('searchPhrase')->getData(), $form->get('sortBy')->getData());
-        }
-        else
-        {
-            $pagination = $this->getDoctrine()->getRepository(ProductOptionGroup::class)->getSearchPagination();
-        }
-
+        $pagination = $this->getDoctrine()->getRepository(ProductOptionGroup::class)->getSearchPagination($searchData);
         if($pagination->isCurrentPageOutOfBounds())
         {
             throw new NotFoundHttpException('Na této stránce nebyly nalezeny žádné skupiny produktových voleb.');

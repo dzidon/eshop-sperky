@@ -2,8 +2,8 @@
 
 namespace App\Entity;
 
+use App\Entity\Detached\Search\SearchAndSort;
 use App\Repository\ProductOptionGroupRepository;
-use App\Service\SortingService;
 use DateTime;
 use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -140,10 +140,10 @@ class ProductOptionGroup
     public static function getSortData(): array
     {
         return [
-            'Od nejnovějších' => 'created'.SortingService::ATTRIBUTE_TAG_DESC,
-            'Od nejstarších' => 'created'.SortingService::ATTRIBUTE_TAG_ASC,
-            'Název (A-Z)' => 'name'.SortingService::ATTRIBUTE_TAG_ASC,
-            'Název (Z-A)' => 'name'.SortingService::ATTRIBUTE_TAG_DESC,
+            'Od nejnovějších' => 'created'.SearchAndSort::ATTRIBUTE_TAG_DESC,
+            'Od nejstarších' => 'created'.SearchAndSort::ATTRIBUTE_TAG_ASC,
+            'Název (A-Z)' => 'name'.SearchAndSort::ATTRIBUTE_TAG_ASC,
+            'Název (Z-A)' => 'name'.SearchAndSort::ATTRIBUTE_TAG_DESC,
         ];
     }
 }

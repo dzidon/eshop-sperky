@@ -2,8 +2,8 @@
 
 namespace App\Entity;
 
+use App\Entity\Detached\Search\SearchAndSort;
 use App\Repository\DeliveryMethodRepository;
-use App\Service\SortingService;
 use DateTime;
 use DateTimeInterface;
 use Symfony\Component\HttpFoundation\File\File;
@@ -282,12 +282,12 @@ class DeliveryMethod
     public static function getSortData(): array
     {
         return [
-            'Od nejnovějších' => 'created'.SortingService::ATTRIBUTE_TAG_DESC,
-            'Od nejstarších' => 'created'.SortingService::ATTRIBUTE_TAG_ASC,
-            'Název (A-Z)' => 'name'.SortingService::ATTRIBUTE_TAG_ASC,
-            'Název (Z-A)' => 'name'.SortingService::ATTRIBUTE_TAG_DESC,
-            'Cena vč. DPH (vzestupně)' => 'priceWithVat'.SortingService::ATTRIBUTE_TAG_ASC,
-            'Cena vč. DPH (sestupně)' => 'priceWithVat'.SortingService::ATTRIBUTE_TAG_DESC,
+            'Od nejnovějších' => 'created'.SearchAndSort::ATTRIBUTE_TAG_DESC,
+            'Od nejstarších' => 'created'.SearchAndSort::ATTRIBUTE_TAG_ASC,
+            'Název (A-Z)' => 'name'.SearchAndSort::ATTRIBUTE_TAG_ASC,
+            'Název (Z-A)' => 'name'.SearchAndSort::ATTRIBUTE_TAG_DESC,
+            'Cena vč. DPH (vzestupně)' => 'priceWithVat'.SearchAndSort::ATTRIBUTE_TAG_ASC,
+            'Cena vč. DPH (sestupně)' => 'priceWithVat'.SearchAndSort::ATTRIBUTE_TAG_DESC,
         ];
     }
 }

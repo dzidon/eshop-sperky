@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\Detached\Search\SearchAndSort;
 use App\Entity\ProductSection;
 use App\Form\HiddenTrueFormType;
 use App\Form\ProductSectionFormType;
@@ -48,19 +49,12 @@ class ProductSectionController extends AbstractController
      */
     public function productSections(FormFactoryInterface $formFactory): Response
     {
-        $form = $formFactory->createNamed('', SearchTextAndSortFormType::class, null, ['sort_choices' => ProductSection::getSortData()]);
+        $searchData = new SearchAndSort(ProductSection::getSortData(), 'Hledejte podle názvu nebo názvu v odkazu.');
+        $form = $formFactory->createNamed('', SearchTextAndSortFormType::class, $searchData);
         //button je přidáván v šabloně, aby se nezobrazoval v odkazu
         $form->handleRequest($this->request);
 
-        if ($form->isSubmitted() && $form->isValid())
-        {
-            $pagination = $this->getDoctrine()->getRepository(ProductSection::class)->getSearchPagination($form->get('searchPhrase')->getData(), $form->get('sortBy')->getData());
-        }
-        else
-        {
-            $pagination = $this->getDoctrine()->getRepository(ProductSection::class)->getSearchPagination();
-        }
-
+        $pagination = $this->getDoctrine()->getRepository(ProductSection::class)->getSearchPagination($searchData);
         if($pagination->isCurrentPageOutOfBounds())
         {
             throw new NotFoundHttpException('Na této stránce nebyly nalezeny žádné sekce.');

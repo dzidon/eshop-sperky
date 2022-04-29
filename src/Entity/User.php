@@ -2,8 +2,8 @@
 
 namespace App\Entity;
 
+use App\Entity\Detached\Search\SearchAndSort;
 use App\Repository\UserRepository;
-use App\Service\SortingService;
 use DateTime;
 use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -486,18 +486,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public static function getSortData(): array
     {
         return [
-            'Od nejnovějších' => 'registered'.SortingService::ATTRIBUTE_TAG_DESC,
-            'Od nejstarších' => 'registered'.SortingService::ATTRIBUTE_TAG_ASC,
-            'E-mail (A-Z)' => 'email'.SortingService::ATTRIBUTE_TAG_ASC,
-            'E-mail (Z-A)' => 'email'.SortingService::ATTRIBUTE_TAG_DESC,
-            'Křestní jméno (A-Z)' => 'nameFirst'.SortingService::ATTRIBUTE_TAG_ASC,
-            'Křestní jméno (Z-A)' => 'nameFirst'.SortingService::ATTRIBUTE_TAG_DESC,
-            'Příjmení (A-Z)' => 'nameLast'.SortingService::ATTRIBUTE_TAG_ASC,
-            'Příjmení (Z-A)' => 'nameLast'.SortingService::ATTRIBUTE_TAG_DESC,
-            'Od ověřených' => 'isVerified'.SortingService::ATTRIBUTE_TAG_DESC,
-            'Od neověřených' => 'isVerified'.SortingService::ATTRIBUTE_TAG_ASC,
-            'Od umlčených' => 'isMuted'.SortingService::ATTRIBUTE_TAG_DESC,
-            'Od neumlčených' => 'isMuted'.SortingService::ATTRIBUTE_TAG_ASC,
+            'Od nejnovějších' => 'registered'.SearchAndSort::ATTRIBUTE_TAG_DESC,
+            'Od nejstarších' => 'registered'.SearchAndSort::ATTRIBUTE_TAG_ASC,
+            'E-mail (A-Z)' => 'email'.SearchAndSort::ATTRIBUTE_TAG_ASC,
+            'E-mail (Z-A)' => 'email'.SearchAndSort::ATTRIBUTE_TAG_DESC,
+            'Křestní jméno (A-Z)' => 'nameFirst'.SearchAndSort::ATTRIBUTE_TAG_ASC,
+            'Křestní jméno (Z-A)' => 'nameFirst'.SearchAndSort::ATTRIBUTE_TAG_DESC,
+            'Příjmení (A-Z)' => 'nameLast'.SearchAndSort::ATTRIBUTE_TAG_ASC,
+            'Příjmení (Z-A)' => 'nameLast'.SearchAndSort::ATTRIBUTE_TAG_DESC,
+            'Od ověřených' => 'isVerified'.SearchAndSort::ATTRIBUTE_TAG_DESC,
+            'Od neověřených' => 'isVerified'.SearchAndSort::ATTRIBUTE_TAG_ASC,
+            'Od umlčených' => 'isMuted'.SearchAndSort::ATTRIBUTE_TAG_DESC,
+            'Od neumlčených' => 'isMuted'.SearchAndSort::ATTRIBUTE_TAG_ASC,
         ];
     }
 }

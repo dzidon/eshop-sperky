@@ -2,9 +2,9 @@
 
 namespace App\Repository;
 
+use App\Entity\Detached\Search\SearchAndSort;
 use App\Entity\Review;
 use App\Pagination\Pagination;
-use App\Service\SortingService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
@@ -18,20 +18,18 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 class ReviewRepository extends ServiceEntityRepository
 {
-    private SortingService $sorting;
     private $request;
 
-    public function __construct(ManagerRegistry $registry, SortingService $sorting, RequestStack $requestStack)
+    public function __construct(ManagerRegistry $registry, RequestStack $requestStack)
     {
         parent::__construct($registry, Review::class);
 
-        $this->sorting = $sorting;
         $this->request = $requestStack->getCurrentRequest();
     }
 
-    public function getSearchPagination($searchPhrase = null, string $sortAttribute = null): Pagination
+    public function getSearchPagination(SearchAndSort $searchData): Pagination
     {
-        $sortData = $this->sorting->createSortData($sortAttribute, Review::getSortData());
+        $sortData = $searchData->getDqlSortData();
 
         $queryBuilder = $this->createQueryBuilder('r')
             ->select('r', 'u')
@@ -40,7 +38,7 @@ class ReviewRepository extends ServiceEntityRepository
             //vyhledavani
             ->andWhere('r.text LIKE :searchPhrase OR
                         CONCAT(u.nameFirst, \' \', u.nameLast) LIKE :searchPhrase')
-            ->setParameter('searchPhrase', '%' . $searchPhrase . '%')
+            ->setParameter('searchPhrase', '%' . $searchData->getSearchPhrase() . '%')
 
             //razeni
             ->orderBy('r.' . $sortData['attribute'], $sortData['order'])

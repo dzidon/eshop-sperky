@@ -2,12 +2,12 @@
 
 namespace App\Repository;
 
+use DateTime;
+use App\Entity\Detached\Search\SearchOrder;
 use App\Entity\Order;
 use App\Entity\Product;
 use App\Entity\User;
 use App\Pagination\Pagination;
-use App\Service\SortingService;
-use DateTime;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\Uid\Uuid;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -22,20 +22,18 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 class OrderRepository extends ServiceEntityRepository
 {
-    private SortingService $sorting;
     private $request;
 
-    public function __construct(ManagerRegistry $registry, SortingService $sorting, RequestStack $requestStack)
+    public function __construct(ManagerRegistry $registry, RequestStack $requestStack)
     {
         parent::__construct($registry, Order::class);
 
-        $this->sorting = $sorting;
         $this->request = $requestStack->getCurrentRequest();
     }
 
-    public function getProfileSearchPagination(string $email, User $user, string $searchPhrase = null, string $sortAttribute = null, int $lifecycle = null): Pagination
+    public function getProfileSearchPagination(string $email, User $user, SearchOrder $searchData): Pagination
     {
-        $sortData = $this->sorting->createSortData($sortAttribute, Order::getSortData());
+        $sortData = $searchData->getDqlSortData();
 
         $queryBuilder = $this->createQueryBuilder('o')
             ->andWhere('o.email = :email OR o.user = :user')
@@ -46,9 +44,10 @@ class OrderRepository extends ServiceEntityRepository
 
             // vyhledavani
             ->andWhere('o.id LIKE :searchPhrase')
-            ->setParameter('searchPhrase', '%' . $searchPhrase . '%')
+            ->setParameter('searchPhrase', '%' . $searchData->getSearchPhrase() . '%')
         ;
 
+        $lifecycle = $searchData->getLifecycle();
         if ($lifecycle !== null)
         {
             $queryBuilder
@@ -67,9 +66,9 @@ class OrderRepository extends ServiceEntityRepository
         return new Pagination($query, $this->request);
     }
 
-    public function getAdminSearchPagination(string $searchPhrase = null, string $sortAttribute = null, int $lifecycle = null): Pagination
+    public function getAdminSearchPagination(SearchOrder $searchData): Pagination
     {
-        $sortData = $this->sorting->createSortData($sortAttribute, Order::getSortData());
+        $sortData = $searchData->getDqlSortData();
 
         $queryBuilder = $this->createQueryBuilder('o')
             ->andWhere('o.lifecycleChapter > :lifecycleFresh OR (o.createdManually = true AND o.lifecycleChapter = :lifecycleFresh)')
@@ -77,9 +76,10 @@ class OrderRepository extends ServiceEntityRepository
 
             // vyhledavani
             ->andWhere('o.id LIKE :searchPhrase')
-            ->setParameter('searchPhrase', '%' . $searchPhrase . '%')
+            ->setParameter('searchPhrase', '%' . $searchData->getSearchPhrase() . '%')
         ;
 
+        $lifecycle = $searchData->getLifecycle();
         if ($lifecycle !== null)
         {
             $queryBuilder

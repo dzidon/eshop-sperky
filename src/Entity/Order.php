@@ -2,7 +2,7 @@
 
 namespace App\Entity;
 
-use App\Service\SortingService;
+use App\Entity\Detached\Search\SearchAndSort;
 use DateTime;
 use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -1319,10 +1319,10 @@ class Order
     public static function getSortData(): array
     {
         return [
-            'ID (sestupně)' => 'id'.SortingService::ATTRIBUTE_TAG_DESC,
-            'ID (vzestupně)' => 'id'.SortingService::ATTRIBUTE_TAG_ASC,
-            'Od nejdříve dokončených' => 'finishedAt'.SortingService::ATTRIBUTE_TAG_ASC,
-            'Od naposledy dokončených' => 'finishedAt'.SortingService::ATTRIBUTE_TAG_DESC,
+            'ID (sestupně)' => 'id'.SearchAndSort::ATTRIBUTE_TAG_DESC,
+            'ID (vzestupně)' => 'id'.SearchAndSort::ATTRIBUTE_TAG_ASC,
+            'Od nejdříve dokončených' => 'finishedAt'.SearchAndSort::ATTRIBUTE_TAG_ASC,
+            'Od naposledy dokončených' => 'finishedAt'.SearchAndSort::ATTRIBUTE_TAG_DESC,
         ];
     }
 }

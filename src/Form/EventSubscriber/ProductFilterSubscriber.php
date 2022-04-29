@@ -2,7 +2,7 @@
 
 namespace App\Form\EventSubscriber;
 
-use App\Entity\Detached\ProductCatalogFilter;
+use App\Entity\Detached\Search\SearchProduct;
 use App\Entity\ProductCategory;
 use App\Repository\ProductCategoryRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -10,7 +10,6 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * Subscriber manipulující s produktovým filtrem v katalogu
@@ -19,29 +18,24 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  */
 class ProductFilterSubscriber implements EventSubscriberInterface
 {
-    private ProductCatalogFilter $defaultModel;
-
     private EntityManagerInterface $entityManager;
-    private ValidatorInterface $validator;
 
-    public function __construct(EntityManagerInterface $entityManager, ValidatorInterface $validator)
+    public function __construct(EntityManagerInterface $entityManager)
     {
         $this->entityManager = $entityManager;
-        $this->validator = $validator;
     }
 
     public static function getSubscribedEvents(): array
     {
         return [
             FormEvents::PRE_SET_DATA => 'preSetData',
-            FormEvents::POST_SET_DATA => 'postSetData',
             FormEvents::PRE_SUBMIT => 'preSubmit',
         ];
     }
 
     public function preSetData(FormEvent $event): void
     {
-        /** @var ProductCatalogFilter $filterData */
+        /** @var SearchProduct $filterData */
         $filterData = $event->getData();
         $form = $event->getForm();
 
@@ -50,6 +44,7 @@ class ProductFilterSubscriber implements EventSubscriberInterface
             $form->add('categories', EntityType::class, [
                 'class' => ProductCategory::class,
                 'choice_label' => 'name',
+                'invalid_message' => 'Snažíte se vyhledat neexistující kategorii.',
                 'query_builder' => function (ProductCategoryRepository $er) use ($filterData) {
                     return $er->qbFindCategoriesInSection($filterData->getSection());
                 },
@@ -64,38 +59,50 @@ class ProductFilterSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function postSetData(FormEvent $event): void
-    {
-        $this->defaultModel = clone $event->getData(); // defaultní data
-    }
-
     public function preSubmit(FormEvent $event): void
     {
-        $data = $event->getData(); // data zadaná uživatelem
+        /** @var SearchProduct $defaultData */
+        $defaultData = $event->getForm()->getData();
+        $submittedData = $event->getData();
 
-        if(count($this->validator->validatePropertyValue(ProductCatalogFilter::class, 'sortBy', $data['sortBy'])))
+        // min cena zadaná uživatelem
+        if (!isset($submittedData['priceMin']) || !is_numeric($submittedData['priceMin']))
         {
-            $data['sortBy'] = $this->defaultModel->getSortBy();
+            $submittedData['priceMin'] = $defaultData->getPriceMin();
         }
 
-        if(count($this->validator->validatePropertyValue(ProductCatalogFilter::class, 'priceMin', $data['priceMin']))
-           || $data['priceMin'] > $this->defaultModel->getPriceMax() || $data['priceMin'] < $this->defaultModel->getPriceMin())
+        if (!isset($submittedData['priceMax']) || !is_numeric($submittedData['priceMax']))
         {
-            $data['priceMin'] = $this->defaultModel->getPriceMin();
+            $submittedData['priceMax'] = $defaultData->getPriceMax();
         }
 
-        if(count($this->validator->validatePropertyValue(ProductCatalogFilter::class, 'priceMax', $data['priceMax']))
-           || $data['priceMax'] > $this->defaultModel->getPriceMax() || $data['priceMax'] < $this->defaultModel->getPriceMin())
+        // min a max hodnota musí být v daném intervalu
+        if ($submittedData['priceMin'] < $defaultData->getPriceMin())
         {
-            $data['priceMax'] = $this->defaultModel->getPriceMax();
+            $submittedData['priceMin'] = $defaultData->getPriceMin();
         }
 
-        if ($data['priceMin'] > $data['priceMax'])
+        if ($submittedData['priceMin'] > $defaultData->getPriceMax())
         {
-            $data['priceMin'] = $this->defaultModel->getPriceMin();
-            $data['priceMax'] = $this->defaultModel->getPriceMax();
+            $submittedData['priceMin'] = $defaultData->getPriceMax();
         }
 
-        $event->setData($data);
+        if ($submittedData['priceMax'] < $defaultData->getPriceMin())
+        {
+            $submittedData['priceMax'] = $defaultData->getPriceMin();
+        }
+
+        if ($submittedData['priceMax'] > $defaultData->getPriceMax())
+        {
+            $submittedData['priceMax'] = $defaultData->getPriceMax();
+        }
+
+        // min hodnota nebude vetsi nez max hodnota
+        if ($submittedData['priceMin'] > $submittedData['priceMax'])
+        {
+            $submittedData['priceMin'] = $submittedData['priceMax'];
+        }
+
+        $event->setData($submittedData);
     }
 }

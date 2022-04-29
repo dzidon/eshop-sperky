@@ -3,6 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Entity\DeliveryMethod;
+use App\Entity\Detached\Search\SearchAndSort;
 use App\Form\DeliveryMethodFormType;
 use App\Form\SearchTextAndSortFormType;
 use App\Service\BreadcrumbsService;
@@ -46,19 +47,12 @@ class DeliveryMethodController extends AbstractController
      */
     public function deliveryMethods(FormFactoryInterface $formFactory): Response
     {
-        $form = $formFactory->createNamed('', SearchTextAndSortFormType::class, null, ['sort_choices' => DeliveryMethod::getSortData()]);
+        $searchData = new SearchAndSort(DeliveryMethod::getSortData(), 'Hledejte podle názvu.');
+        $form = $formFactory->createNamed('', SearchTextAndSortFormType::class, $searchData);
         //button je přidáván v šabloně, aby se nezobrazoval v odkazu
         $form->handleRequest($this->request);
 
-        if ($form->isSubmitted() && $form->isValid())
-        {
-            $pagination = $this->getDoctrine()->getRepository(DeliveryMethod::class)->getSearchPagination($form->get('searchPhrase')->getData(), $form->get('sortBy')->getData());
-        }
-        else
-        {
-            $pagination = $this->getDoctrine()->getRepository(DeliveryMethod::class)->getSearchPagination();
-        }
-
+        $pagination = $this->getDoctrine()->getRepository(DeliveryMethod::class)->getSearchPagination($searchData);
         if($pagination->isCurrentPageOutOfBounds())
         {
             throw new NotFoundHttpException('Na této stránce nebyly nalezeny žádné doručovací metody.');

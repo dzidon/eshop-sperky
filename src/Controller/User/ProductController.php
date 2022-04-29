@@ -3,7 +3,7 @@
 namespace App\Controller\User;
 
 use App\Entity\Detached\CartInsert;
-use App\Entity\Detached\ProductCatalogFilter;
+use App\Entity\Detached\Search\SearchProduct;
 use App\Entity\Product;
 use App\Entity\ProductSection;
 use App\Form\CartInsertFormType;
@@ -49,22 +49,17 @@ class ProductController extends AbstractController
             }
         }
 
-        $filterData = new ProductCatalogFilter();
+        $priceData = $this->getDoctrine()->getRepository(Product::class)->getMinAndMaxPrice($section);
+        $filterData = new SearchProduct(Product::getSortDataForCatalog(), 'Hledejte podle názvu.');
+        $filterData->setPriceMin($priceData['priceMin']);
+        $filterData->setPriceMax($priceData['priceMax']);
         $filterData->setSection($section);
 
         $form = $formFactory->createNamed('', ProductCatalogFilterFormType::class, $filterData);
         // button je přidáván v šabloně, aby se nezobrazoval v odkazu
         $form->handleRequest($this->request);
 
-        if ($form->isSubmitted() && $form->isValid())
-        {
-            $pagination = $this->getDoctrine()->getRepository(Product::class)->getSearchPagination($inAdmin = false, $filterData->getSection(), $filterData->getSearchPhrase(), $filterData->getSortBy(), $filterData->getPriceMin(), $filterData->getPriceMax(), $filterData->getCategoriesGrouped());
-        }
-        else
-        {
-            $pagination = $this->getDoctrine()->getRepository(Product::class)->getSearchPagination($inAdmin = false, $filterData->getSection());
-        }
-
+        $pagination = $this->getDoctrine()->getRepository(Product::class)->getSearchPagination($inAdmin = false, $filterData);
         $pagination->addAttributesToPathParameters(['slug']);
         if($pagination->isCurrentPageOutOfBounds())
         {

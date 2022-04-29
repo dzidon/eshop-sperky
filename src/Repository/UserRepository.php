@@ -2,9 +2,9 @@
 
 namespace App\Repository;
 
+use App\Entity\Detached\Search\SearchAndSort;
 use App\Entity\User;
 use App\Pagination\Pagination;
-use App\Service\SortingService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -21,14 +21,12 @@ use Doctrine\ORM\Query;
  */
 class UserRepository extends ServiceEntityRepository implements PasswordUpgraderInterface
 {
-    private SortingService $sorting;
     private $request;
 
-    public function __construct(ManagerRegistry $registry, SortingService $sorting, RequestStack $requestStack)
+    public function __construct(ManagerRegistry $registry, RequestStack $requestStack)
     {
         parent::__construct($registry, User::class);
 
-        $this->sorting = $sorting;
         $this->request = $requestStack->getCurrentRequest();
     }
 
@@ -47,21 +45,21 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $this->_em->flush();
     }
 
-    public function getSearchPagination($searchPhrase = null, string $sortAttribute = null): Pagination
+    public function getSearchPagination(SearchAndSort $searchData): Pagination
     {
-        $sortData = $this->sorting->createSortData($sortAttribute, User::getSortData());
+        $sortData = $searchData->getDqlSortData();
 
         $query = $this->createQueryBuilder('u')
 
             //podminky
             ->orWhere('u.email LIKE :email')
-            ->setParameter('email', '%' . $searchPhrase . '%')
+            ->setParameter('email', '%' . $searchData->getSearchPhrase() . '%')
 
             ->orWhere('CONCAT(u.nameFirst, \' \', u.nameLast) LIKE :fullName')
-            ->setParameter('fullName', '%' . $searchPhrase . '%')
+            ->setParameter('fullName', '%' . $searchData->getSearchPhrase() . '%')
 
             ->orWhere('u.phoneNumber LIKE :phoneNumber')
-            ->setParameter('phoneNumber', '%' . str_replace(' ', '', $searchPhrase) . '%')
+            ->setParameter('phoneNumber', '%' . str_replace(' ', '', $searchData->getSearchPhrase()) . '%')
 
             //razeni
             ->orderBy('u.' . $sortData['attribute'], $sortData['order'])

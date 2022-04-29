@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\Detached\Search\SearchAndSort;
 use App\Entity\User;
 use App\Form\AdminPermissionsFormType;
 use App\Form\HiddenTrueFormType;
@@ -49,20 +50,13 @@ class UserController extends AbstractController
      */
     public function users(FormFactoryInterface $formFactory): Response
     {
-        $form = $formFactory->createNamed('', SearchTextAndSortFormType::class, null, ['sort_choices' => User::getSortData()]);
+        $searchData = new SearchAndSort(User::getSortData(), 'Hledejte podle e-mailu, jména nebo telefonního čísla.');
+        $form = $formFactory->createNamed('', SearchTextAndSortFormType::class, $searchData);
         //button je přidáván v šabloně, aby se nezobrazoval v odkazu
         $form->handleRequest($this->request);
 
-        if ($form->isSubmitted() && $form->isValid())
-        {
-            $pagination = $this->getDoctrine()->getRepository(User::class)->getSearchPagination($form->get('searchPhrase')->getData(), $form->get('sortBy')->getData());
-        }
-        else
-        {
-            $pagination = $this->getDoctrine()->getRepository(User::class)->getSearchPagination();
-        }
-
-        if($pagination->isCurrentPageOutOfBounds())
+        $pagination = $this->getDoctrine()->getRepository(User::class)->getSearchPagination($searchData);
+        if ($pagination->isCurrentPageOutOfBounds())
         {
             throw new NotFoundHttpException('Na této stránce nebyli nalezeni žádní uživatelé.');
         }
@@ -88,13 +82,13 @@ class UserController extends AbstractController
         $userEdited = $this->getDoctrine()->getRepository(User::class)->findOneBy(['id' => $id]);
 
         //nenaslo to zadneho uzivatele
-        if($userEdited === null)
+        if ($userEdited === null)
         {
             throw new NotFoundHttpException('Uzivatel nenalezen.');
         }
 
         //admin nemuze editovat sam sebe mimo dev
-        if($this->getParameter('kernel.environment') !== 'dev' && $user === $userEdited)
+        if ($this->getParameter('kernel.environment') !== 'dev' && $user === $userEdited)
         {
             throw new AccessDeniedHttpException('Nemůžete editovat sami sebe.');
         }
@@ -131,7 +125,7 @@ class UserController extends AbstractController
          * Formulář - oprávnění
          */
         $formPermissionsView = null;
-        if($this->isGranted('user_set_permissions'))
+        if ($this->isGranted('user_set_permissions'))
         {
             $formPermissions = $this->createForm(AdminPermissionsFormType::class, $userEdited);
             $formPermissions->add('submit', SubmitType::class, ['label' => 'Uložit', 'attr' => ['class' => 'btn-large blue left']]);
@@ -155,10 +149,10 @@ class UserController extends AbstractController
          * Formulář - umlčení
          */
         $formMuteView = null;
-        if($this->isGranted('user_block_reviews'))
+        if ($this->isGranted('user_block_reviews'))
         {
             $formMute = $this->createForm(HiddenTrueFormType::class, null, ['csrf_token_id' => 'form_admin_mute_user']);
-            if($userEdited->isMuted())
+            if ($userEdited->isMuted())
             {
                 $formMute->add('submit', SubmitType::class, ['label' => 'Odmlčet', 'attr' => ['class' => 'btn-large green left']]);
             }
@@ -168,7 +162,7 @@ class UserController extends AbstractController
             }
             $formMute->handleRequest($this->request);
 
-            if($formMute->isSubmitted() && $formMute->isValid())
+            if ($formMute->isSubmitted() && $formMute->isValid())
             {
                 $userEdited->setIsMuted( !$userEdited->isMuted() );
                 $entityManager->persist($userEdited);

@@ -2,8 +2,8 @@
 
 namespace App\Entity;
 
+use App\Entity\Detached\Search\SearchAndSort;
 use App\Repository\AddressRepository;
-use App\Service\SortingService;
 use DateTime;
 use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
@@ -338,10 +338,10 @@ class Address
     public static function getSortData(): array
     {
         return [
-            'Od nejnovějších' => 'created'.SortingService::ATTRIBUTE_TAG_DESC,
-            'Od nejstarších' => 'created'.SortingService::ATTRIBUTE_TAG_ASC,
-            'Alias (A-Z)' => 'alias'.SortingService::ATTRIBUTE_TAG_ASC,
-            'Alias (Z-A)' => 'alias'.SortingService::ATTRIBUTE_TAG_DESC,
+            'Od nejnovějších' => 'created'.SearchAndSort::ATTRIBUTE_TAG_DESC,
+            'Od nejstarších' => 'created'.SearchAndSort::ATTRIBUTE_TAG_ASC,
+            'Alias (A-Z)' => 'alias'.SearchAndSort::ATTRIBUTE_TAG_ASC,
+            'Alias (Z-A)' => 'alias'.SearchAndSort::ATTRIBUTE_TAG_DESC,
         ];
     }
 }

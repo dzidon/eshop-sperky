@@ -61,6 +61,12 @@
                                             {% endfor %}
                                         </div>
                                     {% endfor %}
+
+                                    {% if not filterForm.categories.vars.valid %}
+                                        <div class="collection-item">
+                                            {{ form_errors(filterForm.categories) }}
+                                        </div>
+                                    {% endif %}
                                 {% endif %}
                             </div>
                         </div>
@@ -98,6 +104,16 @@
                                 </div>
                             </div>
                         </div>
+
+                        {% if not filterForm.vars.valid %}
+                            <div class="col s12">
+                                <div class="col s12">
+                                    <div class="row">
+                                        <span class="red-text">Vaše hledání obsahuje již neplatné hodnoty, klikněte prosím znovu na tlačítko "Hledat".</span>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
 
                         {# Produkty #}
                         {{ include('fragments/_products.html.twig', {products: products, admin: false, large: false, can_edit: false, can_delete: false}) }}

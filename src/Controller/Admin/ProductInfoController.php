@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\Detached\Search\SearchAndSort;
 use App\Entity\ProductInformationGroup;
 use App\Form\HiddenTrueFormType;
 use App\Form\ProductInformationGroupFormType;
@@ -47,19 +48,12 @@ class ProductInfoController extends AbstractController
      */
     public function productInfoGroups(FormFactoryInterface $formFactory): Response
     {
-        $form = $formFactory->createNamed('', SearchTextAndSortFormType::class, null, ['sort_choices' => ProductInformationGroup::getSortData()]);
+        $searchData = new SearchAndSort(ProductInformationGroup::getSortData(), 'Hledejte podle názvu.');
+        $form = $formFactory->createNamed('', SearchTextAndSortFormType::class, $searchData);
         //button je přidáván v šabloně, aby se nezobrazoval v odkazu
         $form->handleRequest($this->request);
 
-        if ($form->isSubmitted() && $form->isValid())
-        {
-            $pagination = $this->getDoctrine()->getRepository(ProductInformationGroup::class)->getSearchPagination($form->get('searchPhrase')->getData(), $form->get('sortBy')->getData());
-        }
-        else
-        {
-            $pagination = $this->getDoctrine()->getRepository(ProductInformationGroup::class)->getSearchPagination();
-        }
-
+        $pagination = $this->getDoctrine()->getRepository(ProductInformationGroup::class)->getSearchPagination($searchData);
         if($pagination->isCurrentPageOutOfBounds())
         {
             throw new NotFoundHttpException('Na této stránce nebyly nalezeny žádné skupiny produktových informací.');

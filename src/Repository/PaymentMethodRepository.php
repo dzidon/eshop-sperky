@@ -2,9 +2,9 @@
 
 namespace App\Repository;
 
+use App\Entity\Detached\Search\SearchAndSort;
 use App\Entity\PaymentMethod;
 use App\Pagination\Pagination;
-use App\Service\SortingService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -17,26 +17,24 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 class PaymentMethodRepository extends ServiceEntityRepository
 {
-    private SortingService $sorting;
     private $request;
 
-    public function __construct(ManagerRegistry $registry, SortingService $sorting, RequestStack $requestStack)
+    public function __construct(ManagerRegistry $registry, RequestStack $requestStack)
     {
         parent::__construct($registry, PaymentMethod::class);
 
-        $this->sorting = $sorting;
         $this->request = $requestStack->getCurrentRequest();
     }
 
-    public function getSearchPagination($searchPhrase = null, string $sortAttribute = null): Pagination
+    public function getSearchPagination(SearchAndSort $searchData): Pagination
     {
-        $sortData = $this->sorting->createSortData($sortAttribute, PaymentMethod::getSortData());
+        $sortData = $searchData->getDqlSortData();
 
         $query = $this->createQueryBuilder('pm')
 
             //podminky
             ->andWhere('pm.name LIKE :name')
-            ->setParameter('name', '%' . $searchPhrase . '%')
+            ->setParameter('name', '%' . $searchData->getSearchPhrase() . '%')
 
             //razeni
             ->orderBy('pm.' . $sortData['attribute'], $sortData['order'])

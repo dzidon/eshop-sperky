@@ -2,10 +2,10 @@
 
 namespace App\Repository;
 
+use DateTime;
+use App\Entity\Detached\Search\SearchAndSort;
 use App\Entity\ProductSection;
 use App\Pagination\Pagination;
-use App\Service\SortingService;
-use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -18,14 +18,12 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 class ProductSectionRepository extends ServiceEntityRepository
 {
-    private SortingService $sorting;
     private $request;
 
-    public function __construct(ManagerRegistry $registry, SortingService $sorting, RequestStack $requestStack)
+    public function __construct(ManagerRegistry $registry, RequestStack $requestStack)
     {
         parent::__construct($registry, ProductSection::class);
 
-        $this->sorting = $sorting;
         $this->request = $requestStack->getCurrentRequest();
     }
 
@@ -41,18 +39,18 @@ class ProductSectionRepository extends ServiceEntityRepository
         ;
     }
 
-    public function getSearchPagination($searchPhrase = null, string $sortAttribute = null): Pagination
+    public function getSearchPagination(SearchAndSort $searchData): Pagination
     {
-        $sortData = $this->sorting->createSortData($sortAttribute, ProductSection::getSortData());
+        $sortData = $searchData->getDqlSortData();
 
         $query = $this->createQueryBuilder('ps')
 
             //podminky
             ->orWhere('ps.name LIKE :name')
-            ->setParameter('name', '%' . $searchPhrase . '%')
+            ->setParameter('name', '%' . $searchData->getSearchPhrase() . '%')
 
             ->orWhere('ps.slug LIKE :slug')
-            ->setParameter('slug', '%' . $searchPhrase . '%')
+            ->setParameter('slug', '%' . $searchData->getSearchPhrase() . '%')
 
             //razeni
             ->orderBy('ps.' . $sortData['attribute'], $sortData['order'])
