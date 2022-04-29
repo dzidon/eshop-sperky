@@ -1,64 +1,27 @@
 <?php
 
-namespace App\Entity\Detached;
+namespace App\Entity\Detached\Search;
 
 use App\Entity\ProductCategory;
 use App\Entity\ProductSection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Symfony\Component\Validator\Constraints as Assert;
 
-class ProductCatalogFilter
+class SearchProduct extends SearchAndSort
 {
-    private $searchPhrase;
-
-    /**
-     * @Assert\Choice(callback={"App\Entity\Product", "getSortDataForCatalog"})
-     * @Assert\NotBlank
-     */
-    private $sortBy;
-
-    /**
-     * @Assert\Type("numeric")
-     */
     private $priceMin;
 
-    /**
-     * @Assert\Type("numeric")
-     */
     private $priceMax;
 
     private $section;
 
     private $categories;
 
-    public function __construct()
+    public function __construct(array $allSortData, string $searchHelp = null)
     {
+        parent::__construct($allSortData, $searchHelp);
+
         $this->categories = new ArrayCollection();
-    }
-
-    public function getSearchPhrase(): ?string
-    {
-        return $this->searchPhrase;
-    }
-
-    public function setSearchPhrase(?string $searchPhrase): self
-    {
-        $this->searchPhrase = $searchPhrase;
-
-        return $this;
-    }
-
-    public function getSortBy(): ?string
-    {
-        return $this->sortBy;
-    }
-
-    public function setSortBy(?string $sortBy): self
-    {
-        $this->sortBy = $sortBy;
-
-        return $this;
     }
 
     public function getPriceMin(): ?float
@@ -142,5 +105,14 @@ class ProductCatalogFilter
         $this->categories->removeElement($category);
 
         return $this;
+    }
+
+    public function reset(): void
+    {
+        parent::reset();
+
+        $this->priceMin = null;
+        $this->priceMax = null;
+        $this->categories = new ArrayCollection();
     }
 }
