@@ -28,7 +28,7 @@ class OrderMethodsSubscriber implements EventSubscriberInterface
         $order = $event->getData();
         if ($order->deliveryMethodLocksDeliveryAddress())
         {
-            $order->injectStaticAddressDelivery();
+            $order->injectAddressDeliveryToStatic();
         }
     }
 
@@ -36,6 +36,6 @@ class OrderMethodsSubscriber implements EventSubscriberInterface
     {
         /** @var Order $order */
         $order = $event->getData();
-        $order->determineAddressDelivery();
+        $order->saveHistoricalDataForMethods();
     }
 }

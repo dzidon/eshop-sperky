@@ -1179,24 +1179,15 @@ class Order
         ;
     }
 
-    public function determineAddressDelivery(): self
+    public function saveHistoricalDataForMethods(): self
     {
-        // přechod na null/Českou poštu
-        if ($this->addressDeliveryLocked && !$this->deliveryMethodLocksDeliveryAddress())
-        {
-            $this->resetAddressDelivery();
-        }
-
-        // přechod na Zásilkovnu
-        if ($this->staticAddressDeliveryAdditionalInfo !== null && $this->deliveryMethodLocksDeliveryAddress())
-        {
-            $this->loadAddressDeliveryFromStatic();
-        }
+        $this->saveHistoricalDataForDeliveryMethod();
+        $this->saveHistoricalDataForPaymentMethod();
 
         return $this;
     }
 
-    public function injectStaticAddressDelivery(): void
+    public function injectAddressDeliveryToStatic(): void
     {
         $this->setStaticAddressDeliveryAdditionalInfo($this->addressDeliveryAdditionalInfo);
         $this->setStaticAddressDeliveryCountry($this->addressDeliveryCountry);
@@ -1252,22 +1243,19 @@ class Order
         $this->setAddressBillingDic(null);
     }
 
-    /**
-     * @ORM\PreFlush
-     */
-    public function fixDeliveryMethodData(): void
+    public function saveHistoricalDataForDeliveryMethod(): void
     {
-        /* Historická data pro doručovací metodu */
         if ($this->deliveryMethod === null)
         {
             $this->deliveryPriceWithoutVat = 0.0;
             $this->deliveryPriceWithVat = 0.0;
             $this->deliveryMethodName = null;
 
+            // nemá doručovací metodu a adresa je zamčená
             if ($this->addressDeliveryLocked)
             {
-                $this->resetAddressDelivery();
                 $this->addressDeliveryLocked = false;
+                $this->resetAddressDelivery();
             }
         }
         else
@@ -1276,24 +1264,32 @@ class Order
             $this->deliveryPriceWithVat = $this->deliveryMethod->getPriceWithVat();
             $this->deliveryMethodName = $this->deliveryMethod->getName();
 
-            /* Zamykání/odemykání doručovací adresy */
+            // má nastavenou doručovací metodu, která zamyká adresu (Zásilkovna)
             if ($this->deliveryMethodLocksDeliveryAddress())
             {
                 $this->addressDeliveryLocked = true;
+
+                // zrovna vybral nové výdejní místo
+                if ($this->staticAddressDeliveryAdditionalInfo !== null)
+                {
+                    $this->loadAddressDeliveryFromStatic();
+                }
             }
+            // má nastavenou doručovací metodu, která nezamyká adresu (Česká pošta)
             else
             {
+                if ($this->addressDeliveryLocked)
+                {
+                    $this->resetAddressDelivery();
+                }
+
                 $this->addressDeliveryLocked = false;
             }
         }
     }
 
-    /**
-     * @ORM\PreFlush
-     */
-    public function fixPaymentMethodData(): void
+    public function saveHistoricalDataForPaymentMethod(): void
     {
-        /* Historická data pro platební metodu */
         if ($this->paymentMethod === null)
         {
             $this->paymentPriceWithoutVat = 0.0;
