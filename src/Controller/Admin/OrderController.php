@@ -235,6 +235,7 @@ class OrderController extends AbstractController
                         {
                             $packetaApiService->createPacket($order);
                             $this->addFlash('success', 'Zásilka vytvořena!');
+                            return $this->redirectToRoute('admin_order_overview', ['id' => $order->getId()]);
                         }
                         catch (PacketaException $exception)
                         {
@@ -243,8 +244,6 @@ class OrderController extends AbstractController
                                 $this->addFlash('failure', $error);
                             }
                         }
-
-                        return $this->redirectToRoute('admin_order_overview', ['id' => $order->getId()]);
                     }
                 }
             }

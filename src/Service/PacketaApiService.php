@@ -113,7 +113,7 @@ class PacketaApiService
         // objednávka musí mít ID
         if ($this->order->getId() === null)
         {
-            throw new LogicException(sprintf('Služba App\Service\PacketaApiService dostala do metody initialize objednávku s null ID.'));
+            throw new LogicException('Služba App\Service\PacketaApiService dostala do metody initialize objednávku s null ID.');
         }
 
         // připojení
