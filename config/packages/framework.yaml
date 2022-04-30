@@ -33,6 +33,10 @@ framework:
     uid:
         default_uuid_version: 4
 
+when@prod:
+    framework:
+        error_controller: App\Controller\ErrorController::showError
+
 when@test:
     framework:
         test: true

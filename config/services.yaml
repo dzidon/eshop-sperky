@@ -95,7 +95,6 @@ services:
             - '../src/Entity/'
             - '../src/Pagination/'
             - '../src/EntityCollectionManagement/'
-            - '../src/OrderSynchronizer/'
             - '../src/Exception/'
             - '../src/Response/'
             - '../src/CatalogFilter/'

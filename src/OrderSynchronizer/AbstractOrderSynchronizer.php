@@ -3,7 +3,7 @@
 namespace App\OrderSynchronizer;
 
 use App\Entity\Order;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Abstraktní třída pro synchronizátory, které zajišťují aktuálnost stavu objednávky.
@@ -12,8 +12,15 @@ use Symfony\Component\HttpFoundation\Request;
  */
 abstract class AbstractOrderSynchronizer
 {
+    private RequestStack $requestStack;
+
     protected bool $hasWarnings = false;
     private array $warnings = [];
+
+    public function __construct(RequestStack $requestStack)
+    {
+        $this->requestStack = $requestStack;
+    }
 
     /**
      * Synchronizuje stav objednávky.
@@ -64,13 +71,13 @@ abstract class AbstractOrderSynchronizer
 
     /**
      * Přidá varování do flash bagu
-     *
-     * @param Request $request
      */
-    public function addWarningsToFlashBag(Request $request): void
+    public function addWarningsToFlashBag(): void
     {
         if($this->hasWarnings)
         {
+            $request = $this->requestStack->getCurrentRequest();
+
             foreach ($this->warnings as $warning)
             {
                 $request->getSession()->getFlashBag()->add('warning', $warning);

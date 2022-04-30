@@ -5,7 +5,6 @@ namespace App\Service;
 use App\Entity\Order;
 use App\OrderSynchronizer\CustomOrderSynchronizer;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Uid\Uuid;
 
 /**
@@ -15,21 +14,18 @@ use Symfony\Component\Uid\Uuid;
  */
 class CustomOrderService
 {
-    private RequestStack $requestStack;
     private CustomOrderSynchronizer $synchronizer;
     private EntityManagerInterface $entityManager;
 
-    public function __construct(EntityManagerInterface $entityManager, RequestStack $requestStack)
+    public function __construct(EntityManagerInterface $entityManager, CustomOrderSynchronizer $synchronizer)
     {
         $this->entityManager = $entityManager;
-        $this->requestStack = $requestStack;
-
-        $this->synchronizer = new CustomOrderSynchronizer();
+        $this->synchronizer = $synchronizer;
     }
 
-    public function getSynchronizer(): CustomOrderSynchronizer
+    public function hasSyncWarnings(): bool
     {
-        return $this->synchronizer;
+        return $this->synchronizer->hasWarnings();
     }
 
     /**
@@ -40,7 +36,6 @@ class CustomOrderService
      */
     public function loadCustomOrder(?string $token): ?Order
     {
-        $order = null;
         if ($token !== null && UUid::isValid($token))
         {
             $uuid = Uuid::fromString($token);
@@ -50,7 +45,7 @@ class CustomOrderService
             if ($order !== null && $order->isCreatedManually() && $order->getLifecycleChapter() === Order::LIFECYCLE_FRESH)
             {
                 $this->synchronizer->synchronize($order);
-                $this->synchronizer->addWarningsToFlashBag($this->requestStack->getCurrentRequest());
+                $this->synchronizer->addWarningsToFlashBag();
 
                 $order->calculateTotals();
 
@@ -59,9 +54,11 @@ class CustomOrderService
                     $this->entityManager->persist($order);
                     $this->entityManager->flush();
                 }
+
+                return $order;
             }
         }
 
-        return $order;
+        return null;
     }
 }

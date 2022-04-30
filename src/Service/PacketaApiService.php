@@ -58,10 +58,10 @@ class PacketaApiService
      * Vrátí data o zásilce.
      *
      * @param Order $order
-     * @return object|null
+     * @return object
      * @throws PacketaException
      */
-    public function packetStatus(Order $order): ?object
+    public function packetStatus(Order $order): object
     {
         $this->initialize($order);
 
@@ -79,10 +79,10 @@ class PacketaApiService
      * Pokusí se vytvořit zásilku. Po úspěšném vytvoření vrátí data o vytvořené zásilce.
      *
      * @param Order $order
-     * @return object|null
+     * @return object
      * @throws PacketaException
      */
-    public function createPacket(Order $order): ?object
+    public function createPacket(Order $order): object
     {
         $this->initialize($order);
 
@@ -92,7 +92,13 @@ class PacketaApiService
         }
         catch (SoapFault $exception)
         {
-            throw new PacketaException( $this->getPacketAttributesFaults($exception->detail->PacketAttributesFault) );
+            $errors = [$exception->getMessage()];
+            if (isset($exception->detail))
+            {
+                $errors = $this->getPacketAttributesFaults($exception->detail->PacketAttributesFault);
+            }
+
+            throw new PacketaException($errors);
         }
     }
 
@@ -110,28 +116,19 @@ class PacketaApiService
             throw new LogicException(sprintf('Služba App\Service\PacketaApiService dostala do metody initialize objednávku s null ID.'));
         }
 
+        // připojení
         if ($this->client === null)
         {
-            $this->connect();
-        }
-    }
-
-    /**
-     * Vytvoří SoapClient
-     *
-     * @throws PacketaException
-     */
-    private function connect(): void
-    {
-        try
-        {
-            $this->client = new SoapClient($this->parameterBag->get('app_packeta_api_url'), [
-                'cache_wsdl'   => WSDL_CACHE_MEMORY
-            ]);
-        }
-        catch (SoapFault $exception)
-        {
-            throw new PacketaException(['Nepodařilo se připojit do systému Zásilkovny, zkuste to prosím znovu.']);
+            try
+            {
+                $this->client = new SoapClient($this->parameterBag->get('app_packeta_api_url'), [
+                    'cache_wsdl'   => WSDL_CACHE_MEMORY
+                ]);
+            }
+            catch (SoapFault $exception)
+            {
+                throw new PacketaException(['Nepodařilo se připojit do systému Zásilkovny, zkuste to prosím znovu.']);
+            }
         }
     }
 
@@ -168,8 +165,7 @@ class PacketaApiService
      */
     private function getPacketAttributes(): array
     {
-        $phoneNumberWithSpaces = $this->phoneNumberUtil->format($this->order->getPhoneNumber(), PhoneNumberFormat::INTERNATIONAL);
-        $phoneNumber = preg_replace('/\s+/', '', $phoneNumberWithSpaces);
+        $phoneNumber = $this->phoneNumberUtil->format($this->order->getPhoneNumber(), PhoneNumberFormat::E164);
 
         $attributes = [
             'number'    => (string) $this->order->getId(),

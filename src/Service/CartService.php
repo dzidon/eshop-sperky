@@ -45,12 +45,11 @@ class CartService
     private EntityManagerInterface $entityManager;
     private OrderCartSynchronizer $synchronizer;
 
-    public function __construct(EntityManagerInterface $entityManager, RequestStack $requestStack)
+    public function __construct(EntityManagerInterface $entityManager, RequestStack $requestStack, OrderCartSynchronizer $synchronizer)
     {
         $this->entityManager = $entityManager;
         $this->requestStack = $requestStack;
-
-        $this->synchronizer = new OrderCartSynchronizer();
+        $this->synchronizer = $synchronizer;
     }
 
     /**
@@ -72,11 +71,11 @@ class CartService
     }
 
     /**
-     * @return OrderCartSynchronizer
+     * @return bool
      */
-    public function getSynchronizer(): OrderCartSynchronizer
+    public function hasSyncWarnings(): bool
     {
-        return $this->synchronizer;
+        return $this->synchronizer->hasWarnings();
     }
 
     /**
@@ -129,7 +128,7 @@ class CartService
             }
 
             $this->synchronizer->synchronize($this->order);
-            $this->synchronizer->addWarningsToFlashBag($request);
+            $this->synchronizer->addWarningsToFlashBag();
 
             $this->order->calculateTotals();
             $this->totalQuantityForNavbar = $this->order->getTotalQuantity();

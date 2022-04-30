@@ -87,6 +87,7 @@ function cleanUp()
 {
     loaderClose();
     M.updateTextFields();
+    $('.tooltipped').tooltip();
     initialize();
     requestInProgress = false;
 }

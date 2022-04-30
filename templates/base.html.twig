@@ -38,13 +38,13 @@
                         <img src="{{ asset('prysky-logo.png', 'images') }}" class="img-navbar-logo" alt="Logo Prysky">
                     </a>
 
-                    <ul class="right hide-on-med-and-down">
-                        {% set path_order_cart = path('order_cart') %}
-                        {% set is_authenticated_remembered = is_granted('IS_AUTHENTICATED_REMEMBERED') %}
-                        {% set can_enter_admin = is_granted('admin_permission_overview') %}
-                        {% set navbar_sections = navbar_service.getVisibleSections() %}
-                        {% set navbar_sections_count = navbar_sections|length %}
+                    {% set path_order_cart = path('order_cart') %}
+                    {% set is_authenticated_remembered = is_granted('IS_AUTHENTICATED_REMEMBERED') %}
+                    {% set can_enter_admin = is_granted('admin_permission_overview') %}
+                    {% set navbar_sections = navbar_service.getVisibleSections() %}
+                    {% set navbar_sections_count = navbar_sections|length %}
 
+                    <ul class="right hide-on-med-and-down">
                         {% if navbar_sections_count > 0  %}
                             <ul id="dropdown_sections_desktop" class="dropdown-content">
                                 <li><a href="{{ path('products') }}" class="black-text">Všechny</a></li>
@@ -61,16 +61,18 @@
 
                         <li><a href="{{ path_order_cart }}" class="black-text"> <i class="material-icons left">shopping_cart</i> Košík <span class="cart-badge blue white-text navbar-cart-total-products">{{ cart_service.totalQuantityForNavbar }}</span></a></li>
 
-                        {% if is_authenticated_remembered %}
-                            <li><a href="{{ path('profile') }}" class="black-text"> <i class="material-icons left">account_circle</i> {{ app.user.email }}</a></li>
+                        {% if is_error_page is not defined or not is_error_page %}
+                            {% if is_authenticated_remembered %}
+                                <li><a href="{{ path('profile') }}" class="black-text"> <i class="material-icons left">account_circle</i> {{ app.user.email }}</a></li>
 
-                            {% if can_enter_admin %}
-                                <li><a href="{{ path('admin_permission_overview') }}" class="black-text tooltipped" data-position="bottom" data-tooltip="Admin"> <i class="material-icons">build</i></a></li>
+                                {% if can_enter_admin %}
+                                    <li><a href="{{ path('admin_permission_overview') }}" class="black-text tooltipped" data-position="bottom" data-tooltip="Admin"> <i class="material-icons">build</i></a></li>
+                                {% endif %}
+
+                                <li><a href="{{ path('logout') }}" class="black-text tooltipped" data-position="bottom" data-tooltip="Odhlásit"><i class="material-icons">meeting_room</i></a></li>
+                            {% else %}
+                                <li><a href="{{ path('login') }}" class="black-text"> <i class="material-icons left">vpn_key</i> Přihlásit se</a></li>
                             {% endif %}
-
-                            <li><a href="{{ path('logout') }}" class="black-text tooltipped" data-position="bottom" data-tooltip="Odhlásit"><i class="material-icons">meeting_room</i></a></li>
-                        {% else %}
-                            <li><a href="{{ path('login') }}" class="black-text"> <i class="material-icons left">vpn_key</i> Přihlásit se</a></li>
                         {% endif %}
                     </ul>
 
@@ -96,15 +98,17 @@
 
             <li><a href="{{ path_order_cart }}"> <i class="material-icons left">shopping_cart</i> Košík <span class="cart-badge blue white-text navbar-cart-total-products">{{ cart_service.totalQuantityForNavbar }}</span></a></li>
 
-            {% if is_authenticated_remembered %}
-                {% if can_enter_admin %}
-                    <li><a href="{{ path('admin_permission_overview') }}"> <i class="material-icons left">build</i> Admin</a></li>
-                {% endif %}
+            {% if is_error_page is not defined or not is_error_page %}
+                {% if is_authenticated_remembered %}
+                    {% if can_enter_admin %}
+                        <li><a href="{{ path('admin_permission_overview') }}"> <i class="material-icons left">build</i> Admin</a></li>
+                    {% endif %}
 
-                <li><a href="{{ path('profile') }}"> <i class="material-icons left">account_circle</i> <span class="truncate">{{ app.user.email }}</span></a></li>
-                <li><a href="{{ path('logout') }}"> <i class="material-icons left">meeting_room</i> Odhlásit se</a></li>
-            {% else %}
-                <li><a href="{{ path('login') }}"> <i class="material-icons left">vpn_key</i> Přihlásit se</a></li>
+                    <li><a href="{{ path('profile') }}"> <i class="material-icons left">account_circle</i> <span class="truncate">{{ app.user.email }}</span></a></li>
+                    <li><a href="{{ path('logout') }}"> <i class="material-icons left">meeting_room</i> Odhlásit se</a></li>
+                {% else %}
+                    <li><a href="{{ path('login') }}"> <i class="material-icons left">vpn_key</i> Přihlásit se</a></li>
+                {% endif %}
             {% endif %}
         </ul>
 
