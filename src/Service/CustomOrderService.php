@@ -23,11 +23,6 @@ class CustomOrderService
         $this->synchronizer = $synchronizer;
     }
 
-    public function hasSyncWarnings(): bool
-    {
-        return $this->synchronizer->hasWarnings();
-    }
-
     /**
      * Načte objednávku vytvořenou na míru podle tokenu.
      *
@@ -44,12 +39,10 @@ class CustomOrderService
             $order = $this->entityManager->getRepository(Order::class)->findOneAndFetchEverything($uuid);
             if ($order !== null && $order->isCreatedManually() && $order->getLifecycleChapter() === Order::LIFECYCLE_FRESH)
             {
-                $this->synchronizer->synchronize($order);
-                $this->synchronizer->addWarningsToFlashBag();
-
+                $this->synchronizer->synchronizeAndAddWarningsToFlashBag($order);
                 $order->calculateTotals();
 
-                if ($this->synchronizer->hasWarnings())
+                if ($order->hasSynchronizationWarnings())
                 {
                     $this->entityManager->persist($order);
                     $this->entityManager->flush();

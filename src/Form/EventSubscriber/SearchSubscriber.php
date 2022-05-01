@@ -7,7 +7,7 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
 /**
- * Subscriber pro vyhledávací třídy
+ * Subscriber pro vyhledávací formuláře.
  *
  * @package App\Form\EventSubscriber
  */

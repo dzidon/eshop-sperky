@@ -139,7 +139,6 @@ class OrderController extends AbstractController
     public function orderAddresses(OrderPostCompletionService $orderPostCompletionService, LoggerInterface $logger, $token = null): Response
     {
         $targetOrder = $this->cart->getOrder();
-        $synchronizerHasWarnings = $this->cart->hasSyncWarnings();
 
         if ($token !== null)
         {
@@ -148,7 +147,6 @@ class OrderController extends AbstractController
                 throw $this->createNotFoundException('Objednávka nenalezena.');
             }
 
-            $synchronizerHasWarnings = $this->customOrderService->hasSyncWarnings();
             $this->breadcrumbs
                 ->addRoute('order_custom', ['token' => $token])
                 ->addRoute('order_methods', ['token' => $token])
@@ -166,7 +164,7 @@ class OrderController extends AbstractController
         // tlačítko se přidává v šabloně
         $form->handleRequest($this->request);
 
-        if ($form->isSubmitted() && $form->isValid() && !$synchronizerHasWarnings)
+        if ($form->isSubmitted() && $form->isValid() && !$targetOrder->hasSynchronizationWarnings())
         {
             $response = $orderPostCompletionService->finishOrderAndGetResponse($targetOrder);
             $orderPostCompletionService->sendConfirmationEmail($targetOrder);

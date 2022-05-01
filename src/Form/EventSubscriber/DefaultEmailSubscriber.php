@@ -2,6 +2,7 @@
 
 namespace App\Form\EventSubscriber;
 
+use App\Entity\User;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -14,15 +15,11 @@ use Symfony\Component\Security\Core\Security;
  */
 class DefaultEmailSubscriber implements EventSubscriberInterface
 {
-    private string $defaultEmail = '';
+    private Security $security;
 
     public function __construct(Security $security)
     {
-        $user = $security->getUser();
-        if($user)
-        {
-            $this->defaultEmail = $user->getEmail();
-        }
+        $this->security = $security;
     }
 
     public static function getSubscribedEvents(): array
@@ -34,8 +31,16 @@ class DefaultEmailSubscriber implements EventSubscriberInterface
 
     public function preSetData(FormEvent $event): void
     {
-        $data = $event->getData();
-        $data->setEmail($this->defaultEmail);
-        $event->setData($data);
+        /** @var User|null $user */
+        $user = $this->security->getUser();
+        if ($user !== null)
+        {
+            $data = $event->getData();
+            if ($data->getEmail() === null)
+            {
+                $data->setEmail($user->getEmail());
+                $event->setData($data);
+            }
+        }
     }
 }

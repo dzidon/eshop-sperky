@@ -71,14 +71,6 @@ class CartService
     }
 
     /**
-     * @return bool
-     */
-    public function hasSyncWarnings(): bool
-    {
-        return $this->synchronizer->hasWarnings();
-    }
-
-    /**
      * @return Cookie|null
      */
     public function getNewOrderCookie(): ?Cookie
@@ -127,14 +119,13 @@ class CartService
                 $this->createNewOrder();
             }
 
-            $this->synchronizer->synchronize($this->order);
-            $this->synchronizer->addWarningsToFlashBag();
+            $this->synchronizer->synchronizeAndAddWarningsToFlashBag($this->order);
 
             $this->order->calculateTotals();
             $this->totalQuantityForNavbar = $this->order->getTotalQuantity();
             $this->obtainNewOrderCookie();
 
-            if ($this->isOrderNew || $this->synchronizer->hasWarnings())
+            if ($this->isOrderNew || $this->order->hasSynchronizationWarnings())
             {
                 $this->entityManager->persist($this->order);
                 $this->entityManager->flush();

@@ -371,6 +371,8 @@ class Order
     private float $totalPriceWithoutVat = 0.0;
     private float $totalPriceWithVat = 0.0;
 
+    private bool $hasSynchronizationWarnings = false;
+
     public function __construct()
     {
         $this->token = Uuid::v4();
@@ -1133,9 +1135,11 @@ class Order
         return $this->companyChecked;
     }
 
-    public function setCompanyChecked(bool $companyChecked): void
+    public function setCompanyChecked(bool $companyChecked): self
     {
         $this->companyChecked = $companyChecked;
+
+        return $this;
     }
 
     public function isBillingAddressChecked(): bool
@@ -1143,9 +1147,11 @@ class Order
         return $this->billingAddressChecked;
     }
 
-    public function setBillingAddressChecked(bool $billingAddressChecked): void
+    public function setBillingAddressChecked(bool $billingAddressChecked): self
     {
         $this->billingAddressChecked = $billingAddressChecked;
+
+        return $this;
     }
 
     public function isNoteChecked(): bool
@@ -1153,9 +1159,23 @@ class Order
         return $this->noteChecked;
     }
 
-    public function setNoteChecked(bool $noteChecked): void
+    public function setNoteChecked(bool $noteChecked): self
     {
         $this->noteChecked = $noteChecked;
+
+        return $this;
+    }
+
+    public function hasSynchronizationWarnings(): bool
+    {
+        return $this->hasSynchronizationWarnings;
+    }
+
+    public function setHasSynchronizationWarnings(bool $hasSynchronizationWarnings): self
+    {
+        $this->hasSynchronizationWarnings = $hasSynchronizationWarnings;
+
+        return $this;
     }
 
     public function deliveryMethodLocksDeliveryAddress(): bool

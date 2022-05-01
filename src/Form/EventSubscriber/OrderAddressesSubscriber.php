@@ -19,22 +19,11 @@ use Symfony\Component\Security\Core\Security;
  */
 class OrderAddressesSubscriber implements EventSubscriberInterface
 {
-    private $defaultPhoneNumber = null;
-    private $defaultNameFirst = null;
-    private $defaultNameLast = null;
-    private $defaultEmail = null;
+    private Security $security;
 
     public function __construct(Security $security)
     {
-        /** @var User $user */
-        $user = $security->getUser();
-        if($user !== null)
-        {
-            $this->defaultPhoneNumber = $user->getPhoneNumber();
-            $this->defaultNameFirst = $user->getNameFirst();
-            $this->defaultNameLast = $user->getNameLast();
-            $this->defaultEmail = $user->getEmail();
-        }
+        $this->security = $security;
     }
 
     public static function getSubscribedEvents(): array
@@ -74,27 +63,32 @@ class OrderAddressesSubscriber implements EventSubscriberInterface
 
     private function setDefaultData(FormEvent $event): void
     {
-        /** @var Order $order */
-        $order = $event->getData();
-
-        if($order->getPhoneNumber() === null)
+        /** @var User $user */
+        $user = $this->security->getUser();
+        if($user !== null)
         {
-            $order->setPhoneNumber($this->defaultPhoneNumber);
-        }
+            /** @var Order $order */
+            $order = $event->getData();
 
-        if($order->getAddressDeliveryNameFirst() === null)
-        {
-            $order->setAddressDeliveryNameFirst($this->defaultNameFirst);
-        }
+            if($order->getPhoneNumber() === null)
+            {
+                $order->setPhoneNumber($user->getPhoneNumber());
+            }
 
-        if($order->getAddressDeliveryNameLast() === null)
-        {
-            $order->setAddressDeliveryNameLast($this->defaultNameLast);
-        }
+            if($order->getAddressDeliveryNameFirst() === null)
+            {
+                $order->setAddressDeliveryNameFirst($user->getNameFirst());
+            }
 
-        if($order->getEmail() === null)
-        {
-            $order->setEmail($this->defaultEmail);
+            if($order->getAddressDeliveryNameLast() === null)
+            {
+                $order->setAddressDeliveryNameLast($user->getNameLast());
+            }
+
+            if($order->getEmail() === null)
+            {
+                $order->setEmail($user->getEmail());
+            }
         }
     }
 
