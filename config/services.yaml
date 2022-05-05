@@ -43,7 +43,7 @@ parameters:
     app_page_title.order_methods: 'Doprava a platba'
     app_page_title.order_addresses: 'Dodací údaje'
     app_page_title.order_overview: 'Objednávka'
-    app_page_title.admin_permission_overview: 'Moje oprávnění'
+    app_page_title.admin_dashboard: 'Dashboard'
     app_page_title.admin_user_management: 'Uživatelé'
     app_page_title.admin_user_management_specific: 'Uživatel'
     app_page_title.admin_product_sections: 'Produktové sekce'

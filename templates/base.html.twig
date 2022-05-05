@@ -40,7 +40,7 @@
 
                     {% set path_order_cart = path('order_cart') %}
                     {% set is_authenticated_remembered = is_granted('IS_AUTHENTICATED_REMEMBERED') %}
-                    {% set can_enter_admin = is_granted('admin_permission_overview') %}
+                    {% set can_enter_admin = is_granted('admin_dashboard') %}
                     {% set navbar_sections = navbar_service.getVisibleSections() %}
                     {% set navbar_sections_count = navbar_sections|length %}
 
@@ -66,7 +66,7 @@
                                 <li><a href="{{ path('profile') }}" class="black-text"> <i class="material-icons left">account_circle</i> {{ app.user.email }}</a></li>
 
                                 {% if can_enter_admin %}
-                                    <li><a href="{{ path('admin_permission_overview') }}" class="black-text tooltipped" data-position="bottom" data-tooltip="Admin"> <i class="material-icons">build</i></a></li>
+                                    <li><a href="{{ path('admin_dashboard') }}" class="black-text tooltipped" data-position="bottom" data-tooltip="Admin"> <i class="material-icons">build</i></a></li>
                                 {% endif %}
 
                                 <li><a href="{{ path('logout') }}" class="black-text tooltipped" data-position="bottom" data-tooltip="Odhlásit"><i class="material-icons">meeting_room</i></a></li>
@@ -101,7 +101,7 @@
             {% if is_error_page is not defined or not is_error_page %}
                 {% if is_authenticated_remembered %}
                     {% if can_enter_admin %}
-                        <li><a href="{{ path('admin_permission_overview') }}"> <i class="material-icons left">build</i> Admin</a></li>
+                        <li><a href="{{ path('admin_dashboard') }}"> <i class="material-icons left">build</i> Admin</a></li>
                     {% endif %}
 
                     <li><a href="{{ path('profile') }}"> <i class="material-icons left">account_circle</i> <span class="truncate">{{ app.user.email }}</span></a></li>

@@ -100,10 +100,10 @@ class NavbarService
         return
         [
             [
-                'granted'   => $this->security->isGranted('admin_permission_overview'),
-                'path'      => $this->router->generate('admin_permission_overview'),
-                'isActive'  => $currentRoute === 'admin_permission_overview',
-                'title'     => $this->parameterBag->get('app_page_title.admin_permission_overview')
+                'granted'   => $this->security->isGranted('admin_dashboard'),
+                'path'      => $this->router->generate('admin_dashboard'),
+                'isActive'  => $currentRoute === 'admin_dashboard',
+                'title'     => $this->parameterBag->get('app_page_title.admin_dashboard')
             ],
             [
                 'granted'   => $this->security->isGranted('admin_user_management'),

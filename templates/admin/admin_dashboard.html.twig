@@ -1,0 +1,61 @@
+{% extends 'admin/admin_base.html.twig' %}
+
+{% set can_edit = is_granted('order_edit') %}
+{% set can_cancel = is_granted('order_cancel') %}
+
+{% block admin_body %}
+
+    {% if orders is not null %}
+        <div class="row">
+            <h4>Objednávky čekající na odeslání</h4>
+
+            {% if orders is empty %}
+                Nenalezeny žádné objednávky čekající na odeslání.
+            {% else %}
+                <div class="collection">
+                    {% for order in orders %}
+                        <div class="collection-item valign-wrapper">
+                            <div class="col s9 no-padding left-align">
+                                <strong>Objednávka č. {{ order.id }}</strong>
+                                <span>- {% if order.createdManually %}Na míru{% else %}Z katalogu{% endif %}</span>
+                            </div>
+
+                            <div class="col s3 no-padding right-align">
+                                {% if can_edit %}
+                                    <a href="{{ path('admin_order_overview', {id: order.id}) }}" class="tooltipped" data-position="bottom" data-tooltip="Upravit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                {% endif %}
+
+                                {% if can_cancel and not order.isCancelled() %}
+                                    <a href="{{ path('admin_order_cancel', {id: order.id}) }}" class="tooltipped" data-position="bottom" data-tooltip="Zrušit">
+                                        <i class="fas fa-ban"></i>
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <a href="{{ path('admin_orders', {sortBy: 'finishedAt-ASC', lifecycle: constant('App\\Entity\\Order::LIFECYCLE_AWAITING_SHIPPING')}) }}">Všechny</a>
+            {% endif %}
+        </div>
+    {% endif %}
+
+    <div class="row">
+        <h4>Moje oprávnění</h4>
+
+        {% for groupName, groupElements in permissionsGrouped %}
+            <h5>
+                {{ groupName }}
+            </h5>
+
+            <ul>
+                {% for permission in groupElements %}
+                    <li>- {{ permission.getName() }}</li>
+                {% endfor %}
+            </ul>
+        {% endfor %}
+    </div>
+
+{% endblock %}

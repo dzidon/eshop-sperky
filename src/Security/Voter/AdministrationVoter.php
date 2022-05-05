@@ -8,7 +8,7 @@ use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 class AdministrationVoter implements VoterInterface
 {
-    const SECTION_PERMISSION_OVERVIEW = 'admin_permission_overview';
+    const SECTION_PERMISSION_OVERVIEW = 'admin_dashboard';
     const SECTION_USER_MANAGEMENT = 'admin_user_management';
     const SECTION_ORDER_MANAGEMENT = 'admin_orders';
     const SECTION_PRODUCT_MANAGEMENT = 'admin_products';

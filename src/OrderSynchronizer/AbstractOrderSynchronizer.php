@@ -12,10 +12,10 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 abstract class AbstractOrderSynchronizer
 {
-    private RequestStack $requestStack;
+    protected RequestStack $requestStack;
 
     protected Order $order;
-    private array $warnings = [];
+    protected array $warnings = [];
 
     public function __construct(RequestStack $requestStack)
     {

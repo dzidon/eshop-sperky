@@ -278,6 +278,18 @@ class OrderRepository extends ServiceEntityRepository
         return $order;
     }
 
+    public function findAllForAdminDashboard()
+    {
+        return $this->createQueryBuilder('o')
+            ->andWhere('o.lifecycleChapter = :lifecycleAwaitingShipping')
+            ->setParameter('lifecycleAwaitingShipping', Order::LIFECYCLE_AWAITING_SHIPPING)
+            ->setMaxResults(10)
+            ->addOrderBy('o.finishedAt', 'ASC')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
     public function deleteInactiveCartOrders()
     {
         return $this->createQueryBuilder('o')

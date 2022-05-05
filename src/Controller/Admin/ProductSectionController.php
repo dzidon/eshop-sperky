@@ -37,7 +37,7 @@ class ProductSectionController extends AbstractController
 
         $this->breadcrumbs
             ->addRoute('home')
-            ->addRoute('admin_permission_overview', [], MainController::ADMIN_TITLE)
+            ->addRoute(MainController::ADMIN_ROUTE, [], MainController::ADMIN_TITLE)
             ->addRoute('admin_product_sections')
         ;
     }
