@@ -4,6 +4,7 @@ namespace App\Controller\User;
 
 use App\Entity\Address;
 use App\Entity\Order;
+use App\Exception\PaymentException;
 use App\Form\CartFormType;
 use App\Form\OrderAddressesFormType;
 use App\Form\OrderMethodsFormType;
@@ -12,6 +13,7 @@ use App\Service\BreadcrumbsService;
 use App\Service\CartService;
 use App\Service\CustomOrderService;
 use App\Service\OrderPostCompletionService;
+use App\Service\PaymentService;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -136,7 +138,7 @@ class OrderController extends AbstractController
     /**
      * @Route("/objednavka/dodaci-udaje/{token}", name="order_addresses")
      */
-    public function orderAddresses(OrderPostCompletionService $orderPostCompletionService, LoggerInterface $logger, $token = null): Response
+    public function orderAddresses(OrderPostCompletionService $orderPostCompletionService, PaymentService $paymentService, LoggerInterface $logger, $token = null): Response
     {
         $targetOrder = $this->cart->getOrder();
 
@@ -166,16 +168,24 @@ class OrderController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid() && !$targetOrder->hasSynchronizationWarnings())
         {
-            $response = $orderPostCompletionService->finishOrderAndGetResponse($targetOrder);
-            $orderPostCompletionService->sendConfirmationEmail($targetOrder);
+            try
+            {
+                $targetOrder->calculateTotals();
+                $payment = $paymentService->createPayment($targetOrder);
+                $orderPostCompletionService->finishOrder($targetOrder);
+                $orderPostCompletionService->sendConfirmationEmail($targetOrder);
 
-            $this->getDoctrine()->getManager()->persist($targetOrder);
-            $this->getDoctrine()->getManager()->flush();
+                $this->getDoctrine()->getManager()->persist($targetOrder);
+                $this->getDoctrine()->getManager()->flush();
 
-            $this->addFlash('success', 'Objednávka dokončena!');
-            $logger->info(sprintf('Order ID %d has been finished. Current lifecycle chapter: %d.', $targetOrder->getId(), $targetOrder->getLifecycleChapter()));
+                $logger->info(sprintf('Order ID %d has been finished. Current lifecycle chapter: %d.', $targetOrder->getId(), $targetOrder->getLifecycleChapter()));
 
-            return $response;
+                return $orderPostCompletionService->getCompletionRedirectResponse($targetOrder, $payment);
+            }
+            catch (PaymentException $exception)
+            {
+                $this->addFlash('failure', $exception->getMessage());
+            }
         }
 
         return $this->render('order/addresses.html.twig', [

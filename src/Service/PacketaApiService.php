@@ -18,7 +18,6 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
  */
 class PacketaApiService
 {
-    private Order $order;
     private ?SoapClient $client = null;
     private string $secret;
     private string $eshopName;
@@ -67,7 +66,7 @@ class PacketaApiService
 
         try
         {
-            return $this->client->packetStatus($this->secret, (string) $this->order->getId());
+            return $this->client->packetStatus($this->secret, (string) $order->getId());
         }
         catch (SoapFault $exception)
         {
@@ -88,7 +87,7 @@ class PacketaApiService
 
         try
         {
-            return $this->client->createPacket($this->secret, $this->getPacketAttributes());
+            return $this->client->createPacket($this->secret, $this->getPacketAttributes($order));
         }
         catch (SoapFault $exception)
         {
@@ -108,10 +107,8 @@ class PacketaApiService
      */
     private function initialize(Order $order): void
     {
-        $this->order = $order;
-
         // objednávka musí mít ID
-        if ($this->order->getId() === null)
+        if ($order->getId() === null)
         {
             throw new LogicException('Služba App\Service\PacketaApiService dostala do metody initialize objednávku s null ID.');
         }
@@ -122,7 +119,7 @@ class PacketaApiService
             try
             {
                 $this->client = new SoapClient($this->parameterBag->get('app_packeta_api_url'), [
-                    'cache_wsdl'   => WSDL_CACHE_MEMORY
+                    'cache_wsdl' => WSDL_CACHE_MEMORY
                 ]);
             }
             catch (SoapFault $exception)
@@ -161,27 +158,26 @@ class PacketaApiService
     /**
      * Převede objednávku na array PacketAttributes.
      *
+     * @param Order $order
      * @return array
      */
-    private function getPacketAttributes(): array
+    private function getPacketAttributes(Order $order): array
     {
-        $phoneNumber = $this->phoneNumberUtil->format($this->order->getPhoneNumber(), PhoneNumberFormat::E164);
-
         $attributes = [
-            'number'    => (string) $this->order->getId(),
-            'name'      => $this->order->getAddressDeliveryNameFirst(),
-            'surname'   => $this->order->getAddressDeliveryNameLast(),
-            'email'     => $this->order->getEmail(),
-            'phone'     => $phoneNumber,
-            'addressId' => (int) $this->order->getAddressDeliveryAdditionalInfo(),
-            'cod'       => $this->order->getCashOnDelivery(),
-            'value'     => $this->order->getTotalPriceWithVat($withMethods = false),
-            'weight'    => $this->order->getWeight(),
+            'number'    => (string) $order->getId(),
+            'name'      => $order->getAddressDeliveryNameFirst(),
+            'surname'   => $order->getAddressDeliveryNameLast(),
+            'email'     => $order->getEmail(),
+            'phone'     => $this->phoneNumberUtil->format($order->getPhoneNumber(), PhoneNumberFormat::E164),
+            'addressId' => (int) $order->getAddressDeliveryAdditionalInfo(),
+            'cod'       => $order->getCashOnDelivery(),
+            'value'     => $order->getTotalPriceWithVat($withMethods = false),
+            'weight'    => $order->getWeight(),
             'eshop'     => $this->eshopName,
             'currency'  => 'CZK',
         ];
 
-        $company = $this->order->getAddressBillingCompany();
+        $company = $order->getAddressBillingCompany();
         if ($company !== null)
         {
             $attributes['company'] = $company;

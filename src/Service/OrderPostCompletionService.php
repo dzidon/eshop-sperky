@@ -3,9 +3,11 @@
 namespace App\Service;
 
 use App\Entity\Order;
+use App\Entity\Payment;
 use App\Entity\User;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Security;
@@ -20,29 +22,31 @@ class OrderPostCompletionService
     private Security $security;
     private LoggerInterface $logger;
     private RouterInterface $router;
+    private RequestStack $requestStack;
     private OrderEmailService $orderEmailService;
 
-    public function __construct(Security $security, LoggerInterface $logger, RouterInterface $router, OrderEmailService $orderEmailService)
+    public function __construct(Security $security, LoggerInterface $logger, RouterInterface $router, RequestStack $requestStack, OrderEmailService $orderEmailService)
     {
-        $this->security = $security;
         $this->logger = $logger;
         $this->router = $router;
+        $this->security = $security;
+        $this->requestStack = $requestStack;
         $this->orderEmailService = $orderEmailService;
     }
 
     /**
-     * Dokončí objednávku a vrátí odpověď pro přesměrování.
+     * Dokončí objednávku.
      *
      * @param Order $order
-     * @return RedirectResponse
+     * @return $this
      */
-    public function finishOrderAndGetResponse(Order $order): RedirectResponse
+    public function finishOrder(Order $order): self
     {
         /** @var User|null $user */
         $user = $this->security->getUser();
         $order->finish($user);
 
-        return $this->getCompletionRedirectResponse($order);
+        return $this;
     }
 
     /**
@@ -69,11 +73,21 @@ class OrderPostCompletionService
      * Vytvoří odpověď pro přesměrování po dokončení objednávky.
      *
      * @param Order $order
+     * @param Payment|null $payment
      * @return RedirectResponse
      */
-    private function getCompletionRedirectResponse(Order $order): RedirectResponse
+    public function getCompletionRedirectResponse(Order $order, ?Payment $payment): RedirectResponse
     {
-        $url = $this->router->generate('home');
+        if ($payment !== null && $payment->getGateUrl() !== null)
+        {
+            $url = $payment->getGateUrl();
+        }
+        else
+        {
+            $url = $this->router->generate('home');
+            $flashBag = $this->requestStack->getCurrentRequest()->getSession()->getFlashBag();
+            $flashBag->add('success', sprintf('Objednávka dokončena! Na e-mail %s jsme Vám poslali potvrzení.', $order->getEmail()));
+        }
 
         $redirectResponse = new RedirectResponse($url);
         if (!$order->isCreatedManually())

@@ -11,6 +11,16 @@ parameters:
     app_packeta_key: '%env(PACKETA_KEY)%'
     app_packeta_secret: '%env(PACKETA_SECRET)%'
 
+    gopay.config:
+        goid: '%env(GOPAY_ID)%'
+        clientId: '%env(GOPAY_CLIENT_ID)%'
+        clientSecret: '%env(GOPAY_CLIENT_SECRET)%'
+        gatewayUrl: '%env(GOPAY_GATEWAY_URL)%'
+        # optional config
+        scope: payment-all
+        language: CS
+        timeout: 30
+
     container.dumper.inline_factories: true
 
     # názvy cest
@@ -43,6 +53,7 @@ parameters:
     app_page_title.order_methods: 'Doprava a platba'
     app_page_title.order_addresses: 'Dodací údaje'
     app_page_title.order_overview: 'Objednávka'
+    app_page_title.payment_return: 'Platba'
     app_page_title.admin_dashboard: 'Dashboard'
     app_page_title.admin_user_management: 'Uživatelé'
     app_page_title.admin_user_management_specific: 'Uživatel'
@@ -105,6 +116,19 @@ services:
         tags:
             - { name: doctrine.event_subscriber, connection: default }
 
+    gopay.payments:
+        class: GoPay\Payments
+        factory: ['GoPay\Api', payments]
+        arguments:
+            - '%gopay.config%'
+            - cache: '@gopay.cache'
+              logger: '@gopay.logger'
+
+    gopay.cache:
+        class: GoPay\Token\InMemoryTokenCache
+    gopay.logger:
+        class: GoPay\Http\Log\PrintHttpRequest
+
     app.navbar_service:
         class: App\Service\NavbarService
     app.cart_service:
@@ -118,3 +142,4 @@ services:
     App\Service\CartService: '@app.cart_service'
     App\Service\BreadcrumbsService: '@app.breadcrumbs_service'
     App\Service\PacketaApiService: '@app.packeta_service'
+    GoPay\Payments: '@gopay.payments'

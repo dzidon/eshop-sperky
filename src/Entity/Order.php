@@ -75,6 +75,11 @@ class Order
     private $cartOccurences;
 
     /**
+     * @ORM\OneToMany(targetEntity=Payment::class, mappedBy="order_", cascade={"persist"})
+     */
+    private $payments;
+
+    /**
      * @ORM\Column(type="boolean")
      */
     private bool $createdManually = false;
@@ -377,6 +382,7 @@ class Order
     {
         $this->token = Uuid::v4();
         $this->cartOccurences = new ArrayCollection();
+        $this->payments = new ArrayCollection();
 
         $this->created = new DateTime('now');
         $this->updated = $this->created;
@@ -483,6 +489,36 @@ class Order
         }
 
         return $this->cartOccurencesWithProduct;
+    }
+
+    /**
+     * @return Collection|Payment[]
+     */
+    public function getPayments(): Collection
+    {
+        return $this->payments;
+    }
+
+    public function addPayment(Payment $payment): self
+    {
+        if (!$this->payments->contains($payment)) {
+            $this->payments[] = $payment;
+            $payment->setOrder($this);
+        }
+
+        return $this;
+    }
+
+    public function removePayment(Payment $payment): self
+    {
+        if ($this->payments->removeElement($payment)) {
+            // set the owning side to null (unless already changed)
+            if ($payment->getOrder() === $this) {
+                $payment->setOrder(null);
+            }
+        }
+
+        return $this;
     }
 
     public function getWeight(): ?float

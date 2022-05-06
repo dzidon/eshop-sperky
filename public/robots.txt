@@ -8,5 +8,6 @@ Disallow: /overeni-emailu
 Disallow: /kosik
 Disallow: /objednavka-na-miru/
 Disallow: /objednavka
+Disallow: /platba
 
 Sitemap: https://master-7rqtwti-c25idlfhe6buk.de-2.platformsh.site/sitemap.xml

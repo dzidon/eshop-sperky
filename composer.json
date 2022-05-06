@@ -13,6 +13,7 @@
         "doctrine/doctrine-migrations-bundle": "^3.2",
         "doctrine/orm": "^2.10",
         "excelwebzone/recaptcha-bundle": "^1.5",
+        "gopay/payments-sdk-php": "^1.5",
         "knpuniversity/oauth2-client-bundle": "^2.8",
         "league/oauth2-facebook": "^2.0",
         "league/oauth2-google": "^4.0",

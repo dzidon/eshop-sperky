@@ -245,6 +245,11 @@ class PaymentMethod
         return $this;
     }
 
+    public function isOnline(): bool
+    {
+        return $this->type === self::TYPE_CARD || $this->type === self::TYPE_TRANSFER;
+    }
+
     /**
      * @ORM\PreUpdate
      */
