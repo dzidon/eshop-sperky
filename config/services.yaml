@@ -122,12 +122,9 @@ services:
         arguments:
             - '%gopay.config%'
             - cache: '@gopay.cache'
-              logger: '@gopay.logger'
 
     gopay.cache:
         class: GoPay\Token\InMemoryTokenCache
-    gopay.logger:
-        class: GoPay\Http\Log\PrintHttpRequest
 
     app.navbar_service:
         class: App\Service\NavbarService

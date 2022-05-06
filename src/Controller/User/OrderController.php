@@ -171,7 +171,7 @@ class OrderController extends AbstractController
             try
             {
                 $targetOrder->calculateTotals();
-                $payment = $paymentService->createPayment($targetOrder);
+                $payment = null /*$paymentService->createPayment($targetOrder)*/; // ještě není napojená platební brána
                 $orderPostCompletionService->finishOrder($targetOrder);
                 $orderPostCompletionService->sendConfirmationEmail($targetOrder);
 

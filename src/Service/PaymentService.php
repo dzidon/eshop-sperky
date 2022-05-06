@@ -2,11 +2,11 @@
 
 namespace App\Service;
 
-use GoPay\Http\Response;
 use LogicException;
 use GoPay\Payments;
 use App\Entity\Order;
 use App\Entity\Payment;
+use GoPay\Http\Response;
 use App\Entity\PaymentMethod;
 use GoPay\Definition\Language;
 use App\Exception\PaymentException;
@@ -81,22 +81,26 @@ class PaymentService
 
         if ($oldState !== $newState)
         {
-            if (!$payment->stateChangeIsValid($newState))
+            if (!$payment->isValidStateChange($newState))
             {
                 throw new PaymentException('Tato změna stavu platby není platná.');
             }
 
             $order = $payment->getOrder();
+            // objednávka čeká na zaplacení a její platba přechází ze stavu "platební metoda zvolena" do jiného stavu
             if ($order->getLifecycleChapter() === Order::LIFECYCLE_AWAITING_PAYMENT)
             {
                 // zaplacení = změna stavu objednávky na "čeká na odeslání"
                 if ($oldState === Payment::STATE_PAYMENT_METHOD_CHOSEN && $newState === Payment::STATE_PAID)
                 {
                     $order->setLifecycleChapter(Order::LIFECYCLE_AWAITING_SHIPPING);
+
+                    $this->orderPostCompletionService->sendConfirmationEmail($order);
                     $this->entityManager->persist($order);
                 }
                 // zrušení/timeout = zrušení objednávky
-                else if ($oldState === Payment::STATE_PAYMENT_METHOD_CHOSEN && ($newState === Payment::STATE_CANCELED || $newState === Payment::STATE_TIMEOUTED))
+                else if (($oldState === Payment::STATE_PAYMENT_METHOD_CHOSEN && ($newState === Payment::STATE_CANCELED || $newState === Payment::STATE_TIMEOUTED))
+                      || ($oldState === Payment::STATE_CREATED               &&  $newState === Payment::STATE_TIMEOUTED))
                 {
                     $order->cancel($forceInventoryReplenish = true);
                     $order->setCancellationReason('Platba zrušena.');
@@ -124,9 +128,12 @@ class PaymentService
     public function getErrorString(Response $response): string
     {
         $errors = '';
-        foreach ($response->json['errors'] as $error)
+        if (isset($response->json['errors']))
         {
-            $errors .= sprintf('%s ', $error['message']);
+            foreach ($response->json['errors'] as $error)
+            {
+                $errors .= sprintf('%s ', $error['message']);
+            }
         }
 
         return $errors;

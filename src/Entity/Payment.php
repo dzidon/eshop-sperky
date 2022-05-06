@@ -164,7 +164,7 @@ class Payment
         $this->updated = new DateTime('now');
     }
 
-    public function stateChangeIsValid(string $newState): bool
+    public function isValidStateChange(string $newState): bool
     {
         $oldState = $this->state;
 

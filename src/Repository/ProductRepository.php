@@ -184,6 +184,16 @@ class ProductRepository extends ServiceEntityRepository
         return $priceData;
     }
 
+    public function findAllVisible()
+    {
+        return (new CatalogProductQueryBuilder( $this->createQueryBuilder('p') ))
+            ->addProductVisibilityCondition()
+            ->getQueryBuilder()
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
     public function findRelated(Product $product, int $quantity)
     {
         $productsCount = $this->getQueryForRelated($product, $quantity)

@@ -77,11 +77,22 @@
                     </ul>
 
                     <a href="#" data-target="nav-mobile" class="sidenav-trigger"><i class="black-text material-icons">menu</i></a>
+
+                    <div class="right cart-mobile-container hide-on-large-only hide-on-extra-large-only">
+                        <a href="{{ path_order_cart }}">
+                            <i class="black-text material-icons">shopping_cart</i>
+
+                            <div class="cart-mobile-count-container">
+                                <span class="cart-badge-absolute blue white-text navbar-cart-total-products">{{ cart_service.totalQuantityForNavbar }}</span>
+                            </div>
+                        </a>
+                    </div>
                 </div>
             </nav>
         </div>
 
         <ul id="nav-mobile" class="sidenav">
+            <li><a href="{{ path('home') }}"> <i class="material-icons left">home</i> Domů</a></li>
             {% if navbar_sections_count > 0  %}
                 <ul id="dropdown_sections_mobile" class="dropdown-content black-text">
                     <li><a href="{{ path('products') }}" class="black-text">Všechny</a></li>

@@ -62,6 +62,21 @@ main {
     border-radius: 50px;
 }
 
+.cart-badge-absolute {
+    font-size: 12px;
+    padding-left: 5px;
+    padding-right: 5px;
+    border-radius: 100px;
+}
+
+.cart-mobile-container {
+    margin: 0 18px;
+}
+
+.cart-mobile-count-container {
+    position: absolute; top: -10px; right: 13px;
+}
+
 .flex-wrap {
     display: flex;
     flex-wrap: wrap;
