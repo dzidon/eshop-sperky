@@ -130,7 +130,7 @@ class ProfileController extends AbstractController
         $form->handleRequest($this->request);
 
         $pagination = $this->getDoctrine()->getRepository(Address::class)->getSearchPagination($user, $searchData);
-        if($pagination->isCurrentPageOutOfBounds())
+        if ($pagination->isCurrentPageOutOfBounds())
         {
             throw new NotFoundHttpException('Na této stránce nebyly nalezeny žádné adresy.');
         }
@@ -153,14 +153,14 @@ class ProfileController extends AbstractController
         $user = $this->getUser();
         $this->breadcrumbs->addRoute('profile_addresses');
 
-        if($id !== null) // zadal id do url, snazi se editovat existujici
+        if ($id !== null) // zadal id do url, snazi se editovat existujici
         {
             $address = $this->getDoctrine()->getRepository(Address::class)->findOneBy(['id' => $id]);
-            if($address === null) // nenaslo to zadnou adresu
+            if ($address === null) // nenaslo to zadnou adresu
             {
                 throw new NotFoundHttpException('Adresa nenalezena.');
             }
-            else if(!$this->isGranted('address_edit', $address)) // nalezena adresa neni uzivatele
+            else if (!$this->isGranted('address_edit', $address)) // nalezena adresa neni uzivatele
             {
                 throw new AccessDeniedHttpException('Tuto adresu nemůžete editovat.');
             }
@@ -204,11 +204,11 @@ class ProfileController extends AbstractController
         $user = $this->getUser();
 
         $address = $this->getDoctrine()->getRepository(Address::class)->findOneBy(['id' => $id]);
-        if($address === null) //nenaslo to zadnou adresu
+        if ($address === null) //nenaslo to zadnou adresu
         {
             throw new NotFoundHttpException('Adresa nenalezena.');
         }
-        else if(!$this->isGranted('address_delete', $address)) //nalezena adresa neni uzivatele
+        else if (!$this->isGranted('address_delete', $address)) //nalezena adresa neni uzivatele
         {
             throw new AccessDeniedHttpException('Tuto adresu nemůžete smazat.');
         }

@@ -12,6 +12,12 @@
     {{ include('fragments/_instance_created_updated.html.twig', {instance: productInstance}) }}
 
     {{ form_start(productForm) }}
+        {% if productForm.vars.errors|length > 0 %}
+            <div class="row">
+                {{ form_errors(productForm) }}
+            </div>
+        {% endif %}
+
         {{ form_row(productForm.name) }}
         {{ form_row(productForm.slug) }}
         {{ form_row(productForm.descriptionShort) }}
@@ -57,11 +63,11 @@
 
             {% if productForm.categoriesNew is defined %}
                 <div class="row">
-                    <ul class="tabs">
+                    <ul class="tabs z-depth-1">
                         <li class="tab col s6">
                             <a href="#categories-tab1">
                                 Přidat z existujících
-                                {% if productForm.categories.vars.valid is same as(false) %}
+                                {% if productForm.categories is defined and productForm.categories.vars.valid is same as(false) %}
                                     <i class="fas fa-exclamation-circle form-error red-text"></i>
                                 {% endif %}
                             </a>
@@ -79,15 +85,25 @@
 
                 <div class="row">
                     <div id="categories-tab1" class="col s12">
-                        {{ form_row(productForm.categories) }}
+                        {% if productForm.categories is defined %}
+                            {{ form_row(productForm.categories) }}
+                        {% else %}
+                            <div class="row">
+                                <span>Nebyly nalezeny žádné existující kategorie.</span>
+                            </div>
+                        {% endif %}
                     </div>
                     <div id="categories-tab2" class="col s12">
                         {{ form_row(productForm.categoriesNew, { 'attr': {'data-index': productForm.categoriesNew|length > 0 ? productForm.categoriesNew|last.vars.name + 1 : 0} }) }}
                         {{ form_row(productForm.addItemCategoryNew) }}
                     </div>
                 </div>
-            {% else %}
+            {% elseif productForm.categories is defined %}
                 {{ form_row(productForm.categories) }}
+            {% else %}
+                <div class="row">
+                    <span>Nebyly nalezeny žádné existující kategorie.</span>
+                </div>
             {% endif %}
         </div>
 
@@ -98,11 +114,11 @@
 
             {% if productForm.infoNew is defined %}
                 <div class="row">
-                    <ul class="tabs">
+                    <ul class="tabs z-depth-1">
                         <li class="tab col s6">
                             <a href="#info-tab1">
                                 Přidat z existujících
-                                {% if productForm.info.vars.valid is same as(false) %}
+                                {% if productForm.info is defined and productForm.info.vars.valid is same as(false) %}
                                     <i class="fas fa-exclamation-circle form-error red-text"></i>
                                 {% endif %}
                             </a>
@@ -120,17 +136,27 @@
 
                 <div class="row">
                     <div id="info-tab1" class="col s12">
-                        {{ form_row(productForm.info, { 'attr': {'data-index': productForm.info|length > 0 ? productForm.info|last.vars.name + 1 : 0} }) }}
-                        {{ form_row(productForm.addItemInfo) }}
+                        {% if productForm.info is defined %}
+                            {{ form_row(productForm.info, { 'attr': {'data-index': productForm.info|length > 0 ? productForm.info|last.vars.name + 1 : 0} }) }}
+                            {{ form_row(productForm.addItemInfo) }}
+                        {% else %}
+                            <div class="row">
+                                <span>Nebyly nalezeny žádné existující skupiny informací.</span>
+                            </div>
+                        {% endif %}
                     </div>
                     <div id="info-tab2" class="col s12">
                         {{ form_row(productForm.infoNew, { 'attr': {'data-index': productForm.infoNew|length > 0 ? productForm.infoNew|last.vars.name + 1 : 0} }) }}
                         {{ form_row(productForm.addItemInfoNew) }}
                     </div>
                 </div>
-            {% else %}
+            {% elseif productForm.info is defined %}
                 {{ form_row(productForm.info, { 'attr': {'data-index': productForm.info|length > 0 ? productForm.info|last.vars.name + 1 : 0} }) }}
                 {{ form_row(productForm.addItemInfo) }}
+            {% else %}
+                <div class="row">
+                    <span>Nebyly nalezeny žádné existující skupiny informací.</span>
+                </div>
             {% endif %}
         </div>
 
@@ -139,7 +165,13 @@
                 <h4>Volby</h4>
             </div>
 
-            {{ form_row(productForm.optionGroups) }}
+            {% if productForm.optionGroups is defined %}
+                {{ form_row(productForm.optionGroups) }}
+            {% else %}
+                <div class="row">
+                    <span>Nebyly nalezeny žádné produktové volby.</span>
+                </div>
+            {% endif %}
         </div>
 
         <div class="section no-pad-bot">

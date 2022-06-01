@@ -6,13 +6,14 @@ use App\Entity\Product;
 use App\Entity\ProductCategory;
 use App\Entity\ProductImage;
 use App\Entity\ProductInformation;
+use App\Entity\ProductInformationGroup;
 use App\Entity\ProductOptionGroup;
 use App\Entity\ProductSection;
 use App\Form\EventSubscriber\OrphanRemovalSubscriber;
 use App\Form\EventSubscriber\ProductCategorySubscriber;
 use App\Form\EventSubscriber\ProductInformationSubscriber;
 use App\Form\EventSubscriber\SlugSubscriber;
-use App\Repository\ProductCategoryRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ButtonType;
@@ -33,11 +34,13 @@ class ProductFormType extends AbstractType
     private ProductCategorySubscriber $productCategorySubscriber;
     private SlugSubscriber $slugSubscriber;
     private OrphanRemovalSubscriber $orphanRemovalSubscriber;
+    private EntityManagerInterface $entityManager;
 
-    public function __construct(ProductInformationSubscriber $productInformationSubscriber, ProductCategorySubscriber $productCategorySubscriber, SlugSubscriber $slugSubscriber, OrphanRemovalSubscriber $orphanRemovalSubscriber)
+    public function __construct(ProductInformationSubscriber $productInformationSubscriber, ProductCategorySubscriber $productCategorySubscriber, SlugSubscriber $slugSubscriber, OrphanRemovalSubscriber $orphanRemovalSubscriber, EntityManagerInterface $entityManager)
     {
         $this->productInformationSubscriber = $productInformationSubscriber;
         $this->productCategorySubscriber = $productCategorySubscriber;
+        $this->entityManager = $entityManager;
 
         $this->slugSubscriber = $slugSubscriber;
         $this->slugSubscriber->setGettersForAutoGenerate(['getName'])
@@ -52,6 +55,77 @@ class ProductFormType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        // existující kategorie
+        $categories = $this->entityManager->getRepository(ProductCategory::class)->findAllAndFetchGroups();
+        if ($categories !== null && count($categories) > 0)
+        {
+            $builder
+                ->add('categories', EntityType::class, [
+                    'class' => ProductCategory::class,
+                    'choice_label' => 'name',
+                    'choices' => $categories,
+                    'group_by' => function(ProductCategory $category) {
+                        return $category->getProductCategoryGroup()->getName();
+                    },
+                    'multiple' => true,
+                    'expanded' => true,
+                    'required' => false,
+                    'label' => false,
+                ])
+            ;
+        }
+
+        // existující skupiny informací
+        $infoGroups = $this->entityManager->getRepository(ProductInformationGroup::class)->findAll();
+        if ($infoGroups !== null && count($infoGroups) > 0)
+        {
+            $builder
+                ->add('info', CollectionType::class, [
+                    'entry_type' => ProductInformationFormType::class,
+                    'by_reference' => false,
+                    'required' => false,
+                    'allow_add' => true,
+                    'allow_delete' => true,
+                    'delete_empty' => function (ProductInformation $information = null) {
+                        return $information === null || $information->getValue() === null;
+                    },
+                    'label' => false,
+                    'attr' => [
+                        'class' => 'info',
+                        'data-reload-select' => true,
+                    ],
+                    'entry_options' => [
+                        'information_groups' => $infoGroups,
+                    ],
+                ])
+                ->add('addItemInfo', ButtonType::class, [
+                    'attr' => [
+                        'class' => 'btn-medium grey left js-add-item-link',
+                        'data-collection-holder-class' => 'info',
+                    ],
+                    'label' => 'Přidat informaci',
+                ])
+            ;
+        }
+
+        // produktové volby
+        $optionGroups = $this->entityManager->getRepository(ProductOptionGroup::class)->findAll();
+        if ($optionGroups !== null && count($optionGroups))
+        {
+            $builder
+                ->add('optionGroups', EntityType::class, [
+                    'class' => ProductOptionGroup::class,
+                    'choices' => $optionGroups,
+                    'choice_label' => 'name',
+                    'multiple' => true,
+                    'expanded' => true,
+                    'required' => false,
+                    'label' => false,
+                ])
+            ;
+        }
+
+        // zbytek
         $builder
             ->add('name', TextType::class, [
                 'attr' => ['autofocus' => 'autofocus'],
@@ -117,50 +191,6 @@ class ProductFormType extends AbstractType
                 'placeholder' => '-- nezařazeno --',
                 'choice_label' => 'name',
                 'label' => 'Sekce',
-            ])
-            ->add('categories', EntityType::class, [
-                'class' => ProductCategory::class,
-                'choice_label' => 'name',
-                'query_builder' => function (ProductCategoryRepository $er) {
-                    return $er->qbFindAllAndFetchGroups();
-                },
-                'group_by' => function(ProductCategory $category) {
-                    return $category->getProductCategoryGroup()->getName();
-                },
-                'multiple' => true,
-                'expanded' => true,
-                'required' => false,
-                'label' => false,
-            ])
-            ->add('optionGroups', EntityType::class, [
-                'class' => ProductOptionGroup::class,
-                'choice_label' => 'name',
-                'multiple' => true,
-                'expanded' => true,
-                'required' => false,
-                'label' => false,
-            ])
-            ->add('info', CollectionType::class, [
-                'entry_type' => ProductInformationFormType::class,
-                'by_reference' => false,
-                'required' => false,
-                'allow_add' => true,
-                'allow_delete' => true,
-                'delete_empty' => function (ProductInformation $information = null) {
-                    return $information === null || $information->getValue() === null;
-                },
-                'label' => false,
-                'attr' => [
-                    'class' => 'info',
-                    'data-reload-select' => true,
-                ],
-            ])
-            ->add('addItemInfo', ButtonType::class, [
-                'attr' => [
-                    'class' => 'btn-medium grey left js-add-item-link',
-                    'data-collection-holder-class' => 'info',
-                ],
-                'label' => 'Přidat informaci',
             ])
             ->add('images', CollectionType::class, [
                 'entry_type' => ProductImageFormType::class,

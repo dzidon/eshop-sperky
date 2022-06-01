@@ -21,17 +21,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class LoginController extends AbstractController
 {
-    private BreadcrumbsService $breadcrumbs;
-
-    public function __construct(BreadcrumbsService $breadcrumbs)
-    {
-        $this->breadcrumbs = $breadcrumbs;
-    }
-
     /**
      * @Route("/prihlaseni", name="login")
      */
-    public function login(FormFactoryInterface $formFactory, Request $request, AuthenticationUtils $authenticationUtils, TranslatorInterface $translator): Response
+    public function login(BreadcrumbsService $breadcrumbs, FormFactoryInterface $formFactory, Request $request, AuthenticationUtils $authenticationUtils, TranslatorInterface $translator): Response
     {
         if ($this->isGranted('IS_AUTHENTICATED_FULLY'))
         {
@@ -50,7 +43,7 @@ class LoginController extends AbstractController
 
         $request->getSession()->remove(Security::LAST_USERNAME);
 
-        $this->breadcrumbs
+        $breadcrumbs
             ->addRoute('home')
             ->addRoute('login');
 

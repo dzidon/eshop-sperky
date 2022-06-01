@@ -5,6 +5,8 @@ namespace App\Service;
 use App\Entity\CartOccurence;
 use App\Entity\Order;
 use App\Entity\Product;
+use App\Entity\ProductOption;
+use App\EntityCollectionManagement\EntityCollectionEnvelope;
 use App\Exception\CartException;
 use App\OrderSynchronizer\OrderCartSynchronizer;
 use Doctrine\ORM\EntityManagerInterface;
@@ -44,12 +46,14 @@ class CartService
     private RequestStack $requestStack;
     private EntityManagerInterface $entityManager;
     private OrderCartSynchronizer $synchronizer;
+    private EntityCollectionService $entityCollectionService;
 
-    public function __construct(EntityManagerInterface $entityManager, RequestStack $requestStack, OrderCartSynchronizer $synchronizer)
+    public function __construct(EntityManagerInterface $entityManager, RequestStack $requestStack, OrderCartSynchronizer $synchronizer, EntityCollectionService $entityCollectionService)
     {
         $this->entityManager = $entityManager;
         $this->requestStack = $requestStack;
         $this->synchronizer = $synchronizer;
+        $this->entityCollectionService = $entityCollectionService;
     }
 
     /**
@@ -119,6 +123,9 @@ class CartService
                 $this->createNewOrder();
             }
 
+            $cartOccurencesEnvelope = new EntityCollectionEnvelope($this->order, [
+                ['getterForCollection' => 'getCartOccurences', 'getterForParent' => 'getOrder'],
+            ]);
             $this->synchronizer->synchronizeAndAddWarningsToFlashBag($this->order);
 
             $this->order->calculateTotals();
@@ -127,6 +134,7 @@ class CartService
 
             if ($this->isOrderNew || $this->order->hasSynchronizationWarnings())
             {
+                $this->entityCollectionService->removeOrphans($cartOccurencesEnvelope);
                 $this->entityManager->persist($this->order);
                 $this->entityManager->flush();
             }
@@ -166,10 +174,11 @@ class CartService
                 $requiredQuantity += $cartOccurence->getQuantity();
 
                 // snaha najít v košíku vkládaný produkt s danými volbami
-                if($targetCartOccurence === null)
+                $cartOccurenceOptions = $cartOccurence->getOptions()->toArray();
+                if($targetCartOccurence === null && count($submittedOptions) === count($cartOccurenceOptions))
                 {
-                    $containsSubmittedOptions = ([] === array_udiff($cartOccurence->getOptions()->toArray(), $submittedOptions,
-                        function ($objA, $objB) {
+                    $containsSubmittedOptions = ([] === array_udiff($submittedOptions, $cartOccurenceOptions,
+                        function (ProductOption $objA, ProductOption $objB) {
                             return $objA->getId() - $objB->getId();
                         }
                     ));
@@ -218,8 +227,8 @@ class CartService
     }
 
     /**
-     * Aktualizuje počty produktů v košíku. Pokud je nějaký počet 0, produkt se odstraní. Pokud je počet
-     * větší než 0, CartOccurence se uloží.
+     * Aktualizuje počty produktů v košíku. Pokud je nějaký počet menší nebo roven 0, CartOccurence se odstraní. Pokud je
+     * počet větší než 0, CartOccurence se uloží.
      */
     public function updateQuantities(): void
     {
@@ -285,7 +294,7 @@ class CartService
     {
         $this->newOrderCookie = null;
 
-        if ($this->isOrderNew || (($this->order->getExpireAt()->getTimestamp() - time()) < (86400 * Order::REFRESH_WINDOW_IN_DAYS)))
+        if ($this->isOrderNew || (($this->order->getExpireAt()->getTimestamp() - time()) < (86400 * Order::REFRESH_WINDOW_IN_DAYS))) // 86400s = 1d
         {
             $this->order->setExpireAtBasedOnLifetime();
             $expires = time() + (86400 * Order::LIFETIME_IN_DAYS);

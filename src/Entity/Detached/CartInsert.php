@@ -12,17 +12,24 @@ class CartInsert
      * @AssertCompound\ProductQuantityRequirements
      * @Assert\GreaterThanOrEqual(1)
      */
-    private $quantity;
+    private $quantity = 1;
 
+    /**
+     * @Assert\NotBlank(message="Bylo odesláno neplatné ID produktu. Zkuste aktualizovat stránku a opakovat akci.")
+     */
     private $productId;
+
+    /**
+     * @Assert\NotNull(message="Některá z produktových voleb byla vybrána chybně. Zkuste aktualizovat stránku a opakovat akci.")
+     */
+    private $optionGroups;
 
     private $product;
 
-    private $optionGroups;
-
-    public function __construct()
+    public function __construct(Product $product)
     {
-        $this->quantity = 1;
+        $this->product = $product;
+        $this->productId = $product->getId();
     }
 
     public function getQuantity(): ?int
@@ -37,6 +44,11 @@ class CartInsert
         return $this;
     }
 
+    public function getProduct(): Product
+    {
+        return $this->product;
+    }
+
     public function getProductId(): ?int
     {
         return $this->productId;
@@ -49,25 +61,12 @@ class CartInsert
         return $this;
     }
 
-    public function getProduct(): ?Product
-    {
-        return $this->product;
-    }
-
-    public function setProduct(Product $product): self
-    {
-        $this->product = $product;
-        $this->productId = $product->getId();
-
-        return $this;
-    }
-
-    public function getOptionGroups(): array
+    public function getOptionGroups(): ?array
     {
         return $this->optionGroups;
     }
 
-    public function setOptionGroups(array $optionGroups): self
+    public function setOptionGroups(?array $optionGroups): self
     {
         $this->optionGroups = $optionGroups;
 

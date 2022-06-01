@@ -64,52 +64,46 @@ class CartController extends AbstractController
 
         $jsonResponse = new Json();
         $productId = $this->getProductIdFromRequest('cart_insert_form');
-        if ($productId !== null)
+        if ($productId === null)
         {
-            /** @var Product|null $product */
-            $product = $this->getDoctrine()->getRepository(Product::class)->findOneForCartInsert($productId);
-            if($product !== null)
-            {
-                $cartInsertRequest = new CartInsert();
-                $cartInsertRequest->setProduct($product);
-                $form = $this->createForm(CartInsertFormType::class, $cartInsertRequest);
-                $form->handleRequest($this->request);
+            $jsonResponse->addResponseError('Bylo odesláno neplatné ID produktu. Zkuste aktualizovat stránku a opakovat akci.');
+            return $jsonResponse->create();
+        }
 
-                if ($form->isSubmitted() && $form->isValid())
-                {
-                    try
-                    {
-                        $this->cart->insertProduct($cartInsertRequest->getProduct(), $cartInsertRequest->getQuantity(), $cartInsertRequest->getOptionGroups());
-                        $jsonResponse->setResponseHtml(
-                            $this->renderView('fragments/_cart_insert_modal_content.html.twig', [
-                                'order'             => $this->cart->getOrder(),
-                                'product'           => $cartInsertRequest->getProduct(),
-                                'submittedQuantity' => $cartInsertRequest->getQuantity(),
-                            ])
-                        )
-                        ->setResponseData('totalProducts', $this->cart->getOrder()->getTotalQuantity());
-                    }
-                    catch(CartException $exception)
-                    {
-                        $jsonResponse->addResponseError($exception->getMessage());
-                    }
-                }
-                else if ($form->isSubmitted() && !$form->isValid())
-                {
-                    foreach ($form->getErrors() as $formError)
-                    {
-                        $jsonResponse->addResponseError($formError->getMessage());
-                    }
-                }
-            }
-            else
+        /** @var Product|null $product */
+        $product = $this->getDoctrine()->getRepository(Product::class)->findOneForCartInsert($productId);
+        if ($product === null)
+        {
+            $jsonResponse->addResponseError('Tento produkt už nejde vložit do košíku.');
+            return $jsonResponse->create();
+        }
+
+        $cartInsertRequest = new CartInsert($product);
+        $form = $this->createForm(CartInsertFormType::class, $cartInsertRequest);
+        $form->handleRequest($this->request);
+
+        if ($form->isSubmitted() && $form->isValid())
+        {
+            try
             {
-                $jsonResponse->addResponseError('Tento produkt už nejde vložit do košíku.');
+                $this->cart->insertProduct($cartInsertRequest->getProduct(), $cartInsertRequest->getQuantity(), $cartInsertRequest->getOptionGroups());
+                $jsonResponse->setResponseHtml(
+                    $this->renderView('fragments/_cart_insert_modal_content.html.twig', [
+                        'product'           => $product,
+                        'order'             => $this->cart->getOrder(),
+                        'submittedQuantity' => $cartInsertRequest->getQuantity(),
+                    ])
+                )
+                ->setResponseData('totalProducts', $this->cart->getOrder()->getTotalQuantity());
+            }
+            catch (CartException $exception)
+            {
+                $jsonResponse->addResponseError($exception->getMessage());
             }
         }
-        else
+        else if ($form->isSubmitted() && !$form->isValid())
         {
-            $jsonResponse->addResponseError('Neplatné ID produktu.');
+            $jsonResponse->addResponseFormErrors($form);
         }
 
         return $jsonResponse->create();
@@ -132,21 +126,15 @@ class CartController extends AbstractController
         $jsonResponse->setResponseHtml($this->renderView('fragments/forms_unique/_form_cart_update.html.twig', ['cartForm' => $form->createView(), 'order' => $order]));
         $form->handleRequest($this->request);
 
-        if ($form->isSubmitted())
+        if ($form->isSubmitted() && $form->isValid())
         {
-            if($form->isValid())
-            {
-                $this->cart->updateQuantities();
-                $form = $this->createForm(CartFormType::class, $order);
-                $jsonResponse->setResponseHtml($this->renderView('fragments/forms_unique/_form_cart_update.html.twig', ['cartForm' => $form->createView(), 'order' => $order]));
-            }
-            else
-            {
-                foreach ($form->getErrors() as $formError)
-                {
-                    $jsonResponse->addResponseError($formError->getMessage());
-                }
-            }
+            $this->cart->updateQuantities();
+            $form = $this->createForm(CartFormType::class, $order);
+            $jsonResponse->setResponseHtml($this->renderView('fragments/forms_unique/_form_cart_update.html.twig', ['cartForm' => $form->createView(), 'order' => $order]));
+        }
+        else if ($form->isSubmitted() && !$form->isValid())
+        {
+            $jsonResponse->addResponseFormErrors($form);
         }
 
         return $jsonResponse
@@ -173,7 +161,7 @@ class CartController extends AbstractController
         {
             $this->cart->removeCartOccurence($cartOccurenceId);
         }
-        catch(CartException $exception)
+        catch (CartException $exception)
         {
             $jsonResponse->addResponseError($exception->getMessage());
         }

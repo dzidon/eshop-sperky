@@ -23,13 +23,14 @@ abstract class AbstractOrderSynchronizer
     }
 
     /**
-     * Přidá varování do flash bagu
+     * Synchronizuje objednávku a přidá varování do flash bagu
      *
      * @param Order $order
      */
     public function synchronizeAndAddWarningsToFlashBag(Order $order): void
     {
-        $this->synchronize($order);
+        $this->order = $order;
+        $this->synchronize();
 
         if($this->order->hasSynchronizationWarnings())
         {
@@ -44,12 +45,9 @@ abstract class AbstractOrderSynchronizer
 
     /**
      * Synchronizuje stav objednávky.
-     *
-     * @param Order $order
      */
-    protected function synchronize(Order $order): void
+    protected function synchronize(): void
     {
-        $this->order = $order;
         $this->order->setHasSynchronizationWarnings(false);
         $this->warnings = [];
 

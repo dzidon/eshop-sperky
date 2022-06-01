@@ -235,6 +235,7 @@ class OrderController extends AbstractController
             'ic' => $address->getIc(),
             'dic' => $address->getDic(),
         ];
+
         $jsonResponse->setResponseData('addressData', $addressData);
         return $jsonResponse->create();
     }
@@ -269,7 +270,6 @@ class OrderController extends AbstractController
 
         return $this->render('order/overview.html.twig', [
             'order' => $order,
-            'showProductIds' => false,
         ]);
     }
 }

@@ -16,7 +16,6 @@ use App\Service\BreadcrumbsService;
 use App\Service\OrderPostCompletionService;
 use App\Service\PacketaApiService;
 use Psr\Log\LoggerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -30,23 +29,18 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
  *
  * @IsGranted("IS_AUTHENTICATED_FULLY")
  */
-class OrderController extends AbstractController
+class OrderController extends AbstractAdminController
 {
     private LoggerInterface $logger;
-    private BreadcrumbsService $breadcrumbs;
     private $request;
 
     public function __construct(LoggerInterface $logger, BreadcrumbsService $breadcrumbs, RequestStack $requestStack)
     {
-        $this->logger = $logger;
-        $this->breadcrumbs = $breadcrumbs;
-        $this->request = $requestStack->getCurrentRequest();
+        parent::__construct($breadcrumbs);
+        $this->breadcrumbs->addRoute('admin_orders');
 
-        $this->breadcrumbs
-            ->addRoute('home')
-            ->addRoute(MainController::ADMIN_ROUTE, [], MainController::ADMIN_TITLE)
-            ->addRoute('admin_orders')
-        ;
+        $this->logger = $logger;
+        $this->request = $requestStack->getCurrentRequest();
     }
 
     /**
@@ -106,6 +100,7 @@ class OrderController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid())
         {
+            $order->calculatePricesWithVatForCartOccurences();
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($order);
             $entityManager->flush();
@@ -256,7 +251,6 @@ class OrderController extends AbstractController
             'formLifecycleChapter' => $formLifecycleChapterView,
             'formPacketa' => $formPacketaView,
             'packetaMessage' => $packetaMessage,
-            'showProductIds' => true,
         ]);
     }
 

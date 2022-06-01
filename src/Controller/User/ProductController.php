@@ -113,8 +113,7 @@ class ProductController extends AbstractController
             throw new NotFoundHttpException('Produkt nenalezen.');
         }
 
-        $cartInsertRequest = new CartInsert();
-        $cartInsertRequest->setProduct($product);
+        $cartInsertRequest = new CartInsert($product);
         $form = $this->createForm(CartInsertFormType::class, $cartInsertRequest);
 
         $relatedProducts = null;
@@ -124,13 +123,10 @@ class ProductController extends AbstractController
         }
 
         $section = $product->getSection();
-        $sectionData = [
-            'slug'  => ($section !== null ? $section->getSlug() : null),
-            'title' => ($section !== null ? $section->getName() : 'Všechny produkty'),
-        ];
-
         $this->breadcrumbs
-            ->addRoute('products', ['slug' => $sectionData['slug']], $sectionData['title'])
+            ->addRoute('products',
+                ['slug' => ($section !== null ? $section->getSlug() : null)],
+                ($section !== null ? $section->getName() : 'Všechny produkty'))
             ->addRoute('product', ['slug' => $product->getSlug()], $product->getName());
 
         return $this->render('products/product.html.twig', [

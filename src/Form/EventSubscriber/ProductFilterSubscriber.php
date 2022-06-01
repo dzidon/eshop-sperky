@@ -65,7 +65,7 @@ class ProductFilterSubscriber implements EventSubscriberInterface
         $defaultData = $event->getForm()->getData();
         $submittedData = $event->getData();
 
-        // min cena zadaná uživatelem
+        // min a max cena zadaná uživatelem
         if (!isset($submittedData['priceMin']) || !is_numeric($submittedData['priceMin']))
         {
             $submittedData['priceMin'] = $defaultData->getPriceMin();

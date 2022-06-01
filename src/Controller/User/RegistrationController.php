@@ -33,7 +33,7 @@ class RegistrationController extends AbstractController
         $this->emailVerifier = $emailVerifier;
         $this->logger = $logger;
         $this->translator = $translator;
-        $this->breadcrumbs = $breadcrumbs;
+        $this->breadcrumbs = $breadcrumbs->addRoute('home')->addRoute('register');
         $this->request = $requestStack->getCurrentRequest();
     }
 
@@ -60,10 +60,6 @@ class RegistrationController extends AbstractController
 
             return $this->redirectToRoute('home');
         }
-
-        $this->breadcrumbs
-            ->addRoute('home')
-            ->addRoute('register');
 
         return $this->render('authentication/register.html.twig', [
             'registrationForm' => $form->createView(),
@@ -96,10 +92,7 @@ class RegistrationController extends AbstractController
         $form = $formFactory->createNamed('', VerificationFormType::class, null, ['default_email' => $this->request->query->get('email', '')]);
         $form->add('submit', SubmitType::class, ['label' => 'Ověřit']);
 
-        $this->breadcrumbs
-            ->addRoute('home')
-            ->addRoute('register')
-            ->addRoute('verify_email');
+        $this->breadcrumbs->addRoute('verify_email');
 
         return $this->render('authentication/verification.html.twig', [
             'verificationForm' => $form->createView(),

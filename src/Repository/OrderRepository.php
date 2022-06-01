@@ -143,34 +143,40 @@ class OrderRepository extends ServiceEntityRepository
         }
 
         // ke každému výskytu v košíku jeho options
-        $this->_em->createQuery('
-            SELECT PARTIAL
-                oc.{id}, oco, ocop
-            FROM 
-                App\Entity\CartOccurence oc
-            LEFT JOIN
-                oc.options oco
-            LEFT JOIN
-                oco.productOptionGroup ocop
-            WHERE
-                oc.id IN (:ids)
-        ')
-        ->setParameter('ids', $cartOccurenceIds)
-        ->getResult();
+        if (count($cartOccurenceIds) > 0)
+        {
+            $this->_em->createQuery('
+                SELECT PARTIAL
+                    oc.{id}, oco, ocop
+                FROM 
+                    App\Entity\CartOccurence oc
+                LEFT JOIN
+                    oc.options oco
+                LEFT JOIN
+                    oco.productOptionGroup ocop
+                WHERE
+                    oc.id IN (:ids)
+            ')
+            ->setParameter('ids', $cartOccurenceIds)
+            ->getResult();
+        }
 
         // ke každému produktu jeho skupiny options
-        $this->_em->createQuery('
-            SELECT PARTIAL
-                ocp.{id}, ocpo
-            FROM 
-                App\Entity\Product ocp
-            LEFT JOIN
-                ocp.optionGroups ocpo
-            WHERE
-                ocp.id IN (:ids)
-        ')
-        ->setParameter('ids', $productIds)
-        ->getResult();
+        if (count($productIds) > 0)
+        {
+            $this->_em->createQuery('
+                SELECT PARTIAL
+                    ocp.{id}, ocpo
+                FROM 
+                    App\Entity\Product ocp
+                LEFT JOIN
+                    ocp.optionGroups ocpo
+                WHERE
+                    ocp.id IN (:ids)
+            ')
+            ->setParameter('ids', $productIds)
+            ->getResult();
+        }
 
         return $order;
     }

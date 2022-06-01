@@ -3,6 +3,7 @@
 namespace App\Response;
 
 use LogicException;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -16,7 +17,6 @@ class Json
     private int $responseStatus = Response::HTTP_OK;
     private array $responseData = [
         'errors' => [],
-        'warnings' => [],
         'html' => null,
     ];
 
@@ -45,9 +45,12 @@ class Json
         return $this;
     }
 
-    public function addResponseWarning(string $text): self
+    public function addResponseFormErrors(FormInterface $form): self
     {
-        $this->responseData['warnings'][] = $text;
+        foreach ($form->getErrors() as $formError)
+        {
+            $this->addResponseError($formError->getMessage());
+        }
 
         return $this;
     }
@@ -61,9 +64,9 @@ class Json
 
     public function setResponseData(string $key, $data): self
     {
-        if($key === 'errors' || $key === 'html' || $key === 'warnings')
+        if($key === 'errors' || $key === 'html')
         {
-            throw new LogicException('Do metody setResponseData v App\Response\Json nepatří klíče errors, html a warnings. Použijte metody addResponseError, addResponseWarning a setResponseHtml.');
+            throw new LogicException('Do metody setResponseData v App\Response\Json nepatří klíče errors a html. Použijte metody addResponseError a setResponseHtml.');
         }
 
         $this->responseData[$key] = $data;

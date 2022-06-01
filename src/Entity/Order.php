@@ -624,6 +624,14 @@ class Order
         }
     }
 
+    public function calculatePricesWithVatForCartOccurences(): void
+    {
+        foreach ($this->cartOccurences as $cartOccurence)
+        {
+            $cartOccurence->calculatePriceWithVat();
+        }
+    }
+
     public function getDeliveryPriceWithoutVat(): ?float
     {
         return $this->deliveryPriceWithoutVat;
@@ -1067,9 +1075,22 @@ class Order
             $this->setLifecycleChapter(self::LIFECYCLE_AWAITING_SHIPPING);
         }
 
+        // nezaškrtl, že chce zadat firmu
+        if (!$this->companyChecked)
+        {
+            $this->resetDataCompany();
+        }
+
+        // nezaškrtl, že chce zadat poznámku
+        if (!$this->noteChecked)
+        {
+            $this->note = null;
+        }
+
         // nezaškrtl, že chce zadat jinou fakturační adresu, takže se nastaví na hodnoty doručovací
         if (!$this->billingAddressChecked)
         {
+            $this->resetAddressBilling();
             $this->loadAddressBillingFromDelivery();
         }
 

@@ -13,12 +13,8 @@
             {# Flash zprávy #}
             {{ include('fragments/_flash_messages.html.twig') }}
 
-            {% block admin_content %}
-
-            {% endblock %}
-
             {# Přehled objednávky #}
-            {{ include('fragments/_order_overview.html.twig', {order: order, showProductIds: showProductIds}) }}
+            {{ include('fragments/_order_overview.html.twig', {order: order, showProductIds: false}) }}
         </div>
     </div>
 

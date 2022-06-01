@@ -23,6 +23,16 @@ class ProductCategoryRepository extends ServiceEntityRepository
         parent::__construct($registry, ProductCategory::class);
     }
 
+    public function findAllAndFetchGroups()
+    {
+        return $this->createQueryBuilder('pc')
+            ->select('pc', 'pcg')
+            ->innerJoin('pc.productCategoryGroup', 'pcg')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
     public function getNumberOfProductsForFilter(ProductCategory $category, ProductSection $section, string $searchPhrase = null, float $priceMin = null, float $priceMax = null, array $categoriesChosen = null)
     {
         $conn = $this->getEntityManager()->getConnection();
@@ -68,14 +78,6 @@ class ProductCategoryRepository extends ServiceEntityRepository
             ->addProductVisibilityCondition()
             ->addProductSearchConditions($section)
             ->getQueryBuilder()
-        ;
-    }
-
-    public function qbFindAllAndFetchGroups(): QueryBuilder
-    {
-        return $this->createQueryBuilder('pc')
-            ->select('pc', 'pcg')
-            ->innerJoin('pc.productCategoryGroup', 'pcg')
         ;
     }
 }

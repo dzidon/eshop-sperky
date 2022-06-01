@@ -34,6 +34,7 @@ class CartInsertFormType extends AbstractType
                 'error_bubbling' => true,
             ])
             ->add('optionGroups', CartInsertOptionGroupsFormType::class, [
+                'empty_data' => [],
                 'error_bubbling' => true,
                 'label' => false,
             ])

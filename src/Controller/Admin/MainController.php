@@ -4,7 +4,6 @@ namespace App\Controller\Admin;
 
 use App\Entity\Order;
 use App\Service\BreadcrumbsService;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -14,17 +13,11 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
  *
  * @IsGranted("IS_AUTHENTICATED_FULLY")
  */
-class MainController extends AbstractController
+class MainController extends AbstractAdminController
 {
-    public const ADMIN_TITLE = 'Admin';
-    public const ADMIN_ROUTE = 'admin_dashboard';
-
-    private BreadcrumbsService $breadcrumbs;
-
     public function __construct(BreadcrumbsService $breadcrumbs)
     {
-        $this->breadcrumbs = $breadcrumbs;
-        $this->breadcrumbs->addRoute('home')->addRoute(self::ADMIN_ROUTE, [], self::ADMIN_TITLE);
+        parent::__construct($breadcrumbs);
     }
 
     /**

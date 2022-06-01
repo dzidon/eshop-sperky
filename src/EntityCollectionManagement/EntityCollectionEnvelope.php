@@ -6,7 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use LogicException;
 
 /**
- * Třída držící elementy kolekce nějaké entity. Jde použít pro orphan removal.
+ * Třída držící elementy kolekcí nějaké entity. Jde použít pro orphan removal.
  *
  * @package App\EntityCollectionManagement
  */

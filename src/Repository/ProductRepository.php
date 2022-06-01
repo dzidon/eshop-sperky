@@ -129,18 +129,21 @@ class ProductRepository extends ServiceEntityRepository
         }, $product->getOptionGroups()->getValues());
 
         // produktové volby
-        $this->_em->createQuery('
-            SELECT PARTIAL
-                pog.{id}, pogo
-            FROM 
-                App\Entity\ProductOptionGroup pog
-            LEFT JOIN
-                pog.options pogo
-            WHERE
-                pog.id IN (:ids)
-        ')
-        ->setParameter('ids', $optionGroupIds)
-        ->getResult();
+        if (count($optionGroupIds) > 0)
+        {
+            $this->_em->createQuery('
+                SELECT PARTIAL
+                    pog.{id}, pogo
+                FROM 
+                    App\Entity\ProductOptionGroup pog
+                LEFT JOIN
+                    pog.options pogo
+                WHERE
+                    pog.id IN (:ids)
+            ')
+            ->setParameter('ids', $optionGroupIds)
+            ->getResult();
+        }
 
         return $product;
     }
@@ -256,18 +259,21 @@ class ProductRepository extends ServiceEntityRepository
         }
 
         // ke každé skupině voleb její volby
-        $this->_em->createQuery('
-            SELECT PARTIAL
-                pog.{id}, pogo
-            FROM 
-                App\Entity\ProductOptionGroup pog
-            LEFT JOIN
-                pog.options pogo
-            WHERE
-                pog.id IN (:ids)
-        ')
-        ->setParameter('ids', $optionGroupIds)
-        ->getResult();
+        if (count($optionGroupIds) > 0)
+        {
+            $this->_em->createQuery('
+                SELECT PARTIAL
+                    pog.{id}, pogo
+                FROM 
+                    App\Entity\ProductOptionGroup pog
+                LEFT JOIN
+                    pog.options pogo
+                WHERE
+                    pog.id IN (:ids)
+            ')
+            ->setParameter('ids', $optionGroupIds)
+            ->getResult();
+        }
 
         return $product;
     }

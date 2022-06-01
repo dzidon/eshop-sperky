@@ -2,8 +2,6 @@
 
 namespace App\OrderSynchronizer;
 
-use App\Entity\Order;
-
 /**
  * Synchronizuje stav aktivní objednávky v košíku se stavem ostatních entit
  *
@@ -34,9 +32,9 @@ class OrderCartSynchronizer extends AbstractOrderSynchronizer
     /**
      * {@inheritdoc}
      */
-    protected function synchronize(Order $order): void
+    protected function synchronize(): void
     {
-        parent::synchronize($order);
+        parent::synchronize();
 
         $productsTotalQuantity = [];
 
@@ -107,7 +105,7 @@ class OrderCartSynchronizer extends AbstractOrderSynchronizer
 
                 // ceny produktu
                 if (($product->getPriceWithoutVat() !== null && $cartOccurence->getPriceWithoutVat() !== $product->getPriceWithoutVat())
-                    || ($product->getPriceWithVat() !== null && $cartOccurence->getPriceWithVat() !== $product->getPriceWithVat()))
+                 || ($product->getPriceWithVat() !== null && $cartOccurence->getPriceWithVat() !== $product->getPriceWithVat()))
                 {
                     $cartOccurence->setPriceWithoutVat($product->getPriceWithoutVat());
                     $cartOccurence->setPriceWithVat($product->getPriceWithVat());

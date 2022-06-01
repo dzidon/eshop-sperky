@@ -17,6 +17,7 @@ class ProductInformationFormType extends AbstractType
         $builder
             ->add('productInformationGroup', EntityType::class, [
                 'class' => ProductInformationGroup::class,
+                'choices' => $options['information_groups'],
                 'choice_label' => 'name',
                 'label' => 'Skupina produktových informací',
             ])
@@ -29,10 +30,13 @@ class ProductInformationFormType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => ProductInformation::class,
-            'csrf_protection' => true,
-            'csrf_field_name' => '_token',
-            'csrf_token_id'   => 'form_product_info',
+            'data_class'          => ProductInformation::class,
+            'csrf_protection'     => true,
+            'csrf_field_name'     => '_token',
+            'csrf_token_id'       => 'form_product_info',
+            'information_groups'  => null,
         ]);
+
+        $resolver->setAllowedTypes('information_groups', ['null', 'array']);
     }
 }

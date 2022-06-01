@@ -8,7 +8,6 @@ use App\Form\PaymentMethodFormType;
 use App\Form\SearchTextAndSortFormType;
 use App\Service\BreadcrumbsService;
 use Psr\Log\LoggerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -22,22 +21,18 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
  *
  * @IsGranted("IS_AUTHENTICATED_FULLY")
  */
-class PaymentMethodController extends AbstractController
+class PaymentMethodController extends AbstractAdminController
 {
     private LoggerInterface $logger;
-    private BreadcrumbsService $breadcrumbs;
     private $request;
 
     public function __construct(LoggerInterface $logger, BreadcrumbsService $breadcrumbs, RequestStack $requestStack)
     {
-        $this->logger = $logger;
-        $this->breadcrumbs = $breadcrumbs;
-        $this->request = $requestStack->getCurrentRequest();
+        parent::__construct($breadcrumbs);
+        $this->breadcrumbs->addRoute('admin_payment_methods');
 
-        $this->breadcrumbs
-            ->addRoute('home')
-            ->addRoute(MainController::ADMIN_ROUTE, [], MainController::ADMIN_TITLE)
-            ->addRoute('admin_payment_methods');
+        $this->logger = $logger;
+        $this->request = $requestStack->getCurrentRequest();
     }
 
     /**
