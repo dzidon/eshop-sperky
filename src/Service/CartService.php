@@ -96,8 +96,10 @@ class CartService
      * Tato metoda se volá jako první před vyvoláním každé controllerové akce.
      * Buď zajístí existenci aktivní objednávky nebo jen zjistí počet produktů v košíku
      * pro zobrazení v navigaci.
+     *
+     * @return $this
      */
-    public function load(): void
+    public function load(): self
     {
         $request = $this->requestStack->getCurrentRequest();
         $tokenInCookie = (string) $request->cookies->get(self::COOKIE_NAME);
@@ -128,7 +130,6 @@ class CartService
             ]);
             $this->synchronizer->synchronizeAndAddWarningsToFlashBag($this->order);
 
-            $this->order->calculateTotals();
             $this->totalQuantityForNavbar = $this->order->getTotalQuantity();
             $this->obtainNewOrderCookie();
 
@@ -149,6 +150,8 @@ class CartService
                 $this->totalQuantityForNavbar = (int) $result['quantity'];
             }
         }
+
+        return $this;
     }
 
     /**
@@ -158,8 +161,10 @@ class CartService
      * @param int $submittedQuantity
      * @param array $submittedOptions
      * @throws CartException
+     *
+     * @return $this
      */
-    public function insertProduct(Product $submittedProduct, int $submittedQuantity, array $submittedOptions): void
+    public function insertProduct(Product $submittedProduct, int $submittedQuantity, array $submittedOptions): self
     {
         $inventory = $submittedProduct->getInventory();
         $requiredQuantity = $submittedQuantity;
@@ -223,14 +228,16 @@ class CartService
         $this->entityManager->persist($targetCartOccurence);
         $this->entityManager->flush();
 
-        $this->order->calculateTotals();
+        return $this;
     }
 
     /**
      * Aktualizuje počty produktů v košíku. Pokud je nějaký počet menší nebo roven 0, CartOccurence se odstraní. Pokud je
      * počet větší než 0, CartOccurence se uloží.
+     *
+     * @return $this
      */
-    public function updateQuantities(): void
+    public function updateQuantities(): self
     {
         foreach ($this->order->getCartOccurences() as $cartOccurence)
         {
@@ -246,9 +253,9 @@ class CartService
         }
 
         $this->entityManager->flush();
-
         $this->order->reindexCartOccurences();
-        $this->order->calculateTotals();
+
+        return $this;
     }
 
     /**
@@ -256,8 +263,10 @@ class CartService
      *
      * @param int|null $cartOccurenceId
      * @throws CartException
+     *
+     * @return $this
      */
-    public function removeCartOccurence(?int $cartOccurenceId): void
+    public function removeCartOccurence(?int $cartOccurenceId): self
     {
         if($cartOccurenceId === null)
         {
@@ -282,9 +291,9 @@ class CartService
         }
 
         $this->entityManager->flush();
-
         $this->order->reindexCartOccurences();
-        $this->order->calculateTotals();
+
+        return $this;
     }
 
     /**

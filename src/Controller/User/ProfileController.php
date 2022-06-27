@@ -285,7 +285,6 @@ class ProfileController extends AbstractController
             throw new NotFoundHttpException('Objednávka nenalezena.');
         }
 
-        $order->calculateTotals();
         $this->breadcrumbs->addRoute('profile_order', ['id' => $id]);
 
         return $this->render('profile/profile_order.html.twig', [

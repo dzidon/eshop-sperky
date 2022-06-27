@@ -372,10 +372,6 @@ class Order
     private $staticAddressDeliveryZip;
     private $staticAddressDeliveryAdditionalInfo;
 
-    private int $totalQuantity = 0;
-    private float $totalPriceWithoutVat = 0.0;
-    private float $totalPriceWithVat = 0.0;
-
     private bool $hasSynchronizationWarnings = false;
 
     public function __construct()
@@ -583,16 +579,30 @@ class Order
 
     public function getTotalQuantity(): int
     {
-        return $this->totalQuantity;
+        $totalQuantity = 0;
+
+        /** @var CartOccurence $cartOccurence */
+        foreach ($this->cartOccurences as $cartOccurence)
+        {
+            $totalQuantity += $cartOccurence->getQuantity();
+        }
+
+        return $totalQuantity;
     }
 
     public function getTotalPriceWithVat(bool $withMethods = false): float
     {
-        $totalPriceWithVat = $this->totalPriceWithVat;
+        $totalPriceWithVat = 0.0;
+
+        /** @var CartOccurence $cartOccurence */
+        foreach ($this->cartOccurences as $cartOccurence)
+        {
+            $totalPriceWithVat += $cartOccurence->getQuantity() * $cartOccurence->getPriceWithVat();
+        }
+
         if ($withMethods)
         {
-            $totalPriceWithVat += $this->deliveryPriceWithVat;
-            $totalPriceWithVat += $this->paymentPriceWithVat;
+            $totalPriceWithVat += $this->deliveryPriceWithVat + $this->paymentPriceWithVat;
         }
 
         return $totalPriceWithVat;
@@ -600,28 +610,20 @@ class Order
 
     public function getTotalPriceWithoutVat(bool $withMethods = false): float
     {
-        $totalPriceWithoutVat = $this->totalPriceWithoutVat;
+        $totalPriceWithoutVat = 0.0;
+
+        /** @var CartOccurence $cartOccurence */
+        foreach ($this->cartOccurences as $cartOccurence)
+        {
+            $totalPriceWithoutVat += $cartOccurence->getQuantity() * $cartOccurence->getPriceWithoutVat();
+        }
+
         if ($withMethods)
         {
-            $totalPriceWithoutVat += $this->deliveryPriceWithoutVat;
-            $totalPriceWithoutVat += $this->paymentPriceWithoutVat;
+            $totalPriceWithoutVat += $this->deliveryPriceWithoutVat + $this->paymentPriceWithoutVat;
         }
 
         return $totalPriceWithoutVat;
-    }
-
-    public function calculateTotals(): void
-    {
-        $this->totalQuantity = 0;
-        $this->totalPriceWithVat = 0.0;
-        $this->totalPriceWithoutVat = 0.0;
-
-        foreach ($this->cartOccurences as $cartOccurence)
-        {
-            $this->totalQuantity += $cartOccurence->getQuantity();
-            $this->totalPriceWithVat += $cartOccurence->getQuantity() * $cartOccurence->getPriceWithVat();
-            $this->totalPriceWithoutVat += $cartOccurence->getQuantity() * $cartOccurence->getPriceWithoutVat();
-        }
     }
 
     public function calculatePricesWithVatForCartOccurences(): void
@@ -1063,70 +1065,6 @@ class Order
         return $this;
     }
 
-    public function finish(?User $user): void
-    {
-        $this->setLifecycleChapter(self::LIFECYCLE_AWAITING_PAYMENT);
-
-        // nastavení částky dobírky + objednávka na dobírku bude rovnou připravená na odeslání
-        if ($this->paymentMethod !== null && $this->paymentMethod->getType() === PaymentMethod::TYPE_ON_DELIVERY)
-        {
-            $cashOnDelivery = $this->getTotalPriceWithVat($withMethods = true);
-            $this->setCashOnDelivery(ceil($cashOnDelivery));
-            $this->setLifecycleChapter(self::LIFECYCLE_AWAITING_SHIPPING);
-        }
-
-        // nezaškrtl, že chce zadat firmu
-        if (!$this->companyChecked)
-        {
-            $this->resetDataCompany();
-        }
-
-        // nezaškrtl, že chce zadat poznámku
-        if (!$this->noteChecked)
-        {
-            $this->note = null;
-        }
-
-        // nezaškrtl, že chce zadat jinou fakturační adresu, takže se nastaví na hodnoty doručovací
-        if (!$this->billingAddressChecked)
-        {
-            $this->resetAddressBilling();
-            $this->loadAddressBillingFromDelivery();
-        }
-
-        // odečtení počtu produktů na skladě
-        /** @var CartOccurence $cartOccurence */
-        foreach ($this->cartOccurences as $cartOccurence)
-        {
-            $product = $cartOccurence->getProduct();
-            $productInventory = $product->getInventory();
-            $cartOccurenceQuantity = $cartOccurence->getQuantity();
-            $product->setInventory($productInventory - $cartOccurenceQuantity);
-        }
-
-        $this->user = $user;
-        $this->token = Uuid::v4();
-        $this->finishedAt = new DateTime('now');
-    }
-
-    public function cancel(bool $forceInventoryReplenish): void
-    {
-        $this->setLifecycleChapter(self::LIFECYCLE_CANCELLED);
-
-        // přidání počtu produktů zpět na sklad
-        /** @var CartOccurence $cartOccurence */
-        foreach ($this->cartOccurences as $cartOccurence)
-        {
-            if ($forceInventoryReplenish || $cartOccurence->isMarkedForInventoryReplenishment())
-            {
-                $product = $cartOccurence->getProduct();
-                $productInventory = $product->getInventory();
-                $cartOccurenceQuantity = $cartOccurence->getQuantity();
-                $product->setInventory($productInventory + $cartOccurenceQuantity);
-            }
-        }
-    }
-
     public function getStaticAddressDeliveryAdditionalInfo(): ?string
     {
         return $this->staticAddressDeliveryAdditionalInfo;
@@ -1258,68 +1196,9 @@ class Order
 
     public function saveHistoricalDataForMethods(): void
     {
-        $this->saveHistoricalDataForDeliveryMethod();
-        $this->saveHistoricalDataForPaymentMethod();
-    }
-
-    public function injectAddressDeliveryToStatic(): void
-    {
-        $this->setStaticAddressDeliveryAdditionalInfo($this->addressDeliveryAdditionalInfo);
-        $this->setStaticAddressDeliveryCountry($this->addressDeliveryCountry);
-        $this->setStaticAddressDeliveryStreet($this->addressDeliveryStreet);
-        $this->setStaticAddressDeliveryTown($this->addressDeliveryTown);
-        $this->setStaticAddressDeliveryZip($this->addressDeliveryZip);
-    }
-
-    private function loadAddressDeliveryFromStatic(): void
-    {
-        $this->setAddressDeliveryAdditionalInfo($this->staticAddressDeliveryAdditionalInfo);
-        $this->setAddressDeliveryCountry($this->staticAddressDeliveryCountry);
-        $this->setAddressDeliveryStreet($this->staticAddressDeliveryStreet);
-        $this->setAddressDeliveryTown($this->staticAddressDeliveryTown);
-        $this->setAddressDeliveryZip($this->staticAddressDeliveryZip);
-    }
-
-    private function resetAddressDelivery(): void
-    {
-        $this->setAddressDeliveryAdditionalInfo(null);
-        $this->setAddressDeliveryCountry(null);
-        $this->setAddressDeliveryStreet(null);
-        $this->setAddressDeliveryTown(null);
-        $this->setAddressDeliveryZip(null);
-    }
-
-    private function loadAddressBillingFromDelivery(): void
-    {
-        $this->setAddressBillingAdditionalInfo($this->addressDeliveryAdditionalInfo);
-        $this->setAddressBillingNameFirst($this->addressDeliveryNameFirst);
-        $this->setAddressBillingNameLast($this->addressDeliveryNameLast);
-        $this->setAddressBillingCountry($this->addressDeliveryCountry);
-        $this->setAddressBillingStreet($this->addressDeliveryStreet);
-        $this->setAddressBillingTown($this->addressDeliveryTown);
-        $this->setAddressBillingZip($this->addressDeliveryZip);
-    }
-
-    public function resetAddressBilling(): void
-    {
-        $this->setAddressBillingNameFirst(null);
-        $this->setAddressBillingNameLast(null);
-        $this->setAddressBillingCountry(null);
-        $this->setAddressBillingStreet(null);
-        $this->setAddressBillingAdditionalInfo(null);
-        $this->setAddressBillingTown(null);
-        $this->setAddressBillingZip(null);
-    }
-
-    public function resetDataCompany(): void
-    {
-        $this->setAddressBillingCompany(null);
-        $this->setAddressBillingIc(null);
-        $this->setAddressBillingDic(null);
-    }
-
-    public function saveHistoricalDataForDeliveryMethod(): void
-    {
+        /*
+         * Dorucovaci metoda
+         */
         if ($this->deliveryMethod === null)
         {
             $this->deliveryPriceWithoutVat = 0.0;
@@ -1361,10 +1240,10 @@ class Order
                 $this->addressDeliveryLocked = false;
             }
         }
-    }
 
-    public function saveHistoricalDataForPaymentMethod(): void
-    {
+        /*
+         * Platebni metoda
+         */
         if ($this->paymentMethod === null)
         {
             $this->paymentPriceWithoutVat = 0.0;
@@ -1377,6 +1256,62 @@ class Order
             $this->paymentPriceWithVat = $this->paymentMethod->getPriceWithVat();
             $this->paymentMethodName = $this->paymentMethod->getName();
         }
+    }
+
+    public function injectAddressDeliveryToStatic(): void
+    {
+        $this->setStaticAddressDeliveryAdditionalInfo($this->addressDeliveryAdditionalInfo);
+        $this->setStaticAddressDeliveryCountry($this->addressDeliveryCountry);
+        $this->setStaticAddressDeliveryStreet($this->addressDeliveryStreet);
+        $this->setStaticAddressDeliveryTown($this->addressDeliveryTown);
+        $this->setStaticAddressDeliveryZip($this->addressDeliveryZip);
+    }
+
+    public function loadAddressDeliveryFromStatic(): void
+    {
+        $this->setAddressDeliveryAdditionalInfo($this->staticAddressDeliveryAdditionalInfo);
+        $this->setAddressDeliveryCountry($this->staticAddressDeliveryCountry);
+        $this->setAddressDeliveryStreet($this->staticAddressDeliveryStreet);
+        $this->setAddressDeliveryTown($this->staticAddressDeliveryTown);
+        $this->setAddressDeliveryZip($this->staticAddressDeliveryZip);
+    }
+
+    public function resetAddressDelivery(): void
+    {
+        $this->setAddressDeliveryAdditionalInfo(null);
+        $this->setAddressDeliveryCountry(null);
+        $this->setAddressDeliveryStreet(null);
+        $this->setAddressDeliveryTown(null);
+        $this->setAddressDeliveryZip(null);
+    }
+
+    public function loadAddressBillingFromDelivery(): void
+    {
+        $this->setAddressBillingAdditionalInfo($this->addressDeliveryAdditionalInfo);
+        $this->setAddressBillingNameFirst($this->addressDeliveryNameFirst);
+        $this->setAddressBillingNameLast($this->addressDeliveryNameLast);
+        $this->setAddressBillingCountry($this->addressDeliveryCountry);
+        $this->setAddressBillingStreet($this->addressDeliveryStreet);
+        $this->setAddressBillingTown($this->addressDeliveryTown);
+        $this->setAddressBillingZip($this->addressDeliveryZip);
+    }
+
+    public function resetAddressBilling(): void
+    {
+        $this->setAddressBillingNameFirst(null);
+        $this->setAddressBillingNameLast(null);
+        $this->setAddressBillingCountry(null);
+        $this->setAddressBillingStreet(null);
+        $this->setAddressBillingAdditionalInfo(null);
+        $this->setAddressBillingTown(null);
+        $this->setAddressBillingZip(null);
+    }
+
+    public function resetDataCompany(): void
+    {
+        $this->setAddressBillingCompany(null);
+        $this->setAddressBillingIc(null);
+        $this->setAddressBillingDic(null);
     }
 
     /**

@@ -7,6 +7,11 @@ use App\Entity\ProductSection;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
+/**
+ * Třída řešící SEO.
+ *
+ * @package App\Service
+ */
 class SeoService
 {
     private UrlGeneratorInterface $router;
@@ -18,6 +23,11 @@ class SeoService
         $this->entityManager = $entityManager;
     }
 
+    /**
+     * Vrátí odkazy pro sitemap.xml
+     *
+     * @return array
+     */
     public function getSitemapUrls(): array
     {
         $urls = [];

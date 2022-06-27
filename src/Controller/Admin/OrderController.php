@@ -175,8 +175,6 @@ class OrderController extends AbstractAdminController
             throw new NotFoundHttpException('Objednávka nenalezena.');
         }
 
-        $order->calculateTotals();
-
         $formLifecycleChapterView = null;
         $formPacketaView = null;
         $packetaMessage = null;
@@ -279,8 +277,9 @@ class OrderController extends AbstractAdminController
 
         if ($form->isSubmitted() && $form->isValid())
         {
-            $order->cancel($forceInventoryReplenish = false);
-            $orderPostCompletionService->sendConfirmationEmail($order);
+            $orderPostCompletionService
+                ->cancelOrder($order, $forceInventoryReplenish = false)
+                ->sendConfirmationEmail($order);
 
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($order);

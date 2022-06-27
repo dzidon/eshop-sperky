@@ -170,10 +170,10 @@ class OrderController extends AbstractController
         {
             try
             {
-                $targetOrder->calculateTotals();
                 $payment = null /*$paymentService->createPayment($targetOrder)*/; // ještě není napojená platební brána
-                $orderPostCompletionService->finishOrder($targetOrder);
-                $orderPostCompletionService->sendConfirmationEmail($targetOrder);
+                $orderPostCompletionService
+                    ->finishOrder($targetOrder)
+                    ->sendConfirmationEmail($targetOrder);
 
                 $this->getDoctrine()->getManager()->persist($targetOrder);
                 $this->getDoctrine()->getManager()->flush();
@@ -265,7 +265,6 @@ class OrderController extends AbstractController
             throw new NotFoundHttpException('Objednávka nenalezena.');
         }
 
-        $order->calculateTotals();
         $this->breadcrumbs->addRoute('order_overview');
 
         return $this->render('order/overview.html.twig', [

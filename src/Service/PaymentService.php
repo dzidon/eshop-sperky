@@ -41,6 +41,8 @@ class PaymentService
     }
 
     /**
+     * Vytvoří novou platbu v platební bráně a k ní vytvoří a vrátí odpovídající instanci App\Entity\Payment.
+     *
      * @param Order $order
      * @return Payment|null
      * @throws PaymentException
@@ -70,12 +72,14 @@ class PaymentService
     }
 
     /**
+     * Aktualizuje stav platby. V určitých případech aktualizuje stav objednávky.
+     *
      * @param Payment $payment
      * @param string $newState
      * @throws PaymentException
-     * @return void
+     * @return $this
      */
-    public function updatePaymentState(Payment $payment, string $newState): void
+    public function updatePaymentState(Payment $payment, string $newState): self
     {
         $oldState = $payment->getState();
 
@@ -102,14 +106,16 @@ class PaymentService
                 else if (($oldState === Payment::STATE_PAYMENT_METHOD_CHOSEN && ($newState === Payment::STATE_CANCELED || $newState === Payment::STATE_TIMEOUTED))
                       || ($oldState === Payment::STATE_CREATED               &&  $newState === Payment::STATE_TIMEOUTED))
                 {
-                    $order->cancel($forceInventoryReplenish = true);
                     $order->setCancellationReason('Platba zrušena.');
                     if ($newState === Payment::STATE_TIMEOUTED)
                     {
                         $order->setCancellationReason('Čas na zaplacení vypršel.');
                     }
 
-                    $this->orderPostCompletionService->sendConfirmationEmail($order);
+                    $this->orderPostCompletionService
+                        ->cancelOrder($order, $forceInventoryReplenish = true)
+                        ->sendConfirmationEmail($order);
+
                     $this->entityManager->persist($order);
                 }
             }
@@ -119,6 +125,8 @@ class PaymentService
             $this->entityManager->persist($payment);
             $this->entityManager->flush();
         }
+
+        return $this;
     }
 
     /**

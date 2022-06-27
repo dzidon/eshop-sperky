@@ -24,9 +24,8 @@ class EntityCollectionService
      * specifikované v EntityCollectionEnvelope.
      *
      * @param EntityCollectionEnvelope $envelope
-     * @param bool $flush
      */
-    public function removeOrphans(EntityCollectionEnvelope $envelope, bool $flush = false): void
+    public function removeOrphans(EntityCollectionEnvelope $envelope): void
     {
         $collections = $envelope->getCollections();
         foreach ($collections as $collection)
@@ -39,11 +38,6 @@ class EntityCollectionService
                     $this->entityManager->remove($child);
                 }
             }
-        }
-
-        if ($flush)
-        {
-            $this->entityManager->flush();
         }
     }
 }

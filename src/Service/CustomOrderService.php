@@ -40,7 +40,6 @@ class CustomOrderService
             if ($order !== null && $order->isCreatedManually() && $order->getLifecycleChapter() === Order::LIFECYCLE_FRESH)
             {
                 $this->synchronizer->synchronizeAndAddWarningsToFlashBag($order);
-                $order->calculateTotals();
 
                 if ($order->hasSynchronizationWarnings())
                 {
