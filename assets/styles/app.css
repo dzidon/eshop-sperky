@@ -129,6 +129,14 @@ main {
     white-space: nowrap;
 }
 
+.navbar-collapsible-header {
+    padding-left: 32px !important;
+}
+
+.navbar-collapsible-item {
+    padding-left: 64px !important;
+}
+
 /*
     Input, Textarea
 */

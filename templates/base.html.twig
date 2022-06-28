@@ -53,7 +53,7 @@
                                 {% endfor %}
                             </ul>
                             <li>
-                                <a href="#!" class="dropdown-trigger black-text" data-target="dropdown_sections_desktop"> <i class="material-icons left">local_florist</i> Produkty <i class="material-icons right">arrow_drop_down</i></a>
+                                <a href="javascript:void(0);" class="dropdown-trigger black-text" data-target="dropdown_sections_desktop"> <i class="material-icons left">local_florist</i> Produkty <i class="material-icons right">arrow_drop_down</i></a>
                             </li>
                         {% else %}
                             <li><a href="{{ path('products') }}" class="black-text"> <i class="material-icons left">local_florist</i> Produkty</a></li>
@@ -91,17 +91,23 @@
             </nav>
         </div>
 
-        <ul id="nav-mobile" class="sidenav">
+        <ul id="nav-mobile" class="sidenav collapsible">
             <li><a href="{{ path('home') }}"> <i class="material-icons left">home</i> Domů</a></li>
             {% if navbar_sections_count > 0  %}
-                <ul id="dropdown_sections_mobile" class="dropdown-content black-text">
-                    <li><a href="{{ path('products') }}" class="black-text">Všechny</a></li>
-                    {% for section in navbar_sections %}
-                        <li><a href="{{ path('products', {slug: section.getSlug()}) }}">{{ section.getName() }}</a></li>
-                    {% endfor %}
-                </ul>
                 <li>
-                    <a href="#!" class="dropdown-trigger" data-target="dropdown_sections_mobile"> <i class="material-icons left">local_florist</i> Produkty <i class="material-icons right margin-0">arrow_drop_down</i></a>
+                    <a href="javascript:void(0);" class="collapsible-header navbar-collapsible-header">
+                        <i class="material-icons left">local_florist</i> Produkty
+                    </a>
+                    <div class="collapsible-body">
+                        <ul>
+                            <li><a href="{{ path('products') }}" class="black-text navbar-collapsible-item">Všechny</a></li>
+                            {% for section in navbar_sections %}
+                                <li>
+                                    <a href="{{ path('products', {slug: section.getSlug()}) }}" class="black-text navbar-collapsible-item">{{ section.getName() }}</a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
                 </li>
             {% else %}
                 <li><a href="{{ path('products') }}"> <i class="material-icons left">local_florist</i> Produkty</a></li>

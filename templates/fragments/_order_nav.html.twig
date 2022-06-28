@@ -10,7 +10,7 @@
                             {{ pageNumber }}. {{ pageData.title }}
                         </a>
                     {% else %}
-                        <span>{{ pageNumber }}. {{ pageData.title }}</span>
+                        <span class="grey-text text-lighten-1">{{ pageNumber }}. {{ pageData.title }}</span>
                     {% endif %}
                 </li>
             {% endfor %}
@@ -23,7 +23,9 @@
                         {{ pageNumber }}. {{ pageData.title }}
                     </a>
                 {% else %}
-                    <div class="collection-item">{{ pageNumber }}. {{ pageData.title }}</div>
+                    <div class="collection-item">
+                        <span class="grey-text text-lighten-1">{{ pageNumber }}. {{ pageData.title }}</span>
+                    </div>
                 {% endif %}
             {% endfor %}
         </div>
