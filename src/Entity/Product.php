@@ -19,7 +19,7 @@ use App\Validation\Compound as AssertCompound;
  * @ORM\HasLifecycleCallbacks()
  * @UniqueEntity(fields={"slug"}, message="Už existuje produktová sekce s tímto názvem pro odkaz.")
  */
-class Product implements EntitySlugInterface
+class Product implements EntitySlugInterface, EntityOrphanRemovalInterface
 {
     public const VAT_NONE = 0.0;
     public const VAT_BASIC = 0.21;
@@ -629,5 +629,13 @@ class Product implements EntitySlugInterface
     public static function getAttributesForSlug(): array
     {
         return ['name'];
+    }
+
+    public static function getOrphanRemovalCollectionAttributes(): array
+    {
+        return [
+            ['collection' => 'info', 'parent' => 'product'],
+            ['collection' => 'images', 'parent' => 'product']
+        ];
     }
 }

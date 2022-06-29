@@ -8,6 +8,7 @@ use App\Form\HiddenTrueFormType;
 use App\Form\ProductCategoryGroupFormType;
 use App\Form\SearchTextAndSortFormType;
 use App\Service\BreadcrumbsService;
+use App\Service\EntityCollectionService;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -66,7 +67,7 @@ class ProductCategoryController extends AbstractAdminController
      *
      * @IsGranted("product_category_edit")
      */
-    public function productCategoryGroup($id = null): Response
+    public function productCategoryGroup(EntityCollectionService $entityCollectionService, $id = null): Response
     {
         $user = $this->getUser();
 
@@ -86,12 +87,14 @@ class ProductCategoryController extends AbstractAdminController
             $this->breadcrumbs->addRoute('admin_product_category_edit', ['id' => null],'', 'new');
         }
 
+        $collectionMessenger = $entityCollectionService->createEntityCollectionsMessengerForOrphanRemoval($categoryGroup);
         $form = $this->createForm(ProductCategoryGroupFormType::class, $categoryGroup);
         $form->add('submit', SubmitType::class, ['label' => 'Uložit']);
         $form->handleRequest($this->request);
 
         if ($form->isSubmitted() && $form->isValid())
         {
+            $entityCollectionService->removeOrphans($collectionMessenger);
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($categoryGroup);
             $entityManager->flush();

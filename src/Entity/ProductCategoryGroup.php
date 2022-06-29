@@ -23,7 +23,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  *     collectionName="categories",
  *     message="Všechny kategorie obsažené ve skupině musejí mít unikátní názvy.")
  */
-class ProductCategoryGroup
+class ProductCategoryGroup implements EntityOrphanRemovalInterface
 {
     /**
      * @ORM\Id
@@ -151,6 +151,13 @@ class ProductCategoryGroup
             'Od nejstarších' => 'created'.SearchAndSort::ATTRIBUTE_TAG_ASC,
             'Název (A-Z)' => 'name'.SearchAndSort::ATTRIBUTE_TAG_ASC,
             'Název (Z-A)' => 'name'.SearchAndSort::ATTRIBUTE_TAG_DESC,
+        ];
+    }
+
+    public static function getOrphanRemovalCollectionAttributes(): array
+    {
+        return [
+            ['collection' => 'categories', 'parent' => 'productCategoryGroup']
         ];
     }
 }

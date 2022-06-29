@@ -6,7 +6,6 @@ use App\Entity\CartOccurence;
 use App\Entity\Order;
 use App\Entity\Product;
 use App\Entity\ProductOption;
-use App\EntityCollectionManagement\EntityCollectionEnvelope;
 use App\Exception\CartException;
 use App\OrderSynchronizer\OrderCartSynchronizer;
 use Doctrine\ORM\EntityManagerInterface;
@@ -125,9 +124,7 @@ class CartService
                 $this->createNewOrder();
             }
 
-            $cartOccurencesEnvelope = new EntityCollectionEnvelope($this->order, [
-                ['getterForCollection' => 'getCartOccurences', 'getterForParent' => 'getOrder'],
-            ]);
+            $cartOccurencesMessenger = $this->entityCollectionService->createEntityCollectionsMessengerForOrphanRemoval($this->order);
             $this->synchronizer->synchronizeAndAddWarningsToFlashBag($this->order);
 
             $this->totalQuantityForNavbar = $this->order->getTotalQuantity();
@@ -135,7 +132,7 @@ class CartService
 
             if ($this->isOrderNew || $this->order->hasSynchronizationWarnings())
             {
-                $this->entityCollectionService->removeOrphans($cartOccurencesEnvelope);
+                $this->entityCollectionService->removeOrphans($cartOccurencesMessenger);
                 $this->entityManager->persist($this->order);
                 $this->entityManager->flush();
             }

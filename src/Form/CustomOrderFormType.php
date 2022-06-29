@@ -4,7 +4,6 @@ namespace App\Form;
 
 use App\Entity\CartOccurence;
 use App\Entity\Order;
-use App\Form\EventSubscriber\OrphanRemovalSubscriber;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
@@ -15,16 +14,10 @@ use Symfony\Component\Security\Core\Security;
 class CustomOrderFormType extends AbstractType
 {
     private Security $security;
-    private OrphanRemovalSubscriber $orphanRemovalSubscriber;
 
-    public function __construct(Security $security, OrphanRemovalSubscriber $orphanRemovalSubscriber)
+    public function __construct(Security $security)
     {
         $this->security = $security;
-        $this->orphanRemovalSubscriber = $orphanRemovalSubscriber;
-
-        $this->orphanRemovalSubscriber->setCollectionGetters([
-            ['getterForCollection' => 'getCartOccurences', 'getterForParent' => 'getOrder']
-        ]);
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -53,7 +46,6 @@ class CustomOrderFormType extends AbstractType
                 ],
                 'label' => 'Přidat produkt',
             ])
-            ->addEventSubscriber($this->orphanRemovalSubscriber)
         ;
     }
 

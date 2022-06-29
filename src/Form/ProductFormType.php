@@ -9,7 +9,6 @@ use App\Entity\ProductInformation;
 use App\Entity\ProductInformationGroup;
 use App\Entity\ProductOptionGroup;
 use App\Entity\ProductSection;
-use App\Form\EventSubscriber\OrphanRemovalSubscriber;
 use App\Form\EventSubscriber\ProductCategorySubscriber;
 use App\Form\EventSubscriber\ProductInformationSubscriber;
 use App\Form\EventSubscriber\SlugGeneratorSubscriber\SlugGeneratorWithTimeSubscriber;
@@ -33,21 +32,14 @@ class ProductFormType extends AbstractType
     private ProductInformationSubscriber $productInformationSubscriber;
     private ProductCategorySubscriber $productCategorySubscriber;
     private SlugGeneratorWithTimeSubscriber $slugGeneratorSubscriber;
-    private OrphanRemovalSubscriber $orphanRemovalSubscriber;
     private EntityManagerInterface $entityManager;
 
-    public function __construct(ProductInformationSubscriber $productInformationSubscriber, ProductCategorySubscriber $productCategorySubscriber, SlugGeneratorWithTimeSubscriber $slugGeneratorSubscriber, OrphanRemovalSubscriber $orphanRemovalSubscriber, EntityManagerInterface $entityManager)
+    public function __construct(ProductInformationSubscriber $productInformationSubscriber, ProductCategorySubscriber $productCategorySubscriber, SlugGeneratorWithTimeSubscriber $slugGeneratorSubscriber, EntityManagerInterface $entityManager)
     {
         $this->productInformationSubscriber = $productInformationSubscriber;
         $this->productCategorySubscriber = $productCategorySubscriber;
         $this->slugGeneratorSubscriber = $slugGeneratorSubscriber;
         $this->entityManager = $entityManager;
-
-        $this->orphanRemovalSubscriber = $orphanRemovalSubscriber;
-        $this->orphanRemovalSubscriber->setCollectionGetters([
-            ['getterForCollection' => 'getInfo', 'getterForParent' => 'getProduct'],
-            ['getterForCollection' => 'getImages', 'getterForParent' => 'getProduct']
-        ]);
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -213,7 +205,6 @@ class ProductFormType extends AbstractType
             ->addEventSubscriber($this->slugGeneratorSubscriber)
             ->addEventSubscriber($this->productInformationSubscriber)
             ->addEventSubscriber($this->productCategorySubscriber)
-            ->addEventSubscriber($this->orphanRemovalSubscriber)
         ;
     }
 

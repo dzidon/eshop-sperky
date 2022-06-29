@@ -13,6 +13,7 @@ use App\Form\OrderEditFormType;
 use App\Form\OrderPacketaFormType;
 use App\Form\OrderSearchFormType;
 use App\Service\BreadcrumbsService;
+use App\Service\EntityCollectionService;
 use App\Service\OrderPostCompletionService;
 use App\Service\PacketaApiService;
 use Psr\Log\LoggerInterface;
@@ -73,7 +74,7 @@ class OrderController extends AbstractAdminController
      *
      * @IsGranted("order_edit_custom")
      */
-    public function orderCustom(int $id = null): Response
+    public function orderCustom(EntityCollectionService $entityCollectionService, int $id = null): Response
     {
         $user = $this->getUser();
 
@@ -94,12 +95,14 @@ class OrderController extends AbstractAdminController
             $this->breadcrumbs->addRoute('admin_order_custom_edit', ['id' => null],'', 'new');
         }
 
+        $collectionMessenger = $entityCollectionService->createEntityCollectionsMessengerForOrphanRemoval($order);
         $form = $this->createForm(CustomOrderFormType::class, $order);
         $form->add('submit', SubmitType::class, ['label' => 'Uložit']);
         $form->handleRequest($this->request);
 
         if ($form->isSubmitted() && $form->isValid())
         {
+            $entityCollectionService->removeOrphans($collectionMessenger);
             $order->calculatePricesWithVatForCartOccurences();
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($order);

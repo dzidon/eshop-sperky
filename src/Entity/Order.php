@@ -23,7 +23,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @AssertCustom\PacketaId(groups={"methods"})
  * @AssertCustom\PacketaExists(groups={"admin_state"})
  */
-class Order
+class Order implements EntityOrphanRemovalInterface
 {
     public const LIFETIME_IN_DAYS = 60;
     public const REFRESH_WINDOW_IN_DAYS = 30;
@@ -1329,6 +1329,13 @@ class Order
             'ID (vzestupně)' => 'id'.SearchAndSort::ATTRIBUTE_TAG_ASC,
             'Od nejdříve dokončených' => 'finishedAt'.SearchAndSort::ATTRIBUTE_TAG_ASC,
             'Od naposledy dokončených' => 'finishedAt'.SearchAndSort::ATTRIBUTE_TAG_DESC,
+        ];
+    }
+
+    public static function getOrphanRemovalCollectionAttributes(): array
+    {
+        return [
+            ['collection' => 'cartOccurences', 'parent' => 'order'],
         ];
     }
 }

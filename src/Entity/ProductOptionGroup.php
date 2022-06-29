@@ -15,7 +15,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @ORM\Entity(repositoryClass=ProductOptionGroupRepository::class)
  * @ORM\HasLifecycleCallbacks()
  */
-class ProductOptionGroup
+class ProductOptionGroup implements EntityOrphanRemovalInterface
 {
     /**
      * @ORM\Id
@@ -144,6 +144,13 @@ class ProductOptionGroup
             'Od nejstarších' => 'created'.SearchAndSort::ATTRIBUTE_TAG_ASC,
             'Název (A-Z)' => 'name'.SearchAndSort::ATTRIBUTE_TAG_ASC,
             'Název (Z-A)' => 'name'.SearchAndSort::ATTRIBUTE_TAG_DESC,
+        ];
+    }
+
+    public static function getOrphanRemovalCollectionAttributes(): array
+    {
+        return [
+            ['collection' => 'options', 'parent' => 'productOptionGroup']
         ];
     }
 }

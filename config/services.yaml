@@ -105,7 +105,7 @@ services:
             - '../src/DependencyInjection/'
             - '../src/Entity/'
             - '../src/Pagination/'
-            - '../src/EntityCollectionManagement/'
+            - '../src/Messenger/'
             - '../src/Exception/'
             - '../src/Response/'
             - '../src/CatalogFilter/'
