@@ -3,7 +3,7 @@
 namespace App\Form;
 
 use App\Entity\ProductSection;
-use App\Form\EventSubscriber\SlugSubscriber;
+use App\Form\EventSubscriber\SlugGeneratorSubscriber\SlugGeneratorWithTimeSubscriber;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
@@ -13,11 +13,11 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ProductSectionFormType extends AbstractType
 {
-    private SlugSubscriber $slugSubscriber;
+    private SlugGeneratorWithTimeSubscriber $slugGeneratorSubscriber;
 
-    public function __construct(SlugSubscriber $slugSubscriber)
+    public function __construct(SlugGeneratorWithTimeSubscriber $slugGeneratorSubscriber)
     {
-        $this->slugSubscriber = $slugSubscriber->setGettersForAutoGenerate(['getName']);
+        $this->slugGeneratorSubscriber = $slugGeneratorSubscriber;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -43,7 +43,7 @@ class ProductSectionFormType extends AbstractType
                 'required' => false,
                 'label' => 'Manuálně skrýt pro uživatele',
             ])
-            ->addEventSubscriber($this->slugSubscriber)
+            ->addEventSubscriber($this->slugGeneratorSubscriber)
         ;
     }
 

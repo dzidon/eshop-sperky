@@ -19,7 +19,7 @@ use App\Validation\Compound as AssertCompound;
  * @ORM\HasLifecycleCallbacks()
  * @UniqueEntity(fields={"slug"}, message="Už existuje produktová sekce s tímto názvem pro odkaz.")
  */
-class Product
+class Product implements EntitySlugInterface
 {
     public const VAT_NONE = 0.0;
     public const VAT_BASIC = 0.21;
@@ -624,5 +624,10 @@ class Product
             'Ks skladem (vzestupně)' => 'inventory'.SearchAndSort::ATTRIBUTE_TAG_ASC,
             'Ks skladem (sestupně)' => 'inventory'.SearchAndSort::ATTRIBUTE_TAG_DESC,
         ];
+    }
+
+    public static function getAttributesForSlug(): array
+    {
+        return ['name'];
     }
 }

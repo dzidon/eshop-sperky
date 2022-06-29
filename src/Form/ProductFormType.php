@@ -12,7 +12,7 @@ use App\Entity\ProductSection;
 use App\Form\EventSubscriber\OrphanRemovalSubscriber;
 use App\Form\EventSubscriber\ProductCategorySubscriber;
 use App\Form\EventSubscriber\ProductInformationSubscriber;
-use App\Form\EventSubscriber\SlugSubscriber;
+use App\Form\EventSubscriber\SlugGeneratorSubscriber\SlugGeneratorWithTimeSubscriber;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
@@ -32,19 +32,16 @@ class ProductFormType extends AbstractType
 {
     private ProductInformationSubscriber $productInformationSubscriber;
     private ProductCategorySubscriber $productCategorySubscriber;
-    private SlugSubscriber $slugSubscriber;
+    private SlugGeneratorWithTimeSubscriber $slugGeneratorSubscriber;
     private OrphanRemovalSubscriber $orphanRemovalSubscriber;
     private EntityManagerInterface $entityManager;
 
-    public function __construct(ProductInformationSubscriber $productInformationSubscriber, ProductCategorySubscriber $productCategorySubscriber, SlugSubscriber $slugSubscriber, OrphanRemovalSubscriber $orphanRemovalSubscriber, EntityManagerInterface $entityManager)
+    public function __construct(ProductInformationSubscriber $productInformationSubscriber, ProductCategorySubscriber $productCategorySubscriber, SlugGeneratorWithTimeSubscriber $slugGeneratorSubscriber, OrphanRemovalSubscriber $orphanRemovalSubscriber, EntityManagerInterface $entityManager)
     {
         $this->productInformationSubscriber = $productInformationSubscriber;
         $this->productCategorySubscriber = $productCategorySubscriber;
+        $this->slugGeneratorSubscriber = $slugGeneratorSubscriber;
         $this->entityManager = $entityManager;
-
-        $this->slugSubscriber = $slugSubscriber;
-        $this->slugSubscriber->setGettersForAutoGenerate(['getName'])
-            ->setExtraDataForAutoGenerate([date("HisdmY")]);
 
         $this->orphanRemovalSubscriber = $orphanRemovalSubscriber;
         $this->orphanRemovalSubscriber->setCollectionGetters([
@@ -213,7 +210,7 @@ class ProductFormType extends AbstractType
                 ],
                 'label' => 'Přidat obrázek',
             ])
-            ->addEventSubscriber($this->slugSubscriber)
+            ->addEventSubscriber($this->slugGeneratorSubscriber)
             ->addEventSubscriber($this->productInformationSubscriber)
             ->addEventSubscriber($this->productCategorySubscriber)
             ->addEventSubscriber($this->orphanRemovalSubscriber)

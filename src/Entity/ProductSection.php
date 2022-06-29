@@ -15,7 +15,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  * @ORM\HasLifecycleCallbacks()
  * @UniqueEntity(fields={"slug"}, message="Už existuje produktová sekce s tímto názvem pro odkaz.")
  */
-class ProductSection
+class ProductSection implements EntitySlugInterface
 {
     /**
      * @ORM\Id
@@ -175,5 +175,10 @@ class ProductSection
             'Odkaz (A-Z)' => 'slug'.SearchAndSort::ATTRIBUTE_TAG_ASC,
             'Odkaz (Z-A)' => 'slug'.SearchAndSort::ATTRIBUTE_TAG_DESC,
         ];
+    }
+
+    public static function getAttributesForSlug(): array
+    {
+        return ['name'];
     }
 }
