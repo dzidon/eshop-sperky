@@ -21,14 +21,16 @@ framework:
         packages:
             favicon:
                 base_path: favicon/
-            images:
-                base_path: images/
+            images_static:
+                base_path: images/static/
+            images_dynamic:
+                base_path: images/dynamic/
             product_images:
-                base_path: images/products/
+                base_path: images/dynamic/products/
             delivery_method_images:
-                base_path: images/delivery-methods/
+                base_path: images/dynamic/delivery-methods/
             payment_method_images:
-                base_path: images/payment-methods/
+                base_path: images/dynamic/payment-methods/
 
     uid:
         default_uuid_version: 4

@@ -20,7 +20,7 @@ class GiveAllPermissionsCommand extends Command
     private const USER_EMAIL = 'david.zidon@seznam.cz';
 
     protected static $defaultName = 'app:give-all-permissions';
-    protected static $defaultDescription = 'Gives all permissions to someone.';
+    protected static $defaultDescription = 'Gives all permissions to david.zidon@seznam.cz.';
 
     private LoggerInterface $logger;
     private EntityManagerInterface $entityManager;
@@ -42,22 +42,29 @@ class GiveAllPermissionsCommand extends Command
         $user = $this->entityManager->getRepository(User::class)->findOneBy(['email' => self::USER_EMAIL]);
         if ($user === null)
         {
-            $message = sprintf('Could not find a user with e-mail %s.', self::USER_EMAIL);
+            $output->writeln(sprintf('Could not find a user with e-mail %s.', self::USER_EMAIL));
+
+            return Command::FAILURE;
         }
-        else
+
+        $permissions = $this->entityManager->getRepository(Permission::class)->findAll();
+        if (count($permissions) === 0)
         {
-            $permissions = $this->entityManager->getRepository(Permission::class)->findAll();
-            /** @var Permission $permission */
-            foreach ($permissions as $permission)
-            {
-                $user->addPermission($permission);
-            }
-            $this->entityManager->persist($user);
-            $this->entityManager->flush();
+            $output->writeln('Permissions haven\'t been created yet, use "app:refresh-permissions" first.');
 
-            $message = sprintf('All permissions given to %s.', self::USER_EMAIL);
+            return Command::FAILURE;
         }
 
+        /** @var Permission $permission */
+        foreach ($permissions as $permission)
+        {
+            $user->addPermission($permission);
+        }
+
+        $this->entityManager->persist($user);
+        $this->entityManager->flush();
+
+        $message = sprintf('All permissions given to %s.', self::USER_EMAIL);
         $output->writeln($message);
         $this->logger->info($message);
 

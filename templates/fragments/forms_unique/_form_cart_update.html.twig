@@ -37,7 +37,7 @@
 
                                 <a href="{{ product_path }}" class="margin-right15px">
                                     <div class="img-cart-product">
-                                        <img alt="Obrázek produktu {{ cartOccurenceData.product.name }}" class="responsive-img" src="{% if cartOccurenceData.product.mainImageName %} {{ asset(cartOccurenceData.product.mainImageName, 'product_images') }}  {% else %} {{ asset('no-image.png', 'images') }} {% endif %}">
+                                        <img alt="Obrázek produktu {{ cartOccurenceData.product.name }}" class="responsive-img" src="{% if cartOccurenceData.product.mainImageName %} {{ asset(cartOccurenceData.product.mainImageName, 'product_images') }}  {% else %} {{ asset('no-image.png', 'images_static') }} {% endif %}">
                                     </div>
                                 </a>
                                 <a href="{{ product_path }}">

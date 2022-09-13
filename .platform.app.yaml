@@ -10,7 +10,6 @@ runtime:
         - ctype
         - iconv
         - soap
-        
 
 variables:
     env:
@@ -43,7 +42,7 @@ dependencies:
 
 mounts:
     "/var": { source: local, source_path: var }
-    "/public/images": "shared:files/images"
+    "/public/images/dynamic": "shared:files/images/dynamic"
 
 hooks:
     build: |

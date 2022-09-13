@@ -20,7 +20,7 @@
                             {% if hasImages %}
                                 <img src="{{ asset(productInstance.getMainImageName(), 'product_images') }}" class="materialboxed responsive-img" id="product-image-large" alt="Obrázek produktu {{ productInstance.getName() }}">
                             {% else %}
-                                <img src="{{ asset('no-image.png', 'images') }}" class="responsive-img" id="product-image-large" alt="Žádný obrázek">
+                                <img src="{{ asset('no-image.png', 'images_static') }}" class="responsive-img" id="product-image-large" alt="Žádný obrázek">
                             {% endif %}
                         </div>
                     </div>

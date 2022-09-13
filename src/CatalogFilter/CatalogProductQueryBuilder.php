@@ -76,7 +76,7 @@ class CatalogProductQueryBuilder
         if ($categoriesGrouped !== null)
         {
             $parameterNumber = 0;
-            foreach ($categoriesGrouped as $groupName => $categories)
+            foreach ($categoriesGrouped as $categories)
             {
                 $categoryGroupConditions = [];
                 foreach ($categories as $category)
