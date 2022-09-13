@@ -6,6 +6,7 @@ use App\Entity\EntityOrphanRemovalInterface;
 use App\Messenger\EntityCollectionsMessenger;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\PersistentCollection;
 use LogicException;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
@@ -43,7 +44,7 @@ class EntityCollectionService
             }
 
             $collection = $this->propertyAccessor->getValue($entity, $collectionAttributes['collection']);
-            if (!$collection->isInitialized()) // Kolekce není načtená, nemá smysl dělat orphan removal
+            if ($collection instanceof PersistentCollection && !$collection->isInitialized()) // Kolekce není načtená, nemá smysl dělat orphan removal
             {
                 continue;
             }
