@@ -113,7 +113,7 @@ class PaymentService
                     }
 
                     $this->orderPostCompletionService
-                        ->cancelOrder($order, $forceInventoryReplenish = true)
+                        ->cancelOrder($order, true)
                         ->sendConfirmationEmail($order);
 
                     $this->entityManager->persist($order);
@@ -193,7 +193,7 @@ class PaymentService
                     'country_code' => $countryCode,
                 ]
             ],
-            'amount'        => ceil($order->getTotalPriceWithVat($withMethods = true) * 100), // v haléřích
+            'amount'        => ceil($order->getTotalPriceWithVat(true) * 100), // v haléřích
             'currency'      => Currency::CZECH_CROWNS,
             'order_number'  => (string) $order->getId(),
             'lang'          => Language::CZECH,

@@ -2,10 +2,12 @@
 
 namespace App\Controller\Admin;
 
-use App\Entity\Detached\Search\SearchAndSort;
+use App\Entity\Detached\Search\Atomic\Phrase;
+use App\Entity\Detached\Search\Atomic\Sort;
+use App\Entity\Detached\Search\Composition\PhraseSort;
 use App\Entity\PaymentMethod;
-use App\Form\PaymentMethodFormType;
-use App\Form\SearchTextAndSortFormType;
+use App\Form\FormType\Search\Composition\PhraseSortFormType;
+use App\Form\FormType\Admin\PaymentMethodFormType;
 use App\Service\BreadcrumbsService;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -42,8 +44,11 @@ class PaymentMethodController extends AbstractAdminController
      */
     public function paymentMethods(FormFactoryInterface $formFactory): Response
     {
-        $searchData = new SearchAndSort(PaymentMethod::getSortData(), 'Hledejte podle názvu.');
-        $form = $formFactory->createNamed('', SearchTextAndSortFormType::class, $searchData);
+        $phrase = new Phrase('Hledejte podle názvu.');
+        $sort = new Sort(PaymentMethod::getSortData());
+        $searchData = new PhraseSort($phrase, $sort);
+
+        $form = $formFactory->createNamed('', PhraseSortFormType::class, $searchData);
         //button je přidáván v šabloně, aby se nezobrazoval v odkazu
         $form->handleRequest($this->request);
 

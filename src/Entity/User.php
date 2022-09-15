@@ -2,7 +2,7 @@
 
 namespace App\Entity;
 
-use App\Entity\Detached\Search\SearchAndSort;
+use App\Entity\Detached\Search\Atomic\Sort;
 use App\Repository\UserRepository;
 use DateTime;
 use DateTimeInterface;
@@ -387,13 +387,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function removeAddress(Address $address): self
     {
-        if ($this->addresses->removeElement($address)) {
-            // set the owning side to null (unless already changed)
-            if ($address->getUser() === $this)
-            {
-                $address->setUser(null);
-            }
-        }
+        $this->addresses->removeElement($address);
 
         return $this;
     }
@@ -486,18 +480,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public static function getSortData(): array
     {
         return [
-            'Od nejnovějších' => 'registered'.SearchAndSort::ATTRIBUTE_TAG_DESC,
-            'Od nejstarších' => 'registered'.SearchAndSort::ATTRIBUTE_TAG_ASC,
-            'E-mail (A-Z)' => 'email'.SearchAndSort::ATTRIBUTE_TAG_ASC,
-            'E-mail (Z-A)' => 'email'.SearchAndSort::ATTRIBUTE_TAG_DESC,
-            'Křestní jméno (A-Z)' => 'nameFirst'.SearchAndSort::ATTRIBUTE_TAG_ASC,
-            'Křestní jméno (Z-A)' => 'nameFirst'.SearchAndSort::ATTRIBUTE_TAG_DESC,
-            'Příjmení (A-Z)' => 'nameLast'.SearchAndSort::ATTRIBUTE_TAG_ASC,
-            'Příjmení (Z-A)' => 'nameLast'.SearchAndSort::ATTRIBUTE_TAG_DESC,
-            'Od ověřených' => 'isVerified'.SearchAndSort::ATTRIBUTE_TAG_DESC,
-            'Od neověřených' => 'isVerified'.SearchAndSort::ATTRIBUTE_TAG_ASC,
-            'Od umlčených' => 'isMuted'.SearchAndSort::ATTRIBUTE_TAG_DESC,
-            'Od neumlčených' => 'isMuted'.SearchAndSort::ATTRIBUTE_TAG_ASC,
+            'Od nejnovějších' => 'registered'.Sort::ATTRIBUTE_TAG_DESC,
+            'Od nejstarších' => 'registered'.Sort::ATTRIBUTE_TAG_ASC,
+            'E-mail (A-Z)' => 'email'.Sort::ATTRIBUTE_TAG_ASC,
+            'E-mail (Z-A)' => 'email'.Sort::ATTRIBUTE_TAG_DESC,
+            'Křestní jméno (A-Z)' => 'nameFirst'.Sort::ATTRIBUTE_TAG_ASC,
+            'Křestní jméno (Z-A)' => 'nameFirst'.Sort::ATTRIBUTE_TAG_DESC,
+            'Příjmení (A-Z)' => 'nameLast'.Sort::ATTRIBUTE_TAG_ASC,
+            'Příjmení (Z-A)' => 'nameLast'.Sort::ATTRIBUTE_TAG_DESC,
+            'Od ověřených' => 'isVerified'.Sort::ATTRIBUTE_TAG_DESC,
+            'Od neověřených' => 'isVerified'.Sort::ATTRIBUTE_TAG_ASC,
+            'Od umlčených' => 'isMuted'.Sort::ATTRIBUTE_TAG_DESC,
+            'Od neumlčených' => 'isMuted'.Sort::ATTRIBUTE_TAG_ASC,
         ];
     }
 }

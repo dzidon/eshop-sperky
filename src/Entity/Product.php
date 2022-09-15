@@ -2,7 +2,7 @@
 
 namespace App\Entity;
 
-use App\Entity\Detached\Search\SearchAndSort;
+use App\Entity\Detached\Search\Atomic\Sort;
 use App\Repository\ProductRepository;
 use DateTime;
 use DateTimeInterface;
@@ -595,34 +595,34 @@ class Product implements EntitySlugInterface, EntityOrphanRemovalInterface
     public static function getSortDataForAdmin(): array
     {
         return [
-            'Od nejnovějších' => 'created'.SearchAndSort::ATTRIBUTE_TAG_DESC,
-            'Od nejstarších' => 'created'.SearchAndSort::ATTRIBUTE_TAG_ASC,
-            'Název (A-Z)' => 'name'.SearchAndSort::ATTRIBUTE_TAG_ASC,
-            'Název (Z-A)' => 'name'.SearchAndSort::ATTRIBUTE_TAG_DESC,
-            'Odkaz (A-Z)' => 'slug'.SearchAndSort::ATTRIBUTE_TAG_ASC,
-            'Odkaz (Z-A)' => 'slug'.SearchAndSort::ATTRIBUTE_TAG_DESC,
-            'Cena bez DPH (vzestupně)' => 'priceWithoutVat'.SearchAndSort::ATTRIBUTE_TAG_ASC,
-            'Cena bez DPH (sestupně)' => 'priceWithoutVat'.SearchAndSort::ATTRIBUTE_TAG_DESC,
-            'Cena s DPH (vzestupně)' => 'priceWithVat'.SearchAndSort::ATTRIBUTE_TAG_ASC,
-            'Cena s DPH (sestupně)' => 'priceWithVat'.SearchAndSort::ATTRIBUTE_TAG_DESC,
-            'DPH (vzestupně)' => 'vat'.SearchAndSort::ATTRIBUTE_TAG_ASC,
-            'DPH (sestupně)' => 'vat'.SearchAndSort::ATTRIBUTE_TAG_DESC,
-            'Ks skladem (vzestupně)' => 'inventory'.SearchAndSort::ATTRIBUTE_TAG_ASC,
-            'Ks skladem (sestupně)' => 'inventory'.SearchAndSort::ATTRIBUTE_TAG_DESC,
+            'Od nejnovějších' => 'created'.Sort::ATTRIBUTE_TAG_DESC,
+            'Od nejstarších' => 'created'.Sort::ATTRIBUTE_TAG_ASC,
+            'Název (A-Z)' => 'name'.Sort::ATTRIBUTE_TAG_ASC,
+            'Název (Z-A)' => 'name'.Sort::ATTRIBUTE_TAG_DESC,
+            'Odkaz (A-Z)' => 'slug'.Sort::ATTRIBUTE_TAG_ASC,
+            'Odkaz (Z-A)' => 'slug'.Sort::ATTRIBUTE_TAG_DESC,
+            'Cena bez DPH (vzestupně)' => 'priceWithoutVat'.Sort::ATTRIBUTE_TAG_ASC,
+            'Cena bez DPH (sestupně)' => 'priceWithoutVat'.Sort::ATTRIBUTE_TAG_DESC,
+            'Cena s DPH (vzestupně)' => 'priceWithVat'.Sort::ATTRIBUTE_TAG_ASC,
+            'Cena s DPH (sestupně)' => 'priceWithVat'.Sort::ATTRIBUTE_TAG_DESC,
+            'DPH (vzestupně)' => 'vat'.Sort::ATTRIBUTE_TAG_ASC,
+            'DPH (sestupně)' => 'vat'.Sort::ATTRIBUTE_TAG_DESC,
+            'Ks skladem (vzestupně)' => 'inventory'.Sort::ATTRIBUTE_TAG_ASC,
+            'Ks skladem (sestupně)' => 'inventory'.Sort::ATTRIBUTE_TAG_DESC,
         ];
     }
 
     public static function getSortDataForCatalog(): array
     {
         return [
-            'Od nejnovějších' => 'created'.SearchAndSort::ATTRIBUTE_TAG_DESC,
-            'Od nejstarších' => 'created'.SearchAndSort::ATTRIBUTE_TAG_ASC,
-            'Název (A-Z)' => 'name'.SearchAndSort::ATTRIBUTE_TAG_ASC,
-            'Název (Z-A)' => 'name'.SearchAndSort::ATTRIBUTE_TAG_DESC,
-            'Cena (vzestupně)' => 'priceWithVat'.SearchAndSort::ATTRIBUTE_TAG_ASC,
-            'Cena (sestupně)' => 'priceWithVat'.SearchAndSort::ATTRIBUTE_TAG_DESC,
-            'Ks skladem (vzestupně)' => 'inventory'.SearchAndSort::ATTRIBUTE_TAG_ASC,
-            'Ks skladem (sestupně)' => 'inventory'.SearchAndSort::ATTRIBUTE_TAG_DESC,
+            'Od nejnovějších' => 'created'.Sort::ATTRIBUTE_TAG_DESC,
+            'Od nejstarších' => 'created'.Sort::ATTRIBUTE_TAG_ASC,
+            'Název (A-Z)' => 'name'.Sort::ATTRIBUTE_TAG_ASC,
+            'Název (Z-A)' => 'name'.Sort::ATTRIBUTE_TAG_DESC,
+            'Cena (vzestupně)' => 'priceWithVat'.Sort::ATTRIBUTE_TAG_ASC,
+            'Cena (sestupně)' => 'priceWithVat'.Sort::ATTRIBUTE_TAG_DESC,
+            'Ks skladem (vzestupně)' => 'inventory'.Sort::ATTRIBUTE_TAG_ASC,
+            'Ks skladem (sestupně)' => 'inventory'.Sort::ATTRIBUTE_TAG_DESC,
         ];
     }
 

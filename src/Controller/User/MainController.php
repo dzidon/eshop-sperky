@@ -5,13 +5,12 @@ namespace App\Controller\User;
 use App\Entity\Detached\ContactEmail;
 use App\Entity\Product;
 use App\Entity\Review;
-use App\Form\ContactFormType;
-use App\Form\CustomOrderDemandFormType;
+use App\Form\FormType\User\ContactFormType;
+use App\Form\FormType\User\CustomOrderDemandFormType;
 use App\Service\BreadcrumbsService;
 use App\Service\ContactEmailService;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,12 +20,10 @@ use Symfony\Component\Routing\Annotation\Route;
 class MainController extends AbstractController
 {
     private BreadcrumbsService $breadcrumbs;
-    private ParameterBagInterface $parameterBag;
 
-    public function __construct(BreadcrumbsService $breadcrumbs, ParameterBagInterface $parameterBag)
+    public function __construct(BreadcrumbsService $breadcrumbs)
     {
         $this->breadcrumbs = $breadcrumbs->addRoute('home');
-        $this->parameterBag = $parameterBag;
     }
 
     /**

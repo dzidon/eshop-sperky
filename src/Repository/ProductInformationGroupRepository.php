@@ -2,7 +2,7 @@
 
 namespace App\Repository;
 
-use App\Entity\Detached\Search\SearchAndSort;
+use App\Entity\Detached\Search\Composition\PhraseSort;
 use App\Entity\ProductInformationGroup;
 use App\Pagination\Pagination;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -26,15 +26,15 @@ class ProductInformationGroupRepository extends ServiceEntityRepository
         $this->request = $requestStack->getCurrentRequest();
     }
 
-    public function getSearchPagination(SearchAndSort $searchData): Pagination
+    public function getSearchPagination(PhraseSort $searchData): Pagination
     {
-        $sortData = $searchData->getDqlSortData();
+        $sortData = $searchData->getSort()->getDqlSortData();
 
         $query = $this->createQueryBuilder('pig')
 
             //podminky
             ->orWhere('pig.name LIKE :name')
-            ->setParameter('name', '%' . $searchData->getSearchPhrase() . '%')
+            ->setParameter('name', '%' . $searchData->getPhrase()->getText() . '%')
 
             //razeni
             ->orderBy('pig.' . $sortData['attribute'], $sortData['order'])

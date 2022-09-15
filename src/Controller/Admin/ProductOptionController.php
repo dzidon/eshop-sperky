@@ -2,11 +2,13 @@
 
 namespace App\Controller\Admin;
 
-use App\Entity\Detached\Search\SearchAndSort;
+use App\Entity\Detached\Search\Atomic\Phrase;
+use App\Entity\Detached\Search\Atomic\Sort;
+use App\Entity\Detached\Search\Composition\PhraseSort;
 use App\Entity\ProductOptionGroup;
-use App\Form\HiddenTrueFormType;
-use App\Form\ProductOptionGroupFormType;
-use App\Form\SearchTextAndSortFormType;
+use App\Form\FormType\Search\Composition\PhraseSortFormType;
+use App\Form\FormType\User\HiddenTrueFormType;
+use App\Form\FormType\Admin\ProductOptionGroupFormType;
 use App\Service\BreadcrumbsService;
 use App\Service\EntityCollectionService;
 use Psr\Log\LoggerInterface;
@@ -44,8 +46,11 @@ class ProductOptionController extends AbstractAdminController
      */
     public function productOptionGroups(FormFactoryInterface $formFactory): Response
     {
-        $searchData = new SearchAndSort(ProductOptionGroup::getSortData(), 'Hledejte podle názvu.');
-        $form = $formFactory->createNamed('', SearchTextAndSortFormType::class, $searchData);
+        $phrase = new Phrase('Hledejte podle názvu.');
+        $sort = new Sort(ProductOptionGroup::getSortData());
+        $searchData = new PhraseSort($phrase, $sort);
+
+        $form = $formFactory->createNamed('', PhraseSortFormType::class, $searchData);
         //button je přidáván v šabloně, aby se nezobrazoval v odkazu
         $form->handleRequest($this->request);
 

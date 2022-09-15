@@ -5,7 +5,7 @@ namespace App\Form\EventSubscriber;
 use App\Entity\Product;
 use App\Entity\ProductCategory;
 use App\Entity\ProductCategoryGroup;
-use App\Form\ProductCategoryNewFormType;
+use App\Form\FormType\Admin\ProductCategoryNewFormType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\Extension\Core\Type\ButtonType;

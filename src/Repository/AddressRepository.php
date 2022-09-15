@@ -3,7 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Address;
-use App\Entity\Detached\Search\SearchAndSort;
+use App\Entity\Detached\Search\Composition\PhraseSort;
 use App\Entity\User;
 use App\Pagination\Pagination;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -27,9 +27,9 @@ class AddressRepository extends ServiceEntityRepository
         $this->request = $requestStack->getCurrentRequest();
     }
 
-    public function getSearchPagination(User $user, SearchAndSort $searchData): Pagination
+    public function getSearchPagination(User $user, PhraseSort $searchData): Pagination
     {
-        $sortData = $searchData->getDqlSortData();
+        $sortData = $searchData->getSort()->getDqlSortData();
 
         $query = $this->createQueryBuilder('a')
 
@@ -39,7 +39,7 @@ class AddressRepository extends ServiceEntityRepository
 
             //vyhledavani
             ->andWhere('a.alias LIKE :searchPhrase')
-            ->setParameter('searchPhrase', '%' . $searchData->getSearchPhrase() . '%')
+            ->setParameter('searchPhrase', '%' . $searchData->getPhrase()->getText() . '%')
 
             //razeni
             ->orderBy('a.' . $sortData['attribute'], $sortData['order'])

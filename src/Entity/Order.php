@@ -2,7 +2,7 @@
 
 namespace App\Entity;
 
-use App\Entity\Detached\Search\SearchAndSort;
+use App\Entity\Detached\Search\Atomic\Sort;
 use DateTime;
 use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -507,12 +507,7 @@ class Order implements EntityOrphanRemovalInterface
 
     public function removePayment(Payment $payment): self
     {
-        if ($this->payments->removeElement($payment)) {
-            // set the owning side to null (unless already changed)
-            if ($payment->getOrder() === $this) {
-                $payment->setOrder(null);
-            }
-        }
+        $this->payments->removeElement($payment);
 
         return $this;
     }
@@ -1325,10 +1320,10 @@ class Order implements EntityOrphanRemovalInterface
     public static function getSortData(): array
     {
         return [
-            'ID (sestupně)' => 'id'.SearchAndSort::ATTRIBUTE_TAG_DESC,
-            'ID (vzestupně)' => 'id'.SearchAndSort::ATTRIBUTE_TAG_ASC,
-            'Od nejdříve dokončených' => 'finishedAt'.SearchAndSort::ATTRIBUTE_TAG_ASC,
-            'Od naposledy dokončených' => 'finishedAt'.SearchAndSort::ATTRIBUTE_TAG_DESC,
+            'ID (sestupně)' => 'id'.Sort::ATTRIBUTE_TAG_DESC,
+            'ID (vzestupně)' => 'id'.Sort::ATTRIBUTE_TAG_ASC,
+            'Od nejdříve dokončených' => 'finishedAt'.Sort::ATTRIBUTE_TAG_ASC,
+            'Od naposledy dokončených' => 'finishedAt'.Sort::ATTRIBUTE_TAG_DESC,
         ];
     }
 

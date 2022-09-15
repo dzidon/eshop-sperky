@@ -3,16 +3,19 @@
 namespace App\Controller\User;
 
 use App\Entity\Address;
-use App\Entity\Detached\Search\SearchAndSort;
-use App\Entity\Detached\Search\SearchOrder;
+use App\Entity\Detached\Search\Atomic\Dropdown;
+use App\Entity\Detached\Search\Atomic\Phrase;
+use App\Entity\Detached\Search\Atomic\Sort;
+use App\Entity\Detached\Search\Composition\PhraseSort;
+use App\Entity\Detached\Search\Composition\PhraseSortDropdown;
 use App\Entity\Order;
 use App\Entity\User;
-use App\Form\AddressFormType;
-use App\Form\ChangePasswordLoggedInFormType;
-use App\Form\HiddenTrueFormType;
-use App\Form\OrderSearchFormType;
-use App\Form\PersonalInfoFormType;
-use App\Form\SearchTextAndSortFormType;
+use App\Form\FormType\User\ChangePasswordLoggedInFormType;
+use App\Form\FormType\Search\Composition\PhraseSortDropdownFormType;
+use App\Form\FormType\Search\Composition\PhraseSortFormType;
+use App\Form\FormType\User\HiddenTrueFormType;
+use App\Form\FormType\User\PersonalInfoFormType;
+use App\Form\FormType\User\AddressFormType;
 use App\Service\BreadcrumbsService;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -124,8 +127,11 @@ class ProfileController extends AbstractController
         /** @var User|null $user */
         $user = $this->getUser();
 
-        $searchData = new SearchAndSort(Address::getSortData(), 'Hledejte podle aliasu.');
-        $form = $formFactory->createNamed('', SearchTextAndSortFormType::class, $searchData);
+        $phrase = new Phrase('Hledejte podle aliasu.');
+        $sort = new Sort(Address::getSortData());
+        $searchData = new PhraseSort($phrase, $sort);
+
+        $form = $formFactory->createNamed('', PhraseSortFormType::class, $searchData);
         //button je přidáván v šabloně, aby se nezobrazoval v odkazu
         $form->handleRequest($this->request);
 
@@ -250,8 +256,11 @@ class ProfileController extends AbstractController
         /** @var User|null $user */
         $user = $this->getUser();
 
-        $searchData = new SearchOrder(Order::getSortData(), 'Hledejte podle ID.');
-        $form = $formFactory->createNamed('', OrderSearchFormType::class, $searchData);
+        $phraseSort = new PhraseSort(new Phrase('Hledejte podle ID.'), new Sort(Order::getSortData()));
+        $dropdown = new Dropdown(array_flip(Order::LIFECYCLE_CHAPTERS));
+        $searchData = new PhraseSortDropdown($phraseSort, $dropdown);
+
+        $form = $formFactory->createNamed('', PhraseSortDropdownFormType::class, $searchData);
         //button je přidáván v šabloně, aby se nezobrazoval v odkazu
         $form->handleRequest($this->request);
 

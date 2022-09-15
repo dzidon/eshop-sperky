@@ -2,7 +2,7 @@
 
 namespace App\Repository;
 
-use App\Entity\Detached\Search\SearchProduct;
+use App\Entity\Detached\Search\Composition\ProductFilter;
 use Exception;
 use App\Entity\Product;
 use App\Entity\ProductSection;
@@ -176,7 +176,7 @@ class ProductRepository extends ServiceEntityRepository
             ->getScalarResult()[0]
         ;
 
-        foreach ($priceData as $key => &$value)
+        foreach ($priceData as &$value)
         {
             if($value === null)
             {
@@ -278,9 +278,9 @@ class ProductRepository extends ServiceEntityRepository
         return $product;
     }
 
-    public function getSearchPagination(bool $inAdmin, SearchProduct $searchData): Pagination
+    public function getSearchPagination(bool $inAdmin, ProductFilter $searchData): Pagination
     {
-        $sortData = $searchData->getDqlSortData();
+        $sortData = $searchData->getPhraseSort()->getSort()->getDqlSortData();
         $queryBuilder = $this->createQueryBuilder('p');
 
         if($inAdmin)
@@ -290,14 +290,14 @@ class ProductRepository extends ServiceEntityRepository
                 ->andWhere('p.id LIKE :searchPhrase OR
                             p.name LIKE :searchPhrase OR
                             p.slug LIKE :searchPhrase')
-                ->setParameter('searchPhrase', '%' . $searchData->getSearchPhrase() . '%')
+                ->setParameter('searchPhrase', '%' . $searchData->getPhraseSort()->getPhrase()->getText() . '%')
             ;
         }
         else
         {
             $queryBuilder = (new CatalogProductQueryBuilder($queryBuilder))
                 ->addProductVisibilityCondition()
-                ->addProductSearchConditions($searchData->getSection(), $searchData->getSearchPhrase(), $searchData->getPriceMin(), $searchData->getPriceMax(), $searchData->getCategoriesGrouped())
+                ->addProductSearchConditions($searchData->getSection(), $searchData->getPhraseSort()->getPhrase()->getText(), $searchData->getPriceMin(), $searchData->getPriceMax(), $searchData->getCategoriesGrouped())
                 ->getQueryBuilder()
             ;
         }

@@ -3,7 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\DeliveryMethod;
-use App\Entity\Detached\Search\SearchAndSort;
+use App\Entity\Detached\Search\Composition\PhraseSort;
 use App\Pagination\Pagination;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -26,15 +26,15 @@ class DeliveryMethodRepository extends ServiceEntityRepository
         $this->request = $requestStack->getCurrentRequest();
     }
 
-    public function getSearchPagination(SearchAndSort $searchData): Pagination
+    public function getSearchPagination(PhraseSort $searchData): Pagination
     {
-        $sortData = $searchData->getDqlSortData();
+        $sortData = $searchData->getSort()->getDqlSortData();
 
         $query = $this->createQueryBuilder('dm')
 
             //podminky
             ->andWhere('dm.name LIKE :name')
-            ->setParameter('name', '%' . $searchData->getSearchPhrase() . '%')
+            ->setParameter('name', '%' . $searchData->getPhrase()->getText() . '%')
 
             //razeni
             ->orderBy('dm.' . $sortData['attribute'], $sortData['order'])

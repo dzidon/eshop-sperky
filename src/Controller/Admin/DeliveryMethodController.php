@@ -3,9 +3,11 @@
 namespace App\Controller\Admin;
 
 use App\Entity\DeliveryMethod;
-use App\Entity\Detached\Search\SearchAndSort;
-use App\Form\DeliveryMethodFormType;
-use App\Form\SearchTextAndSortFormType;
+use App\Entity\Detached\Search\Atomic\Phrase;
+use App\Entity\Detached\Search\Atomic\Sort;
+use App\Entity\Detached\Search\Composition\PhraseSort;
+use App\Form\FormType\Admin\DeliveryMethodFormType;
+use App\Form\FormType\Search\Composition\PhraseSortFormType;
 use App\Service\BreadcrumbsService;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -42,8 +44,11 @@ class DeliveryMethodController extends AbstractAdminController
      */
     public function deliveryMethods(FormFactoryInterface $formFactory): Response
     {
-        $searchData = new SearchAndSort(DeliveryMethod::getSortData(), 'Hledejte podle názvu.');
-        $form = $formFactory->createNamed('', SearchTextAndSortFormType::class, $searchData);
+        $phrase = new Phrase('Hledejte podle názvu.');
+        $sort = new Sort(DeliveryMethod::getSortData());
+        $searchData = new PhraseSort($phrase, $sort);
+
+        $form = $formFactory->createNamed('', PhraseSortFormType::class, $searchData);
         //button je přidáván v šabloně, aby se nezobrazoval v odkazu
         $form->handleRequest($this->request);
 

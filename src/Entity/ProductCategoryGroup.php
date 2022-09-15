@@ -2,7 +2,7 @@
 
 namespace App\Entity;
 
-use App\Entity\Detached\Search\SearchAndSort;
+use App\Entity\Detached\Search\Atomic\Sort;
 use App\Repository\ProductCategoryGroupRepository;
 use DateTime;
 use DateTimeInterface;
@@ -147,10 +147,10 @@ class ProductCategoryGroup implements EntityOrphanRemovalInterface
     public static function getSortData(): array
     {
         return [
-            'Od nejnovějších' => 'created'.SearchAndSort::ATTRIBUTE_TAG_DESC,
-            'Od nejstarších' => 'created'.SearchAndSort::ATTRIBUTE_TAG_ASC,
-            'Název (A-Z)' => 'name'.SearchAndSort::ATTRIBUTE_TAG_ASC,
-            'Název (Z-A)' => 'name'.SearchAndSort::ATTRIBUTE_TAG_DESC,
+            'Od nejnovějších' => 'created'.Sort::ATTRIBUTE_TAG_DESC,
+            'Od nejstarších' => 'created'.Sort::ATTRIBUTE_TAG_ASC,
+            'Název (A-Z)' => 'name'.Sort::ATTRIBUTE_TAG_ASC,
+            'Název (Z-A)' => 'name'.Sort::ATTRIBUTE_TAG_DESC,
         ];
     }
 

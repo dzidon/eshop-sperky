@@ -2,7 +2,7 @@
 
 namespace App\Repository;
 
-use App\Entity\Detached\Search\SearchAndSort;
+use App\Entity\Detached\Search\Composition\PhraseSort;
 use App\Entity\Review;
 use App\Pagination\Pagination;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -27,9 +27,9 @@ class ReviewRepository extends ServiceEntityRepository
         $this->request = $requestStack->getCurrentRequest();
     }
 
-    public function getSearchPagination(SearchAndSort $searchData): Pagination
+    public function getSearchPagination(PhraseSort $searchData): Pagination
     {
-        $sortData = $searchData->getDqlSortData();
+        $sortData = $searchData->getSort()->getDqlSortData();
 
         $queryBuilder = $this->createQueryBuilder('r')
             ->select('r', 'u')
@@ -38,7 +38,7 @@ class ReviewRepository extends ServiceEntityRepository
             //vyhledavani
             ->andWhere('r.text LIKE :searchPhrase OR
                         CONCAT(u.nameFirst, \' \', u.nameLast) LIKE :searchPhrase')
-            ->setParameter('searchPhrase', '%' . $searchData->getSearchPhrase() . '%')
+            ->setParameter('searchPhrase', '%' . $searchData->getPhrase()->getText() . '%')
 
             //razeni
             ->orderBy('r.' . $sortData['attribute'], $sortData['order'])

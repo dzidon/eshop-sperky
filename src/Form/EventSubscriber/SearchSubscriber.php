@@ -2,6 +2,7 @@
 
 namespace App\Form\EventSubscriber;
 
+use App\Entity\Detached\Search\Abstraction\SearchModelInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -25,8 +26,13 @@ class SearchSubscriber implements EventSubscriberInterface
         $form = $event->getForm();
         if ($form->isSubmitted() && !$form->isValid())
         {
+            /** @var SearchModelInterface $searchData */
             $searchData = $form->getData();
-            $searchData->reset();
+
+            if ($searchData instanceof SearchModelInterface)
+            {
+                $searchData->invalidateSearch();
+            }
         }
     }
 }

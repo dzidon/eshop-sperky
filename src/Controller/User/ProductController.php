@@ -3,13 +3,15 @@
 namespace App\Controller\User;
 
 use App\Entity\Detached\CartInsert;
-use App\Entity\Detached\Search\SearchProduct;
+use App\Entity\Detached\Search\Atomic\Phrase;
+use App\Entity\Detached\Search\Atomic\Sort;
+use App\Entity\Detached\Search\Composition\PhraseSort;
+use App\Entity\Detached\Search\Composition\ProductFilter;
 use App\Entity\Product;
 use App\Entity\ProductSection;
-use App\Form\CartInsertFormType;
-use App\Form\ProductCatalogFilterFormType;
+use App\Form\FormType\User\CartInsertFormType;
+use App\Form\FormType\Search\Composition\ProductCatalogFilterFormType;
 use App\Service\BreadcrumbsService;
-use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -20,13 +22,11 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
 class ProductController extends AbstractController
 {
-    private LoggerInterface $logger;
     private BreadcrumbsService $breadcrumbs;
     private $request;
 
-    public function __construct(LoggerInterface $logger, BreadcrumbsService $breadcrumbs, RequestStack $requestStack)
+    public function __construct(BreadcrumbsService $breadcrumbs, RequestStack $requestStack)
     {
-        $this->logger = $logger;
         $this->breadcrumbs = $breadcrumbs;
         $this->request = $requestStack->getCurrentRequest();
 
@@ -49,8 +49,10 @@ class ProductController extends AbstractController
             }
         }
 
+        $phraseSort = new PhraseSort(new Phrase('Hledejte podle názvu.'), new Sort(Product::getSortDataForCatalog()));
+        $filterData = new ProductFilter($phraseSort);
+
         $priceData = $this->getDoctrine()->getRepository(Product::class)->getMinAndMaxPrice($section);
-        $filterData = new SearchProduct(Product::getSortDataForCatalog(), 'Hledejte podle názvu.');
         $filterData->setPriceMin($priceData['priceMin']);
         $filterData->setPriceMax($priceData['priceMax']);
         $filterData->setSection($section);
@@ -59,7 +61,7 @@ class ProductController extends AbstractController
         // button je přidáván v šabloně, aby se nezobrazoval v odkazu
         $form->handleRequest($this->request);
 
-        $pagination = $this->getDoctrine()->getRepository(Product::class)->getSearchPagination($inAdmin = false, $filterData);
+        $pagination = $this->getDoctrine()->getRepository(Product::class)->getSearchPagination(false, $filterData);
         $pagination->addAttributesToPathParameters(['slug']);
         if($pagination->isCurrentPageOutOfBounds())
         {
@@ -107,7 +109,7 @@ class ProductController extends AbstractController
     public function product(string $slug): Response
     {
         /** @var Product $product */
-        $product = $this->getDoctrine()->getRepository(Product::class)->findOneAndFetchEverything(['slug' => $slug], $visibleOnly = true);
+        $product = $this->getDoctrine()->getRepository(Product::class)->findOneAndFetchEverything(['slug' => $slug], true);
         if($product === null)
         {
             throw new NotFoundHttpException('Produkt nenalezen.');

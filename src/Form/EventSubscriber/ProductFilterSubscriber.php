@@ -2,10 +2,9 @@
 
 namespace App\Form\EventSubscriber;
 
-use App\Entity\Detached\Search\SearchProduct;
+use App\Entity\Detached\Search\Composition\ProductFilter;
 use App\Entity\ProductCategory;
 use App\Repository\ProductCategoryRepository;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvent;
@@ -18,13 +17,6 @@ use Symfony\Component\Form\FormEvents;
  */
 class ProductFilterSubscriber implements EventSubscriberInterface
 {
-    private EntityManagerInterface $entityManager;
-
-    public function __construct(EntityManagerInterface $entityManager)
-    {
-        $this->entityManager = $entityManager;
-    }
-
     public static function getSubscribedEvents(): array
     {
         return [
@@ -35,7 +27,7 @@ class ProductFilterSubscriber implements EventSubscriberInterface
 
     public function preSetData(FormEvent $event): void
     {
-        /** @var SearchProduct $filterData */
+        /** @var ProductFilter $filterData */
         $filterData = $event->getData();
         $form = $event->getForm();
 
@@ -61,7 +53,7 @@ class ProductFilterSubscriber implements EventSubscriberInterface
 
     public function preSubmit(FormEvent $event): void
     {
-        /** @var SearchProduct $defaultData */
+        /** @var ProductFilter $defaultData */
         $defaultData = $event->getForm()->getData();
         $submittedData = $event->getData();
 

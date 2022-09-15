@@ -5,11 +5,10 @@ namespace App\Controller\User;
 use App\Entity\Detached\CartInsert;
 use App\Entity\Product;
 use App\Exception\CartException;
-use App\Form\CartFormType;
-use App\Form\CartInsertFormType;
+use App\Form\FormType\User\CartInsertFormType;
+use App\Form\FormType\User\CartFormType;
 use App\Response\Json;
 use App\Service\CartService;
-use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -22,20 +21,18 @@ class CartController extends AbstractController
 {
     private $request;
     private CartService $cart;
-    private LoggerInterface $logger;
 
-    public function __construct(LoggerInterface $logger, RequestStack $requestStack, CartService $cart)
+    public function __construct(RequestStack $requestStack, CartService $cart)
     {
         $this->cart = $cart;
-        $this->logger = $logger;
         $this->request = $requestStack->getCurrentRequest();
     }
 
-    private function getProductIdFromRequest(string $formName): ?int
+    private function getProductIdFromRequest(): ?int
     {
-        if(isset($this->request->request->all()[$formName]['productId']) && is_numeric($this->request->request->all()[$formName]['productId']))
+        if(isset($this->request->request->all()['cart_insert_form']['productId']) && is_numeric($this->request->request->all()['cart_insert_form']['productId']))
         {
-            return (int) $this->request->request->all()[$formName]['productId'];
+            return (int) $this->request->request->all()['cart_insert_form']['productId'];
         }
 
         return null;
@@ -63,7 +60,7 @@ class CartController extends AbstractController
         }
 
         $jsonResponse = new Json();
-        $productId = $this->getProductIdFromRequest('cart_insert_form');
+        $productId = $this->getProductIdFromRequest();
         if ($productId === null)
         {
             $jsonResponse->addResponseError('Bylo odesláno neplatné ID produktu. Zkuste aktualizovat stránku a opakovat akci.');

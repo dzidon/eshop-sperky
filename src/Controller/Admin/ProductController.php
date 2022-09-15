@@ -2,11 +2,14 @@
 
 namespace App\Controller\Admin;
 
-use App\Entity\Detached\Search\SearchProduct;
+use App\Entity\Detached\Search\Atomic\Phrase;
+use App\Entity\Detached\Search\Atomic\Sort;
+use App\Entity\Detached\Search\Composition\PhraseSort;
+use App\Entity\Detached\Search\Composition\ProductFilter;
 use App\Entity\Product;
-use App\Form\HiddenTrueFormType;
-use App\Form\ProductFormType;
-use App\Form\SearchTextAndSortFormType;
+use App\Form\FormType\Search\Composition\PhraseSortFormType;
+use App\Form\FormType\User\HiddenTrueFormType;
+use App\Form\FormType\Admin\ProductFormType;
 use App\Service\BreadcrumbsService;
 use App\Service\EntityCollectionService;
 use Psr\Log\LoggerInterface;
@@ -44,12 +47,14 @@ class ProductController extends AbstractAdminController
      */
     public function products(FormFactoryInterface $formFactory): Response
     {
-        $searchData = new SearchProduct(Product::getSortDataForAdmin(), 'Hledejte podle ID, názvu nebo názvu v odkazu.');
-        $form = $formFactory->createNamed('', SearchTextAndSortFormType::class, $searchData);
+        $phraseSort = new PhraseSort(new Phrase('Hledejte podle ID, názvu nebo názvu v odkazu.'), new Sort(Product::getSortDataForAdmin()));
+        $searchData = new ProductFilter($phraseSort);
+
+        $form = $formFactory->createNamed('', PhraseSortFormType::class, $searchData->getPhraseSort());
         //button je přidáván v šabloně, aby se nezobrazoval v odkazu
         $form->handleRequest($this->request);
 
-        $pagination = $this->getDoctrine()->getRepository(Product::class)->getSearchPagination($inAdmin = true, $searchData);
+        $pagination = $this->getDoctrine()->getRepository(Product::class)->getSearchPagination(true, $searchData);
         if($pagination->isCurrentPageOutOfBounds())
         {
             throw new NotFoundHttpException('Na této stránce nebyly nalezeny žádné produkty.');
@@ -73,7 +78,7 @@ class ProductController extends AbstractAdminController
 
         if($id !== null) //zadal id do url, snazi se editovat existujici
         {
-            $product = $this->getDoctrine()->getRepository(Product::class)->findOneAndFetchEverything(['id' => $id], $visibleOnly = false);
+            $product = $this->getDoctrine()->getRepository(Product::class)->findOneAndFetchEverything(['id' => $id], false);
             if($product === null) //nenaslo to zadny produkt
             {
                 throw new NotFoundHttpException('Produkt nenalezen.');

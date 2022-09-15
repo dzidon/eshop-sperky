@@ -2,7 +2,7 @@
 
 namespace App\Repository;
 
-use App\Entity\Detached\Search\SearchAndSort;
+use App\Entity\Detached\Search\Composition\PhraseSort;
 use App\Entity\User;
 use App\Pagination\Pagination;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -45,21 +45,21 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $this->_em->flush();
     }
 
-    public function getSearchPagination(SearchAndSort $searchData): Pagination
+    public function getSearchPagination(PhraseSort $searchData): Pagination
     {
-        $sortData = $searchData->getDqlSortData();
+        $sortData = $searchData->getSort()->getDqlSortData();
 
         $query = $this->createQueryBuilder('u')
 
             //podminky
             ->orWhere('u.email LIKE :email')
-            ->setParameter('email', '%' . $searchData->getSearchPhrase() . '%')
+            ->setParameter('email', '%' . $searchData->getPhrase()->getText() . '%')
 
             ->orWhere('CONCAT(u.nameFirst, \' \', u.nameLast) LIKE :fullName')
-            ->setParameter('fullName', '%' . $searchData->getSearchPhrase() . '%')
+            ->setParameter('fullName', '%' . $searchData->getPhrase()->getText() . '%')
 
             ->orWhere('u.phoneNumber LIKE :phoneNumber')
-            ->setParameter('phoneNumber', '%' . str_replace(' ', '', $searchData->getSearchPhrase()) . '%')
+            ->setParameter('phoneNumber', '%' . str_replace(' ', '', $searchData->getPhrase()->getText()) . '%')
 
             //razeni
             ->orderBy('u.' . $sortData['attribute'], $sortData['order'])

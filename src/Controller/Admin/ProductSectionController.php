@@ -2,11 +2,13 @@
 
 namespace App\Controller\Admin;
 
-use App\Entity\Detached\Search\SearchAndSort;
+use App\Entity\Detached\Search\Atomic\Phrase;
+use App\Entity\Detached\Search\Atomic\Sort;
+use App\Entity\Detached\Search\Composition\PhraseSort;
 use App\Entity\ProductSection;
-use App\Form\HiddenTrueFormType;
-use App\Form\ProductSectionFormType;
-use App\Form\SearchTextAndSortFormType;
+use App\Form\FormType\Search\Composition\PhraseSortFormType;
+use App\Form\FormType\User\HiddenTrueFormType;
+use App\Form\FormType\Admin\ProductSectionFormType;
 use App\Service\BreadcrumbsService;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -43,8 +45,11 @@ class ProductSectionController extends AbstractAdminController
      */
     public function productSections(FormFactoryInterface $formFactory): Response
     {
-        $searchData = new SearchAndSort(ProductSection::getSortData(), 'Hledejte podle názvu nebo názvu v odkazu.');
-        $form = $formFactory->createNamed('', SearchTextAndSortFormType::class, $searchData);
+        $phrase = new Phrase('Hledejte podle názvu nebo názvu v odkazu.');
+        $sort = new Sort(ProductSection::getSortData());
+        $searchData = new PhraseSort($phrase, $sort);
+
+        $form = $formFactory->createNamed('', PhraseSortFormType::class, $searchData);
         //button je přidáván v šabloně, aby se nezobrazoval v odkazu
         $form->handleRequest($this->request);
 

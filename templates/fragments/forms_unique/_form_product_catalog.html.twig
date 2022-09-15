@@ -82,16 +82,16 @@
                         <div class="col s12">
                             <div class="row no-mar-bot">
                                 <div class="input-field col s12 l6">
-                                    {{ form_widget(filterForm.searchPhrase) }}
-                                    {{ form_label(filterForm.searchPhrase) }}
-                                    {{ form_help(filterForm.searchPhrase) }}
-                                    {{ form_errors(filterForm.searchPhrase) }}
+                                    {{ form_widget(filterForm.phraseSort.phrase.text) }}
+                                    {{ form_label(filterForm.phraseSort.phrase.text) }}
+                                    {{ form_help(filterForm.phraseSort.phrase.text) }}
+                                    {{ form_errors(filterForm.phraseSort.phrase.text) }}
                                 </div>
                                 <div class="input-field col s12 l4">
-                                    {{ form_widget(filterForm.sortBy) }}
-                                    {{ form_label(filterForm.sortBy) }}
-                                    {{ form_help(filterForm.sortBy) }}
-                                    {{ form_errors(filterForm.sortBy) }}
+                                    {{ form_widget(filterForm.phraseSort.sort.sortBy) }}
+                                    {{ form_label(filterForm.phraseSort.sort.sortBy) }}
+                                    {{ form_help(filterForm.phraseSort.sort.sortBy) }}
+                                    {{ form_errors(filterForm.phraseSort.sort.sortBy) }}
                                 </div>
                                 <div class="input-field col s12 l2">
                                     <div class="col s12">

@@ -2,7 +2,7 @@
 
 namespace App\Entity;
 
-use App\Entity\Detached\Search\SearchAndSort;
+use App\Entity\Detached\Search\Atomic\Sort;
 use App\Repository\ProductSectionRepository;
 use DateTime;
 use DateTimeInterface;
@@ -168,12 +168,12 @@ class ProductSection implements EntitySlugInterface
     public static function getSortData(): array
     {
         return [
-            'Od nejnovějších' => 'created'.SearchAndSort::ATTRIBUTE_TAG_DESC,
-            'Od nejstarších' => 'created'.SearchAndSort::ATTRIBUTE_TAG_ASC,
-            'Název (A-Z)' => 'name'.SearchAndSort::ATTRIBUTE_TAG_ASC,
-            'Název (Z-A)' => 'name'.SearchAndSort::ATTRIBUTE_TAG_DESC,
-            'Odkaz (A-Z)' => 'slug'.SearchAndSort::ATTRIBUTE_TAG_ASC,
-            'Odkaz (Z-A)' => 'slug'.SearchAndSort::ATTRIBUTE_TAG_DESC,
+            'Od nejnovějších' => 'created'.Sort::ATTRIBUTE_TAG_DESC,
+            'Od nejstarších' => 'created'.Sort::ATTRIBUTE_TAG_ASC,
+            'Název (A-Z)' => 'name'.Sort::ATTRIBUTE_TAG_ASC,
+            'Název (Z-A)' => 'name'.Sort::ATTRIBUTE_TAG_DESC,
+            'Odkaz (A-Z)' => 'slug'.Sort::ATTRIBUTE_TAG_ASC,
+            'Odkaz (Z-A)' => 'slug'.Sort::ATTRIBUTE_TAG_DESC,
         ];
     }
 

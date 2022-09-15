@@ -1,0 +1,34 @@
+{{ form_start(form) }}
+    <div class="row">
+        <div class="input-field col s12 l8">
+            {{ form_widget(form.phraseSort.phrase.text) }}
+            {{ form_label(form.phraseSort.phrase.text) }}
+            {{ form_help(form.phraseSort.phrase.text) }}
+            {{ form_errors(form.phraseSort.phrase.text) }}
+        </div>
+
+        <div class="input-field col s12 l4">
+            {{ form_widget(form.phraseSort.sort.sortBy) }}
+            {{ form_label(form.phraseSort.sort.sortBy) }}
+            {{ form_help(form.phraseSort.sort.sortBy) }}
+            {{ form_errors(form.phraseSort.sort.sortBy) }}
+        </div>
+
+        <div class="input-field col s12 l8">
+            {{ form_widget(form.dropdown.choice) }}
+            {{ form_label(form.dropdown.choice) }}
+            {{ form_help(form.dropdown.choice) }}
+            {{ form_errors(form.dropdown.choice) }}
+        </div>
+
+        <div class="input-field col s12 l4">
+            <div class="col s12">
+                <div class="row">
+                    <button class="btn waves-effect waves-light blue width-max no-padding center-align" type="submit">
+                        Hledat
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+{{ form_end(form) }}

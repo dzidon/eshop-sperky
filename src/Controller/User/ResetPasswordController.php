@@ -3,8 +3,8 @@
 namespace App\Controller\User;
 
 use App\Entity\User;
-use App\Form\ChangePasswordFormType;
-use App\Form\ResetPasswordRequestFormType;
+use App\Form\FormType\User\ChangePasswordFormType;
+use App\Form\FormType\User\ResetPasswordRequestFormType;
 use App\Service\BreadcrumbsService;
 use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;

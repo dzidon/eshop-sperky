@@ -2,7 +2,7 @@
 
 namespace App\Entity;
 
-use App\Entity\Detached\Search\SearchAndSort;
+use App\Entity\Detached\Search\Atomic\Sort;
 use App\Repository\AddressRepository;
 use DateTime;
 use DateTimeInterface;
@@ -91,7 +91,7 @@ class Address
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="addresses")
      * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
      */
-    private $user;
+    private User $user;
 
     /**
      * @ORM\Column(type="string", length=255)
@@ -233,7 +233,7 @@ class Address
         return $this;
     }
 
-    public function getUser(): ?User
+    public function getUser(): User
     {
         return $this->user;
     }
@@ -338,10 +338,10 @@ class Address
     public static function getSortData(): array
     {
         return [
-            'Od nejnovějších' => 'created'.SearchAndSort::ATTRIBUTE_TAG_DESC,
-            'Od nejstarších' => 'created'.SearchAndSort::ATTRIBUTE_TAG_ASC,
-            'Alias (A-Z)' => 'alias'.SearchAndSort::ATTRIBUTE_TAG_ASC,
-            'Alias (Z-A)' => 'alias'.SearchAndSort::ATTRIBUTE_TAG_DESC,
+            'Od nejnovějších' => 'created'.Sort::ATTRIBUTE_TAG_DESC,
+            'Od nejstarších' => 'created'.Sort::ATTRIBUTE_TAG_ASC,
+            'Alias (A-Z)' => 'alias'.Sort::ATTRIBUTE_TAG_ASC,
+            'Alias (Z-A)' => 'alias'.Sort::ATTRIBUTE_TAG_DESC,
         ];
     }
 }

@@ -3,12 +3,10 @@
 namespace App\Controller\User;
 
 use App\Entity\User;
-use App\Form\RegistrationFormType;
-use App\Form\VerificationFormType;
-use App\Security\EmailVerifier;
+use App\Form\FormType\User\RegistrationFormType;
+use App\Form\FormType\User\VerificationFormType;
 use App\Service\BreadcrumbsService;
 use App\Service\UserRegistrationService;
-use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -22,16 +20,12 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
 class RegistrationController extends AbstractController
 {
-    private EmailVerifier $emailVerifier;
-    private LoggerInterface $logger;
     private TranslatorInterface $translator;
     private BreadcrumbsService $breadcrumbs;
     private $request;
 
-    public function __construct(EmailVerifier $emailVerifier, LoggerInterface $logger, TranslatorInterface $translator, BreadcrumbsService $breadcrumbs, RequestStack $requestStack)
+    public function __construct(TranslatorInterface $translator, BreadcrumbsService $breadcrumbs, RequestStack $requestStack)
     {
-        $this->emailVerifier = $emailVerifier;
-        $this->logger = $logger;
         $this->translator = $translator;
         $this->breadcrumbs = $breadcrumbs->addRoute('home')->addRoute('register');
         $this->request = $requestStack->getCurrentRequest();

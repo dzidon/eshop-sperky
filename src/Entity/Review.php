@@ -2,7 +2,7 @@
 
 namespace App\Entity;
 
-use App\Entity\Detached\Search\SearchAndSort;
+use App\Entity\Detached\Search\Atomic\Sort;
 use App\Repository\ReviewRepository;
 use DateTime;
 use DateTimeInterface;
@@ -140,10 +140,10 @@ class Review
     public static function getSortData(): array
     {
         return [
-            'Od nejnovějších' => 'created'.SearchAndSort::ATTRIBUTE_TAG_DESC,
-            'Od nejstarších' => 'created'.SearchAndSort::ATTRIBUTE_TAG_ASC,
-            'Počet hvězd (vzestupně)' => 'stars'.SearchAndSort::ATTRIBUTE_TAG_ASC,
-            'Počet hvězd (sestupně)' => 'stars'.SearchAndSort::ATTRIBUTE_TAG_DESC,
+            'Od nejnovějších' => 'created'.Sort::ATTRIBUTE_TAG_DESC,
+            'Od nejstarších' => 'created'.Sort::ATTRIBUTE_TAG_ASC,
+            'Počet hvězd (vzestupně)' => 'stars'.Sort::ATTRIBUTE_TAG_ASC,
+            'Počet hvězd (sestupně)' => 'stars'.Sort::ATTRIBUTE_TAG_DESC,
         ];
     }
 }

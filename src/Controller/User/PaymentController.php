@@ -5,7 +5,6 @@ namespace App\Controller\User;
 use GoPay\Payments;
 use App\Entity\Payment;
 use App\Service\PaymentService;
-use Psr\Log\LoggerInterface;
 use App\Exception\PaymentException;
 use App\Service\BreadcrumbsService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -20,13 +19,11 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 class PaymentController extends AbstractController
 {
     private Payments $payments;
-    private LoggerInterface $logger;
     private PaymentService $paymentService;
     private $request;
 
-    public function __construct(LoggerInterface $logger, PaymentService $paymentService, Payments $payments, RequestStack $requestStack)
+    public function __construct(PaymentService $paymentService, Payments $payments, RequestStack $requestStack)
     {
-        $this->logger = $logger;
         $this->payments = $payments;
         $this->paymentService = $paymentService;
         $this->request = $requestStack->getCurrentRequest();

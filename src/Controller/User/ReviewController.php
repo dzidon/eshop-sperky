@@ -2,12 +2,14 @@
 
 namespace App\Controller\User;
 
-use App\Entity\Detached\Search\SearchAndSort;
+use App\Entity\Detached\Search\Atomic\Phrase;
+use App\Entity\Detached\Search\Atomic\Sort;
+use App\Entity\Detached\Search\Composition\PhraseSort;
 use App\Entity\Review;
 use App\Entity\User;
-use App\Form\HiddenTrueFormType;
-use App\Form\ReviewFormType;
-use App\Form\SearchTextAndSortFormType;
+use App\Form\FormType\Search\Composition\PhraseSortFormType;
+use App\Form\FormType\User\HiddenTrueFormType;
+use App\Form\FormType\User\ReviewFormType;
 use App\Service\BreadcrumbsService;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -43,8 +45,11 @@ class ReviewController extends AbstractController
      */
     public function reviews(FormFactoryInterface $formFactory): Response
     {
-        $searchData = new SearchAndSort(Review::getSortData(), 'Hledejte jméno autora nebo kus textu.');
-        $form = $formFactory->createNamed('', SearchTextAndSortFormType::class, $searchData);
+        $phrase = new Phrase('Hledejte jméno autora nebo kus textu.');
+        $sort = new Sort(Review::getSortData());
+        $searchData = new PhraseSort($phrase, $sort);
+
+        $form = $formFactory->createNamed('', PhraseSortFormType::class, $searchData);
         //button je přidáván v šabloně, aby se nezobrazoval v odkazu
         $form->handleRequest($this->request);
 

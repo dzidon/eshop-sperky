@@ -2,7 +2,7 @@
 
 namespace App\Controller\User;
 
-use App\Form\LoginFormType;
+use App\Form\FormType\User\LoginFormType;
 use App\Service\BreadcrumbsService;
 use KnpU\OAuth2ClientBundle\Client\ClientRegistry;
 use KnpU\OAuth2ClientBundle\Client\Provider\FacebookClient;

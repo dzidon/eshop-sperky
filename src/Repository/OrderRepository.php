@@ -2,8 +2,8 @@
 
 namespace App\Repository;
 
+use App\Entity\Detached\Search\Composition\PhraseSortDropdown;
 use DateTime;
-use App\Entity\Detached\Search\SearchOrder;
 use App\Entity\Order;
 use App\Entity\Product;
 use App\Entity\User;
@@ -31,9 +31,9 @@ class OrderRepository extends ServiceEntityRepository
         $this->request = $requestStack->getCurrentRequest();
     }
 
-    public function getProfileSearchPagination(string $email, User $user, SearchOrder $searchData): Pagination
+    public function getProfileSearchPagination(string $email, User $user, PhraseSortDropdown $searchData): Pagination
     {
-        $sortData = $searchData->getDqlSortData();
+        $sortData = $searchData->getPhraseSort()->getSort()->getDqlSortData();
 
         $queryBuilder = $this->createQueryBuilder('o')
             ->andWhere('o.email = :email OR o.user = :user')
@@ -44,10 +44,10 @@ class OrderRepository extends ServiceEntityRepository
 
             // vyhledavani
             ->andWhere('o.id LIKE :searchPhrase')
-            ->setParameter('searchPhrase', '%' . $searchData->getSearchPhrase() . '%')
+            ->setParameter('searchPhrase', '%' . $searchData->getPhraseSort()->getPhrase()->getText() . '%')
         ;
 
-        $lifecycle = $searchData->getLifecycle();
+        $lifecycle = $searchData->getDropdown()->getChoice();
         if ($lifecycle !== null)
         {
             $queryBuilder
@@ -66,9 +66,9 @@ class OrderRepository extends ServiceEntityRepository
         return new Pagination($query, $this->request);
     }
 
-    public function getAdminSearchPagination(SearchOrder $searchData): Pagination
+    public function getAdminSearchPagination(PhraseSortDropdown $searchData): Pagination
     {
-        $sortData = $searchData->getDqlSortData();
+        $sortData = $searchData->getPhraseSort()->getSort()->getDqlSortData();
 
         $queryBuilder = $this->createQueryBuilder('o')
             ->andWhere('o.lifecycleChapter > :lifecycleFresh OR (o.createdManually = true AND o.lifecycleChapter = :lifecycleFresh)')
@@ -76,10 +76,10 @@ class OrderRepository extends ServiceEntityRepository
 
             // vyhledavani
             ->andWhere('o.id LIKE :searchPhrase')
-            ->setParameter('searchPhrase', '%' . $searchData->getSearchPhrase() . '%')
+            ->setParameter('searchPhrase', '%' . $searchData->getPhraseSort()->getPhrase()->getText() . '%')
         ;
 
-        $lifecycle = $searchData->getLifecycle();
+        $lifecycle = $searchData->getDropdown()->getChoice();
         if ($lifecycle !== null)
         {
             $queryBuilder

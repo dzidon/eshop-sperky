@@ -4,7 +4,7 @@ namespace App\Form\EventSubscriber;
 
 use App\Entity\Product;
 use App\Entity\ProductInformation;
-use App\Form\ProductInformationNewFormType;
+use App\Form\FormType\Admin\ProductInformationNewFormType;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;

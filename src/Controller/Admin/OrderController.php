@@ -3,15 +3,19 @@
 namespace App\Controller\Admin;
 
 use App\Entity\DeliveryMethod;
-use App\Entity\Detached\Search\SearchOrder;
+use App\Entity\Detached\Search\Atomic\Dropdown;
+use App\Entity\Detached\Search\Atomic\Phrase;
+use App\Entity\Detached\Search\Atomic\Sort;
+use App\Entity\Detached\Search\Composition\PhraseSort;
+use App\Entity\Detached\Search\Composition\PhraseSortDropdown;
 use App\Entity\Order;
 use App\Exception\PacketaException;
-use App\Form\CustomOrderFormType;
-use App\Form\HiddenTrueFormType;
-use App\Form\OrderCancelFormType;
-use App\Form\OrderEditFormType;
-use App\Form\OrderPacketaFormType;
-use App\Form\OrderSearchFormType;
+use App\Form\FormType\Admin\CustomOrderFormType;
+use App\Form\FormType\Search\Composition\PhraseSortDropdownFormType;
+use App\Form\FormType\User\HiddenTrueFormType;
+use App\Form\FormType\Admin\OrderCancelFormType;
+use App\Form\FormType\Admin\OrderEditFormType;
+use App\Form\FormType\Admin\OrderPacketaFormType;
 use App\Service\BreadcrumbsService;
 use App\Service\EntityCollectionService;
 use App\Service\OrderPostCompletionService;
@@ -51,8 +55,11 @@ class OrderController extends AbstractAdminController
      */
     public function orders(FormFactoryInterface $formFactory): Response
     {
-        $searchData = new SearchOrder(Order::getSortData(), 'Hledejte podle ID.');
-        $form = $formFactory->createNamed('', OrderSearchFormType::class, $searchData);
+        $phraseSort = new PhraseSort(new Phrase('Hledejte podle ID.'), new Sort(Order::getSortData()));
+        $dropdown = new Dropdown(array_flip(Order::LIFECYCLE_CHAPTERS));
+        $searchData = new PhraseSortDropdown($phraseSort, $dropdown);
+
+        $form = $formFactory->createNamed('', PhraseSortDropdownFormType::class, $searchData);
         // button je přidáván v šabloně, aby se nezobrazoval v odkazu
         $form->handleRequest($this->request);
 
