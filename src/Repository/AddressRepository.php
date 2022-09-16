@@ -18,13 +18,13 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 class AddressRepository extends ServiceEntityRepository
 {
-    private $request;
+    private RequestStack $requestStack;
 
     public function __construct(ManagerRegistry $registry, RequestStack $requestStack)
     {
         parent::__construct($registry, Address::class);
 
-        $this->request = $requestStack->getCurrentRequest();
+        $this->requestStack = $requestStack;
     }
 
     public function getSearchPagination(User $user, PhraseSort $searchData): Pagination
@@ -46,6 +46,6 @@ class AddressRepository extends ServiceEntityRepository
             ->getQuery()
         ;
 
-        return new Pagination($query, $this->request);
+        return new Pagination($query, $this->requestStack->getCurrentRequest());
     }
 }

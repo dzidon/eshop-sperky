@@ -17,13 +17,13 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 class ProductCategoryGroupRepository extends ServiceEntityRepository
 {
-    private $request;
+    private RequestStack $requestStack;
 
     public function __construct(ManagerRegistry $registry, RequestStack $requestStack)
     {
         parent::__construct($registry, ProductCategoryGroup::class);
 
-        $this->request = $requestStack->getCurrentRequest();
+        $this->requestStack = $requestStack;
     }
 
     public function findOneByIdAndFetchCategories($id)
@@ -65,7 +65,7 @@ class ProductCategoryGroupRepository extends ServiceEntityRepository
             ->getQuery()
         ;
 
-        return new Pagination($query, $this->request);
+        return new Pagination($query, $this->requestStack->getCurrentRequest());
     }
 
     public function getArrayOfNames(): array

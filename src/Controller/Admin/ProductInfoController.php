@@ -13,7 +13,7 @@ use App\Service\BreadcrumbsService;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
@@ -27,15 +27,13 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 class ProductInfoController extends AbstractAdminController
 {
     private LoggerInterface $logger;
-    private $request;
 
-    public function __construct(LoggerInterface $logger, BreadcrumbsService $breadcrumbs, RequestStack $requestStack)
+    public function __construct(LoggerInterface $logger, BreadcrumbsService $breadcrumbs)
     {
         parent::__construct($breadcrumbs);
-        $this->breadcrumbs->addRoute('admin_product_info');
 
+        $this->breadcrumbs->addRoute('admin_product_info');
         $this->logger = $logger;
-        $this->request = $requestStack->getCurrentRequest();
     }
 
     /**
@@ -43,7 +41,7 @@ class ProductInfoController extends AbstractAdminController
      *
      * @IsGranted("admin_product_info")
      */
-    public function productInfoGroups(FormFactoryInterface $formFactory): Response
+    public function productInfoGroups(FormFactoryInterface $formFactory, Request $request): Response
     {
         $phrase = new Phrase('Hledejte podle názvu.');
         $sort = new Sort(ProductInformationGroup::getSortData());
@@ -51,7 +49,7 @@ class ProductInfoController extends AbstractAdminController
 
         $form = $formFactory->createNamed('', PhraseSortFormType::class, $searchData);
         //button je přidáván v šabloně, aby se nezobrazoval v odkazu
-        $form->handleRequest($this->request);
+        $form->handleRequest($request);
 
         $pagination = $this->getDoctrine()->getRepository(ProductInformationGroup::class)->getSearchPagination($searchData);
         if($pagination->isCurrentPageOutOfBounds())
@@ -71,7 +69,7 @@ class ProductInfoController extends AbstractAdminController
      *
      * @IsGranted("product_info_edit")
      */
-    public function productInfoGroup($id = null): Response
+    public function productInfoGroup(Request $request, $id = null): Response
     {
         $user = $this->getUser();
 
@@ -93,7 +91,7 @@ class ProductInfoController extends AbstractAdminController
 
         $form = $this->createForm(ProductInformationGroupFormType::class, $infoGroup);
         $form->add('submit', SubmitType::class, ['label' => 'Uložit']);
-        $form->handleRequest($this->request);
+        $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid())
         {
@@ -118,7 +116,7 @@ class ProductInfoController extends AbstractAdminController
      *
      * @IsGranted("product_info_delete")
      */
-    public function productInfoGroupDelete($id): Response
+    public function productInfoGroupDelete(Request $request, $id): Response
     {
         $user = $this->getUser();
 
@@ -133,7 +131,7 @@ class ProductInfoController extends AbstractAdminController
             'label' => 'Smazat',
             'attr' => ['class' => 'btn-large red left'],
         ]);
-        $form->handleRequest($this->request);
+        $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid())
         {

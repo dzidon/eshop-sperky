@@ -17,13 +17,13 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 class DeliveryMethodRepository extends ServiceEntityRepository
 {
-    private $request;
+    private RequestStack $requestStack;
 
     public function __construct(ManagerRegistry $registry, RequestStack $requestStack)
     {
         parent::__construct($registry, DeliveryMethod::class);
 
-        $this->request = $requestStack->getCurrentRequest();
+        $this->requestStack = $requestStack;
     }
 
     public function getSearchPagination(PhraseSort $searchData): Pagination
@@ -41,6 +41,6 @@ class DeliveryMethodRepository extends ServiceEntityRepository
             ->getQuery()
         ;
 
-        return new Pagination($query, $this->request);
+        return new Pagination($query, $this->requestStack->getCurrentRequest());
     }
 }

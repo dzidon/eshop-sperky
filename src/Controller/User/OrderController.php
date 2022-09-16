@@ -16,7 +16,7 @@ use App\Service\OrderPostCompletionService;
 use App\Service\PaymentService;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Uid\Uuid;
@@ -28,13 +28,10 @@ class OrderController extends AbstractController
     private CustomOrderService $customOrderService;
     private BreadcrumbsService $breadcrumbs;
 
-    private $request;
-
-    public function __construct(CartService $cart, CustomOrderService $customOrderService, BreadcrumbsService $breadcrumbs, RequestStack $requestStack)
+    public function __construct(CartService $cart, CustomOrderService $customOrderService, BreadcrumbsService $breadcrumbs)
     {
         $this->cart = $cart;
         $this->customOrderService = $customOrderService;
-        $this->request = $requestStack->getCurrentRequest();
         $this->breadcrumbs = $breadcrumbs->addRoute('home');
     }
 
@@ -74,7 +71,7 @@ class OrderController extends AbstractController
     /**
      * @Route("/objednavka/doprava-a-platba/{token}", name="order_methods")
      */
-    public function orderMethods($token = null): Response
+    public function orderMethods(Request $request, $token = null): Response
     {
         $targetOrder = $this->cart->getOrder();
 
@@ -100,20 +97,20 @@ class OrderController extends AbstractController
             'action' => $this->generateUrl('order_methods', ['token' => $token]),
         ]);
         // tlačítko se přidává v šabloně
-        $form->handleRequest($this->request);
+        $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid())
         {
             $this->getDoctrine()->getManager()->persist($targetOrder);
             $this->getDoctrine()->getManager()->flush();
 
-            if(!$this->request->isXmlHttpRequest())
+            if(!$request->isXmlHttpRequest())
             {
                 return $this->redirectToRoute('order_addresses', ['token' => $token]);
             }
         }
 
-        if($this->request->isXmlHttpRequest())
+        if($request->isXmlHttpRequest())
         {
             $jsonResponse = new Json();
             return $jsonResponse
@@ -138,7 +135,7 @@ class OrderController extends AbstractController
     /**
      * @Route("/objednavka/dodaci-udaje/{token}", name="order_addresses")
      */
-    public function orderAddresses(OrderPostCompletionService $orderPostCompletionService, PaymentService $paymentService, LoggerInterface $logger, $token = null): Response
+    public function orderAddresses(OrderPostCompletionService $orderPostCompletionService, Request $request, PaymentService $paymentService, LoggerInterface $logger, $token = null): Response
     {
         $targetOrder = $this->cart->getOrder();
 
@@ -164,7 +161,7 @@ class OrderController extends AbstractController
 
         $form = $this->createForm(OrderAddressesFormType::class, $targetOrder);
         // tlačítko se přidává v šabloně
-        $form->handleRequest($this->request);
+        $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid() && !$targetOrder->hasSynchronizationWarnings())
         {
@@ -198,7 +195,7 @@ class OrderController extends AbstractController
     /**
      * @Route("/objednavka/nacist-adresu", name="order_address_load", methods={"POST"})
      */
-    public function loadAddress(): Response
+    public function loadAddress(Request $request): Response
     {
         $jsonResponse = new Json();
         $user = $this->getUser();
@@ -208,7 +205,7 @@ class OrderController extends AbstractController
             return $jsonResponse->create();
         }
 
-        $addressId = $this->request->request->get('addressId');
+        $addressId = $request->request->get('addressId');
         if ($addressId === null)
         {
             $jsonResponse->addResponseError('Musíte vybrat platnou adresu.');
@@ -243,15 +240,15 @@ class OrderController extends AbstractController
     /**
      * @Route("/objednavka/prehled/{token}", name="order_overview")
      */
-    public function orderPublicOverview($token = null): Response
+    public function orderPublicOverview(Request $request, $token = null): Response
     {
         if ($token !== null)
         {
-            $this->request->getSession()->set('OrderPublicToken', $token);
+            $request->getSession()->set('OrderPublicToken', $token);
             return $this->redirectToRoute('order_overview');
         }
 
-        $token = $this->request->getSession()->get('OrderPublicToken');
+        $token = $request->getSession()->get('OrderPublicToken');
         if ($token === null || !UUid::isValid($token))
         {
             throw new NotFoundHttpException('Neplatný token.');

@@ -22,13 +22,13 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
  */
 class ProductRepository extends ServiceEntityRepository
 {
-    private $request;
+    private RequestStack $requestStack;
 
     public function __construct(ManagerRegistry $registry, RequestStack $requestStack)
     {
         parent::__construct($registry, Product::class);
 
-        $this->request = $requestStack->getCurrentRequest();
+        $this->requestStack = $requestStack;
     }
 
     public function findOneAndFetchEverything(array $criteria, bool $visibleOnly): ?Product
@@ -307,7 +307,7 @@ class ProductRepository extends ServiceEntityRepository
             ->getQuery()
         ;
 
-        return new Pagination($query, $this->request, 12);
+        return new Pagination($query, $this->requestStack->getCurrentRequest(), 12);
     }
 
     private function getQueryForRelated(Product $product, int $quantity): QueryBuilder

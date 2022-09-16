@@ -14,7 +14,7 @@ use App\Service\EntityCollectionService;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
@@ -28,15 +28,13 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 class ProductCategoryController extends AbstractAdminController
 {
     private LoggerInterface $logger;
-    private $request;
 
-    public function __construct(LoggerInterface $logger, BreadcrumbsService $breadcrumbs, RequestStack $requestStack)
+    public function __construct(LoggerInterface $logger, BreadcrumbsService $breadcrumbs)
     {
         parent::__construct($breadcrumbs);
-        $this->breadcrumbs->addRoute('admin_product_categories');
 
+        $this->breadcrumbs->addRoute('admin_product_categories');
         $this->logger = $logger;
-        $this->request = $requestStack->getCurrentRequest();
     }
 
     /**
@@ -44,7 +42,7 @@ class ProductCategoryController extends AbstractAdminController
      *
      * @IsGranted("admin_product_categories")
      */
-    public function productCategoryGroups(FormFactoryInterface $formFactory): Response
+    public function productCategoryGroups(FormFactoryInterface $formFactory, Request $request): Response
     {
         $phrase = new Phrase('Hledejte podle názvu.');
         $sort = new Sort(ProductCategoryGroup::getSortData());
@@ -52,7 +50,7 @@ class ProductCategoryController extends AbstractAdminController
 
         $form = $formFactory->createNamed('', PhraseSortFormType::class, $searchData);
         //button je přidáván v šabloně, aby se nezobrazoval v odkazu
-        $form->handleRequest($this->request);
+        $form->handleRequest($request);
 
         $pagination = $this->getDoctrine()->getRepository(ProductCategoryGroup::class)->getSearchPagination($searchData);
         if($pagination->isCurrentPageOutOfBounds())
@@ -72,7 +70,7 @@ class ProductCategoryController extends AbstractAdminController
      *
      * @IsGranted("product_category_edit")
      */
-    public function productCategoryGroup(EntityCollectionService $entityCollectionService, $id = null): Response
+    public function productCategoryGroup(EntityCollectionService $entityCollectionService, Request $request, $id = null): Response
     {
         $user = $this->getUser();
 
@@ -95,7 +93,7 @@ class ProductCategoryController extends AbstractAdminController
         $collectionMessenger = $entityCollectionService->createEntityCollectionsMessengerForOrphanRemoval($categoryGroup);
         $form = $this->createForm(ProductCategoryGroupFormType::class, $categoryGroup);
         $form->add('submit', SubmitType::class, ['label' => 'Uložit']);
-        $form->handleRequest($this->request);
+        $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid())
         {
@@ -121,7 +119,7 @@ class ProductCategoryController extends AbstractAdminController
      *
      * @IsGranted("product_category_delete")
      */
-    public function productCategoryGroupDelete($id): Response
+    public function productCategoryGroupDelete(Request $request, $id): Response
     {
         $user = $this->getUser();
 
@@ -136,7 +134,7 @@ class ProductCategoryController extends AbstractAdminController
             'label' => 'Smazat',
             'attr' => ['class' => 'btn-large red left'],
         ]);
-        $form->handleRequest($this->request);
+        $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid())
         {

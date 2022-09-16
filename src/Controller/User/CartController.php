@@ -10,7 +10,7 @@ use App\Form\FormType\User\CartFormType;
 use App\Response\Json;
 use App\Service\CartService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -19,28 +19,26 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class CartController extends AbstractController
 {
-    private $request;
     private CartService $cart;
 
-    public function __construct(RequestStack $requestStack, CartService $cart)
+    public function __construct(CartService $cart)
     {
         $this->cart = $cart;
-        $this->request = $requestStack->getCurrentRequest();
     }
 
-    private function getProductIdFromRequest(): ?int
+    private function getProductIdFromRequest(Request $request): ?int
     {
-        if(isset($this->request->request->all()['cart_insert_form']['productId']) && is_numeric($this->request->request->all()['cart_insert_form']['productId']))
+        if(isset($request->request->all()['cart_insert_form']['productId']) && is_numeric($request->request->all()['cart_insert_form']['productId']))
         {
-            return (int) $this->request->request->all()['cart_insert_form']['productId'];
+            return (int) $request->request->all()['cart_insert_form']['productId'];
         }
 
         return null;
     }
 
-    private function getCartOccurenceIdFromRequest(): ?int
+    private function getCartOccurenceIdFromRequest(Request $request): ?int
     {
-        $cartOccurenceId = $this->request->request->get('cartOccurenceId');
+        $cartOccurenceId = $request->request->get('cartOccurenceId');
         if($cartOccurenceId !== null)
         {
             return (int) $cartOccurenceId;
@@ -52,15 +50,15 @@ class CartController extends AbstractController
     /**
      * @Route("/vlozit", name="cart_insert")
      */
-    public function insert(): Response
+    public function insert(Request $request): Response
     {
-        if (!$this->request->isXmlHttpRequest())
+        if (!$request->isXmlHttpRequest())
         {
             throw $this->createNotFoundException();
         }
 
         $jsonResponse = new Json();
-        $productId = $this->getProductIdFromRequest();
+        $productId = $this->getProductIdFromRequest($request);
         if ($productId === null)
         {
             $jsonResponse->addResponseError('Bylo odesláno neplatné ID produktu. Zkuste aktualizovat stránku a opakovat akci.');
@@ -77,7 +75,7 @@ class CartController extends AbstractController
 
         $cartInsertRequest = new CartInsert($product);
         $form = $this->createForm(CartInsertFormType::class, $cartInsertRequest);
-        $form->handleRequest($this->request);
+        $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid())
         {
@@ -109,9 +107,9 @@ class CartController extends AbstractController
     /**
      * @Route("/aktualizovat", name="cart_update")
      */
-    public function update(): Response
+    public function update(Request $request): Response
     {
-        if (!$this->request->isXmlHttpRequest())
+        if (!$request->isXmlHttpRequest())
         {
             throw $this->createNotFoundException();
         }
@@ -121,7 +119,7 @@ class CartController extends AbstractController
 
         $form = $this->createForm(CartFormType::class, $order);
         $jsonResponse->setResponseHtml($this->renderView('fragments/forms_unique/_form_cart_update.html.twig', ['cartForm' => $form->createView(), 'order' => $order]));
-        $form->handleRequest($this->request);
+        $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid())
         {
@@ -144,15 +142,15 @@ class CartController extends AbstractController
     /**
      * @Route("/smazat", name="cart_remove")
      */
-    public function remove(): Response
+    public function remove(Request $request): Response
     {
-        if (!$this->request->isXmlHttpRequest())
+        if (!$request->isXmlHttpRequest())
         {
             throw $this->createNotFoundException();
         }
 
         $jsonResponse = new Json();
-        $cartOccurenceId = $this->getCartOccurenceIdFromRequest();
+        $cartOccurenceId = $this->getCartOccurenceIdFromRequest($request);
 
         try
         {

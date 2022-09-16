@@ -11,7 +11,7 @@ use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
@@ -32,13 +32,11 @@ class ResetPasswordController extends AbstractController
     private ResetPasswordHelperInterface $resetPasswordHelper;
     private LoggerInterface $logger;
     private BreadcrumbsService $breadcrumbs;
-    private $request;
 
-    public function __construct(ResetPasswordHelperInterface $resetPasswordHelper, LoggerInterface $logger, BreadcrumbsService $breadcrumbs, RequestStack $requestStack)
+    public function __construct(ResetPasswordHelperInterface $resetPasswordHelper, LoggerInterface $logger, BreadcrumbsService $breadcrumbs)
     {
         $this->resetPasswordHelper = $resetPasswordHelper;
         $this->logger = $logger;
-        $this->request = $requestStack->getCurrentRequest();
         $this->breadcrumbs = $breadcrumbs
             ->addRoute('home')
             ->addRoute('login')
@@ -50,12 +48,12 @@ class ResetPasswordController extends AbstractController
      *
      * @Route("", name="forgot_password_request")
      */
-    public function request(MailerInterface $mailer): Response
+    public function request(MailerInterface $mailer, Request $request): Response
     {
         $userForEmailValidation = new User();
         $form = $this->createForm(ResetPasswordRequestFormType::class, $userForEmailValidation);
         $form->add('submit', SubmitType::class, ['label' => 'Poslat odkaz']);
-        $form->handleRequest($this->request);
+        $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid())
         {
@@ -75,7 +73,7 @@ class ResetPasswordController extends AbstractController
      *
      * @Route("/zpracovani/{token}", name="reset_password")
      */
-    public function reset(TranslatorInterface $translator, string $token = null): Response
+    public function reset(TranslatorInterface $translator, Request $request, string $token = null): Response
     {
         if ($token)
         {
@@ -102,7 +100,7 @@ class ResetPasswordController extends AbstractController
 
         $form = $this->createForm(ChangePasswordFormType::class, $user);
         $form->add('submit', SubmitType::class, ['label' => 'Změnit']);
-        $form->handleRequest($this->request);
+        $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid())
         {

@@ -21,13 +21,13 @@ use Doctrine\ORM\Query;
  */
 class UserRepository extends ServiceEntityRepository implements PasswordUpgraderInterface
 {
-    private $request;
+    private RequestStack $requestStack;
 
     public function __construct(ManagerRegistry $registry, RequestStack $requestStack)
     {
         parent::__construct($registry, User::class);
 
-        $this->request = $requestStack->getCurrentRequest();
+        $this->requestStack = $requestStack;
     }
 
     /**
@@ -67,6 +67,6 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             ->setHint(Query::HINT_FORCE_PARTIAL_LOAD, true)
         ;
 
-        return new Pagination($query, $this->request);
+        return new Pagination($query, $this->requestStack->getCurrentRequest());
     }
 }

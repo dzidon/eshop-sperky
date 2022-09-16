@@ -23,7 +23,7 @@ use App\Service\PacketaApiService;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
@@ -37,15 +37,13 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 class OrderController extends AbstractAdminController
 {
     private LoggerInterface $logger;
-    private $request;
 
-    public function __construct(LoggerInterface $logger, BreadcrumbsService $breadcrumbs, RequestStack $requestStack)
+    public function __construct(LoggerInterface $logger, BreadcrumbsService $breadcrumbs)
     {
         parent::__construct($breadcrumbs);
-        $this->breadcrumbs->addRoute('admin_orders');
 
+        $this->breadcrumbs->addRoute('admin_orders');
         $this->logger = $logger;
-        $this->request = $requestStack->getCurrentRequest();
     }
 
     /**
@@ -53,7 +51,7 @@ class OrderController extends AbstractAdminController
      *
      * @IsGranted("admin_orders")
      */
-    public function orders(FormFactoryInterface $formFactory): Response
+    public function orders(FormFactoryInterface $formFactory, Request $request): Response
     {
         $phraseSort = new PhraseSort(new Phrase('Hledejte podle ID.'), new Sort(Order::getSortData()));
         $dropdown = new Dropdown(array_flip(Order::LIFECYCLE_CHAPTERS));
@@ -61,7 +59,7 @@ class OrderController extends AbstractAdminController
 
         $form = $formFactory->createNamed('', PhraseSortDropdownFormType::class, $searchData);
         // button je přidáván v šabloně, aby se nezobrazoval v odkazu
-        $form->handleRequest($this->request);
+        $form->handleRequest($request);
 
         $pagination = $this->getDoctrine()->getRepository(Order::class)->getAdminSearchPagination($searchData);
         if($pagination->isCurrentPageOutOfBounds())
@@ -81,7 +79,7 @@ class OrderController extends AbstractAdminController
      *
      * @IsGranted("order_edit_custom")
      */
-    public function orderCustom(EntityCollectionService $entityCollectionService, int $id = null): Response
+    public function orderCustom(EntityCollectionService $entityCollectionService, Request $request, int $id = null): Response
     {
         $user = $this->getUser();
 
@@ -105,7 +103,7 @@ class OrderController extends AbstractAdminController
         $collectionMessenger = $entityCollectionService->createEntityCollectionsMessengerForOrphanRemoval($order);
         $form = $this->createForm(CustomOrderFormType::class, $order);
         $form->add('submit', SubmitType::class, ['label' => 'Uložit']);
-        $form->handleRequest($this->request);
+        $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid())
         {
@@ -132,7 +130,7 @@ class OrderController extends AbstractAdminController
      *
      * @IsGranted("order_delete_custom")
      */
-    public function orderCustomDelete($id): Response
+    public function orderCustomDelete(Request $request, $id): Response
     {
         $user = $this->getUser();
 
@@ -147,7 +145,7 @@ class OrderController extends AbstractAdminController
             'label' => 'Smazat',
             'attr' => ['class' => 'btn-large red left'],
         ]);
-        $form->handleRequest($this->request);
+        $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid())
         {
@@ -174,7 +172,7 @@ class OrderController extends AbstractAdminController
      *
      * @IsGranted("order_edit")
      */
-    public function order(PacketaApiService $packetaApiService, int $id = null): Response
+    public function order(PacketaApiService $packetaApiService, Request $request, int $id = null): Response
     {
         $user = $this->getUser();
 
@@ -198,7 +196,7 @@ class OrderController extends AbstractAdminController
                 'label' => 'Nastavit',
                 'attr' => ['class' => 'btn-medium blue left'],
             ]);
-            $formLifecycleChapter->handleRequest($this->request);
+            $formLifecycleChapter->handleRequest($request);
             $formLifecycleChapterView = $formLifecycleChapter->createView();
 
             if ($formLifecycleChapter->isSubmitted() && $formLifecycleChapter->isValid())
@@ -229,7 +227,7 @@ class OrderController extends AbstractAdminController
                         'label' => 'Vytvořit',
                         'attr' => ['class' => 'btn-medium blue left'],
                     ]);
-                    $formPacketa->handleRequest($this->request);
+                    $formPacketa->handleRequest($request);
                     $formPacketaView = $formPacketa->createView();
 
                     if ($formPacketa->isSubmitted() && $formPacketa->isValid())
@@ -267,7 +265,7 @@ class OrderController extends AbstractAdminController
      *
      * @IsGranted("order_cancel")
      */
-    public function orderCancel(OrderPostCompletionService $orderPostCompletionService, $id): Response
+    public function orderCancel(OrderPostCompletionService $orderPostCompletionService, Request $request, $id): Response
     {
         $user = $this->getUser();
 
@@ -283,12 +281,12 @@ class OrderController extends AbstractAdminController
             'label' => 'Zrušit',
             'attr' => ['class' => 'btn-large red left'],
         ]);
-        $form->handleRequest($this->request);
+        $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid())
         {
             $orderPostCompletionService
-                ->cancelOrder($order, $forceInventoryReplenish = false)
+                ->cancelOrder($order, false)
                 ->sendConfirmationEmail($order);
 
             $entityManager = $this->getDoctrine()->getManager();

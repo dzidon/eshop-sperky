@@ -8,7 +8,7 @@ use App\Service\PaymentService;
 use App\Exception\PaymentException;
 use App\Service\BreadcrumbsService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -20,18 +20,16 @@ class PaymentController extends AbstractController
 {
     private Payments $payments;
     private PaymentService $paymentService;
-    private $request;
 
-    public function __construct(PaymentService $paymentService, Payments $payments, RequestStack $requestStack)
+    public function __construct(PaymentService $paymentService, Payments $payments)
     {
         $this->payments = $payments;
         $this->paymentService = $paymentService;
-        $this->request = $requestStack->getCurrentRequest();
     }
 
-    private function validateRequestAndGetData(): array
+    private function validateRequestAndGetData(Request $request): array
     {
-        $paymentId = $this->request->query->get('id');
+        $paymentId = $request->query->get('id');
         if ($paymentId === null)
         {
             throw $this->createNotFoundException('V odkazu chybí id platby.');
@@ -58,9 +56,9 @@ class PaymentController extends AbstractController
     /**
      * @Route("", name="payment_return")
      */
-    public function returnAction(BreadcrumbsService $breadcrumbs): Response
+    public function returnAction(BreadcrumbsService $breadcrumbs, Request $request): Response
     {
-        $data = $this->validateRequestAndGetData();
+        $data = $this->validateRequestAndGetData($request);
 
         /** @var Payment $payment */
         $payment = $data['payment'];
@@ -87,9 +85,9 @@ class PaymentController extends AbstractController
     /**
      * @Route("/notifikace", name="payment_notification")
      */
-    public function notificationAction(): Response
+    public function notificationAction(Request $request): Response
     {
-        $data = $this->validateRequestAndGetData();
+        $data = $this->validateRequestAndGetData($request);
 
         /** @var Payment $payment */
         $payment = $data['payment'];

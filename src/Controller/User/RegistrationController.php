@@ -10,7 +10,7 @@ use App\Service\UserRegistrationService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
@@ -22,19 +22,17 @@ class RegistrationController extends AbstractController
 {
     private TranslatorInterface $translator;
     private BreadcrumbsService $breadcrumbs;
-    private $request;
 
-    public function __construct(TranslatorInterface $translator, BreadcrumbsService $breadcrumbs, RequestStack $requestStack)
+    public function __construct(TranslatorInterface $translator, BreadcrumbsService $breadcrumbs)
     {
         $this->translator = $translator;
         $this->breadcrumbs = $breadcrumbs->addRoute('home')->addRoute('register');
-        $this->request = $requestStack->getCurrentRequest();
     }
 
     /**
      * @Route("/registrace", name="register")
      */
-    public function register(UserRegistrationService $userRegistrationService): Response
+    public function register(UserRegistrationService $userRegistrationService, Request $request): Response
     {
         if ($this->getUser())
         {
@@ -45,7 +43,7 @@ class RegistrationController extends AbstractController
         $user = new User();
         $form = $this->createForm(RegistrationFormType::class, $user);
         $form->add('submit', SubmitType::class, ['label' => 'Zaregistrovat se']);
-        $form->handleRequest($this->request);
+        $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid())
         {
@@ -63,7 +61,7 @@ class RegistrationController extends AbstractController
     /**
      * @Route("/overeni-emailu", name="verify_email")
      */
-    public function verifyUserEmail(FormFactoryInterface $formFactory, AuthenticationUtils $authenticationUtils): Response
+    public function verifyUserEmail(FormFactoryInterface $formFactory, AuthenticationUtils $authenticationUtils, Request $request): Response
     {
         $user = $this->getUser();
         if($user)
@@ -72,7 +70,7 @@ class RegistrationController extends AbstractController
             return $this->redirectToRoute('home');
         }
 
-        if(!$this->request->query->has('email') || !$this->request->query->has('expires') || !$this->request->query->has('signature') || !$this->request->query->has('token'))
+        if(!$request->query->has('email') || !$request->query->has('expires') || !$request->query->has('signature') || !$request->query->has('token'))
         {
             throw new NotFoundHttpException('Nemáte platný odkaz pro ověření účtu.');
         }
@@ -83,7 +81,7 @@ class RegistrationController extends AbstractController
             $this->addFlash('failure', $this->translator->trans($error->getMessageKey()));
         }
 
-        $form = $formFactory->createNamed('', VerificationFormType::class, null, ['default_email' => $this->request->query->get('email', '')]);
+        $form = $formFactory->createNamed('', VerificationFormType::class, null, ['default_email' => $request->query->get('email', '')]);
         $form->add('submit', SubmitType::class, ['label' => 'Ověřit']);
 
         $this->breadcrumbs->addRoute('verify_email');

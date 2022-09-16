@@ -14,7 +14,7 @@ use App\Service\BreadcrumbsService;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -29,15 +29,13 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 class UserController extends AbstractAdminController
 {
     private LoggerInterface $logger;
-    private $request;
 
-    public function __construct(LoggerInterface $logger, BreadcrumbsService $breadcrumbs, RequestStack $requestStack)
+    public function __construct(LoggerInterface $logger, BreadcrumbsService $breadcrumbs)
     {
         parent::__construct($breadcrumbs);
-        $this->breadcrumbs->addRoute('admin_user_management');
 
+        $this->breadcrumbs->addRoute('admin_user_management');
         $this->logger = $logger;
-        $this->request = $requestStack->getCurrentRequest();
     }
 
     /**
@@ -45,7 +43,7 @@ class UserController extends AbstractAdminController
      *
      * @IsGranted("admin_user_management")
      */
-    public function users(FormFactoryInterface $formFactory): Response
+    public function users(FormFactoryInterface $formFactory, Request $request): Response
     {
         $phrase = new Phrase('Hledejte podle e-mailu, jména nebo telefonního čísla.');
         $sort = new Sort(User::getSortData());
@@ -53,7 +51,7 @@ class UserController extends AbstractAdminController
 
         $form = $formFactory->createNamed('', PhraseSortFormType::class, $searchData);
         //button je přidáván v šabloně, aby se nezobrazoval v odkazu
-        $form->handleRequest($this->request);
+        $form->handleRequest($request);
 
         $pagination = $this->getDoctrine()->getRepository(User::class)->getSearchPagination($searchData);
         if ($pagination->isCurrentPageOutOfBounds())
@@ -75,7 +73,7 @@ class UserController extends AbstractAdminController
      *
      * @IsGranted("admin_user_management")
      */
-    public function editUser($id): Response
+    public function editUser(Request $request, $id): Response
     {
         $entityManager = $this->getDoctrine()->getManager();
         $user = $this->getUser();
@@ -101,7 +99,7 @@ class UserController extends AbstractAdminController
         {
             $formCredentials = $this->createForm(PersonalInfoFormType::class, $userEdited);
             $formCredentials->add('submit', SubmitType::class, ['label' => 'Uložit', 'attr' => ['class' => 'btn-large blue left']]);
-            $formCredentials->handleRequest($this->request);
+            $formCredentials->handleRequest($request);
 
             if ($formCredentials->isSubmitted() && $formCredentials->isValid())
             {
@@ -129,7 +127,7 @@ class UserController extends AbstractAdminController
         {
             $formPermissions = $this->createForm(AdminPermissionsFormType::class, $userEdited);
             $formPermissions->add('submit', SubmitType::class, ['label' => 'Uložit', 'attr' => ['class' => 'btn-large blue left']]);
-            $formPermissions->handleRequest($this->request);
+            $formPermissions->handleRequest($request);
 
             if ($formPermissions->isSubmitted() && $formPermissions->isValid())
             {
@@ -160,7 +158,7 @@ class UserController extends AbstractAdminController
             {
                 $formMute->add('submit', SubmitType::class, ['label' => 'Umlčet', 'attr' => ['class' => 'btn-large red left']]);
             }
-            $formMute->handleRequest($this->request);
+            $formMute->handleRequest($request);
 
             if ($formMute->isSubmitted() && $formMute->isValid())
             {

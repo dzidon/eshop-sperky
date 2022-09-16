@@ -15,7 +15,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -29,21 +29,17 @@ class ReviewController extends AbstractController
 {
     private LoggerInterface $logger;
     private BreadcrumbsService $breadcrumbs;
-    private $request;
 
-    public function __construct(LoggerInterface $logger, BreadcrumbsService $breadcrumbs, RequestStack $requestStack)
+    public function __construct(LoggerInterface $logger, BreadcrumbsService $breadcrumbs)
     {
         $this->logger = $logger;
-        $this->breadcrumbs = $breadcrumbs;
-        $this->request = $requestStack->getCurrentRequest();
-
-        $this->breadcrumbs->addRoute('home')->addRoute('reviews');
+        $this->breadcrumbs = $breadcrumbs->addRoute('home')->addRoute('reviews');
     }
 
     /**
      * @Route("/vsechny", name="reviews")
      */
-    public function reviews(FormFactoryInterface $formFactory): Response
+    public function reviews(FormFactoryInterface $formFactory, Request $request): Response
     {
         $phrase = new Phrase('Hledejte jméno autora nebo kus textu.');
         $sort = new Sort(Review::getSortData());
@@ -51,7 +47,7 @@ class ReviewController extends AbstractController
 
         $form = $formFactory->createNamed('', PhraseSortFormType::class, $searchData);
         //button je přidáván v šabloně, aby se nezobrazoval v odkazu
-        $form->handleRequest($this->request);
+        $form->handleRequest($request);
 
         $pagination = $this->getDoctrine()->getRepository(Review::class)->getSearchPagination($searchData);
         if($pagination->isCurrentPageOutOfBounds())
@@ -71,7 +67,7 @@ class ReviewController extends AbstractController
      *
      * @IsGranted("IS_AUTHENTICATED_REMEMBERED")
      */
-    public function reviewEdit($id = null): Response
+    public function reviewEdit(Request $request, $id = null): Response
     {
         /** @var User $user */
         $user = $this->getUser();
@@ -133,7 +129,7 @@ class ReviewController extends AbstractController
 
         $form = $this->createForm(ReviewFormType::class, $review);
         $form->add('submit', SubmitType::class, ['label' => 'Uložit']);
-        $form->handleRequest($this->request);
+        $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid())
         {
@@ -158,7 +154,7 @@ class ReviewController extends AbstractController
      *
      * @IsGranted("IS_AUTHENTICATED_REMEMBERED")
      */
-    public function reviewDelete($id): Response
+    public function reviewDelete(Request $request, $id): Response
     {
         $user = $this->getUser();
         $review = $this->getDoctrine()->getRepository(Review::class)->findOneBy(['id' => $id]);
@@ -184,7 +180,7 @@ class ReviewController extends AbstractController
                 'class' => 'btn-large red left',
             ],
         ]);
-        $form->handleRequest($this->request);
+        $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid())
         {

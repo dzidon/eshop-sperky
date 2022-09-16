@@ -18,13 +18,13 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 class ProductSectionRepository extends ServiceEntityRepository
 {
-    private $request;
+    private RequestStack $requestStack;
 
     public function __construct(ManagerRegistry $registry, RequestStack $requestStack)
     {
         parent::__construct($registry, ProductSection::class);
 
-        $this->request = $requestStack->getCurrentRequest();
+        $this->requestStack = $requestStack;
     }
 
     public function findAllVisible()
@@ -57,6 +57,6 @@ class ProductSectionRepository extends ServiceEntityRepository
             ->getQuery()
         ;
 
-        return new Pagination($query, $this->request);
+        return new Pagination($query, $this->requestStack->getCurrentRequest());
     }
 }

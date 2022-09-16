@@ -14,7 +14,7 @@ use App\Form\FormType\Search\Composition\ProductCatalogFilterFormType;
 use App\Service\BreadcrumbsService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
@@ -23,20 +23,16 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 class ProductController extends AbstractController
 {
     private BreadcrumbsService $breadcrumbs;
-    private $request;
 
-    public function __construct(BreadcrumbsService $breadcrumbs, RequestStack $requestStack)
+    public function __construct(BreadcrumbsService $breadcrumbs)
     {
-        $this->breadcrumbs = $breadcrumbs;
-        $this->request = $requestStack->getCurrentRequest();
-
-        $this->breadcrumbs->addRoute('home');
+        $this->breadcrumbs = $breadcrumbs->addRoute('home');
     }
 
     /**
      * @Route("/produkty/{slug}", name="products")
      */
-    public function products(FormFactoryInterface $formFactory, string $slug = null): Response
+    public function products(FormFactoryInterface $formFactory, Request $request, string $slug = null): Response
     {
         $section = null;
         if($slug)
@@ -59,7 +55,7 @@ class ProductController extends AbstractController
 
         $form = $formFactory->createNamed('', ProductCatalogFilterFormType::class, $filterData);
         // button je přidáván v šabloně, aby se nezobrazoval v odkazu
-        $form->handleRequest($this->request);
+        $form->handleRequest($request);
 
         $pagination = $this->getDoctrine()->getRepository(Product::class)->getSearchPagination(false, $filterData);
         $pagination->addAttributesToPathParameters(['slug']);
@@ -68,7 +64,7 @@ class ProductController extends AbstractController
             throw new NotFoundHttpException('Na této stránce nebyly nalezeny žádné produkty.');
         }
 
-        if ($this->request->isXmlHttpRequest())
+        if ($request->isXmlHttpRequest())
         {
             $response = $this->render('fragments/forms_unique/_form_product_catalog.html.twig', [
                 'filterForm' => $form->createView(),

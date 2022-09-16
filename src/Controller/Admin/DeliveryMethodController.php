@@ -12,7 +12,7 @@ use App\Service\BreadcrumbsService;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
@@ -26,15 +26,13 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 class DeliveryMethodController extends AbstractAdminController
 {
     private LoggerInterface $logger;
-    private $request;
 
-    public function __construct(LoggerInterface $logger, BreadcrumbsService $breadcrumbs, RequestStack $requestStack)
+    public function __construct(LoggerInterface $logger, BreadcrumbsService $breadcrumbs)
     {
         parent::__construct($breadcrumbs);
-        $this->breadcrumbs->addRoute('admin_delivery_methods');
 
+        $this->breadcrumbs->addRoute('admin_delivery_methods');
         $this->logger = $logger;
-        $this->request = $requestStack->getCurrentRequest();
     }
 
     /**
@@ -42,7 +40,7 @@ class DeliveryMethodController extends AbstractAdminController
      *
      * @IsGranted("admin_payment_methods")
      */
-    public function deliveryMethods(FormFactoryInterface $formFactory): Response
+    public function deliveryMethods(FormFactoryInterface $formFactory, Request $request): Response
     {
         $phrase = new Phrase('Hledejte podle názvu.');
         $sort = new Sort(DeliveryMethod::getSortData());
@@ -50,7 +48,7 @@ class DeliveryMethodController extends AbstractAdminController
 
         $form = $formFactory->createNamed('', PhraseSortFormType::class, $searchData);
         //button je přidáván v šabloně, aby se nezobrazoval v odkazu
-        $form->handleRequest($this->request);
+        $form->handleRequest($request);
 
         $pagination = $this->getDoctrine()->getRepository(DeliveryMethod::class)->getSearchPagination($searchData);
         if($pagination->isCurrentPageOutOfBounds())
@@ -70,7 +68,7 @@ class DeliveryMethodController extends AbstractAdminController
      *
      * @IsGranted("delivery_method_edit")
      */
-    public function deliveryMethod($id): Response
+    public function deliveryMethod(Request $request, $id): Response
     {
         $user = $this->getUser();
 
@@ -84,7 +82,7 @@ class DeliveryMethodController extends AbstractAdminController
 
         $form = $this->createForm(DeliveryMethodFormType::class, $deliveryMethod);
         $form->add('submit', SubmitType::class, ['label' => 'Uložit']);
-        $form->handleRequest($this->request);
+        $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid())
         {

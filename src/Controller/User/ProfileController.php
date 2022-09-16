@@ -21,7 +21,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -37,28 +37,24 @@ class ProfileController extends AbstractController
 {
     private LoggerInterface $logger;
     private BreadcrumbsService $breadcrumbs;
-    private $request;
 
-    public function __construct(LoggerInterface $logger, BreadcrumbsService $breadcrumbs, RequestStack $requestStack)
+    public function __construct(LoggerInterface $logger, BreadcrumbsService $breadcrumbs)
     {
         $this->logger = $logger;
-        $this->breadcrumbs = $breadcrumbs;
-        $this->request = $requestStack->getCurrentRequest();
-
-        $this->breadcrumbs->addRoute('home')->addRoute('profile', [], 'Profil');
+        $this->breadcrumbs = $breadcrumbs->addRoute('home')->addRoute('profile', [], 'Profil');
     }
 
     /**
      * @Route("", name="profile")
      */
-    public function overview(): Response
+    public function overview(Request $request): Response
     {
         /** @var User|null $user */
         $user = $this->getUser();
 
         $form = $this->createForm(PersonalInfoFormType::class, $user);
         $form->add('submit', SubmitType::class, ['label' => 'Uložit']);
-        $form->handleRequest($this->request);
+        $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid())
         {
@@ -86,7 +82,7 @@ class ProfileController extends AbstractController
     /**
      * @Route("/zmena-hesla", name="profile_change_password")
      */
-    public function passwordChange(): Response
+    public function passwordChange(Request $request): Response
     {
         /** @var User|null $user */
         $user = $this->getUser();
@@ -98,7 +94,7 @@ class ProfileController extends AbstractController
 
         $form = $this->createForm(ChangePasswordLoggedInFormType::class, $user);
         $form->add('submit', SubmitType::class, ['label' => 'Uložit']);
-        $form->handleRequest($this->request);
+        $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid())
         {
@@ -122,7 +118,7 @@ class ProfileController extends AbstractController
     /**
      * @Route("/adresy", name="profile_addresses")
      */
-    public function addresses(FormFactoryInterface $formFactory): Response
+    public function addresses(FormFactoryInterface $formFactory, Request $request): Response
     {
         /** @var User|null $user */
         $user = $this->getUser();
@@ -133,7 +129,7 @@ class ProfileController extends AbstractController
 
         $form = $formFactory->createNamed('', PhraseSortFormType::class, $searchData);
         //button je přidáván v šabloně, aby se nezobrazoval v odkazu
-        $form->handleRequest($this->request);
+        $form->handleRequest($request);
 
         $pagination = $this->getDoctrine()->getRepository(Address::class)->getSearchPagination($user, $searchData);
         if ($pagination->isCurrentPageOutOfBounds())
@@ -153,7 +149,7 @@ class ProfileController extends AbstractController
     /**
      * @Route("/adresa/{id}", name="profile_address", requirements={"id"="\d+"})
      */
-    public function address($id = null): Response
+    public function address(Request $request, $id = null): Response
     {
         /** @var User|null $user */
         $user = $this->getUser();
@@ -181,7 +177,7 @@ class ProfileController extends AbstractController
 
         $form = $this->createForm(AddressFormType::class, $address);
         $form->add('submit', SubmitType::class, ['label' => 'Uložit']);
-        $form->handleRequest($this->request);
+        $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid())
         {
@@ -204,7 +200,7 @@ class ProfileController extends AbstractController
     /**
      * @Route("/adresa/{id}/smazat", name="profile_address_delete", requirements={"id"="\d+"})
      */
-    public function addressDelete($id): Response
+    public function addressDelete(Request $request, $id): Response
     {
         /** @var User|null $user */
         $user = $this->getUser();
@@ -224,7 +220,7 @@ class ProfileController extends AbstractController
             'label' => 'Smazat',
             'attr' => ['class' => 'btn-large red left'],
         ]);
-        $form->handleRequest($this->request);
+        $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid())
         {
@@ -251,7 +247,7 @@ class ProfileController extends AbstractController
     /**
      * @Route("/objednavky", name="profile_orders")
      */
-    public function orders(FormFactoryInterface $formFactory): Response
+    public function orders(FormFactoryInterface $formFactory, Request $request): Response
     {
         /** @var User|null $user */
         $user = $this->getUser();
@@ -264,7 +260,7 @@ class ProfileController extends AbstractController
 
         $form = $formFactory->createNamed('', PhraseSortDropdownFormType::class, $searchData);
         //button je přidáván v šabloně, aby se nezobrazoval v odkazu
-        $form->handleRequest($this->request);
+        $form->handleRequest($request);
 
         $pagination = $this->getDoctrine()->getRepository(Order::class)->getProfileSearchPagination($user->getEmail(), $user, $searchData);
         if($pagination->isCurrentPageOutOfBounds())

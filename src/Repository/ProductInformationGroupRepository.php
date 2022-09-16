@@ -17,13 +17,13 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 class ProductInformationGroupRepository extends ServiceEntityRepository
 {
-    private $request;
+    private RequestStack $requestStack;
 
     public function __construct(ManagerRegistry $registry, RequestStack $requestStack)
     {
         parent::__construct($registry, ProductInformationGroup::class);
 
-        $this->request = $requestStack->getCurrentRequest();
+        $this->requestStack = $requestStack;
     }
 
     public function getSearchPagination(PhraseSort $searchData): Pagination
@@ -41,7 +41,7 @@ class ProductInformationGroupRepository extends ServiceEntityRepository
             ->getQuery()
         ;
 
-        return new Pagination($query, $this->request);
+        return new Pagination($query, $this->requestStack->getCurrentRequest());
     }
 
     public function getArrayOfNames(): array
