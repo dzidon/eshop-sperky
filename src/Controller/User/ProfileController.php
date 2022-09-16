@@ -256,8 +256,10 @@ class ProfileController extends AbstractController
         /** @var User|null $user */
         $user = $this->getUser();
 
+        $lifecycleChapters = Order::LIFECYCLE_CHAPTERS;
+        unset($lifecycleChapters[Order::LIFECYCLE_FRESH]);
+        $dropdown = new Dropdown(array_flip($lifecycleChapters));
         $phraseSort = new PhraseSort(new Phrase('Hledejte podle ID.'), new Sort(Order::getSortData()));
-        $dropdown = new Dropdown(array_flip(Order::LIFECYCLE_CHAPTERS));
         $searchData = new PhraseSortDropdown($phraseSort, $dropdown);
 
         $form = $formFactory->createNamed('', PhraseSortDropdownFormType::class, $searchData);
