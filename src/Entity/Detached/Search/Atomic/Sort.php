@@ -13,7 +13,7 @@ class Sort extends AbstractSearch
 
     protected array $allSortData;
 
-    public function __construct(array $allSortData, ?string $label = 'Řazení')
+    public function __construct(array $allSortData, string $label = 'Řazení')
     {
         $this->allSortData = $allSortData;
         $this->label = $label;

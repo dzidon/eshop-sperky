@@ -254,7 +254,7 @@ class ProfileController extends AbstractController
 
         $lifecycleChapters = Order::LIFECYCLE_CHAPTERS;
         unset($lifecycleChapters[Order::LIFECYCLE_FRESH]);
-        $dropdown = new Dropdown(array_flip($lifecycleChapters));
+        $dropdown = new Dropdown(array_flip($lifecycleChapters), 'Typ', '-- všechny --');
         $phraseSort = new PhraseSort(new Phrase('Hledejte podle ID.'), new Sort(Order::getSortData()));
         $searchData = new PhraseSortDropdown($phraseSort, $dropdown);
 

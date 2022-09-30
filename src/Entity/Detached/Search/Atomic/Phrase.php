@@ -10,7 +10,7 @@ class Phrase extends AbstractSearch
 
     protected ?string $searchHelp = null;
 
-    public function __construct(string $searchHelp = null, ?string $label = 'Hledat')
+    public function __construct(string $searchHelp = null, string $label = 'Hledat')
     {
         $this->searchHelp = $searchHelp;
         $this->label = $label;

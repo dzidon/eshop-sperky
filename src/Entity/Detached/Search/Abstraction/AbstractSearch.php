@@ -9,18 +9,18 @@ namespace App\Entity\Detached\Search\Abstraction;
  */
 abstract class AbstractSearch implements SearchModelInterface
 {
-    protected ?string $label;
+    protected string $label;
 
     protected bool $isSearchValid = true;
 
-    public function setLabel(?string $label): self
+    public function setLabel(string $label): self
     {
         $this->label = $label;
 
         return $this;
     }
 
-    public function getLabel(): ?string
+    public function getLabel(): string
     {
         return $this->label;
     }

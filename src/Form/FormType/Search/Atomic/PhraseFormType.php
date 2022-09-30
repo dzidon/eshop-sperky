@@ -30,8 +30,8 @@ class PhraseFormType extends AbstractType
 
                 $form = $event->getForm();
                 $form->add('text', TextType::class, [
-                    'help' => $data->getSearchHelp(),
                     'required' => false,
+                    'help' => $data->getSearchHelp(),
                     'label' => $data->getLabel(),
                     'attr' => [
                         'autofocus' => 'autofocus',

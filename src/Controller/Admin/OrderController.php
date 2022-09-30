@@ -54,7 +54,7 @@ class OrderController extends AbstractAdminController
     public function orders(FormFactoryInterface $formFactory, Request $request): Response
     {
         $phraseSort = new PhraseSort(new Phrase('Hledejte podle ID.'), new Sort(Order::getSortData()));
-        $dropdown = new Dropdown(array_flip(Order::LIFECYCLE_CHAPTERS));
+        $dropdown = new Dropdown(array_flip(Order::LIFECYCLE_CHAPTERS), 'Typ', '-- všechny --');
         $searchData = new PhraseSortDropdown($phraseSort, $dropdown);
 
         $form = $formFactory->createNamed('', PhraseSortDropdownFormType::class, $searchData);

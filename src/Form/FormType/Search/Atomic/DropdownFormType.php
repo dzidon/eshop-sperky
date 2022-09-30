@@ -28,8 +28,18 @@ class DropdownFormType extends AbstractType
                 /** @var Dropdown $data */
                 $data = $event->getData();
 
+                $required = true;
+                $placeholder = false;
+                if ($data->getPlaceholder() !== null)
+                {
+                    $required = false;
+                    $placeholder = $data->getPlaceholder();
+                }
+
                 $form = $event->getForm();
                 $form->add('choice', ChoiceType::class, [
+                    'required' => $required,
+                    'placeholder' => $placeholder,
                     'choices' => $data->getChoices(),
                     'invalid_message' => 'Zvolte platnou volbu.',
                     'label' => $data->getLabel(),

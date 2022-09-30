@@ -10,10 +10,13 @@ class Dropdown extends AbstractSearch
 
     private array $choices;
 
-    public function __construct(array $choices = [], ?string $label = 'Volby')
+    private ?string $placeholder;
+
+    public function __construct(array $choices = [], string $label = 'Volby', string $placeholder = null)
     {
         $this->choices = $choices;
         $this->label = $label;
+        $this->placeholder = $placeholder;
     }
 
     public function setChoice($choice): self
@@ -48,5 +51,17 @@ class Dropdown extends AbstractSearch
         parent::invalidateSearch();
 
         $this->choice = null;
+    }
+
+    public function setPlaceholder(?string $placeholder): self
+    {
+        $this->placeholder = $placeholder;
+
+        return $this;
+    }
+
+    public function getPlaceholder(): ?string
+    {
+        return $this->placeholder;
     }
 }

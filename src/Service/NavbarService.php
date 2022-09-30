@@ -43,7 +43,7 @@ class NavbarService
      * @param bool $forceReload
      * @return array
      */
-    public function getVisibleSections($forceReload = false): array
+    public function getVisibleSections(bool $forceReload = false): array
     {
         if (!$this->sectionsLoaded || $forceReload)
         {

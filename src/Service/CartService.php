@@ -141,11 +141,7 @@ class CartService
         {
             $uuid = Uuid::fromString($tokenInCookie);
             $result = $this->entityManager->getRepository(Order::class)->getCartTotalQuantity($uuid);
-
-            if (isset($result['quantity']) && $result['quantity'] !== null)
-            {
-                $this->totalQuantityForNavbar = (int) $result['quantity'];
-            }
+            $this->totalQuantityForNavbar = (int) $result['quantity'];
         }
 
         return $this;
@@ -309,7 +305,7 @@ class CartService
             $this->newOrderCookie = (new Cookie(self::COOKIE_NAME))
                 ->withValue($token)
                 ->withExpires($expires)
-                ->withSecure(true)
+                ->withSecure()
                 ->withHttpOnly()
             ;
         }
