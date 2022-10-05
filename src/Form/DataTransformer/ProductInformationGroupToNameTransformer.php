@@ -3,18 +3,10 @@
 namespace App\Form\DataTransformer;
 
 use App\Entity\ProductInformationGroup;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\DataTransformerInterface;
 
 class ProductInformationGroupToNameTransformer implements DataTransformerInterface
 {
-    private EntityManagerInterface $entityManager;
-
-    public function __construct(EntityManagerInterface $entityManager)
-    {
-        $this->entityManager = $entityManager;
-    }
-
     /**
      * Transformuje objekt (ProductInformationGroup) na název (string).
      *
@@ -50,13 +42,8 @@ class ProductInformationGroupToNameTransformer implements DataTransformerInterfa
             return null;
         }
 
-        /** @var ProductInformationGroup|null $group */
-        $group = $this->entityManager->getRepository(ProductInformationGroup::class)->findOneBy(['name' => $name]);
-        if($group === null)
-        {
-            $group = new ProductInformationGroup();
-            $group->setName($name);
-        }
+        $group = new ProductInformationGroup();
+        $group->setName($name);
 
         return $group;
     }

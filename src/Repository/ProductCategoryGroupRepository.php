@@ -26,6 +26,16 @@ class ProductCategoryGroupRepository extends ServiceEntityRepository
         $this->requestStack = $requestStack;
     }
 
+    public function findAllAndFetchCategories()
+    {
+        return $this->createQueryBuilder('pcg')
+            ->select("pcg, pc")
+            ->leftJoin('pcg.categories', 'pc')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
     public function findOneByIdAndFetchCategories($id)
     {
         return $this->createQueryBuilder('pcg')
@@ -66,14 +76,5 @@ class ProductCategoryGroupRepository extends ServiceEntityRepository
         ;
 
         return new Pagination($query, $this->requestStack->getCurrentRequest());
-    }
-
-    public function getArrayOfNames(): array
-    {
-        $arrayOfAllData = $this->createQueryBuilder('pcg', 'pcg.name')
-            ->getQuery()
-            ->getArrayResult();
-
-        return array_keys($arrayOfAllData); // chceme jen názvy, ty jsou v klíčích
     }
 }

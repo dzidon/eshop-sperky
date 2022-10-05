@@ -4,6 +4,7 @@ namespace App\Form\EventSubscriber;
 
 use App\Entity\Product;
 use App\Entity\ProductInformation;
+use App\Entity\ProductInformationGroup;
 use App\Form\FormType\Admin\ProductInformationNewFormType;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\Extension\Core\Type\ButtonType;
@@ -21,15 +22,12 @@ use Symfony\Component\Validator\Constraints\Valid;
  */
 class ProductInformationSubscriber implements EventSubscriberInterface
 {
-    private Security $security;
-
     private bool $canEditInfo;
+    private array $allInfoGroups;
 
     public function __construct(Security $security)
     {
-        $this->security = $security;
-
-        $this->canEditInfo = $this->security->isGranted('product_info_edit');
+        $this->canEditInfo = $security->isGranted('product_info_edit');
     }
 
     public static function getSubscribedEvents(): array
@@ -44,6 +42,14 @@ class ProductInformationSubscriber implements EventSubscriberInterface
     {
         if($this->canEditInfo)
         {
+            $infoGroupNames = [];
+
+            /** @var ProductInformationGroup $infoGroup */
+            foreach ($this->allInfoGroups as $infoGroup)
+            {
+                $infoGroupNames[] = $infoGroup->getName();
+            }
+
             $event->getForm()
                 ->add('infoNew', CollectionType::class, [
                     'mapped' => false,
@@ -56,6 +62,7 @@ class ProductInformationSubscriber implements EventSubscriberInterface
                         return $info === null || $info->getValue() === null || $info->getProductInformationGroup() === null;
                     },
                     'entry_options' => [
+                        'autocomplete_items' => $infoGroupNames,
                         'constraints' => [
                             new Valid(),
                         ],
@@ -88,20 +95,67 @@ class ProductInformationSubscriber implements EventSubscriberInterface
                 $product = $event->getData();
                 if ($product)
                 {
-                    $infoNew = $form->get('infoNew')->getData();
-                    if ($infoNew !== null)
+                    $allInfoNew = $form->get('infoNew')->getData();
+                    if ($allInfoNew !== null)
                     {
-                        foreach ($infoNew as $objectToBeAdded)
+                        /** @var ProductInformation $infoNew */
+                        foreach ($allInfoNew as $infoNew)
                         {
-                            if($objectToBeAdded !== null)
+                            $targetInfoGroup = null;
+
+                            $inputInfoGroupName = $infoNew->getProductInformationGroup()->getName();
+
+                            // Skupina už možná je přiřazená k produktu
+                            foreach ($product->getInfo() as $info)
                             {
-                                $product->addInfo($objectToBeAdded);
+                                $infoGroup = $info->getProductInformationGroup();
+                                if ($infoGroup->getName() === $inputInfoGroupName)
+                                {
+                                    $targetInfoGroup = $infoGroup;
+                                    break;
+                                }
                             }
+
+                            // Skupina možná existuje v DB, ale není přiřazená k produktu
+                            if ($targetInfoGroup === null)
+                            {
+                                /** @var ProductInformationGroup $infoGroup */
+                                foreach ($this->allInfoGroups as $infoGroup)
+                                {
+                                    if ($infoGroup->getName() === $inputInfoGroupName)
+                                    {
+                                        $targetInfoGroup = $infoGroup;
+                                        break;
+                                    }
+                                }
+                            }
+
+                            // Skupina neexistuje v DB a není přiřazena k produktu
+                            if ($targetInfoGroup === null)
+                            {
+                                $targetInfoGroup = $infoNew->getProductInformationGroup();
+                            }
+
+                            $infoNew->setProductInformationGroup($targetInfoGroup);
+                            $product->addInfo($infoNew);
                         }
+
                         $event->setData($product);
                     }
                 }
             }
         }
+    }
+
+    public function setAllInfoGroups(array $allInfoGroups): self
+    {
+        $this->allInfoGroups = $allInfoGroups;
+
+        return $this;
+    }
+
+    public function getAllInfoGroups(): array
+    {
+        return $this->allInfoGroups;
     }
 }

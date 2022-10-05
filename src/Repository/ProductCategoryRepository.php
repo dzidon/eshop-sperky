@@ -2,12 +2,10 @@
 
 namespace App\Repository;
 
-use Doctrine\ORM\QueryBuilder;
 use App\Entity\ProductSection;
 use App\Entity\ProductCategory;
 use Doctrine\Persistence\ManagerRegistry;
 use App\CatalogFilter\CatalogCategoryQueryData;
-use App\CatalogFilter\CatalogProductQueryBuilder;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
 /**
@@ -64,20 +62,5 @@ class ProductCategoryRepository extends ServiceEntityRepository
         $stmt = $conn->prepare($sql);
         $resultSet = $stmt->executeQuery($placeholderData);
         return $resultSet->fetchOne();
-    }
-
-    public function qbFindCategoriesInSection(?ProductSection $section): QueryBuilder
-    {
-        $queryBuilder = $this->createQueryBuilder('pc')
-            ->select('pc', 'pcg', 'p')
-            ->innerJoin('pc.productCategoryGroup', 'pcg')
-            ->innerJoin('pc.products', 'p')
-        ;
-
-        return (new CatalogProductQueryBuilder($queryBuilder))
-            ->addProductVisibilityCondition()
-            ->addProductSearchConditions($section)
-            ->getQueryBuilder()
-        ;
     }
 }

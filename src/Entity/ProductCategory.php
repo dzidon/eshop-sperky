@@ -38,11 +38,6 @@ class ProductCategory
     private $productCategoryGroup;
 
     /**
-     * @ORM\ManyToMany(targetEntity=Product::class, mappedBy="categories")
-     */
-    private $products;
-
-    /**
      * @ORM\Column(type="datetime")
      */
     private $created;
@@ -54,8 +49,6 @@ class ProductCategory
 
     public function __construct()
     {
-        $this->products = new ArrayCollection();
-
         $this->created = new DateTime('now');
         $this->updated = $this->created;
     }
@@ -85,36 +78,6 @@ class ProductCategory
     public function setProductCategoryGroup(?ProductCategoryGroup $productCategoryGroup): self
     {
         $this->productCategoryGroup = $productCategoryGroup;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection|Product[]
-     */
-    public function getProducts(): Collection
-    {
-        return $this->products;
-    }
-
-    public function addProduct(Product $product): self
-    {
-        if (!$this->products->contains($product))
-        {
-            $this->products[] = $product;
-            $product->addCategory($this);
-        }
-
-        return $this;
-    }
-
-    public function removeProduct(Product $product): self
-    {
-        if ($this->products->contains($product))
-        {
-            $this->products->removeElement($product);
-            $product->removeCategory($this);
-        }
 
         return $this;
     }

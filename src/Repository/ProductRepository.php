@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Detached\Search\Composition\ProductFilter;
+use App\Entity\ProductCategory;
 use Exception;
 use App\Entity\Product;
 use App\Entity\ProductSection;
@@ -325,5 +326,37 @@ class ProductRepository extends ServiceEntityRepository
             ->orderBy('p.created', 'DESC')
             ->setMaxResults($quantity)
         ;
+    }
+
+    public function findProductCategoriesInSection(?ProductSection $section): array
+    {
+        $queryBuilder = $this->createQueryBuilder('p')
+            ->select('p', 'pc', 'pcg')
+            ->innerJoin('p.categories', 'pc')
+            ->leftJoin('pc.productCategoryGroup', 'pcg')
+        ;
+
+        $products = (new CatalogProductQueryBuilder($queryBuilder))
+            ->addProductVisibilityCondition()
+            ->addProductSearchConditions($section)
+            ->getQueryBuilder()
+            ->getQuery()
+            ->getResult()
+        ;
+
+        $categories = [];
+
+        /** @var Product $product */
+        foreach ($products as $product)
+        {
+            /** @var ProductCategory $category */
+            foreach ($product->getCategories() as $category)
+            {
+                $categoryGroup = $category->getProductCategoryGroup();
+                $categories[$categoryGroup->getName()][$category->getName()] = $category;
+            }
+        }
+
+        return $categories;
     }
 }

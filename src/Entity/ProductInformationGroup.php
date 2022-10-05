@@ -15,7 +15,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 /**
  * @ORM\Entity(repositoryClass=ProductInformationGroupRepository::class)
  * @ORM\HasLifecycleCallbacks()
- * @UniqueEntity(fields={"name"}, message="Už existuje skupina produktových informací s tímto názvem.")
+ * @UniqueEntity(groups={"creation"}, fields={"name"}, message="Už existuje skupina produktových informací s tímto názvem.")
  */
 class ProductInformationGroup
 {

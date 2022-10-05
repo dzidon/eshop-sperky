@@ -6,7 +6,6 @@ use App\Entity\Product;
 use App\Entity\ProductCategory;
 use App\Entity\ProductCategoryGroup;
 use App\Form\FormType\Admin\ProductCategoryNewFormType;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
@@ -23,17 +22,12 @@ use Symfony\Component\Validator\Constraints\Valid;
  */
 class ProductCategorySubscriber implements EventSubscriberInterface
 {
-    private Security $security;
-    private EntityManagerInterface $entityManager;
-
     private bool $canEditCategories;
+    private array $allCategoryGroups;
 
-    public function __construct(Security $security, EntityManagerInterface $entityManager)
+    public function __construct(Security $security)
     {
-        $this->security = $security;
-        $this->entityManager = $entityManager;
-
-        $this->canEditCategories = $this->security->isGranted('product_category_edit');
+        $this->canEditCategories = $security->isGranted('product_category_edit');
     }
 
     public static function getSubscribedEvents(): array
@@ -48,6 +42,14 @@ class ProductCategorySubscriber implements EventSubscriberInterface
     {
         if ($this->canEditCategories)
         {
+            $categoryGroupNames = [];
+
+            /** @var ProductCategoryGroup $categoryGroup */
+            foreach ($this->allCategoryGroups as $categoryGroup)
+            {
+                $categoryGroupNames[] = $categoryGroup->getName();
+            }
+
             $event
                 ->getForm()
                 ->add('categoriesNew', CollectionType::class, [
@@ -61,6 +63,7 @@ class ProductCategorySubscriber implements EventSubscriberInterface
                         return $data === null || $data['categoryGroup'] === null || $data['category'] === null;
                     },
                     'entry_options' => [
+                        'autocomplete_items' => $categoryGroupNames,
                         'constraints' => [
                             new Valid(),
                         ],
@@ -104,23 +107,27 @@ class ProductCategorySubscriber implements EventSubscriberInterface
                         $targetCategoryGroup = null;
 
                         // Prohledáme kategorie produktu. Možná už k produktu existuje kategorie se skupinou, která má zadávaný název (a ještě možná není v DB).
-                        if($targetCategoryGroup === null)
+                        foreach ($product->getCategories() as $category)
                         {
-                            foreach ($product->getCategories() as $category)
+                            $categoryGroup = $category->getProductCategoryGroup();
+                            if($categoryGroup->getName() === $inputCategoryGroup->getName())
                             {
-                                $categoryGroup = $category->getProductCategoryGroup();
-                                if($categoryGroup->getName() === $inputCategoryGroup->getName())
-                                {
-                                    $targetCategoryGroup = $categoryGroup;
-                                    break;
-                                }
+                                $targetCategoryGroup = $categoryGroup;
+                                break;
                             }
                         }
 
                         // Nenašlo to nic v kolekci produktu, ještě ale může existovat v DB.
                         if($targetCategoryGroup === null)
                         {
-                            $targetCategoryGroup = $this->entityManager->getRepository(ProductCategoryGroup::class)->findOneByNameAndFetchCategories($inputCategoryGroup->getName());
+                            foreach ($this->allCategoryGroups as $categoryGroup)
+                            {
+                                if ($categoryGroup->getName() === $inputCategoryGroup->getName())
+                                {
+                                    $targetCategoryGroup = $categoryGroup;
+                                    break;
+                                }
+                            }
                         }
 
                         // Našlo to nějakou skupinu buď u produktu nebo v db
@@ -144,6 +151,7 @@ class ProductCategorySubscriber implements EventSubscriberInterface
                             {
                                 $targetCategoryGroup->addCategory($targetCategory);
                             }
+
                             $product->addCategory($targetCategory);
                         }
                         else // Žádná skupina se zadávaným jménem neexistuje, vytváříme novou.
@@ -153,9 +161,22 @@ class ProductCategorySubscriber implements EventSubscriberInterface
                             $product->addCategory($inputCategory);
                         }
                     }
+
                     $event->setData($product);
                 }
             }
         }
+    }
+
+    public function getAllCategoryGroups(): array
+    {
+        return $this->allCategoryGroups;
+    }
+
+    public function setAllCategoryGroups(array $allCategoryGroups): self
+    {
+        $this->allCategoryGroups = $allCategoryGroups;
+
+        return $this;
     }
 }

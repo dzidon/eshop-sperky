@@ -3,8 +3,9 @@
 namespace App\Form\EventSubscriber;
 
 use App\Entity\Detached\Search\Composition\ProductFilter;
+use App\Entity\Product;
 use App\Entity\ProductCategory;
-use App\Repository\ProductCategoryRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvent;
@@ -17,6 +18,13 @@ use Symfony\Component\Form\FormEvents;
  */
 class ProductFilterSubscriber implements EventSubscriberInterface
 {
+    private EntityManagerInterface $entityManager;
+
+    public function __construct(EntityManagerInterface $entityManager)
+    {
+        $this->entityManager = $entityManager;
+    }
+
     public static function getSubscribedEvents(): array
     {
         return [
@@ -33,16 +41,13 @@ class ProductFilterSubscriber implements EventSubscriberInterface
 
         if($filterData->getSection() !== null)
         {
+            $categories = $this->entityManager->getRepository(Product::class)->findProductCategoriesInSection($filterData->getSection());
+
             $form->add('categories', EntityType::class, [
                 'class' => ProductCategory::class,
                 'choice_label' => 'name',
                 'invalid_message' => 'Snažíte se vyhledat neexistující kategorii.',
-                'query_builder' => function (ProductCategoryRepository $er) use ($filterData) {
-                    return $er->qbFindCategoriesInSection($filterData->getSection());
-                },
-                'group_by' => function(ProductCategory $category) {
-                    return $category->getProductCategoryGroup()->getName();
-                },
+                'choices' => $categories,
                 'multiple' => true,
                 'expanded' => true,
                 'required' => false,

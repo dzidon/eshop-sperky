@@ -4,6 +4,7 @@ namespace App\Form\FormType\Admin;
 
 use App\Entity\Product;
 use App\Entity\ProductCategory;
+use App\Entity\ProductCategoryGroup;
 use App\Entity\ProductImage;
 use App\Entity\ProductInformation;
 use App\Entity\ProductInformationGroup;
@@ -44,8 +45,26 @@ class ProductFormType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $categoryGroups = $this->entityManager->getRepository(ProductCategoryGroup::class)->findAllAndFetchCategories();
+        $infoGroups = $this->entityManager->getRepository(ProductInformationGroup::class)->findAll();
+        $optionGroups = $this->entityManager->getRepository(ProductOptionGroup::class)->findAll();
+        $sections = $this->entityManager->getRepository(ProductSection::class)->findAll();
+
+        $categories = [];
+
+        /** @var ProductCategoryGroup $categoryGroup */
+        foreach ($categoryGroups as $categoryGroup)
+        {
+            foreach ($categoryGroup->getCategories() as $category)
+            {
+                $categories[] = $category;
+            }
+        }
+
+        $this->productCategorySubscriber->setAllCategoryGroups($categoryGroups);
+        $this->productInformationSubscriber->setAllInfoGroups($infoGroups);
+
         // existující kategorie
-        $categories = $this->entityManager->getRepository(ProductCategory::class)->findAllAndFetchGroups();
         if ($categories !== null && count($categories) > 0)
         {
             $builder
@@ -65,7 +84,6 @@ class ProductFormType extends AbstractType
         }
 
         // existující skupiny informací
-        $infoGroups = $this->entityManager->getRepository(ProductInformationGroup::class)->findAll();
         if ($infoGroups !== null && count($infoGroups) > 0)
         {
             $builder
@@ -98,8 +116,7 @@ class ProductFormType extends AbstractType
         }
 
         // produktové volby
-        $optionGroups = $this->entityManager->getRepository(ProductOptionGroup::class)->findAll();
-        if ($optionGroups !== null && count($optionGroups))
+        if ($optionGroups !== null && count($optionGroups) > 0)
         {
             $builder
                 ->add('optionGroups', EntityType::class, [
@@ -178,6 +195,7 @@ class ProductFormType extends AbstractType
                 'class' => ProductSection::class,
                 'required' => false,
                 'placeholder' => '-- nezařazeno --',
+                'choices' => $sections,
                 'choice_label' => 'name',
                 'label' => 'Sekce',
             ])

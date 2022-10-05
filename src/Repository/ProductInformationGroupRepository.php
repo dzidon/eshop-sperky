@@ -43,13 +43,4 @@ class ProductInformationGroupRepository extends ServiceEntityRepository
 
         return new Pagination($query, $this->requestStack->getCurrentRequest());
     }
-
-    public function getArrayOfNames(): array
-    {
-        $arrayOfAllData = $this->createQueryBuilder('pig', 'pig.name')
-            ->getQuery()
-            ->getArrayResult();
-
-        return array_keys($arrayOfAllData); // chceme jen názvy, ty jsou v klíčích
-    }
 }

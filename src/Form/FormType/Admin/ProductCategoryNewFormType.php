@@ -2,11 +2,9 @@
 
 namespace App\Form\FormType\Admin;
 
-use App\Entity\ProductCategoryGroup;
 use App\Form\DataTransformer\ProductCategoryGroupToNameTransformer;
 use App\Form\DataTransformer\ProductCategoryToNameTransformer;
 use App\Form\Type\AutoCompleteTextType;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -15,13 +13,11 @@ use Symfony\Component\Validator\Constraints\Valid;
 
 class ProductCategoryNewFormType extends AbstractType
 {
-    private EntityManagerInterface $entityManager;
     private ProductCategoryGroupToNameTransformer $categoryGroupToNameTransformer;
     private ProductCategoryToNameTransformer $categoryToNameTransformer;
 
-    public function __construct(EntityManagerInterface $entityManager, ProductCategoryGroupToNameTransformer $categoryGroupToNameTransformer, ProductCategoryToNameTransformer $categoryToNameTransformer)
+    public function __construct(ProductCategoryGroupToNameTransformer $categoryGroupToNameTransformer, ProductCategoryToNameTransformer $categoryToNameTransformer)
     {
-        $this->entityManager = $entityManager;
         $this->categoryGroupToNameTransformer = $categoryGroupToNameTransformer;
         $this->categoryToNameTransformer = $categoryToNameTransformer;
     }
@@ -30,7 +26,7 @@ class ProductCategoryNewFormType extends AbstractType
     {
         $builder
             ->add('categoryGroup', AutoCompleteTextType::class, [
-                'data_autocomplete' => $this->entityManager->getRepository(ProductCategoryGroup::class)->getArrayOfNames(),
+                'data_autocomplete' => $options['autocomplete_items'],
                 'constraints' => [
                     new Valid(),
                 ],
@@ -58,9 +54,12 @@ class ProductCategoryNewFormType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'csrf_protection' => true,
-            'csrf_field_name' => '_token',
-            'csrf_token_id'   => 'form_product_category_new',
+            'csrf_protection'    => true,
+            'csrf_field_name'    => '_token',
+            'csrf_token_id'      => 'form_product_category_new',
+            'autocomplete_items' => [],
         ]);
+
+        $resolver->setAllowedTypes('autocomplete_items', 'array');
     }
 }

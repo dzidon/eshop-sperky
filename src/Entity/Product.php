@@ -132,7 +132,7 @@ class Product implements EntitySlugInterface, EntityOrphanRemovalInterface
     private $section;
 
     /**
-     * @ORM\ManyToMany(targetEntity=ProductCategory::class, inversedBy="products", cascade={"persist"})
+     * @ORM\ManyToMany(targetEntity=ProductCategory::class, cascade={"persist"})
      * @ORM\JoinTable(name="_product_category")
      */
     private $categories;
@@ -378,7 +378,6 @@ class Product implements EntitySlugInterface, EntityOrphanRemovalInterface
         if (!$this->categories->contains($category))
         {
             $this->categories[] = $category;
-            $category->addProduct($this);
         }
 
         return $this;
@@ -389,7 +388,6 @@ class Product implements EntitySlugInterface, EntityOrphanRemovalInterface
         if ($this->categories->contains($category))
         {
             $this->categories->removeElement($category);
-            $category->removeProduct($this);
         }
 
         return $this;
