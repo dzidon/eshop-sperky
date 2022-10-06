@@ -6,6 +6,7 @@ use App\Entity\Product;
 use App\Entity\ProductInformation;
 use App\Entity\ProductInformationGroup;
 use App\Form\FormType\Admin\ProductInformationNewFormType;
+use LogicException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
@@ -91,57 +92,58 @@ class ProductInformationSubscriber implements EventSubscriberInterface
             $form = $event->getForm();
             if ($form->isSubmitted() && $form->isValid())
             {
-                /** @var Product $product */
                 $product = $event->getData();
-                if ($product)
+                if (!$product instanceof Product)
                 {
-                    $allInfoNew = $form->get('infoNew')->getData();
-                    if ($allInfoNew !== null)
+                    throw new LogicException(sprintf('%s musí dostat objekt třídy %s.', get_class($this), Product::class));
+                }
+
+                $allInfoNew = $form->get('infoNew')->getData();
+                if ($allInfoNew !== null)
+                {
+                    /** @var ProductInformation $infoNew */
+                    foreach ($allInfoNew as $infoNew)
                     {
-                        /** @var ProductInformation $infoNew */
-                        foreach ($allInfoNew as $infoNew)
+                        $targetInfoGroup = null;
+
+                        $inputInfoGroupName = $infoNew->getProductInformationGroup()->getName();
+
+                        // Skupina už možná je přiřazená k produktu
+                        foreach ($product->getInfo() as $info)
                         {
-                            $targetInfoGroup = null;
-
-                            $inputInfoGroupName = $infoNew->getProductInformationGroup()->getName();
-
-                            // Skupina už možná je přiřazená k produktu
-                            foreach ($product->getInfo() as $info)
+                            $infoGroup = $info->getProductInformationGroup();
+                            if ($infoGroup->getName() === $inputInfoGroupName)
                             {
-                                $infoGroup = $info->getProductInformationGroup();
+                                $targetInfoGroup = $infoGroup;
+                                break;
+                            }
+                        }
+
+                        // Skupina možná existuje v DB, ale není přiřazená k produktu
+                        if ($targetInfoGroup === null)
+                        {
+                            /** @var ProductInformationGroup $infoGroup */
+                            foreach ($this->allInfoGroups as $infoGroup)
+                            {
                                 if ($infoGroup->getName() === $inputInfoGroupName)
                                 {
                                     $targetInfoGroup = $infoGroup;
                                     break;
                                 }
                             }
-
-                            // Skupina možná existuje v DB, ale není přiřazená k produktu
-                            if ($targetInfoGroup === null)
-                            {
-                                /** @var ProductInformationGroup $infoGroup */
-                                foreach ($this->allInfoGroups as $infoGroup)
-                                {
-                                    if ($infoGroup->getName() === $inputInfoGroupName)
-                                    {
-                                        $targetInfoGroup = $infoGroup;
-                                        break;
-                                    }
-                                }
-                            }
-
-                            // Skupina neexistuje v DB a není přiřazena k produktu
-                            if ($targetInfoGroup === null)
-                            {
-                                $targetInfoGroup = $infoNew->getProductInformationGroup();
-                            }
-
-                            $infoNew->setProductInformationGroup($targetInfoGroup);
-                            $product->addInfo($infoNew);
                         }
 
-                        $event->setData($product);
+                        // Skupina neexistuje v DB a není přiřazena k produktu
+                        if ($targetInfoGroup === null)
+                        {
+                            $targetInfoGroup = $infoNew->getProductInformationGroup();
+                        }
+
+                        $infoNew->setProductInformationGroup($targetInfoGroup);
+                        $product->addInfo($infoNew);
                     }
+
+                    $event->setData($product);
                 }
             }
         }

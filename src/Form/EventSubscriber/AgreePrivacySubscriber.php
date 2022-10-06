@@ -4,6 +4,7 @@ namespace App\Form\EventSubscriber;
 
 use App\Entity\User;
 use App\Form\Type\AgreePrivacyType;
+use LogicException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -33,10 +34,14 @@ class AgreePrivacySubscriber implements EventSubscriberInterface
 
     public function preSetData(FormEvent $event): void
     {
-        /** @var User $editedUser */
-        $editedUser = $event->getData();
-        $editingUser = $this->security->getUser();
-        if ($editedUser && $editedUser === $editingUser)
+        $user = $event->getData();
+        if (!$user instanceof User)
+        {
+            throw new LogicException(sprintf('%s musí dostat objekt třídy %s.', get_class($this), User::class));
+        }
+
+        $loggedInUser = $this->security->getUser();
+        if ($loggedInUser !== null && $user === $loggedInUser)
         {
             $event->getForm()->add('agreePrivacy', AgreePrivacyType::class);
         }

@@ -6,6 +6,7 @@ use App\Entity\Detached\Search\Composition\ProductFilter;
 use App\Entity\Product;
 use App\Entity\ProductCategory;
 use Doctrine\ORM\EntityManagerInterface;
+use LogicException;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvent;
@@ -35,9 +36,9 @@ class ProductFilterSubscriber implements EventSubscriberInterface
 
     public function preSetData(FormEvent $event): void
     {
-        /** @var ProductFilter $filterData */
-        $filterData = $event->getData();
         $form = $event->getForm();
+        $filterData = $event->getData();
+        $this->validateData($filterData, 'preSetData');
 
         if($filterData->getSection() !== null)
         {
@@ -58,8 +59,9 @@ class ProductFilterSubscriber implements EventSubscriberInterface
 
     public function preSubmit(FormEvent $event): void
     {
-        /** @var ProductFilter $defaultData */
         $defaultData = $event->getForm()->getData();
+        $this->validateData($defaultData, 'preSubmit');
+
         $submittedData = $event->getData();
 
         // min a max cena zadaná uživatelem
@@ -101,5 +103,13 @@ class ProductFilterSubscriber implements EventSubscriberInterface
         }
 
         $event->setData($submittedData);
+    }
+
+    private function validateData($data, string $event): void
+    {
+        if (!$data instanceof ProductFilter)
+        {
+            throw new LogicException(sprintf('%s musí dostat objekt třídy %s. (Událost: %s)', get_class($this), ProductFilter::class, $event));
+        }
     }
 }

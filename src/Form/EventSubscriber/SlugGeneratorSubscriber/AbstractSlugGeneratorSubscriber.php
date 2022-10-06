@@ -34,22 +34,21 @@ abstract class AbstractSlugGeneratorSubscriber implements EventSubscriberInterfa
         $instance = $event->getData();
         if (!$instance instanceof EntitySlugInterface)
         {
-            throw new LogicException('SlugGeneratorSubscriber ve formuláři musí dostat objekt třídy, která implementuje App\Entity\EntitySlugInterface.');
+            throw new LogicException(sprintf('%s musí dostat objekt třídy, která implementuje %s.', get_class($this), EntitySlugInterface::class));
         }
 
         // Uživatel nezadal žádný string pro slug, takže se vygeneruje automaticky
         if ($instance->getSlug() === null)
         {
             $slug = $this->slugGenerator->generateAutomatically($instance);
-            $instance->setSlug($slug);
         }
         // Uživatel zadal string, převede se na slug a nastaví do instance
         else
         {
             $slug = $this->slugGenerator->generateFromString($instance->getSlug());
-            $instance->setSlug($slug);
         }
 
+        $instance->setSlug($slug);
         $event->setData($instance);
     }
 }

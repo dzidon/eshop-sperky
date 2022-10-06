@@ -2,10 +2,11 @@
 
 namespace App\Entity\Detached;
 
+use App\Entity\EntityEmailInterface;
 use App\Validation\Compound as AssertCompound;
 use Symfony\Component\Validator\Constraints as Assert;
 
-class ContactEmail
+class ContactEmail implements EntityEmailInterface
 {
     /**
      * @AssertCompound\EmailRequirements

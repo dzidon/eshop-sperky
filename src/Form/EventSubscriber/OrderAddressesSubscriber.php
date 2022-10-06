@@ -5,6 +5,7 @@ namespace App\Form\EventSubscriber;
 use App\Entity\Address;
 use App\Entity\Order;
 use App\Entity\User;
+use LogicException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -35,6 +36,12 @@ class OrderAddressesSubscriber implements EventSubscriberInterface
 
     public function preSetData(FormEvent $event): void
     {
+        $order = $event->getData();
+        if (!$order instanceof Order)
+        {
+            throw new LogicException(sprintf('%s musí dostat objekt třídy %s.', get_class($this), Order::class));
+        }
+
         $this->setDefaultData($event);
         $this->addDeliveryAddressFields($event);
     }

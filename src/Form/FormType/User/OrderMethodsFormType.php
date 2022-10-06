@@ -5,7 +5,8 @@ namespace App\Form\FormType\User;
 use App\Entity\DeliveryMethod;
 use App\Entity\Order;
 use App\Entity\PaymentMethod;
-use App\Form\EventSubscriber\OrderMethodsSubscriber;
+use App\Form\EventSubscriber\OrderMethodsHistoricalDataSubscriber;
+use App\Form\EventSubscriber\OrderStaticDeliveryAddressSubscriber;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -14,11 +15,13 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class OrderMethodsFormType extends AbstractType
 {
-    private OrderMethodsSubscriber $orderMethodsSubscriber;
+    private OrderStaticDeliveryAddressSubscriber $orderPacketaDeliveryMethodSubscriber;
+    private OrderMethodsHistoricalDataSubscriber $orderMethodsHistoricalDataSubscriber;
 
-    public function __construct(OrderMethodsSubscriber $orderMethodsSubscriber)
+    public function __construct(OrderStaticDeliveryAddressSubscriber $orderPacketaDeliveryMethodSubscriber, OrderMethodsHistoricalDataSubscriber $orderMethodsHistoricalDataSubscriber)
     {
-        $this->orderMethodsSubscriber = $orderMethodsSubscriber;
+        $this->orderPacketaDeliveryMethodSubscriber = $orderPacketaDeliveryMethodSubscriber;
+        $this->orderMethodsHistoricalDataSubscriber = $orderMethodsHistoricalDataSubscriber;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -63,7 +66,8 @@ class OrderMethodsFormType extends AbstractType
                     'class' => 'staticAddressDeliveryZip',
                 ],
             ])
-            ->addEventSubscriber($this->orderMethodsSubscriber)
+            ->addEventSubscriber($this->orderPacketaDeliveryMethodSubscriber)
+            ->addEventSubscriber($this->orderMethodsHistoricalDataSubscriber)
         ;
     }
 

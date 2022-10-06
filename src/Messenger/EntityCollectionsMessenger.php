@@ -11,7 +11,7 @@ use Doctrine\Common\Collections\ArrayCollection;
  */
 class EntityCollectionsMessenger
 {
-    private array $collections;
+    private array $collections = [];
 
     public function getCollections(): array
     {

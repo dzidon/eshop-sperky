@@ -6,6 +6,7 @@ use App\Entity\Product;
 use App\Entity\ProductCategory;
 use App\Entity\ProductCategoryGroup;
 use App\Form\FormType\Admin\ProductCategoryNewFormType;
+use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
@@ -92,78 +93,79 @@ class ProductCategorySubscriber implements EventSubscriberInterface
             $form = $event->getForm();
             if ($form->isSubmitted() && $form->isValid())
             {
-                /** @var Product $product */
                 $product = $event->getData();
-                if ($product)
+                if (!$product instanceof Product)
                 {
-                    foreach ($form->get('categoriesNew')->getData() as $input)
+                    throw new LogicException(sprintf('%s musí dostat objekt třídy %s.', get_class($this), Product::class));
+                }
+
+                foreach ($form->get('categoriesNew')->getData() as $input)
+                {
+                    /** @var ProductCategoryGroup $inputCategoryGroup */
+                    $inputCategoryGroup = $input['categoryGroup'];
+
+                    /** @var ProductCategory $inputCategory */
+                    $inputCategory = $input['category'];
+
+                    $targetCategoryGroup = null;
+
+                    // Prohledáme kategorie produktu. Možná už k produktu existuje kategorie se skupinou, která má zadávaný název (a ještě možná není v DB).
+                    foreach ($product->getCategories() as $category)
                     {
-                        /** @var ProductCategoryGroup $inputCategoryGroup */
-                        $inputCategoryGroup = $input['categoryGroup'];
-
-                        /** @var ProductCategory $inputCategory */
-                        $inputCategory = $input['category'];
-
-                        $targetCategoryGroup = null;
-
-                        // Prohledáme kategorie produktu. Možná už k produktu existuje kategorie se skupinou, která má zadávaný název (a ještě možná není v DB).
-                        foreach ($product->getCategories() as $category)
+                        $categoryGroup = $category->getProductCategoryGroup();
+                        if($categoryGroup->getName() === $inputCategoryGroup->getName())
                         {
-                            $categoryGroup = $category->getProductCategoryGroup();
-                            if($categoryGroup->getName() === $inputCategoryGroup->getName())
+                            $targetCategoryGroup = $categoryGroup;
+                            break;
+                        }
+                    }
+
+                    // Nenašlo to nic v kolekci produktu, ještě ale může existovat v DB.
+                    if($targetCategoryGroup === null)
+                    {
+                        foreach ($this->allCategoryGroups as $categoryGroup)
+                        {
+                            if ($categoryGroup->getName() === $inputCategoryGroup->getName())
                             {
                                 $targetCategoryGroup = $categoryGroup;
                                 break;
                             }
                         }
-
-                        // Nenašlo to nic v kolekci produktu, ještě ale může existovat v DB.
-                        if($targetCategoryGroup === null)
-                        {
-                            foreach ($this->allCategoryGroups as $categoryGroup)
-                            {
-                                if ($categoryGroup->getName() === $inputCategoryGroup->getName())
-                                {
-                                    $targetCategoryGroup = $categoryGroup;
-                                    break;
-                                }
-                            }
-                        }
-
-                        // Našlo to nějakou skupinu buď u produktu nebo v db
-                        if ($targetCategoryGroup !== null)
-                        {
-                            $targetCategory = $inputCategory;
-
-                            // Kategorie se zadávaným jménem už mozná existuje v nalezené skupině.
-                            foreach ($targetCategoryGroup->getCategories() as $category)
-                            {
-                                if($category->getName() === $inputCategory->getName())
-                                {
-                                    $targetCategory = $category;
-                                    break;
-                                }
-                            }
-
-                            // Pokud kategorie se zadávaným jménem ještě neexistuje v nalezené skupině, přidáme ji tam.
-                            // Pokud už kategorie v nalezené skupině existuje, pouze se připojí k produktu.
-                            if($targetCategory === $inputCategory)
-                            {
-                                $targetCategoryGroup->addCategory($targetCategory);
-                            }
-
-                            $product->addCategory($targetCategory);
-                        }
-                        else // Žádná skupina se zadávaným jménem neexistuje, vytváříme novou.
-                        {
-                            $targetCategoryGroup = $inputCategoryGroup;
-                            $targetCategoryGroup->addCategory($inputCategory);
-                            $product->addCategory($inputCategory);
-                        }
                     }
 
-                    $event->setData($product);
+                    // Našlo to nějakou skupinu buď u produktu nebo v db
+                    if ($targetCategoryGroup !== null)
+                    {
+                        $targetCategory = $inputCategory;
+
+                        // Kategorie se zadávaným jménem už mozná existuje v nalezené skupině.
+                        foreach ($targetCategoryGroup->getCategories() as $category)
+                        {
+                            if($category->getName() === $inputCategory->getName())
+                            {
+                                $targetCategory = $category;
+                                break;
+                            }
+                        }
+
+                        // Pokud kategorie se zadávaným jménem ještě neexistuje v nalezené skupině, přidáme ji tam.
+                        // Pokud už kategorie v nalezené skupině existuje, pouze se připojí k produktu.
+                        if($targetCategory === $inputCategory)
+                        {
+                            $targetCategoryGroup->addCategory($targetCategory);
+                        }
+
+                        $product->addCategory($targetCategory);
+                    }
+                    else // Žádná skupina se zadávaným jménem neexistuje, vytváříme novou.
+                    {
+                        $targetCategoryGroup = $inputCategoryGroup;
+                        $targetCategoryGroup->addCategory($inputCategory);
+                        $product->addCategory($inputCategory);
+                    }
                 }
+
+                $event->setData($product);
             }
         }
     }

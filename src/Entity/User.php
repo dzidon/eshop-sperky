@@ -17,7 +17,7 @@ use App\Validation\Compound as AssertCompound;
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
  */
-class User implements UserInterface, PasswordAuthenticatedUserInterface
+class User implements UserInterface, PasswordAuthenticatedUserInterface, EntityEmailInterface
 {
     /**
      * @ORM\Id

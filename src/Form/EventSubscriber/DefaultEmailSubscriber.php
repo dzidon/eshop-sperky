@@ -2,7 +2,9 @@
 
 namespace App\Form\EventSubscriber;
 
+use App\Entity\EntityEmailInterface;
 use App\Entity\User;
+use LogicException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -31,15 +33,21 @@ class DefaultEmailSubscriber implements EventSubscriberInterface
 
     public function preSetData(FormEvent $event): void
     {
-        /** @var User|null $user */
-        $user = $this->security->getUser();
-        if ($user !== null)
+        $user = $event->getData();
+        if (!$user instanceof EntityEmailInterface)
         {
-            $data = $event->getData();
-            if ($data->getEmail() === null)
+            throw new LogicException(sprintf('%s musí dostat objekt třídy, která implementuje %s.', get_class($this), EntityEmailInterface::class));
+        }
+
+        /** @var User|null $loggedInUser */
+        $loggedInUser = $this->security->getUser();
+
+        if ($loggedInUser !== null)
+        {
+            if ($user->getEmail() === null)
             {
-                $data->setEmail($user->getEmail());
-                $event->setData($data);
+                $user->setEmail($loggedInUser->getEmail());
+                $event->setData($user);
             }
         }
     }
