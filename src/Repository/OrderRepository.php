@@ -3,7 +3,6 @@
 namespace App\Repository;
 
 use App\Entity\Detached\Search\Composition\PhraseSortDropdown;
-use DateTime;
 use App\Entity\Order;
 use App\Entity\Product;
 use App\Entity\User;
@@ -301,9 +300,8 @@ class OrderRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('o')
             ->andWhere('o.createdManually = false')
             ->andWhere('o.lifecycleChapter = :lifecycleCart')
-            ->andWhere('o.expireAt IS NULL OR o.expireAt <= :now')
+            ->andWhere('o.expireAt IS NULL OR o.expireAt <= CURRENT_TIME()')
             ->setParameter('lifecycleCart', Order::LIFECYCLE_FRESH)
-            ->setParameter('now', new DateTime('now'))
             ->delete()
             ->getQuery()
             ->execute()

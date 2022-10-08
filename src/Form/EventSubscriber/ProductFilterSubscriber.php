@@ -3,7 +3,6 @@
 namespace App\Form\EventSubscriber;
 
 use App\Entity\Detached\Search\Composition\ProductFilter;
-use App\Entity\Product;
 use App\Entity\ProductCategory;
 use Doctrine\ORM\EntityManagerInterface;
 use LogicException;
@@ -42,7 +41,7 @@ class ProductFilterSubscriber implements EventSubscriberInterface
 
         if($filterData->getSection() !== null)
         {
-            $categories = $this->entityManager->getRepository(Product::class)->findProductCategoriesInSection($filterData->getSection());
+            $categories = $this->entityManager->getRepository(ProductCategory::class)->findProductCategoriesInSection($filterData->getSection());
 
             $form->add('categories', EntityType::class, [
                 'class' => ProductCategory::class,

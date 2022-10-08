@@ -3,7 +3,6 @@
 namespace App\Repository;
 
 use App\Entity\Detached\Search\Composition\PhraseSort;
-use DateTime;
 use App\Entity\ProductSection;
 use App\Pagination\Pagination;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -31,8 +30,7 @@ class ProductSectionRepository extends ServiceEntityRepository
     {
         return $this->createQueryBuilder('ps')
             ->andWhere('ps.isHidden = false')
-            ->andWhere('NOT (ps.availableSince IS NOT NULL AND ps.availableSince > :now)')
-            ->setParameter('now', new DateTime('now'))
+            ->andWhere('NOT (ps.availableSince IS NOT NULL AND ps.availableSince > CURRENT_TIME())')
             ->orderBy('ps.name', 'ASC')
             ->getQuery()
             ->getResult()

@@ -2,16 +2,14 @@
 
 namespace App\Repository;
 
+use App\CatalogFilter\CatalogProductSearchQueryBuilder;
 use App\Entity\Detached\Search\Composition\ProductFilter;
-use App\Entity\ProductCategory;
 use Exception;
 use App\Entity\Product;
 use App\Entity\ProductSection;
 use App\Pagination\Pagination;
-use Doctrine\ORM\QueryBuilder;
 use App\Entity\ProductOptionGroup;
 use Doctrine\Persistence\ManagerRegistry;
-use App\CatalogFilter\CatalogProductQueryBuilder;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
@@ -35,9 +33,10 @@ class ProductRepository extends ServiceEntityRepository
     public function findOneAndFetchEverything(array $criteria, bool $visibleOnly): ?Product
     {
         // produkt, sekce
-        $queryBuilder = $this->createQueryBuilder('p')
-            ->select('p, ps')
+        $queryBuilder = (new CatalogProductSearchQueryBuilder($this->_em, 'p'))
+            ->addSelect('ps')
             ->leftJoin('p.section', 'ps')
+            ->withInvisible(!$visibleOnly)
         ;
 
         foreach ($criteria as $name => $value)
@@ -45,18 +44,11 @@ class ProductRepository extends ServiceEntityRepository
             $queryBuilder->andWhere(sprintf('p.%s = :%s', $name, $name))->setParameter($name, $value);
         }
 
-        if ($visibleOnly)
-        {
-            $queryBuilder = (new CatalogProductQueryBuilder($queryBuilder))
-                ->addProductVisibilityCondition()
-                ->getQueryBuilder()
-            ;
-        }
-
         /** @var Product|null $product */
         $product = $queryBuilder
             ->getQuery()
-            ->getOneOrNullResult();
+            ->getOneOrNullResult()
+        ;
 
         if ($product === null)
         {
@@ -151,14 +143,9 @@ class ProductRepository extends ServiceEntityRepository
 
     public function findLatest(int $count)
     {
-        $queryBuilder = $this->createQueryBuilder('p')
+        return (new CatalogProductSearchQueryBuilder($this->_em, 'p'))
             ->setMaxResults($count)
             ->orderBy('p.created', 'DESC')
-        ;
-
-        return (new CatalogProductQueryBuilder($queryBuilder))
-            ->addProductVisibilityCondition()
-            ->getQueryBuilder()
             ->getQuery()
             ->getResult()
         ;
@@ -166,13 +153,16 @@ class ProductRepository extends ServiceEntityRepository
 
     public function getMinAndMaxPrice(?ProductSection $section)
     {
-        $queryBuilder = $this->createQueryBuilder('p')
-            ->select('min(p.priceWithVat) as priceMin, max(p.priceWithVat) as priceMax');
+        $queryBuilder = (new CatalogProductSearchQueryBuilder($this->_em, 'p'))
+            ->select('min(p.priceWithVat) as priceMin, max(p.priceWithVat) as priceMax')
+        ;
 
-        $priceData = (new CatalogProductQueryBuilder($queryBuilder))
-            ->addProductVisibilityCondition()
-            ->addProductSearchConditions($section)
-            ->getQueryBuilder()
+        if ($section !== null)
+        {
+            $queryBuilder->withSection($section, 'ps');
+        }
+
+        $priceData = $queryBuilder
             ->getQuery()
             ->getScalarResult()[0]
         ;
@@ -190,9 +180,7 @@ class ProductRepository extends ServiceEntityRepository
 
     public function findAllVisible()
     {
-        return (new CatalogProductQueryBuilder( $this->createQueryBuilder('p') ))
-            ->addProductVisibilityCondition()
-            ->getQueryBuilder()
+        return (new CatalogProductSearchQueryBuilder($this->_em, 'p'))
             ->getQuery()
             ->getResult()
         ;
@@ -200,7 +188,7 @@ class ProductRepository extends ServiceEntityRepository
 
     public function findRelated(Product $product, int $quantity)
     {
-        $productsCount = $this->getQueryForRelated($product, $quantity)
+        $productsCount = $this->getQueryBuilderForRelated($product, $quantity)
             ->select('count(p.id)')
             ->getQuery()
             ->getSingleScalarResult()
@@ -221,7 +209,7 @@ class ProductRepository extends ServiceEntityRepository
             $randomOffset = 0;
         }
 
-        $products = $this->getQueryForRelated($product, $quantity)
+        $products = $this->getQueryBuilderForRelated($product, $quantity)
             ->setFirstResult($randomOffset)
             ->getQuery()
             ->getResult()
@@ -233,17 +221,12 @@ class ProductRepository extends ServiceEntityRepository
 
     public function findOneForCartInsert(int $id): ?Product
     {
-        $queryBuilder = $this->createQueryBuilder('p')
+        /** @var Product|null $product */
+        $product = (new CatalogProductSearchQueryBuilder($this->_em, 'p'))
             ->select('p, pog')
             ->leftJoin('p.optionGroups', 'pog')
             ->andWhere('p.id = :id')
             ->setParameter('id', $id)
-        ;
-
-        /** @var Product|null $product */
-        $product = (new CatalogProductQueryBuilder($queryBuilder))
-            ->addProductVisibilityCondition()
-            ->getQueryBuilder()
             ->getQuery()
             ->getOneOrNullResult()
         ;
@@ -282,12 +265,10 @@ class ProductRepository extends ServiceEntityRepository
     public function getSearchPagination(bool $inAdmin, ProductFilter $searchData): Pagination
     {
         $sortData = $searchData->getPhraseSort()->getSort()->getDqlSortData();
-        $queryBuilder = $this->createQueryBuilder('p');
 
         if($inAdmin)
         {
-            $queryBuilder
-                // vyhledavani
+            $queryBuilder = $this->createQueryBuilder('p')
                 ->andWhere('p.id LIKE :searchPhrase OR
                             p.name LIKE :searchPhrase OR
                             p.slug LIKE :searchPhrase')
@@ -296,11 +277,17 @@ class ProductRepository extends ServiceEntityRepository
         }
         else
         {
-            $queryBuilder = (new CatalogProductQueryBuilder($queryBuilder))
-                ->addProductVisibilityCondition()
-                ->addProductSearchConditions($searchData->getSection(), $searchData->getPhraseSort()->getPhrase()->getText(), $searchData->getPriceMin(), $searchData->getPriceMax(), $searchData->getCategoriesGrouped())
-                ->getQueryBuilder()
+            $queryBuilder = (new CatalogProductSearchQueryBuilder($this->_em, 'p'))
+                ->withSearchPhrase($searchData->getPhraseSort()->getPhrase()->getText())
+                ->withCategoriesGrouped($searchData->getCategoriesGrouped())
+                ->withPriceMin($searchData->getPriceMin())
+                ->withPriceMax($searchData->getPriceMax())
             ;
+
+            if ($searchData->getSection() !== null)
+            {
+                $queryBuilder->withSection($searchData->getSection(), 'ps');
+            }
         }
 
         $query = $queryBuilder
@@ -311,14 +298,9 @@ class ProductRepository extends ServiceEntityRepository
         return new Pagination($query, $this->requestStack->getCurrentRequest(), 12);
     }
 
-    private function getQueryForRelated(Product $product, int $quantity): QueryBuilder
+    private function getQueryBuilderForRelated(Product $product, int $quantity): CatalogProductSearchQueryBuilder
     {
-        $queryBuilder = $this->createQueryBuilder('p');
-
-        return (new CatalogProductQueryBuilder($queryBuilder))
-            ->addProductVisibilityCondition()
-            ->getQueryBuilder()
-
+        return (new CatalogProductSearchQueryBuilder($this->_em, 'p'))
             ->andWhere('p.id != :viewedProductId')
             ->andWhere('p.section = :viewedProductSection')
             ->setParameter('viewedProductId', $product->getId())
@@ -326,37 +308,5 @@ class ProductRepository extends ServiceEntityRepository
             ->orderBy('p.created', 'DESC')
             ->setMaxResults($quantity)
         ;
-    }
-
-    public function findProductCategoriesInSection(?ProductSection $section): array
-    {
-        $queryBuilder = $this->createQueryBuilder('p')
-            ->select('p', 'pc', 'pcg')
-            ->innerJoin('p.categories', 'pc')
-            ->leftJoin('pc.productCategoryGroup', 'pcg')
-        ;
-
-        $products = (new CatalogProductQueryBuilder($queryBuilder))
-            ->addProductVisibilityCondition()
-            ->addProductSearchConditions($section)
-            ->getQueryBuilder()
-            ->getQuery()
-            ->getResult()
-        ;
-
-        $categories = [];
-
-        /** @var Product $product */
-        foreach ($products as $product)
-        {
-            /** @var ProductCategory $category */
-            foreach ($product->getCategories() as $category)
-            {
-                $categoryGroup = $category->getProductCategoryGroup();
-                $categories[$categoryGroup->getName()][$category->getName()] = $category;
-            }
-        }
-
-        return $categories;
     }
 }
