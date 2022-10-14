@@ -13,7 +13,7 @@
         {{ include('fragments/_flash_messages.html.twig') }}
 
         {# Přehled objednávky #}
-        {{ include('fragments/_order_overview.html.twig', {order: order, showProductIds: false}) }}
+        {{ include('fragments/_order_overview.html.twig', {order: order, showProductIds: false, anonymous: true}) }}
     </div>
 
 {% endblock %}

@@ -61,117 +61,65 @@
     </div>
 {% endif %}
 
-<div class="row">
-    <h4>Kontaktní údaje</h4>
+{% if not anonymous or (order.user is not null and app.user is not null and order.user is same as(app.user)) or (app.user is not null and app.user.email is same as(order.email)) %}
+    <div class="row">
+        <h4>Kontaktní údaje</h4>
 
-    <div class="card white black-text">
-        <div class="card-content">
-            <div class="row margin-0">
-                <div class="col s6 m5 no-padding">E-mail:</div>
-                <div class="col s6 m7 no-padding">
-                    <strong>{{ order.email }}</strong>
-                </div>
-            </div>
-
-            <div class="row margin-0">
-                <div class="col s6 m5 no-padding">Telefonní číslo:</div>
-                <div class="col s6 m7 no-padding">
-                    <strong>{{ order.phoneNumber|phone_number_format('INTERNATIONAL') }}</strong>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="row">
-    {% if order.addressesAreEqual() %}
-        <h4>Dodací a fakturační adresa</h4>
-    {% else %}
-        <h4>Dodací adresa</h4>
-    {% endif %}
-
-    <div class="card white black-text">
-        <div class="card-content">
-            <div class="row margin-0">
-                <div class="col s6 m5 no-padding">Jméno a příjmení:</div>
-                <div class="col s6 m7 no-padding">
-                    <strong>{{ order.addressDeliveryNameFirst }} {{ order.addressDeliveryNameLast }}</strong>
-                </div>
-            </div>
-
-            <div class="row margin-0">
-                <div class="col s6 m5 no-padding">Země:</div>
-                <div class="col s6 m7 no-padding">
-                    <strong>{{ order.addressDeliveryCountry }}</strong>
-                </div>
-            </div>
-
-            <div class="row margin-0">
-                <div class="col s6 m5 no-padding">Ulice a č. p.:</div>
-                <div class="col s6 m7 no-padding">
-                    <strong>{{ order.addressDeliveryStreet }}</strong>
-                </div>
-            </div>
-
-            {% if order.addressDeliveryAdditionalInfo is not null %}
+        <div class="card white black-text">
+            <div class="card-content">
                 <div class="row margin-0">
-                    <div class="col s6 m5 no-padding">Doplňek adresy:</div>
+                    <div class="col s6 m5 no-padding">E-mail:</div>
                     <div class="col s6 m7 no-padding">
-                        <strong>{{ order.addressDeliveryAdditionalInfo }}</strong>
-                        <em>{% if order.addressDeliveryLocked %}(ID výdejního místa){% endif %}</em>
+                        <strong>{{ order.email }}</strong>
                     </div>
                 </div>
-            {% endif %}
 
-            <div class="row margin-0">
-                <div class="col s6 m5 no-padding">Obec:</div>
-                <div class="col s6 m7 no-padding">
-                    <strong>{{ order.addressDeliveryTown }}</strong>
-                </div>
-            </div>
-
-            <div class="row margin-0">
-                <div class="col s6 m5 no-padding">PSČ:</div>
-                <div class="col s6 m7 no-padding">
-                    <strong>{{ order.addressDeliveryZip }}</strong>
+                <div class="row margin-0">
+                    <div class="col s6 m5 no-padding">Telefonní číslo:</div>
+                    <div class="col s6 m7 no-padding">
+                        <strong>{{ order.phoneNumber|phone_number_format('INTERNATIONAL') }}</strong>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-{% if not order.addressesAreEqual() %}
     <div class="row">
-        <h4>Fakturační adresa</h4>
+        {% if order.addressesAreEqual() %}
+            <h4>Dodací a fakturační adresa</h4>
+        {% else %}
+            <h4>Dodací adresa</h4>
+        {% endif %}
 
         <div class="card white black-text">
             <div class="card-content">
                 <div class="row margin-0">
                     <div class="col s6 m5 no-padding">Jméno a příjmení:</div>
                     <div class="col s6 m7 no-padding">
-                        <strong>{{ order.addressBillingNameFirst }} {{ order.addressBillingNameLast }}</strong>
+                        <strong>{{ order.addressDeliveryNameFirst }} {{ order.addressDeliveryNameLast }}</strong>
                     </div>
                 </div>
 
                 <div class="row margin-0">
                     <div class="col s6 m5 no-padding">Země:</div>
                     <div class="col s6 m7 no-padding">
-                        <strong>{{ order.addressBillingCountry }}</strong>
+                        <strong>{{ order.addressDeliveryCountry }}</strong>
                     </div>
                 </div>
 
                 <div class="row margin-0">
                     <div class="col s6 m5 no-padding">Ulice a č. p.:</div>
                     <div class="col s6 m7 no-padding">
-                        <strong>{{ order.addressBillingStreet }}</strong>
+                        <strong>{{ order.addressDeliveryStreet }}</strong>
                     </div>
                 </div>
 
-                {% if order.addressBillingAdditionalInfo is not null %}
+                {% if order.addressDeliveryAdditionalInfo is not null %}
                     <div class="row margin-0">
                         <div class="col s6 m5 no-padding">Doplňek adresy:</div>
                         <div class="col s6 m7 no-padding">
-                            <strong>{{ order.addressBillingAdditionalInfo }}</strong>
+                            <strong>{{ order.addressDeliveryAdditionalInfo }}</strong>
+                            <em>{% if order.addressDeliveryLocked %}(ID výdejního místa){% endif %}</em>
                         </div>
                     </div>
                 {% endif %}
@@ -179,50 +127,104 @@
                 <div class="row margin-0">
                     <div class="col s6 m5 no-padding">Obec:</div>
                     <div class="col s6 m7 no-padding">
-                        <strong>{{ order.addressBillingTown }}</strong>
+                        <strong>{{ order.addressDeliveryTown }}</strong>
                     </div>
                 </div>
 
                 <div class="row margin-0">
                     <div class="col s6 m5 no-padding">PSČ:</div>
                     <div class="col s6 m7 no-padding">
-                        <strong>{{ order.addressBillingZip }}</strong>
+                        <strong>{{ order.addressDeliveryZip }}</strong>
                     </div>
                 </div>
-
-                {% if order.addressBillingCompany is not null or order.addressBillingIc is not null or order.addressBillingDic is not null %}
-                    <br>
-                {% endif %}
-
-                {% if order.addressBillingCompany is not null %}
-                    <div class="row margin-0">
-                        <div class="col s6 m5 no-padding">Firma:</div>
-                        <div class="col s6 m7 no-padding">
-                            <strong>{{ order.addressBillingCompany }}</strong>
-                        </div>
-                    </div>
-                {% endif %}
-
-                {% if order.addressBillingIc is not null %}
-                    <div class="row margin-0">
-                        <div class="col s6 m5 no-padding">IČ:</div>
-                        <div class="col s6 m7 no-padding">
-                            <strong>{{ order.addressBillingIc }}</strong>
-                        </div>
-                    </div>
-                {% endif %}
-
-                {% if order.addressBillingDic is not null %}
-                    <div class="row margin-0">
-                        <div class="col s6 m5 no-padding">DIČ:</div>
-                        <div class="col s6 m7 no-padding">
-                            <strong>{{ order.addressBillingDic }}</strong>
-                        </div>
-                    </div>
-                {% endif %}
             </div>
         </div>
     </div>
+
+    {% if not order.addressesAreEqual() %}
+        <div class="row">
+            <h4>Fakturační adresa</h4>
+
+            <div class="card white black-text">
+                <div class="card-content">
+                    <div class="row margin-0">
+                        <div class="col s6 m5 no-padding">Jméno a příjmení:</div>
+                        <div class="col s6 m7 no-padding">
+                            <strong>{{ order.addressBillingNameFirst }} {{ order.addressBillingNameLast }}</strong>
+                        </div>
+                    </div>
+
+                    <div class="row margin-0">
+                        <div class="col s6 m5 no-padding">Země:</div>
+                        <div class="col s6 m7 no-padding">
+                            <strong>{{ order.addressBillingCountry }}</strong>
+                        </div>
+                    </div>
+
+                    <div class="row margin-0">
+                        <div class="col s6 m5 no-padding">Ulice a č. p.:</div>
+                        <div class="col s6 m7 no-padding">
+                            <strong>{{ order.addressBillingStreet }}</strong>
+                        </div>
+                    </div>
+
+                    {% if order.addressBillingAdditionalInfo is not null %}
+                        <div class="row margin-0">
+                            <div class="col s6 m5 no-padding">Doplňek adresy:</div>
+                            <div class="col s6 m7 no-padding">
+                                <strong>{{ order.addressBillingAdditionalInfo }}</strong>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    <div class="row margin-0">
+                        <div class="col s6 m5 no-padding">Obec:</div>
+                        <div class="col s6 m7 no-padding">
+                            <strong>{{ order.addressBillingTown }}</strong>
+                        </div>
+                    </div>
+
+                    <div class="row margin-0">
+                        <div class="col s6 m5 no-padding">PSČ:</div>
+                        <div class="col s6 m7 no-padding">
+                            <strong>{{ order.addressBillingZip }}</strong>
+                        </div>
+                    </div>
+
+                    {% if order.addressBillingCompany is not null or order.addressBillingIc is not null or order.addressBillingDic is not null %}
+                        <br>
+                    {% endif %}
+
+                    {% if order.addressBillingCompany is not null %}
+                        <div class="row margin-0">
+                            <div class="col s6 m5 no-padding">Firma:</div>
+                            <div class="col s6 m7 no-padding">
+                                <strong>{{ order.addressBillingCompany }}</strong>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    {% if order.addressBillingIc is not null %}
+                        <div class="row margin-0">
+                            <div class="col s6 m5 no-padding">IČ:</div>
+                            <div class="col s6 m7 no-padding">
+                                <strong>{{ order.addressBillingIc }}</strong>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    {% if order.addressBillingDic is not null %}
+                        <div class="row margin-0">
+                            <div class="col s6 m5 no-padding">DIČ:</div>
+                            <div class="col s6 m7 no-padding">
+                                <strong>{{ order.addressBillingDic }}</strong>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    {% endif %}
 {% endif %}
 
 <div class="row">

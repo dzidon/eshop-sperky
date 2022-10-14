@@ -63,6 +63,6 @@
     {% endif %}
 
     {# Přehled objednávky #}
-    {{ include('fragments/_order_overview.html.twig', {order: order, showProductIds: true}) }}
+    {{ include('fragments/_order_overview.html.twig', {order: order, showProductIds: true, anonymous: false}) }}
 
 {% endblock %}
