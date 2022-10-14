@@ -9,5 +9,5 @@ use Symfony\Component\Validator\Constraint;
  */
 class Ic extends Constraint
 {
-    public $message = 'IČ musí být ve tvaru osmi číslic bez mezery.';
+    public $message = 'IČ musí být zadáno ve správném tvaru.';
 }

@@ -26,11 +26,43 @@ class IcValidator extends ConstraintValidator
             throw new UnexpectedValueException($value, 'string');
         }
 
-        if (!preg_match('/^\d{8}$/', $value))
+        if (!$this->isValidIc($value))
         {
             $this->context
                 ->buildViolation($constraint->message)
                 ->addViolation();
         }
+    }
+
+    public function isValidIc(string $ic): bool
+    {
+        // 8 číslic
+        if (!preg_match('#^\d{8}$#', $ic))
+        {
+            return false;
+        }
+
+        // kontrolní součet
+        $a = 0;
+        for ($i = 0; $i < 7; $i++)
+        {
+            $a += $ic[$i] * (8 - $i);
+        }
+
+        $a = $a % 11;
+        if ($a === 0)
+        {
+            $c = 1;
+        }
+        elseif ($a === 1)
+        {
+            $c = 0;
+        }
+        else
+        {
+            $c = 11 - $a;
+        }
+
+        return (int) $ic[7] === $c;
     }
 }
