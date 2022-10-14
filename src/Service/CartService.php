@@ -24,12 +24,12 @@ class CartService
     /**
      * @var Order|null
      */
-    private $order = null;
+    private ?Order $order = null;
 
     /**
      * @var Cookie|null
      */
-    private $newOrderCookie = null;
+    private ?Cookie $newOrderCookie = null;
 
     /**
      * @var bool
@@ -211,6 +211,7 @@ class CartService
             {
                 $targetCartOccurence->addOption($submittedOption);
             }
+
             $targetCartOccurence->generateOptionsString();
             $this->order->addCartOccurence($targetCartOccurence);
         }
@@ -262,33 +263,25 @@ class CartService
      */
     public function removeCartOccurence(?int $cartOccurenceId): self
     {
-        if($cartOccurenceId === null)
+        if ($cartOccurenceId === null)
         {
             throw new CartException('Byl zadán neplatný produkt.');
         }
 
-        $found = false;
         foreach ($this->order->getCartOccurences() as $cartOccurence)
         {
-            if($cartOccurence->getId() === $cartOccurenceId)
+            if ($cartOccurence->getId() === $cartOccurenceId)
             {
-                $found = true;
                 $this->order->removeCartOccurence($cartOccurence);
                 $this->entityManager->remove($cartOccurence);
+                $this->entityManager->flush();
+                $this->order->reindexCartOccurences();
 
-                break;
+                return $this;
             }
         }
 
-        if(!$found)
-        {
-            throw new CartException('Tento produkt v košíku nemáte.');
-        }
-
-        $this->entityManager->flush();
-        $this->order->reindexCartOccurences();
-
-        return $this;
+        throw new CartException('Tento produkt v košíku nemáte.');
     }
 
     /**

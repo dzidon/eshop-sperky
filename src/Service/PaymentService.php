@@ -91,6 +91,7 @@ class PaymentService
             }
 
             $order = $payment->getOrder();
+
             // objednávka čeká na zaplacení a její platba přechází ze stavu "platební metoda zvolena" do jiného stavu
             if ($order->getLifecycleChapter() === Order::LIFECYCLE_AWAITING_PAYMENT)
             {
@@ -114,7 +115,8 @@ class PaymentService
 
                     $this->orderPostCompletionService
                         ->cancelOrder($order, true)
-                        ->sendConfirmationEmail($order);
+                        ->sendConfirmationEmail($order)
+                    ;
 
                     $this->entityManager->persist($order);
                 }

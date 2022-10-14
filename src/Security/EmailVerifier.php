@@ -51,7 +51,8 @@ class EmailVerifier
         $email->from(new Address($this->parameterBag->get('app_email_noreply'), $this->parameterBag->get('app_site_name')))
             ->to($usedEmail)
             ->subject('Aktivace účtu')
-            ->htmlTemplate('fragments/emails/_verify_account.html.twig');
+            ->htmlTemplate('fragments/emails/_verify_account.html.twig')
+        ;
 
         $signatureComponents = $this->verifyEmailHelper->generateSignature(
             self::VERIFICATION_ROUTE_NAME,
@@ -67,7 +68,7 @@ class EmailVerifier
 
         $email->context($context);
 
-        if($user !== null)
+        if ($user !== null)
         {
             $this->mailer->send($email);
         }

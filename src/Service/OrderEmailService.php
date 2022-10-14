@@ -38,27 +38,26 @@ class OrderEmailService
     public function send(Order $order): void
     {
         $this->order = $order;
-        $this->createEmail();
+        if ($this->order->getLifecycleChapter() >= Order::LIFECYCLE_AWAITING_PAYMENT)
+        {
+            $this->createEmail();
 
-        if ($this->order->getLifecycleChapter() < Order::LIFECYCLE_AWAITING_PAYMENT)
-        {
-            throw new LogicException('App\Service\OrderEmailService nemůže poslat potvrzovací e-mail pro objednávku, která má lifecycleChapter menší než App\Entity\Order::LIFECYCLE_AWAITING_PAYMENT.');
-        }
-        else if ($this->order->getLifecycleChapter() === Order::LIFECYCLE_AWAITING_PAYMENT)
-        {
-            $this->addAwaitingPaymentContent();
-        }
-        else if ($this->order->getLifecycleChapter() === Order::LIFECYCLE_CANCELLED)
-        {
-            $this->addCancelledContent();
-        }
-        else
-        {
-            $this->addPaidContent();
-        }
+            if ($this->order->getLifecycleChapter() === Order::LIFECYCLE_AWAITING_PAYMENT)
+            {
+                $this->addAwaitingPaymentContent();
+            }
+            else if ($this->order->getLifecycleChapter() === Order::LIFECYCLE_CANCELLED)
+            {
+                $this->addCancelledContent();
+            }
+            else
+            {
+                $this->addPaidContent();
+            }
 
-        $this->addOrderDataToContext();
-        $this->mailer->send($this->email);
+            $this->addOrderDataToContext();
+            $this->mailer->send($this->email);
+        }
     }
 
     /**

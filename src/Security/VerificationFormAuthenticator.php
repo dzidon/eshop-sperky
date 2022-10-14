@@ -69,7 +69,7 @@ class VerificationFormAuthenticator extends AbstractLoginFormAuthenticator
                 /** @var User $user */
                 $user = $this->entityManager->getRepository(User::class)->findOneBy(['email' => $userIdentifier]);
 
-                if(!$user || $user->getPassword() === null || $user->isVerified())
+                if (!$user || $user->getPassword() === null || $user->isVerified())
                 {
                     throw new BadCredentialsException();
                 }

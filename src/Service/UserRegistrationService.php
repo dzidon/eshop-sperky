@@ -29,14 +29,14 @@ class UserRegistrationService
      *
      * @var User|null
      */
-    private $existingUser;
+    private ?User $existingUser = null;
 
     /**
      * Uživatel, kterému bude poslán e-mail pro dokončení registrace
      *
      * @var User|null
      */
-    private $userForEmailConfirmation;
+    private ?User $userForEmailConfirmation = null;
 
     /**
      * Datum a čas registrace

@@ -168,6 +168,7 @@ class ResetPasswordController extends AbstractController
         try
         {
             $mailer->send($email);
+            $this->logger->info(sprintf("Someone has requested a password reset for %s (ID: %s)", $user->getUserIdentifier(), $user->getId()));
         }
         catch (TransportExceptionInterface $exception)
         {
@@ -175,8 +176,6 @@ class ResetPasswordController extends AbstractController
         }
 
         $this->setTokenObjectInSession($resetToken);
-        $this->logger->info(sprintf("Someone has requested a password reset for %s (ID: %s)", $user->getUserIdentifier(), $user->getId()));
-
         return $this->redirectWithSuccessMessage();
     }
 

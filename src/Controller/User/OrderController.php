@@ -172,8 +172,9 @@ class OrderController extends AbstractController
                     ->finishOrder($targetOrder)
                     ->sendConfirmationEmail($targetOrder);
 
-                $this->getDoctrine()->getManager()->persist($targetOrder);
-                $this->getDoctrine()->getManager()->flush();
+                $entityManager = $this->getDoctrine()->getManager();
+                $entityManager->persist($targetOrder);
+                $entityManager->flush();
 
                 $logger->info(sprintf('Order ID %d has been finished. Current lifecycle chapter: %d.', $targetOrder->getId(), $targetOrder->getLifecycleChapter()));
 

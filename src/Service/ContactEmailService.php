@@ -45,9 +45,10 @@ class ContactEmailService
         $email->from(new Address($senderEmail))
             ->to($recipientEmail)
             ->subject($subject)
-            ->text($text);
+            ->text($text)
+        ;
 
-        $this->logger->info(sprintf("Someone has sent a contact email with a subject '%s' as %s.", $subject, $senderEmail));
         $this->mailer->send($email);
+        $this->logger->info(sprintf("Someone has sent a contact email with a subject '%s' as %s.", $subject, $senderEmail));
     }
 }
