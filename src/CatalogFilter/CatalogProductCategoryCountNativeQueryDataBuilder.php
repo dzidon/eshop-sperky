@@ -3,7 +3,7 @@
 namespace App\CatalogFilter;
 
 use App\Entity\ProductCategory;
-use App\Messenger\NativeQueryData;
+use App\Messenger\NativeQueryDataMessenger;
 
 /**
  * Vytvoří HAVING klauzuli pro zjištění počtu produktů v kategorii v produktovém filtru.
@@ -53,7 +53,7 @@ class CatalogProductCategoryCountNativeQueryDataBuilder
         return $this;
     }
 
-    public function build(): NativeQueryData
+    public function build(): NativeQueryDataMessenger
     {
         $clauses = ['SUM(CASE WHEN {prefix}.id = :current_category_id THEN 1 ELSE 0 END) > 0'];
         $placeholders['current_category_id'] = $this->currentCategory->getId();
@@ -129,6 +129,6 @@ class CatalogProductCategoryCountNativeQueryDataBuilder
             $clause = 'HAVING ' . $clause;
         }
 
-        return new NativeQueryData($clause, $placeholders);
+        return new NativeQueryDataMessenger($clause, $placeholders);
     }
 }

@@ -3,7 +3,6 @@
 namespace App\Service;
 
 use App\Entity\Order;
-use App\OrderSynchronizer\CustomOrderSynchronizer;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Uid\Uuid;
 
@@ -14,10 +13,10 @@ use Symfony\Component\Uid\Uuid;
  */
 class CustomOrderService
 {
-    private CustomOrderSynchronizer $synchronizer;
+    private OrderSynchronizer $synchronizer;
     private EntityManagerInterface $entityManager;
 
-    public function __construct(EntityManagerInterface $entityManager, CustomOrderSynchronizer $synchronizer)
+    public function __construct(EntityManagerInterface $entityManager, OrderSynchronizer $synchronizer)
     {
         $this->entityManager = $entityManager;
         $this->synchronizer = $synchronizer;
@@ -39,10 +38,10 @@ class CustomOrderService
             $order = $this->entityManager->getRepository(Order::class)->findOneAndFetchEverything($uuid);
             if ($order !== null && $order->isCreatedManually() && $order->getLifecycleChapter() === Order::LIFECYCLE_FRESH)
             {
-                $this->synchronizer->synchronizeAndAddWarningsToFlashBag($order);
-
+                $warnings = $this->synchronizer->synchronize($order, false, 'Ve vaší objednávce na míru došlo ke změně: ');
                 if ($order->hasSynchronizationWarnings())
                 {
+                    $this->synchronizer->addWarningsToFlashBag($warnings);
                     $this->entityManager->persist($order);
                     $this->entityManager->flush();
                 }

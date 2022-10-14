@@ -64,7 +64,7 @@ class Json
 
     public function setResponseData(string $key, $data): self
     {
-        if($key === 'errors' || $key === 'html')
+        if ($key === 'errors' || $key === 'html')
         {
             throw new LogicException('Do metody setResponseData v App\Response\Json nepatří klíče errors a html. Použijte metody addResponseError a setResponseHtml.');
         }

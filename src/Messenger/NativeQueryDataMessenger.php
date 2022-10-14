@@ -7,7 +7,7 @@ namespace App\Messenger;
  *
  * @package App\Messenger
  */
-class NativeQueryData
+class NativeQueryDataMessenger
 {
     private string $clause;
 

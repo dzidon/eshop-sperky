@@ -3,7 +3,7 @@
 namespace App\CatalogFilter;
 
 use App\Entity\ProductSection;
-use App\Messenger\NativeQueryData;
+use App\Messenger\NativeQueryDataMessenger;
 
 /**
  * Vytvoří WHERE klauzuli pro vyhledávání produktů přes produktový filtr.
@@ -105,7 +105,7 @@ class CatalogProductSearchNativeQueryDataBuilder
         return $this;
     }
 
-    public function build(): NativeQueryData
+    public function build(): NativeQueryDataMessenger
     {
         $clause = '';
         $placeholders = [];
@@ -152,6 +152,6 @@ class CatalogProductSearchNativeQueryDataBuilder
             $clause = 'WHERE ' . $clause;
         }
 
-        return new NativeQueryData($clause, $placeholders);
+        return new NativeQueryDataMessenger($clause, $placeholders);
     }
 }

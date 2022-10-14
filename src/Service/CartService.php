@@ -7,7 +7,6 @@ use App\Entity\Order;
 use App\Entity\Product;
 use App\Entity\ProductOption;
 use App\Exception\CartException;
-use App\OrderSynchronizer\OrderCartSynchronizer;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -44,10 +43,10 @@ class CartService
 
     private RequestStack $requestStack;
     private EntityManagerInterface $entityManager;
-    private OrderCartSynchronizer $synchronizer;
+    private OrderSynchronizer $synchronizer;
     private EntityCollectionService $entityCollectionService;
 
-    public function __construct(EntityManagerInterface $entityManager, RequestStack $requestStack, OrderCartSynchronizer $synchronizer, EntityCollectionService $entityCollectionService)
+    public function __construct(EntityManagerInterface $entityManager, RequestStack $requestStack, OrderSynchronizer $synchronizer, EntityCollectionService $entityCollectionService)
     {
         $this->entityManager = $entityManager;
         $this->requestStack = $requestStack;
@@ -64,7 +63,7 @@ class CartService
     }
 
     /**
-     * Vrátí aktivní objednávku
+     * Vrátí aktivní objednávku.
      *
      * @return Order
      */
@@ -82,7 +81,7 @@ class CartService
     }
 
     /**
-     * Vrátí token aktivní objednávky jako string
+     * Vrátí token aktivní objednávky jako string.
      *
      * @return string
      */
@@ -105,7 +104,7 @@ class CartService
         $tokenIsValid = UUid::isValid($tokenInCookie);
 
         $currentRoute = $request->attributes->get('_route');
-        $loadFully = isset(OrderCartSynchronizer::SYNCHRONIZATION_ROUTES[$currentRoute]);
+        $loadFully = isset(OrderSynchronizer::SYNCHRONIZATION_ROUTES[$currentRoute]);
 
         if ($loadFully)
         {
@@ -125,7 +124,9 @@ class CartService
             }
 
             $cartOccurencesMessenger = $this->entityCollectionService->createEntityCollectionsMessengerForOrphanRemoval($this->order);
-            $this->synchronizer->synchronizeAndAddWarningsToFlashBag($this->order);
+
+            $warnings = $this->synchronizer->synchronize($this->order, true, 'Ve vašem košíku došlo ke změně: ');
+            $this->synchronizer->addWarningsToFlashBag($warnings);
 
             $this->totalQuantityForNavbar = $this->order->getTotalQuantity();
             $this->obtainNewOrderCookie();
@@ -252,7 +253,7 @@ class CartService
     }
 
     /**
-     * Odstraní CartOccurence z košíku
+     * Odstraní CartOccurence z košíku.
      *
      * @param int|null $cartOccurenceId
      * @throws CartException
@@ -274,6 +275,7 @@ class CartService
                 $found = true;
                 $this->order->removeCartOccurence($cartOccurence);
                 $this->entityManager->remove($cartOccurence);
+
                 break;
             }
         }

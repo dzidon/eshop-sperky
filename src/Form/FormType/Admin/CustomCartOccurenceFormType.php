@@ -34,7 +34,7 @@ class CustomCartOccurenceFormType extends AbstractType
             ])
             ->add('priceWithoutVat', NumberType::class, [
                 'invalid_message' => 'Musíte zadat číselnou hodnotu.',
-                'label' => 'Cena bez DPH v Kč',
+                'label' => 'Cena za kus bez DPH v Kč',
             ])
             ->add('vat', ChoiceType::class, [
                 'choices' => Product::VAT_NAMES,
