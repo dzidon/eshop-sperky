@@ -48,7 +48,7 @@ class ReviewRepository extends ServiceEntityRepository
             ->getQuery()
         ;
 
-        return new Pagination($query, $this->requestStack->getCurrentRequest());
+        return new Pagination($query, $this->requestStack->getCurrentRequest(), 9);
     }
 
     public function findLatest(int $count)
