@@ -5,33 +5,31 @@
     {# Breadcrumbs #}
     {{ include('fragments/_breadcrumbs.html.twig') }}
 
-    <div class="container">
-        <div class="container">
-            {# h1 #}
-            {{ include('fragments/_h1.html.twig') }}
+    <div class="container container-narrow">
+        {# h1 #}
+        {{ include('fragments/_h1.html.twig') }}
 
-            {# Flash zprávy #}
-            {{ include('fragments/_flash_messages.html.twig') }}
+        {# Flash zprávy #}
+        {{ include('fragments/_flash_messages.html.twig') }}
 
-            <div class="section">
-                {{ form(loginForm) }}
+        <div class="section">
+            {{ form(loginForm) }}
 
-                <div class="row center-align">
-                    {% if not is_authenticated_remembered %}
-                        <div>
-                            Ještě nemáte účet? <a href="{{ path('register') }}">Zaregistrovat se</a>
-                        </div>
-                    {% endif %}
+            <div class="row center-align">
+                {% if not is_authenticated_remembered %}
                     <div>
-                        Zapomněli jste heslo? <a href="{{ path('forgot_password_request') }}">Obnovit</a>
+                        Ještě nemáte účet? <a href="{{ path('register') }}">Zaregistrovat se</a>
                     </div>
+                {% endif %}
+                <div>
+                    Zapomněli jste heslo? <a href="{{ path('forgot_password_request') }}">Obnovit</a>
                 </div>
-
-                <div class="divider row"></div>
-
-                {# Social login #}
-                {{ include('fragments/_social_login.html.twig', {actionName: 'přihlásit'}) }}
             </div>
+
+            <div class="divider row"></div>
+
+            {# Social login #}
+            {{ include('fragments/_social_login.html.twig', {actionName: 'přihlásit'}) }}
         </div>
     </div>
 

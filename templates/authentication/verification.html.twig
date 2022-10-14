@@ -5,22 +5,20 @@
     {# Breadcrumbs #}
     {{ include('fragments/_breadcrumbs.html.twig') }}
 
-    <div class="container">
-        <div class="container">
-            {# h1 #}
-            {{ include('fragments/_h1.html.twig') }}
+    <div class="container container-narrow">
+        {# h1 #}
+        {{ include('fragments/_h1.html.twig') }}
 
-            {# Flash zprávy #}
-            {{ include('fragments/_flash_messages.html.twig') }}
+        {# Flash zprávy #}
+        {{ include('fragments/_flash_messages.html.twig') }}
 
-            <div class="section">
-                <div class="row">
-                    Nyní zadejte heslo, se kterým jste se registrovali. Po správném zadání dojde k ověření účtu a přihlášení.
-                </div>
-                <br>
-
-                {{ form(verificationForm) }}
+        <div class="section">
+            <div class="row">
+                Nyní zadejte heslo, se kterým jste se registrovali. Po správném zadání dojde k ověření účtu a přihlášení.
             </div>
+            <br>
+
+            {{ form(verificationForm) }}
         </div>
     </div>
 

@@ -137,6 +137,10 @@ main {
     padding-left: 64px !important;
 }
 
+.container-narrow {
+    max-width: 800px;
+}
+
 /*
     Input, Textarea
 */
