@@ -59,7 +59,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             ->setParameter('fullName', '%' . $searchData->getPhrase()->getText() . '%')
 
             ->orWhere('u.phoneNumber LIKE :phoneNumber')
-            ->setParameter('phoneNumber', '%' . str_replace(' ', '', $searchData->getPhrase()->getText()) . '%')
+            ->setParameter('phoneNumber', '%' . str_replace(' ', '', (string) $searchData->getPhrase()->getText()) . '%')
 
             //razeni
             ->orderBy('u.' . $sortData['attribute'], $sortData['order'])

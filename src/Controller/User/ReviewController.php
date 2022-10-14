@@ -113,7 +113,7 @@ class ReviewController extends AbstractController
 
             if($user->getReview() !== null)
             {
-                $this->addFlash('failure', 'Můžete napsat pouze jednu recenzi. Protože už jste nějakou napsali, byli jste přesměrováni na úpravu vaší stávající recenze.');
+                $this->addFlash('warning', 'Můžete napsat pouze jednu recenzi. Protože už jste nějakou napsali, byli jste přesměrováni na úpravu vaší stávající recenze.');
                 return $this->redirectToRoute('review_edit', ['id' => $user->getReview()->getId()]);
             }
 

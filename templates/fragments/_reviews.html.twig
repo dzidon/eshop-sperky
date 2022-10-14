@@ -7,14 +7,13 @@
 
     <div class="col s12">
         <div class="row flex-wrap">
-            {% if reviews|length == 1 %}
-                {% set large_size = 12 %}
-            {% else %}
-                {% set large_size = 6 %}
-            {% endif %}
-
             {% for review in reviews %}
-                <div class="col s12 l{{ large_size }} margin-0 flex-wrap">
+                {% set stars = rating_to_stars(review.getStars()) %}
+                {% set can_edit = is_granted('review_edit', review) %}
+                {% set can_delete = is_granted('review_delete', review) %}
+                {% set isReviewTruncationReady = review.isTruncationReady() %}
+
+                <div class="col s12 l4 margin-0 flex-wrap">
                     <div class="card white container-sticky-bottom width-max">
                         <div class="card-content black-text">
                             <span class="card-title">
@@ -24,7 +23,7 @@
 
                             <div class="amber-text accent-3">
                                 {# Hvězdy #}
-                                {{ include('fragments/_review_stars.html.twig', {stars: rating_to_stars(review.getStars())}) }}
+                                {{ include('fragments/_review_stars.html.twig', {stars: stars}) }}
                             </div>
 
                             <small class="light">
@@ -36,15 +35,20 @@
 
                             {% if review.getText() is not null %}
                                 <br><br>
-                                <p>{{ review.getText() }}</p>
+                                <p>
+                                    {{ truncate(review.getText(), constant('App\\Entity\\Review::LENGTH_BEFORE_TRUNCATION')) }}
+
+                                    {% if isReviewTruncationReady %}
+                                        <strong class="nowrap">
+                                            <a href="#modal-review-full-{{ review.getId() }}" class="modal-trigger">(Přečíst)</a>
+                                        </strong>
+                                    {% endif %}
+                                </p>
                             {% else %}
                                 <br><br>
                                 <em>Uživatel nic nenapsal.</em>
                             {% endif %}
                         </div>
-
-                        {% set can_edit = is_granted('review_edit', review) %}
-                        {% set can_delete = is_granted('review_delete', review) %}
 
                         {% if can_edit or can_delete %}
                             <div class="card-action sticky-card-action">
@@ -59,6 +63,43 @@
                         {% endif %}
                     </div>
                 </div>
+
+                {% if isReviewTruncationReady %}
+                    <div id="modal-review-full-{{ review.getId() }}" class="modal">
+                        <div class="modal-content">
+                            <h4>
+                                {# Klikatelné jméno, pokud je oprávněn nějak upravovat ostatní uživatele #}
+                                {{ include('fragments/_fullname_clickable.html.twig', {user: review.getUser(), authorized: can_manage_users}) }}
+                            </h4>
+
+                            <div class="amber-text accent-3">
+                                {# Hvězdy #}
+                                {{ include('fragments/_review_stars.html.twig', {stars: stars}) }}
+                            </div>
+
+                            <small class="light">
+                                {{ review.getCreated()|date('d. m. Y H:i:s') }}
+                                {% if review.getCreated() != review.getUpdated() and review.getUpdated() is not null %}
+                                    (upraveno: {{ review.getUpdated()|date('d. m. Y H:i:s') }})
+                                {% endif %}
+                            </small>
+
+                            <p>{{ review.getText() }}</p>
+                        </div>
+
+                        <div class="modal-footer">
+                            {% if can_edit %}
+                                <a href="{{ path('review_edit', {id: review.getId()}) }}" class="waves-effect blue-text btn-flat">Upravit</a>
+                            {% endif %}
+
+                            {% if can_delete %}
+                                <a href="{{ path('review_delete', {id: review.getId()}) }}" class="waves-effect blue-text btn-flat">Smazat</a>
+                            {% endif %}
+
+                            <a href="javascript:void(0);" class="modal-close waves-effect blue-text btn-flat">Zavřít</a>
+                        </div>
+                    </div>
+                {% endif %}
             {% endfor %}
         </div>
     </div>

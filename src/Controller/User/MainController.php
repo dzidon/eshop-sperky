@@ -32,7 +32,7 @@ class MainController extends AbstractController
     public function index(): Response
     {
         $latestProducts = $this->getDoctrine()->getRepository(Product::class)->findLatest(4);
-        $latestReviews = $this->getDoctrine()->getRepository(Review::class)->findLatest(4);
+        $latestReviews = $this->getDoctrine()->getRepository(Review::class)->findLatest(3);
         $totalAndAverageRating = $this->getDoctrine()->getRepository(Review::class)->getTotalAndAverage();
 
         return $this->render('main/index.html.twig', [

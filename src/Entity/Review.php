@@ -16,6 +16,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class Review
 {
+    public const LENGTH_BEFORE_TRUNCATION = 200;
     public const STAR_VALUES = [5.0,4.0,3.0,2.0,1.0];
     public const STAR_COUNT = 5;
 
@@ -135,6 +136,11 @@ class Review
     public function setUpdatedNow(): void
     {
         $this->updated = new DateTime('now');
+    }
+
+    public function isTruncationReady(): bool
+    {
+        return mb_strlen($this->text, 'utf-8') > self::LENGTH_BEFORE_TRUNCATION;
     }
 
     public static function getSortData(): array
