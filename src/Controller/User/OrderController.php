@@ -166,8 +166,8 @@ class OrderController extends AbstractController
         {
             try
             {
-                $payment = null /*$this->paymentFacade->createPayment($order, false)*/; // ještě není napojená platební brána
-                $response = $orderFacade->finishOrder($targetOrder, $payment, true);
+                /*$this->paymentFacade->createPayment($targetOrder, false);*/ // ještě není napojená platební brána
+                $response = $orderFacade->finishOrder($targetOrder, true);
                 $logger->info(sprintf('Order ID %d has been finished. Current lifecycle chapter: %d.', $targetOrder->getId(), $targetOrder->getLifecycleChapter()));
                 return $response;
             }

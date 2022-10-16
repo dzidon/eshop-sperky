@@ -75,9 +75,9 @@ class Order implements EntityOrphanRemovalInterface
     private $cartOccurences;
 
     /**
-     * @ORM\OneToMany(targetEntity=Payment::class, mappedBy="order_", cascade={"persist"})
+     * @ORM\OneToOne(targetEntity=Payment::class, mappedBy="order_")
      */
-    private $payments;
+    private $payment;
 
     /**
      * @ORM\Column(type="boolean")
@@ -487,27 +487,19 @@ class Order implements EntityOrphanRemovalInterface
         return $this->cartOccurencesWithProduct;
     }
 
-    /**
-     * @return Collection|Payment[]
-     */
-    public function getPayments(): Collection
+    public function getPayment(): ?Payment
     {
-        return $this->payments;
+        return $this->payment;
     }
 
-    public function addPayment(Payment $payment): self
+    public function setPayment(Payment $payment): self
     {
-        if (!$this->payments->contains($payment)) {
-            $this->payments[] = $payment;
+        if ($payment->getOrder() !== $this)
+        {
             $payment->setOrder($this);
         }
 
-        return $this;
-    }
-
-    public function removePayment(Payment $payment): self
-    {
-        $this->payments->removeElement($payment);
+        $this->payment = $payment;
 
         return $this;
     }

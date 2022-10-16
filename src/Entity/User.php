@@ -399,7 +399,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, EntityE
 
     public function setReview(Review $review): self
     {
-        // set the owning side of the relation if necessary
         if ($review->getUser() !== $this)
         {
             $review->setUser($this);

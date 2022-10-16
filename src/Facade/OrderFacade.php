@@ -4,7 +4,6 @@ namespace App\Facade;
 
 use App\Entity\CartOccurence;
 use App\Entity\Order;
-use App\Entity\Payment;
 use App\Entity\PaymentMethod;
 use App\Entity\User;
 use App\Service\CartService;
@@ -79,12 +78,13 @@ class OrderFacade
      * Vrátí odpověď pro přesměrování. Persistne objednávku a může rovnou i flushnout.
      *
      * @param Order $order
-     * @param Payment|null $payment
      * @param bool $flush
      * @return RedirectResponse
      */
-    public function finishOrder(Order $order, ?Payment $payment, bool $flush): RedirectResponse
+    public function finishOrder(Order $order, bool $flush): RedirectResponse
     {
+        $payment = $order->getPayment();
+
         $order->setLifecycleChapter(Order::LIFECYCLE_AWAITING_PAYMENT);
 
         // nastavení částky dobírky + objednávka na dobírku bude rovnou připravená na odeslání

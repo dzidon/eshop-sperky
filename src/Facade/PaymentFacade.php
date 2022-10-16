@@ -41,8 +41,8 @@ class PaymentFacade
     }
 
     /**
-     * Vytvoří novou platbu v platební bráně a k ní vytvoří a vrátí odpovídající instanci App\Entity\Payment. Persistne
-     * platbu a může i flushnout.
+     * Pokud má být objednávka zaplacena on-line, vytvoří k ní novou platbu v systému GoPay a k ní okdpovídající entitu
+     * platby. Objednávku s platbou propojí. Persistne platbu a může i flushnout.
      *
      * @param Order $order
      * @param bool $flush

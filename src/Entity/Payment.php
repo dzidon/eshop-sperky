@@ -51,7 +51,7 @@ class Payment
     private string $state;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Order::class, inversedBy="payments")
+     * @ORM\OneToOne(targetEntity=Order::class, inversedBy="payment")
      * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
      */
     private Order $order_;
@@ -66,14 +66,17 @@ class Payment
      */
     private $updated;
 
-    private $gateUrl;
+    /**
+     * @ORM\Column(type="string", length=2048)
+     */
+    private string $gateUrl;
 
-    public function __construct(int $externalId, string $state, Order $order, string $gateUrl = null)
+    public function __construct(int $externalId, string $state, Order $order, string $gateUrl)
     {
         $this->externalId = $externalId;
         $this->state = $state;
         $this->gateUrl = $gateUrl;
-        $order->addPayment($this);
+        $order->setPayment($this);
 
         $this->created = new DateTime('now');
         $this->updated = $this->created;
@@ -120,7 +123,7 @@ class Payment
         return $this;
     }
 
-    public function getGateUrl(): ?string
+    public function getGateUrl(): string
     {
         return $this->gateUrl;
     }

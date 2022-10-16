@@ -62,7 +62,7 @@ class Review
     {
         $this->created = new DateTime('now');
         $this->updated = $this->created;
-        $this->user = $user;
+        $user->setReview($this);
     }
 
     public function getId(): ?int

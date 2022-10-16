@@ -62,6 +62,62 @@
         </div>
     {% endif %}
 
+    {% if order.getPayment() is not null %}
+        <div class="row">
+            <h4>On-line platba</h4>
+
+            <div class="card white black-text">
+                <div class="card-content">
+                    <div class="row margin-0">
+                        <div class="col s6 m5 no-padding">Interní ID:</div>
+                        <div class="col s6 m7 no-padding">
+                            <strong>{{ order.getPayment().getId() }}</strong>
+                        </div>
+                    </div>
+
+                    <div class="row margin-0">
+                        <div class="col s6 m5 no-padding">GoPay ID:</div>
+                        <div class="col s6 m7 no-padding">
+                            <strong>{{ order.getPayment().getExternalId() }}</strong>
+                        </div>
+                    </div>
+
+                    <div class="row margin-0">
+                        <div class="col s6 m5 no-padding">Stav:</div>
+                        <div class="col s6 m7 no-padding">
+                            <strong>{{ order.getPayment().getState() }}</strong>
+                        </div>
+                    </div>
+
+                    <div class="row margin-0">
+                        <div class="col s6 m5 no-padding">Vytvořeno:</div>
+                        <div class="col s6 m7 no-padding">
+                            <strong>{{ order.getPayment().getCreated()|date('d. m. Y H:i:s') }}</strong>
+                        </div>
+                    </div>
+
+                    {% if order.getPayment().getCreated() != order.getPayment().getUpdated() and order.getPayment().getUpdated() is not null %}
+                        <div class="row margin-0">
+                            <div class="col s6 m5 no-padding">Upraveno:</div>
+                            <div class="col s6 m7 no-padding">
+                                <strong>{{ order.getPayment().getUpdated()|date('d. m. Y H:i:s') }}</strong>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    <div class="row margin-0">
+                        <div class="col s6 m5 no-padding">Platební brána:</div>
+                        <div class="col s6 m7 no-padding">
+                            <a href="{{ order.getPayment().getGateUrl() }}" target="_blank">
+                                <strong>Otevřít</strong>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
     {# Přehled objednávky #}
     {{ include('fragments/_order_overview.html.twig', {order: order, showProductIds: true, anonymous: false}) }}
 

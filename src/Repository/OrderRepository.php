@@ -99,12 +99,13 @@ class OrderRepository extends ServiceEntityRepository
 
     public function findOneAndFetchEverything(Uuid $token): ?Order
     {
-        // objednávka, její doručovací a platební metoda (1 nebo žádný řádek)
+        // objednávka, její doručovací, platební metoda, platba (1 nebo žádný řádek)
         /** @var Order|null $order */
         $order = $this->createQueryBuilder('o')
-            ->select('o, dm, pm')
+            ->select('o, dm, pm, op')
             ->leftJoin('o.deliveryMethod', 'dm')
             ->leftJoin('o.paymentMethod', 'pm')
+            ->leftJoin('o.payment', 'op')
             ->andWhere('o.token = :token')
             ->setParameter('token', $token, 'uuid')
             ->getQuery()
