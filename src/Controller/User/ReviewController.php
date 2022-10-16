@@ -41,7 +41,7 @@ class ReviewController extends AbstractController
      */
     public function reviews(FormFactoryInterface $formFactory, Request $request): Response
     {
-        $phrase = new Phrase('Hledejte jméno autora nebo kus textu.');
+        $phrase = new Phrase('Hledejte jméno autora.');
         $sort = new Sort(Review::getSortData());
         $searchData = new PhraseSort($phrase, $sort);
 

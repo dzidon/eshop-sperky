@@ -36,8 +36,7 @@ class ReviewRepository extends ServiceEntityRepository
             ->innerJoin('r.user', 'u')
 
             //vyhledavani
-            ->andWhere('r.text LIKE :searchPhrase OR
-                        CONCAT(u.nameFirst, \' \', u.nameLast) LIKE :searchPhrase')
+            ->andWhere('CONCAT(u.nameFirst, \' \', u.nameLast) LIKE :searchPhrase')
             ->setParameter('searchPhrase', '%' . $searchData->getPhrase()->getText() . '%')
 
             //razeni
