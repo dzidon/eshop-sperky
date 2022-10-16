@@ -4,7 +4,7 @@ namespace App\Controller\User;
 
 use GoPay\Payments;
 use App\Entity\Payment;
-use App\Service\PaymentService;
+use App\Facade\PaymentFacade;
 use App\Exception\PaymentException;
 use App\Service\BreadcrumbsService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -19,12 +19,12 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 class PaymentController extends AbstractController
 {
     private Payments $payments;
-    private PaymentService $paymentService;
+    private PaymentFacade $paymentFacade;
 
-    public function __construct(PaymentService $paymentService, Payments $payments)
+    public function __construct(PaymentFacade $paymentFacade, Payments $payments)
     {
         $this->payments = $payments;
-        $this->paymentService = $paymentService;
+        $this->paymentFacade = $paymentFacade;
     }
 
     private function validateRequestAndGetData(Request $request): array
@@ -38,7 +38,7 @@ class PaymentController extends AbstractController
         $response = $this->payments->getStatus($paymentId);
         if (!$response->hasSucceed())
         {
-            throw $this->createNotFoundException($this->paymentService->getErrorString($response));
+            throw $this->createNotFoundException($this->paymentFacade->getErrorString($response));
         }
 
         $payment = $this->getDoctrine()->getRepository(Payment::class)->findOneForStatus($paymentId);
@@ -66,7 +66,7 @@ class PaymentController extends AbstractController
 
         try
         {
-            $this->paymentService->updatePaymentState($payment, $response->json['state']);
+            $this->paymentFacade->updatePaymentState($payment, $response->json['state'], true);
         }
         catch (PaymentException $exception)
         {
@@ -95,7 +95,7 @@ class PaymentController extends AbstractController
 
         try
         {
-            $this->paymentService->updatePaymentState($payment, $response->json['state']);
+            $this->paymentFacade->updatePaymentState($payment, $response->json['state'], true);
         }
         catch (PaymentException $exception)
         {

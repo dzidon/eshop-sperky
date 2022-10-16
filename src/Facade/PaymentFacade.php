@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service;
+namespace App\Facade;
 
 use LogicException;
 use GoPay\Payments;
@@ -19,39 +19,41 @@ use GoPay\Definition\Payment\PaymentInstrument;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
- * Třída komunikující s platební bránou.
+ * Třída manipulující s platbami.
  *
- * @package App\Service
+ * @package App\Facade
  */
-class PaymentService
+class PaymentFacade
 {
     private Payments $payments;
     private UrlGeneratorInterface $router;
     private PhoneNumberUtil $phoneNumberUtil;
     private EntityManagerInterface $entityManager;
-    private OrderPostCompletionService $orderPostCompletionService;
+    private OrderFacade $orderFacade;
 
-    public function __construct(Payments $payments, UrlGeneratorInterface $router, PhoneNumberUtil $phoneNumberUtil, EntityManagerInterface $entityManager, OrderPostCompletionService $orderPostCompletionService)
+    public function __construct(Payments $payments, UrlGeneratorInterface $router, PhoneNumberUtil $phoneNumberUtil, EntityManagerInterface $entityManager, OrderFacade $orderFacade)
     {
         $this->router = $router;
         $this->payments = $payments;
         $this->entityManager = $entityManager;
         $this->phoneNumberUtil = $phoneNumberUtil;
-        $this->orderPostCompletionService = $orderPostCompletionService;
+        $this->orderFacade = $orderFacade;
     }
 
     /**
-     * Vytvoří novou platbu v platební bráně a k ní vytvoří a vrátí odpovídající instanci App\Entity\Payment.
+     * Vytvoří novou platbu v platební bráně a k ní vytvoří a vrátí odpovídající instanci App\Entity\Payment. Persistne
+     * platbu a může i flushnout.
      *
      * @param Order $order
+     * @param bool $flush
      * @return Payment|null
      * @throws PaymentException
      */
-    public function createPayment(Order $order): ?Payment
+    public function createPayment(Order $order, bool $flush): ?Payment
     {
         if ($order->getId() === null)
         {
-            throw new LogicException('Metoda createPayment v App\Service\PaymentService dostala objednávku s null ID.');
+            throw new LogicException('Metoda createPayment v App\Facade\PaymentFacade dostala objednávku s null ID.');
         }
 
         $paymentMethod = $order->getPaymentMethod();
@@ -60,7 +62,14 @@ class PaymentService
             $response = $this->payments->createPayment($this->getNewPaymentData($order));
             if ($response->hasSucceed())
             {
-                return new Payment($response->json['id'], $response->json['state'], $order, $response->json['gw_url']);
+                $payment = new Payment($response->json['id'], $response->json['state'], $order, $response->json['gw_url']);
+                $this->entityManager->persist($payment);
+                if ($flush)
+                {
+                    $this->entityManager->flush();
+                }
+
+                return $payment;
             }
             else
             {
@@ -72,14 +81,15 @@ class PaymentService
     }
 
     /**
-     * Aktualizuje stav platby. V určitých případech aktualizuje stav objednávky.
+     * Aktualizuje stav platby. V určitých případech aktualizuje stav objednávky. Persistne platbu a může flushnout.
      *
      * @param Payment $payment
      * @param string $newState
-     * @throws PaymentException
+     * @param bool $flush
      * @return $this
+     * @throws PaymentException
      */
-    public function updatePaymentState(Payment $payment, string $newState): self
+    public function updatePaymentState(Payment $payment, string $newState, bool $flush): self
     {
         $oldState = $payment->getState();
 
@@ -100,7 +110,7 @@ class PaymentService
                 {
                     $order->setLifecycleChapter(Order::LIFECYCLE_AWAITING_SHIPPING);
 
-                    $this->orderPostCompletionService->sendConfirmationEmail($order);
+                    $this->orderFacade->sendInfoEmail($order);
                     $this->entityManager->persist($order);
                 }
                 // zrušení/timeout = zrušení objednávky
@@ -113,19 +123,17 @@ class PaymentService
                         $order->setCancellationReason('Čas na zaplacení vypršel.');
                     }
 
-                    $this->orderPostCompletionService
-                        ->cancelOrder($order, true)
-                        ->sendConfirmationEmail($order)
-                    ;
-
-                    $this->entityManager->persist($order);
+                    $this->orderFacade->cancelOrder($order, true, false);
                 }
             }
 
             $payment->setState($newState);
 
             $this->entityManager->persist($payment);
-            $this->entityManager->flush();
+            if ($flush)
+            {
+                $this->entityManager->flush();
+            }
         }
 
         return $this;

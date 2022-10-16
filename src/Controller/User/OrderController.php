@@ -5,15 +5,14 @@ namespace App\Controller\User;
 use App\Entity\Address;
 use App\Entity\Order;
 use App\Exception\PaymentException;
+use App\Facade\PaymentFacade;
 use App\Form\FormType\User\OrderAddressesFormType;
 use App\Form\FormType\User\OrderMethodsFormType;
 use App\Form\FormType\User\CartFormType;
 use App\Response\Json;
 use App\Service\BreadcrumbsService;
 use App\Service\CartService;
-use App\Service\CustomOrderService;
-use App\Service\OrderPostCompletionService;
-use App\Service\PaymentService;
+use App\Facade\OrderFacade;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,13 +24,13 @@ use Symfony\Component\Routing\Annotation\Route;
 class OrderController extends AbstractController
 {
     private CartService $cart;
-    private CustomOrderService $customOrderService;
+    private OrderFacade $orderFacade;
     private BreadcrumbsService $breadcrumbs;
 
-    public function __construct(CartService $cart, CustomOrderService $customOrderService, BreadcrumbsService $breadcrumbs)
+    public function __construct(CartService $cart, OrderFacade $orderFacade, BreadcrumbsService $breadcrumbs)
     {
         $this->cart = $cart;
-        $this->customOrderService = $customOrderService;
+        $this->orderFacade = $orderFacade;
         $this->breadcrumbs = $breadcrumbs->addRoute('home');
     }
 
@@ -40,7 +39,7 @@ class OrderController extends AbstractController
      */
     public function orderCustom($token = null): Response
     {
-        if (($order = $this->customOrderService->loadCustomOrder($token)) === null)
+        if (($order = $this->orderFacade->loadCustomOrder($token)) === null)
         {
             throw $this->createNotFoundException('Objednávka nenalezena.');
         }
@@ -77,7 +76,7 @@ class OrderController extends AbstractController
 
         if($token !== null)
         {
-            if (($targetOrder = $this->customOrderService->loadCustomOrder($token)) === null)
+            if (($targetOrder = $this->orderFacade->loadCustomOrder($token)) === null)
             {
                 throw $this->createNotFoundException('Objednávka nenalezena.');
             }
@@ -135,13 +134,13 @@ class OrderController extends AbstractController
     /**
      * @Route("/objednavka/dodaci-udaje/{token}", name="order_addresses")
      */
-    public function orderAddresses(OrderPostCompletionService $orderPostCompletionService, Request $request, PaymentService $paymentService, LoggerInterface $logger, $token = null): Response
+    public function orderAddresses(OrderFacade $orderFacade, PaymentFacade $paymentFacade, Request $request, LoggerInterface $logger, $token = null): Response
     {
         $targetOrder = $this->cart->getOrder();
 
         if ($token !== null)
         {
-            if (($targetOrder = $this->customOrderService->loadCustomOrder($token)) === null)
+            if (($targetOrder = $this->orderFacade->loadCustomOrder($token)) === null)
             {
                 throw $this->createNotFoundException('Objednávka nenalezena.');
             }
@@ -167,18 +166,10 @@ class OrderController extends AbstractController
         {
             try
             {
-                $payment = null /*$paymentService->createPayment($targetOrder)*/; // ještě není napojená platební brána
-                $orderPostCompletionService
-                    ->finishOrder($targetOrder)
-                    ->sendConfirmationEmail($targetOrder);
-
-                $entityManager = $this->getDoctrine()->getManager();
-                $entityManager->persist($targetOrder);
-                $entityManager->flush();
-
+                $payment = null /*$this->paymentFacade->createPayment($order, false)*/; // ještě není napojená platební brána
+                $response = $orderFacade->finishOrder($targetOrder, $payment, true);
                 $logger->info(sprintf('Order ID %d has been finished. Current lifecycle chapter: %d.', $targetOrder->getId(), $targetOrder->getLifecycleChapter()));
-
-                return $orderPostCompletionService->getCompletionRedirectResponse($targetOrder, $payment);
+                return $response;
             }
             catch (PaymentException $exception)
             {

@@ -18,7 +18,7 @@ use App\Form\FormType\Admin\OrderEditFormType;
 use App\Form\FormType\Admin\OrderPacketaFormType;
 use App\Service\BreadcrumbsService;
 use App\Service\EntityCollectionService;
-use App\Service\OrderPostCompletionService;
+use App\Facade\OrderFacade;
 use App\Service\PacketaApiService;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -265,7 +265,7 @@ class OrderController extends AbstractAdminController
      *
      * @IsGranted("order_cancel")
      */
-    public function orderCancel(OrderPostCompletionService $orderPostCompletionService, Request $request, $id): Response
+    public function orderCancel(OrderFacade $orderFacade, Request $request, $id): Response
     {
         $user = $this->getUser();
 
@@ -285,14 +285,7 @@ class OrderController extends AbstractAdminController
 
         if ($form->isSubmitted() && $form->isValid())
         {
-            $orderPostCompletionService
-                ->cancelOrder($order, false)
-                ->sendConfirmationEmail($order);
-
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->persist($order);
-            $entityManager->flush();
-
+            $orderFacade->cancelOrder($order, false, true);
             $this->logger->info(sprintf("Admin %s (ID: %s) has cancelled an order ID %s.", $user->getUserIdentifier(), $user->getId(), $order->getId()));
             $this->addFlash('success', 'Objednávka zrušena!');
 

@@ -6,7 +6,7 @@ use App\Entity\User;
 use App\Form\FormType\User\RegistrationFormType;
 use App\Form\FormType\User\VerificationFormType;
 use App\Service\BreadcrumbsService;
-use App\Service\UserRegistrationService;
+use App\Facade\UserFacade;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -32,7 +32,7 @@ class RegistrationController extends AbstractController
     /**
      * @Route("/registrace", name="register")
      */
-    public function register(UserRegistrationService $userRegistrationService, Request $request): Response
+    public function register(UserFacade $userFacade, Request $request): Response
     {
         if ($this->getUser())
         {
@@ -47,7 +47,7 @@ class RegistrationController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid())
         {
-            $userRegistrationService->register($user);
+            $userFacade->registerUser($user, true);
             $this->addFlash('success', sprintf("Registrace proběhla úspěšně! Pokud zadaný e-mail %s existuje, poslali jsme na něj potvrzovací odkaz, přes který e-mail ověříte. Pokud potvrzovací odkaz nedorazí, zkuste registraci za 5 minut opakovat.", $user->getEmail()));
 
             return $this->redirectToRoute('home');
