@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Entity\Abstraction\EntityOrphanRemovalInterface;
 use App\Entity\Detached\Search\Atomic\Sort;
 use DateTime;
 use DateTimeInterface;
@@ -378,7 +379,6 @@ class Order implements EntityOrphanRemovalInterface
     {
         $this->token = Uuid::v4();
         $this->cartOccurences = new ArrayCollection();
-        $this->payments = new ArrayCollection();
 
         $this->created = new DateTime('now');
         $this->updated = $this->created;

@@ -2,7 +2,7 @@
 
 namespace App\Service;
 
-use App\Entity\EntityOrphanRemovalInterface;
+use App\Entity\Abstraction\EntityOrphanRemovalInterface;
 use App\Messenger\EntityCollectionsMessenger;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;

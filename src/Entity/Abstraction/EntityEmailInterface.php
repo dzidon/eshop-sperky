@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Entity;
+namespace App\Entity\Abstraction;
 
 /**
  * Interface pro entity, které mají e-mail.
  *
- * @package App\Entity
+ * @package App\Entity\Abstraction
  */
 interface EntityEmailInterface
 {

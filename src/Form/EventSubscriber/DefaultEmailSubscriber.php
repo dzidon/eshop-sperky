@@ -2,7 +2,7 @@
 
 namespace App\Form\EventSubscriber;
 
-use App\Entity\EntityEmailInterface;
+use App\Entity\Abstraction\EntityEmailInterface;
 use App\Entity\User;
 use LogicException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;

@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Entity;
+namespace App\Entity\Abstraction;
 
 /**
  * Interface pro entity, které mají mít orphan removal v kolekcích.
  *
- * @package App\Entity
+ * @package App\Entity\Abstraction
  */
 interface EntityOrphanRemovalInterface
 {

@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Entity\Abstraction\EntitySlugInterface;
 use App\Entity\Detached\Search\Atomic\Sort;
 use App\Repository\ProductSectionRepository;
 use DateTime;

@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Entity\Abstraction\EntityEmailInterface;
 use App\Entity\Detached\Search\Atomic\Sort;
 use App\Repository\UserRepository;
 use DateTime;

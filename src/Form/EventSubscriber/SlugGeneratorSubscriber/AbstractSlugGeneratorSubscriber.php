@@ -2,7 +2,7 @@
 
 namespace App\Form\EventSubscriber\SlugGeneratorSubscriber;
 
-use App\Entity\EntitySlugInterface;
+use App\Entity\Abstraction\EntitySlugInterface;
 use App\SlugGenerator\AbstractSlugGenerator;
 use LogicException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;

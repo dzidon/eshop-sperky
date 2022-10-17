@@ -2,7 +2,7 @@
 
 namespace App\SlugGenerator;
 
-use App\Entity\EntitySlugInterface;
+use App\Entity\Abstraction\EntitySlugInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\String\Slugger\SluggerInterface;
 

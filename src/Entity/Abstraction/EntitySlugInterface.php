@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Entity;
+namespace App\Entity\Abstraction;
 
 /**
  * Interface pro entity, které mají mít slug.
  *
- * @package App\Entity
+ * @package App\Entity\Abstraction
  */
 interface EntitySlugInterface
 {

@@ -2,7 +2,7 @@
 
 namespace App\Entity\Detached;
 
-use App\Entity\EntityEmailInterface;
+use App\Entity\Abstraction\EntityEmailInterface;
 use App\Validation\Compound as AssertCompound;
 use Symfony\Component\Validator\Constraints as Assert;
 
