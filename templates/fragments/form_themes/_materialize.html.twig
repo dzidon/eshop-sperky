@@ -239,7 +239,7 @@
 
 {# Textarea #}
 {% block textarea_widget %}
-    {% set attr = attr|merge({class: (attr.class|default('') ~ 'materialize-textarea')|trim}) %}
+    {% set attr = attr|merge({class: (attr.class|default('') ~ ' materialize-textarea')|trim}) %}
     {{ parent() }}
 {% endblock textarea_widget %}
 

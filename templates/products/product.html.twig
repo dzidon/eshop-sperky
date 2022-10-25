@@ -123,7 +123,7 @@
                 <div class="row">
                     <div class="col s12 l9">
                         <h4 id="full-description">Popis</h4>
-                        {{ productInstance.getDescription()|nl2br }}
+                        {{ productInstance.getDescription()|raw }}
                     </div>
                 </div>
             {% endif %}

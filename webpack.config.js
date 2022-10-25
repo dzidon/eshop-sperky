@@ -13,6 +13,10 @@ Encore
     .setPublicPath('/build')
     // only needed for CDN's or sub-directory deploy
     //.setManifestKeyPrefix('build/')
+    .copyFiles({
+        from: 'node_modules/tinymce/skins',
+        to: 'skins/[path]/[name].[ext]'
+    })
 
     /*
      * ENTRY CONFIG
@@ -21,12 +25,14 @@ Encore
      * and one CSS file (e.g. app.css) if your JavaScript imports CSS.
      */
     .addEntry('app', './assets/scripts/app.js')
-    .addEntry('productVatCalculator', './assets/scripts/productVatCalculator.js')
     .addEntry('productFilter', './assets/scripts/productFilter.js')
     .addEntry('productPage', './assets/scripts/productPage.js')
     .addEntry('cart', './assets/scripts/cart.js')
     .addEntry('orderMethods', './assets/scripts/orderMethods.js')
     .addEntry('orderAddresses', './assets/scripts/orderAddresses.js')
+    .addEntry('productVatCalculator', './assets/scripts/productVatCalculator.js')
+    .addEntry('tinymceEditor', './assets/scripts/tinymceEditor.js')
+    .addEntry('tinymceCzech', './assets/scripts/tinymceCzech.js')
 
     // enables the Symfony UX Stimulus bridge (used in assets/bootstrap.js)
     //.enableStimulusBridge('./assets/controllers.json')

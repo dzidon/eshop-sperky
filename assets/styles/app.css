@@ -142,21 +142,15 @@ main {
 }
 
 /*
-    Input, Textarea
+    Input, Textarea, Datetime
 */
 .input-field input:focus ~ label, .materialize-textarea:focus:not([readonly]) ~ label {
     color: #2196f3 !important;
 }
 
+input:focus:not([readonly]),
+input[type="datetime-local"]:focus,
 .input-field input:focus, .materialize-textarea:focus:not([readonly]) {
-    border-bottom: 1px solid #2196f3 !important;
-    box-shadow: 0 1px 0 0 #2196f3 !important;
-}
-
-/*
-    Datetime
-*/
-input[type="datetime-local"]:focus {
     border-bottom: 1px solid #2196f3 !important;
     box-shadow: 0 1px 0 0 #2196f3 !important;
 }
@@ -383,12 +377,23 @@ a.secondary-content {
 .noUi-connect {
     background: #2196f3;
 }
+
 .noUi-horizontal .noUi-handle, .noUi-vertical .noUi-handle {
     background: #2196f3;
 }
+
 .noUi-target.noUi-horizontal .noUi-tooltip {
     background-color: #2196f3;
 }
+
 [disabled] .noUi-handle {
     background-color: gray;
+}
+
+/*
+    ======== TinyMCE ========
+ */
+
+.tox-tinymce + label {
+    top: -10px !important;
 }

@@ -2336,6 +2336,14 @@
   dependencies:
     "websocket-driver" ">=0.5.1"
 
+"file-loader@^6.2.0":
+  "integrity" "sha512-qo3glqyTa61Ytg4u73GultjHGjdRyig3tG6lPtyX/jOEJvHif9uB0/OCI2Kif6ctF3caQTW2G5gym21oAsI4pw=="
+  "resolved" "https://registry.npmjs.org/file-loader/-/file-loader-6.2.0.tgz"
+  "version" "6.2.0"
+  dependencies:
+    "loader-utils" "^2.0.0"
+    "schema-utils" "^3.0.0"
+
 "fill-range@^7.0.1":
   "integrity" "sha512-qOo9F+dMUmC2Lcb4BbVvnKJxTPjCm+RRpe4gDuGrzkL7mEVl/djYSu2OdQ2Pa302N4oqkSg9ir6jaLWJ2USVpQ=="
   "resolved" "https://registry.npmjs.org/fill-range/-/fill-range-7.0.1.tgz"
@@ -4426,6 +4434,11 @@
   "integrity" "sha1-QFQRqOfmM5/mTbmiNN4R3DHgK9Q= sha512-qsdtZH+vMoCARQtyod4imc2nIJwg9Cc7lPRrw9CzF8ZKR0khdr8+2nX80PBhET3tcyTtJDxAffGh2rXH4tyU8A=="
   "resolved" "https://registry.npmjs.org/timsort/-/timsort-0.3.0.tgz"
   "version" "0.3.0"
+
+"tinymce@^6.2.0":
+  "integrity" "sha512-zLjbFrg0hbtJ6PxmZUjQY6zyIOM/mLrWGTvhBec7XwYwoW1E0xXMQzy2tgMTh3OvJpsclgqf2ZMjmwcv4Cludw=="
+  "resolved" "https://registry.npmjs.org/tinymce/-/tinymce-6.2.0.tgz"
+  "version" "6.2.0"
 
 "tmp@^0.2.1":
   "integrity" "sha512-76SUhtfqR2Ijn+xllcI5P1oyannHNHByD80W1q447gU3mp9G9PSpGdWmjUOHRDPiHYacIk66W7ubDTuPF3BEtQ=="

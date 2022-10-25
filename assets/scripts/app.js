@@ -1,5 +1,5 @@
 import 'materialize-css/dist/css/materialize.min.css';
-require('materialize-css/dist/js/materialize.min');
+import 'materialize-css/dist/js/materialize.min';
 import 'materialize-css/extras/noUiSlider/nouislider.css';
 import '../styles/app.css';
 

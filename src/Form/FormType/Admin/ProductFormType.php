@@ -153,6 +153,7 @@ class ProductFormType extends AbstractType
             ->add('description', TextareaType::class, [
                 'attr' => [
                     'data-length' => 4096,
+                    'class' => 'tinymce-editor',
                 ],
                 'required' => false,
                 'label' => 'Dlouhý popis',
