@@ -91,9 +91,9 @@ class Product implements EntitySlugInterface, EntityOrphanRemovalInterface
     private $descriptionShort;
 
     /**
-     * @ORM\Column(type="string", length=4096, nullable=true)
+     * @ORM\Column(type="string", length=10000, nullable=true)
      *
-     * @Assert\Length(max=4096, maxMessage="Maximální počet znaků v dlouhém popisu: {{ limit }}")
+     * @Assert\Length(max=10000, maxMessage="Maximální počet znaků v dlouhém popisu: {{ limit }}")
      */
     private $description;
 
