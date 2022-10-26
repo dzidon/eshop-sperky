@@ -27,4 +27,7 @@ $(document).ready(function() {
         promotion: false,
         branding: false,
     });
+
+    // aktivuje label, aby byl videt
+    setTimeout(function() { $('.tox-tinymce + label').addClass('active'); }, 10);
 });
