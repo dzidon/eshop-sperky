@@ -6,7 +6,7 @@ use GoPay\Payments;
 use App\Entity\Payment;
 use App\Facade\PaymentFacade;
 use App\Exception\PaymentException;
-use App\Service\BreadcrumbsService;
+use App\Service\Breadcrumbs;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -56,7 +56,7 @@ class PaymentController extends AbstractController
     /**
      * @Route("", name="payment_return")
      */
-    public function returnAction(BreadcrumbsService $breadcrumbs, Request $request): Response
+    public function returnAction(Breadcrumbs $breadcrumbs, Request $request): Response
     {
         $data = $this->validateRequestAndGetData($request);
 

@@ -2,14 +2,14 @@
 
 namespace App\Controller\Admin;
 
-use App\Service\BreadcrumbsService;
+use App\Service\Breadcrumbs;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 abstract class AbstractAdminController extends AbstractController
 {
-    protected BreadcrumbsService $breadcrumbs;
+    protected Breadcrumbs $breadcrumbs;
 
-    public function __construct(BreadcrumbsService $breadcrumbs)
+    public function __construct(Breadcrumbs $breadcrumbs)
     {
         $this->breadcrumbs = $breadcrumbs
             ->addRoute('home')

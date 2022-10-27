@@ -9,7 +9,7 @@ use App\Entity\ProductInformationGroup;
 use App\Form\FormType\Search\Composition\PhraseSortFormType;
 use App\Form\FormType\User\HiddenTrueFormType;
 use App\Form\FormType\Admin\ProductInformationGroupFormType;
-use App\Service\BreadcrumbsService;
+use App\Service\Breadcrumbs;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -28,7 +28,7 @@ class ProductInfoController extends AbstractAdminController
 {
     private LoggerInterface $logger;
 
-    public function __construct(LoggerInterface $logger, BreadcrumbsService $breadcrumbs)
+    public function __construct(LoggerInterface $logger, Breadcrumbs $breadcrumbs)
     {
         parent::__construct($breadcrumbs);
 

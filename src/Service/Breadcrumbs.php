@@ -9,7 +9,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
  *
  * @package App\Service
  */
-class BreadcrumbsService
+class Breadcrumbs
 {
     private array $breadcrumbsData = [];
     private string $currentTitle = '';
@@ -34,17 +34,18 @@ class BreadcrumbsService
      */
     public function addRoute(string $route, array $parameters = [], string $title = '', string $variation = '', string $titleAppend = ''): self
     {
-        if(mb_strlen($title, 'utf-8') === 0)
+        if (mb_strlen($title, 'utf-8') === 0)
         {
             $title = $this->parameterBag->get('app_page_title.' . $route);
-            if(is_array($title))
+            if (is_array($title))
             {
                 $title = $title[$variation];
             }
+
             $title = (string) $title;
         }
 
-        if(mb_strlen($titleAppend, 'utf-8') > 0)
+        if (mb_strlen($titleAppend, 'utf-8') > 0)
         {
             $title .= ' ' . $titleAppend;
         }
@@ -75,10 +76,11 @@ class BreadcrumbsService
     public function setPageTitleByRoute(string $route, string $variation = ''): self
     {
         $title = $this->parameterBag->get('app_page_title.' . $route);
-        if(is_array($title))
+        if (is_array($title))
         {
             $title = $title[$variation];
         }
+
         $this->currentTitle = (string) $title;
 
         return $this;
@@ -102,7 +104,7 @@ class BreadcrumbsService
      * Přidá string k aktuálnímu title.
      *
      * @param string $string
-     * @return BreadcrumbsService
+     * @return Breadcrumbs
      */
     public function appendToPageTitle(string $string): self
     {

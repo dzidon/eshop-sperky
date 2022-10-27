@@ -17,7 +17,7 @@ use Symfony\Component\Uid\Uuid;
  *
  * @package App\Service
  */
-class CartService
+class Cart
 {
     const COOKIE_NAME = 'CARTTOKEN';
 
@@ -44,14 +44,14 @@ class CartService
     private RequestStack $requestStack;
     private EntityManagerInterface $entityManager;
     private OrderSynchronizer $synchronizer;
-    private EntityCollectionService $entityCollectionService;
+    private OrphanRemoval $orphanRemoval;
 
-    public function __construct(EntityManagerInterface $entityManager, RequestStack $requestStack, OrderSynchronizer $synchronizer, EntityCollectionService $entityCollectionService)
+    public function __construct(EntityManagerInterface $entityManager, RequestStack $requestStack, OrderSynchronizer $synchronizer, OrphanRemoval $orphanRemoval)
     {
         $this->entityManager = $entityManager;
         $this->requestStack = $requestStack;
         $this->synchronizer = $synchronizer;
-        $this->entityCollectionService = $entityCollectionService;
+        $this->orphanRemoval = $orphanRemoval;
     }
 
     /**
@@ -123,7 +123,7 @@ class CartService
                 $this->createNewOrder();
             }
 
-            $cartOccurencesMessenger = $this->entityCollectionService->createEntityCollectionsMessengerForOrphanRemoval($this->order);
+            $cartOccurencesMessenger = $this->orphanRemoval->createEntityCollectionsMessengerForOrphanRemoval($this->order);
 
             $warnings = $this->synchronizer->synchronize($this->order, true, 'Ve vašem košíku došlo ke změně: ');
             $this->synchronizer->addWarningsToFlashBag($warnings);
@@ -133,7 +133,7 @@ class CartService
 
             if ($this->isOrderNew || $this->order->hasSynchronizationWarnings())
             {
-                $this->entityCollectionService->removeOrphans($cartOccurencesMessenger);
+                $this->orphanRemoval->removeOrphans($cartOccurencesMessenger);
                 $this->entityManager->persist($this->order);
                 $this->entityManager->flush();
             }

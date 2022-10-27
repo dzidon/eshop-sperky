@@ -16,7 +16,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
  *
  * @package App\Service
  */
-class PacketaApiService
+class Packeta
 {
     private ?SoapClient $client = null;
     private string $secret;
@@ -110,7 +110,7 @@ class PacketaApiService
         // objednávka musí mít ID
         if ($order->getId() === null)
         {
-            throw new LogicException('Služba App\Service\PacketaApiService dostala do metody initialize objednávku s null ID.');
+            throw new LogicException('Služba App\Service\Packeta dostala do metody initialize objednávku s null ID.');
         }
 
         // připojení

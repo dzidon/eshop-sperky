@@ -15,7 +15,7 @@ use Symfony\Component\Security\Core\Security;
  *
  * @package App\Service
  */
-class NavbarService
+class Navbar
 {
     private array $sections = [];
     private bool $sectionsLoaded = false;
@@ -166,7 +166,7 @@ class NavbarService
     {
         if($currentPage < 1 || $currentPage > 3)
         {
-            throw new LogicException('Proměnná "page" v metodě getOrderNavigationData v NavbarService musí být v rozmezí 1-3.');
+            throw new LogicException('Proměnná "page" v metodě getOrderNavigationData v App\Service\Navbar musí být v rozmezí 1-3.');
         }
 
         return [

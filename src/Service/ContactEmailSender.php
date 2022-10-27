@@ -15,7 +15,7 @@ use Symfony\Component\Mime\Email;
  *
  * @package App\Service
  */
-class ContactEmailService
+class ContactEmailSender
 {
     private MailerInterface $mailer;
     private LoggerInterface $logger;

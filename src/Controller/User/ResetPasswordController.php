@@ -5,7 +5,7 @@ namespace App\Controller\User;
 use App\Entity\User;
 use App\Form\FormType\User\ChangePasswordFormType;
 use App\Form\FormType\User\ResetPasswordRequestFormType;
-use App\Service\BreadcrumbsService;
+use App\Service\Breadcrumbs;
 use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -31,9 +31,9 @@ class ResetPasswordController extends AbstractController
 
     private ResetPasswordHelperInterface $resetPasswordHelper;
     private LoggerInterface $logger;
-    private BreadcrumbsService $breadcrumbs;
+    private Breadcrumbs $breadcrumbs;
 
-    public function __construct(ResetPasswordHelperInterface $resetPasswordHelper, LoggerInterface $logger, BreadcrumbsService $breadcrumbs)
+    public function __construct(ResetPasswordHelperInterface $resetPasswordHelper, LoggerInterface $logger, Breadcrumbs $breadcrumbs)
     {
         $this->resetPasswordHelper = $resetPasswordHelper;
         $this->logger = $logger;

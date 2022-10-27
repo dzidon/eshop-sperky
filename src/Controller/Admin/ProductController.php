@@ -10,8 +10,8 @@ use App\Entity\Product;
 use App\Form\FormType\Search\Composition\PhraseSortFormType;
 use App\Form\FormType\User\HiddenTrueFormType;
 use App\Form\FormType\Admin\ProductFormType;
-use App\Service\BreadcrumbsService;
-use App\Service\EntityCollectionService;
+use App\Service\Breadcrumbs;
+use App\Service\OrphanRemoval;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -30,7 +30,7 @@ class ProductController extends AbstractAdminController
 {
     private LoggerInterface $logger;
 
-    public function __construct(LoggerInterface $logger, BreadcrumbsService $breadcrumbs)
+    public function __construct(LoggerInterface $logger, Breadcrumbs $breadcrumbs)
     {
         parent::__construct($breadcrumbs);
 
@@ -70,7 +70,7 @@ class ProductController extends AbstractAdminController
      *
      * @IsGranted("product_edit")
      */
-    public function product(EntityCollectionService $entityCollectionService, Request $request, $id = null): Response
+    public function product(OrphanRemoval $orphanRemoval, Request $request, $id = null): Response
     {
         $user = $this->getUser();
 
@@ -90,14 +90,14 @@ class ProductController extends AbstractAdminController
             $this->breadcrumbs->addRoute('admin_product_edit', ['id' => null],'', 'new');
         }
 
-        $collectionMessenger = $entityCollectionService->createEntityCollectionsMessengerForOrphanRemoval($product);
+        $collectionMessenger = $orphanRemoval->createEntityCollectionsMessengerForOrphanRemoval($product);
         $form = $this->createForm(ProductFormType::class, $product);
         $form->add('submit', SubmitType::class, ['label' => 'Uložit']);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid())
         {
-            $entityCollectionService->removeOrphans($collectionMessenger);
+            $orphanRemoval->removeOrphans($collectionMessenger);
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($product);
             $entityManager->flush();

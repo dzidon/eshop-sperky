@@ -16,7 +16,7 @@ use App\Form\FormType\Search\Composition\PhraseSortFormType;
 use App\Form\FormType\User\HiddenTrueFormType;
 use App\Form\FormType\User\PersonalInfoFormType;
 use App\Form\FormType\User\AddressFormType;
-use App\Service\BreadcrumbsService;
+use App\Service\Breadcrumbs;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -36,9 +36,9 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 class ProfileController extends AbstractController
 {
     private LoggerInterface $logger;
-    private BreadcrumbsService $breadcrumbs;
+    private Breadcrumbs $breadcrumbs;
 
-    public function __construct(LoggerInterface $logger, BreadcrumbsService $breadcrumbs)
+    public function __construct(LoggerInterface $logger, Breadcrumbs $breadcrumbs)
     {
         $this->logger = $logger;
         $this->breadcrumbs = $breadcrumbs->addRoute('home')->addRoute('profile', [], 'Profil');

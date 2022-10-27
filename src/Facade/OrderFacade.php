@@ -6,8 +6,8 @@ use App\Entity\CartOccurence;
 use App\Entity\Order;
 use App\Entity\PaymentMethod;
 use App\Entity\User;
-use App\Service\CartService;
-use App\Service\OrderEmailService;
+use App\Service\Cart;
+use App\Service\OrderEmailSender;
 use App\Service\OrderSynchronizer;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
@@ -28,16 +28,16 @@ class OrderFacade
     private Security $security;
     private LoggerInterface $logger;
     private RouterInterface $router;
-    private OrderEmailService $orderEmailService;
+    private OrderEmailSender $orderEmailSender;
     private OrderSynchronizer $synchronizer;
     private EntityManagerInterface $entityManager;
 
-    public function __construct(Security $security, LoggerInterface $logger, RouterInterface $router, OrderEmailService $orderEmailService, OrderSynchronizer $synchronizer, EntityManagerInterface $entityManager)
+    public function __construct(Security $security, LoggerInterface $logger, RouterInterface $router, OrderEmailSender $orderEmailSender, OrderSynchronizer $synchronizer, EntityManagerInterface $entityManager)
     {
         $this->logger = $logger;
         $this->router = $router;
         $this->security = $security;
-        $this->orderEmailService = $orderEmailService;
+        $this->orderEmailSender = $orderEmailSender;
         $this->synchronizer = $synchronizer;
         $this->entityManager = $entityManager;
     }
@@ -154,7 +154,7 @@ class OrderFacade
         $redirectResponse = new RedirectResponse($url);
         if (!$order->isCreatedManually())
         {
-            $redirectResponse->headers->clearCookie(CartService::COOKIE_NAME);
+            $redirectResponse->headers->clearCookie(Cart::COOKIE_NAME);
         }
 
         return $redirectResponse;
@@ -209,7 +209,7 @@ class OrderFacade
     {
         try
         {
-            $this->orderEmailService->send($order);
+            $this->orderEmailSender->send($order);
         }
         catch (TransportExceptionInterface $exception)
         {

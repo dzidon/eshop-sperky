@@ -3,7 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Order;
-use App\Service\BreadcrumbsService;
+use App\Service\Breadcrumbs;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -15,7 +15,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
  */
 class MainController extends AbstractAdminController
 {
-    public function __construct(BreadcrumbsService $breadcrumbs)
+    public function __construct(Breadcrumbs $breadcrumbs)
     {
         parent::__construct($breadcrumbs);
     }

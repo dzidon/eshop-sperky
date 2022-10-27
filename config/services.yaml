@@ -1,4 +1,5 @@
 parameters:
+    # všeobecné
     app_vat_payer: false
     app_site_name: 'Prysky'
     app_site_phone: '+420 123 456 789'
@@ -10,7 +11,9 @@ parameters:
     app_packeta_api_url: 'https://www.zasilkovna.cz/api/soap-php-bugfix.wsdl'
     app_packeta_key: '%env(PACKETA_KEY)%'
     app_packeta_secret: '%env(PACKETA_SECRET)%'
+    container.dumper.inline_factories: true
 
+    # GoPay
     gopay.config:
         goid: '%env(GOPAY_ID)%'
         clientId: '%env(GOPAY_CLIENT_ID)%'
@@ -21,7 +24,11 @@ parameters:
         language: CS
         timeout: 30
 
-    container.dumper.inline_factories: true
+    app_text_content:
+        default_text: 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Mauris metus. Nunc tincidunt ante vitae massa. In enim a arcu imperdiet malesuada. Curabitur vitae diam non enim vestibulum interdum. Nunc dapibus tortor vel mi dapibus sollicitudin.'
+        routes:
+            _all: ['footer_about']
+            home: ['home_what_we_do', 'home_follow_us']
 
     # názvy cest
     app_page_title.home: 'Domů'
@@ -127,16 +134,16 @@ services:
         class: GoPay\Token\InMemoryTokenCache
 
     app.navbar_service:
-        class: App\Service\NavbarService
+        class: App\Service\Navbar
     app.cart_service:
-        class: App\Service\CartService
+        class: App\Service\Cart
     app.breadcrumbs_service:
-        class: App\Service\BreadcrumbsService
+        class: App\Service\Breadcrumbs
     app.packeta_service:
-        class: App\Service\PacketaApiService
+        class: App\Service\Packeta
 
-    App\Service\NavbarService: '@app.navbar_service'
-    App\Service\CartService: '@app.cart_service'
-    App\Service\BreadcrumbsService: '@app.breadcrumbs_service'
-    App\Service\PacketaApiService: '@app.packeta_service'
+    App\Service\Navbar: '@app.navbar_service'
+    App\Service\Cart: '@app.cart_service'
+    App\Service\Breadcrumbs: '@app.breadcrumbs_service'
+    App\Service\Packeta: '@app.packeta_service'
     GoPay\Payments: '@gopay.payments'

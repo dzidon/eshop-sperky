@@ -7,8 +7,8 @@ use App\Entity\Product;
 use App\Entity\Review;
 use App\Form\FormType\User\ContactFormType;
 use App\Form\FormType\User\CustomOrderDemandFormType;
-use App\Service\BreadcrumbsService;
-use App\Service\ContactEmailService;
+use App\Service\Breadcrumbs;
+use App\Service\ContactEmailSender;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -19,9 +19,9 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class MainController extends AbstractController
 {
-    private BreadcrumbsService $breadcrumbs;
+    private Breadcrumbs $breadcrumbs;
 
-    public function __construct(BreadcrumbsService $breadcrumbs)
+    public function __construct(Breadcrumbs $breadcrumbs)
     {
         $this->breadcrumbs = $breadcrumbs->addRoute('home');
     }
@@ -45,7 +45,7 @@ class MainController extends AbstractController
     /**
      * @Route("/kontakt", name="contact")
      */
-    public function contact(Request $request, LoggerInterface $logger, ContactEmailService $contactEmailService): Response
+    public function contact(Request $request, LoggerInterface $logger, ContactEmailSender $contactEmailSender): Response
     {
         $emailData = new ContactEmail();
         $form = $this->createForm(ContactFormType::class, $emailData);
@@ -56,7 +56,7 @@ class MainController extends AbstractController
         {
             try
             {
-                $contactEmailService->send($emailData);
+                $contactEmailSender->send($emailData);
                 $this->addFlash('success', sprintf('E-mail odeslán, brzy se ozveme na %s!', $emailData->getEmail()));
 
                 return $this->redirectToRoute('contact');
@@ -78,7 +78,7 @@ class MainController extends AbstractController
     /**
      * @Route("/objednavka-na-miru", name="order_custom_new")
      */
-    public function orderCustomNew(Request $request, LoggerInterface $logger, ContactEmailService $contactEmailService): Response
+    public function orderCustomNew(Request $request, LoggerInterface $logger, ContactEmailSender $contactEmailSender): Response
     {
         $emailData = new ContactEmail();
         $emailData->setSubject('Objednávka na míru');
@@ -91,7 +91,7 @@ class MainController extends AbstractController
         {
             try
             {
-                $contactEmailService->send($emailData);
+                $contactEmailSender->send($emailData);
                 $this->addFlash('success', sprintf('Nezávazná poptávka odeslána, brzy se ozveme na %s!', $emailData->getEmail()));
 
                 return $this->redirectToRoute('order_custom_new');

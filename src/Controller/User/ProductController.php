@@ -11,7 +11,7 @@ use App\Entity\Product;
 use App\Entity\ProductSection;
 use App\Form\FormType\User\CartInsertFormType;
 use App\Form\FormType\Search\Composition\ProductCatalogFilterFormType;
-use App\Service\BreadcrumbsService;
+use App\Service\Breadcrumbs;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -22,9 +22,9 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
 class ProductController extends AbstractController
 {
-    private BreadcrumbsService $breadcrumbs;
+    private Breadcrumbs $breadcrumbs;
 
-    public function __construct(BreadcrumbsService $breadcrumbs)
+    public function __construct(Breadcrumbs $breadcrumbs)
     {
         $this->breadcrumbs = $breadcrumbs->addRoute('home');
     }

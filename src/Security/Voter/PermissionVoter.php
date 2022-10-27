@@ -134,13 +134,13 @@ class PermissionVoter implements VoterInterface
         $user = $token->getUser();
         $vote = self::ACCESS_ABSTAIN;
 
-        foreach ($attributes as $attribute)
+        foreach ($attributes as $attribute) // vetsinou jen jedna iterace, protoze volame treba 'IsGranted("product_info_edit")'
         {
-            if($user instanceof User && isset(self::PERMISSIONS[$attribute]))
+            if ($user instanceof User && isset(self::PERMISSIONS[$attribute]))
             {
                 $vote = self::ACCESS_DENIED;
 
-                if($user->hasPermission($attribute))
+                if ($user->hasPermission($attribute))
                 {
                     return self::ACCESS_GRANTED;
                 }

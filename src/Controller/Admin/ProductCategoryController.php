@@ -9,8 +9,8 @@ use App\Entity\ProductCategoryGroup;
 use App\Form\FormType\Search\Composition\PhraseSortFormType;
 use App\Form\FormType\User\HiddenTrueFormType;
 use App\Form\FormType\Admin\ProductCategoryGroupFormType;
-use App\Service\BreadcrumbsService;
-use App\Service\EntityCollectionService;
+use App\Service\Breadcrumbs;
+use App\Service\OrphanRemoval;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -29,7 +29,7 @@ class ProductCategoryController extends AbstractAdminController
 {
     private LoggerInterface $logger;
 
-    public function __construct(LoggerInterface $logger, BreadcrumbsService $breadcrumbs)
+    public function __construct(LoggerInterface $logger, Breadcrumbs $breadcrumbs)
     {
         parent::__construct($breadcrumbs);
 
@@ -70,7 +70,7 @@ class ProductCategoryController extends AbstractAdminController
      *
      * @IsGranted("product_category_edit")
      */
-    public function productCategoryGroup(EntityCollectionService $entityCollectionService, Request $request, $id = null): Response
+    public function productCategoryGroup(OrphanRemoval $orphanRemoval, Request $request, $id = null): Response
     {
         $user = $this->getUser();
 
@@ -90,14 +90,14 @@ class ProductCategoryController extends AbstractAdminController
             $this->breadcrumbs->addRoute('admin_product_category_edit', ['id' => null],'', 'new');
         }
 
-        $collectionMessenger = $entityCollectionService->createEntityCollectionsMessengerForOrphanRemoval($categoryGroup);
+        $collectionMessenger = $orphanRemoval->createEntityCollectionsMessengerForOrphanRemoval($categoryGroup);
         $form = $this->createForm(ProductCategoryGroupFormType::class, $categoryGroup);
         $form->add('submit', SubmitType::class, ['label' => 'Uložit']);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid())
         {
-            $entityCollectionService->removeOrphans($collectionMessenger);
+            $orphanRemoval->removeOrphans($collectionMessenger);
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($categoryGroup);
             $entityManager->flush();

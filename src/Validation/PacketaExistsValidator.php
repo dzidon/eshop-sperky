@@ -4,7 +4,7 @@ namespace App\Validation;
 
 use App\Entity\DeliveryMethod;
 use App\Entity\Order;
-use App\Service\PacketaApiService;
+use App\Service\Packeta;
 use LogicException;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
@@ -12,11 +12,11 @@ use Symfony\Component\Validator\Constraint;
 
 class PacketaExistsValidator extends ConstraintValidator
 {
-    private PacketaApiService $packetaApiService;
+    private Packeta $packeta;
 
-    public function __construct(PacketaApiService $packetaApiService)
+    public function __construct(Packeta $packeta)
     {
-        $this->packetaApiService = $packetaApiService;
+        $this->packeta = $packeta;
     }
 
     /**
@@ -40,7 +40,7 @@ class PacketaExistsValidator extends ConstraintValidator
             return;
         }
 
-        if ($order->getLifecycleChapter() === Order::LIFECYCLE_SHIPPED && !$this->packetaApiService->packetExists($order))
+        if ($order->getLifecycleChapter() === Order::LIFECYCLE_SHIPPED && !$this->packeta->packetExists($order))
         {
             $this->context
                 ->buildViolation($constraint->message)

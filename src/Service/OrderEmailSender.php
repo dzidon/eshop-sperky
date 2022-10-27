@@ -14,7 +14,7 @@ use Symfony\Component\Mime\Address;
  *
  * @package App\Service
  */
-class OrderEmailService
+class OrderEmailSender
 {
     private Order $order;
     private TemplatedEmail $email;

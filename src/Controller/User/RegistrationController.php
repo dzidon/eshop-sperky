@@ -5,7 +5,7 @@ namespace App\Controller\User;
 use App\Entity\User;
 use App\Form\FormType\User\RegistrationFormType;
 use App\Form\FormType\User\VerificationFormType;
-use App\Service\BreadcrumbsService;
+use App\Service\Breadcrumbs;
 use App\Facade\UserFacade;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -21,9 +21,9 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 class RegistrationController extends AbstractController
 {
     private TranslatorInterface $translator;
-    private BreadcrumbsService $breadcrumbs;
+    private Breadcrumbs $breadcrumbs;
 
-    public function __construct(TranslatorInterface $translator, BreadcrumbsService $breadcrumbs)
+    public function __construct(TranslatorInterface $translator, Breadcrumbs $breadcrumbs)
     {
         $this->translator = $translator;
         $this->breadcrumbs = $breadcrumbs->addRoute('home')->addRoute('register');

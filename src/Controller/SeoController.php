@@ -2,16 +2,16 @@
 
 namespace App\Controller;
 
-use App\Service\SeoService;
+use App\Service\Seo;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class SeoController extends AbstractController
 {
-    private SeoService $seo;
+    private Seo $seo;
 
-    public function __construct(SeoService $seo)
+    public function __construct(Seo $seo)
     {
         $this->seo = $seo;
     }

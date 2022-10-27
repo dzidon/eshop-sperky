@@ -3,7 +3,7 @@
 namespace App\Controller\User;
 
 use App\Form\FormType\User\LoginFormType;
-use App\Service\BreadcrumbsService;
+use App\Service\Breadcrumbs;
 use KnpU\OAuth2ClientBundle\Client\ClientRegistry;
 use KnpU\OAuth2ClientBundle\Client\Provider\FacebookClient;
 use KnpU\OAuth2ClientBundle\Client\Provider\GoogleClient;
@@ -24,7 +24,7 @@ class LoginController extends AbstractController
     /**
      * @Route("/prihlaseni", name="login")
      */
-    public function login(BreadcrumbsService $breadcrumbs, FormFactoryInterface $formFactory, Request $request, AuthenticationUtils $authenticationUtils, TranslatorInterface $translator): Response
+    public function login(Breadcrumbs $breadcrumbs, FormFactoryInterface $formFactory, Request $request, AuthenticationUtils $authenticationUtils, TranslatorInterface $translator): Response
     {
         if ($this->isGranted('IS_AUTHENTICATED_FULLY'))
         {

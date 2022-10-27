@@ -12,7 +12,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  *
  * @package App\Service
  */
-class SeoService
+class Seo
 {
     private UrlGeneratorInterface $router;
     private EntityManagerInterface $entityManager;

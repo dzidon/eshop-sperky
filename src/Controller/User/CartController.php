@@ -8,7 +8,7 @@ use App\Exception\CartException;
 use App\Form\FormType\User\CartInsertFormType;
 use App\Form\FormType\User\CartFormType;
 use App\Response\Json;
-use App\Service\CartService;
+use App\Service\Cart;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,9 +19,9 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class CartController extends AbstractController
 {
-    private CartService $cart;
+    private Cart $cart;
 
-    public function __construct(CartService $cart)
+    public function __construct(Cart $cart)
     {
         $this->cart = $cart;
     }

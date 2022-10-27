@@ -16,10 +16,10 @@ use App\Form\FormType\User\HiddenTrueFormType;
 use App\Form\FormType\Admin\OrderCancelFormType;
 use App\Form\FormType\Admin\OrderEditFormType;
 use App\Form\FormType\Admin\OrderPacketaFormType;
-use App\Service\BreadcrumbsService;
-use App\Service\EntityCollectionService;
+use App\Service\Breadcrumbs;
+use App\Service\OrphanRemoval;
 use App\Facade\OrderFacade;
-use App\Service\PacketaApiService;
+use App\Service\Packeta;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -38,7 +38,7 @@ class OrderController extends AbstractAdminController
 {
     private LoggerInterface $logger;
 
-    public function __construct(LoggerInterface $logger, BreadcrumbsService $breadcrumbs)
+    public function __construct(LoggerInterface $logger, Breadcrumbs $breadcrumbs)
     {
         parent::__construct($breadcrumbs);
 
@@ -79,7 +79,7 @@ class OrderController extends AbstractAdminController
      *
      * @IsGranted("order_edit_custom")
      */
-    public function orderCustom(EntityCollectionService $entityCollectionService, Request $request, int $id = null): Response
+    public function orderCustom(OrphanRemoval $orphanRemoval, Request $request, int $id = null): Response
     {
         $user = $this->getUser();
 
@@ -100,14 +100,14 @@ class OrderController extends AbstractAdminController
             $this->breadcrumbs->addRoute('admin_order_custom_edit', ['id' => null],'', 'new');
         }
 
-        $collectionMessenger = $entityCollectionService->createEntityCollectionsMessengerForOrphanRemoval($order);
+        $collectionMessenger = $orphanRemoval->createEntityCollectionsMessengerForOrphanRemoval($order);
         $form = $this->createForm(CustomOrderFormType::class, $order);
         $form->add('submit', SubmitType::class, ['label' => 'Uložit']);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid())
         {
-            $entityCollectionService->removeOrphans($collectionMessenger);
+            $orphanRemoval->removeOrphans($collectionMessenger);
             $order->calculatePricesWithVatForCartOccurences();
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($order);
@@ -172,7 +172,7 @@ class OrderController extends AbstractAdminController
      *
      * @IsGranted("order_edit")
      */
-    public function order(PacketaApiService $packetaApiService, Request $request, int $id = null): Response
+    public function order(Packeta $packeta, Request $request, int $id = null): Response
     {
         $user = $this->getUser();
 
@@ -186,6 +186,7 @@ class OrderController extends AbstractAdminController
         $formLifecycleChapterView = null;
         $formPacketaView = null;
         $packetaMessage = null;
+
         if (!$order->isCancelled())
         {
             /*
@@ -216,7 +217,7 @@ class OrderController extends AbstractAdminController
              */
             if ($order->getLifecycleChapter() > Order::LIFECYCLE_AWAITING_PAYMENT && $order->getDeliveryMethod() !== null && $order->getDeliveryMethod()->getType() === DeliveryMethod::TYPE_PACKETA_CZ)
             {
-                if ($packetaApiService->packetExists($order))
+                if ($packeta->packetExists($order))
                 {
                     $packetaMessage = 'Zásilka je připravena v systému Zásilkovny.';
                 }
@@ -234,7 +235,7 @@ class OrderController extends AbstractAdminController
                     {
                         try
                         {
-                            $packetaApiService->createPacket($order);
+                            $packeta->createPacket($order);
                             $this->addFlash('success', 'Zásilka vytvořena!');
                             return $this->redirectToRoute('admin_order_overview', ['id' => $order->getId()]);
                         }

@@ -2,7 +2,7 @@
 
 namespace App\EventSubscriber;
 
-use App\Service\CartService;
+use App\Service\Cart;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -16,9 +16,9 @@ use Symfony\Component\HttpKernel\KernelEvents;
  */
 class CartSubscriber implements EventSubscriberInterface
 {
-    private CartService $cart;
+    private Cart $cart;
 
-    public function __construct(CartService $cart)
+    public function __construct(Cart $cart)
     {
         $this->cart = $cart;
     }

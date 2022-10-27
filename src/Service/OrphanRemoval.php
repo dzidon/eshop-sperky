@@ -11,11 +11,11 @@ use LogicException;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
- * Třída sloužící pro manipulaci s kolekcemi entit.
+ * Třída sloužící k mazání osamocených entit.
  *
  * @package App\Service
  */
-class EntityCollectionService
+class OrphanRemoval
 {
     private EntityManagerInterface $entityManager;
     private PropertyAccessorInterface $propertyAccessor;

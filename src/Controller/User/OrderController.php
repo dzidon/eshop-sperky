@@ -10,8 +10,8 @@ use App\Form\FormType\User\OrderAddressesFormType;
 use App\Form\FormType\User\OrderMethodsFormType;
 use App\Form\FormType\User\CartFormType;
 use App\Response\Json;
-use App\Service\BreadcrumbsService;
-use App\Service\CartService;
+use App\Service\Breadcrumbs;
+use App\Service\Cart;
 use App\Facade\OrderFacade;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -23,11 +23,11 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class OrderController extends AbstractController
 {
-    private CartService $cart;
+    private Cart $cart;
     private OrderFacade $orderFacade;
-    private BreadcrumbsService $breadcrumbs;
+    private Breadcrumbs $breadcrumbs;
 
-    public function __construct(CartService $cart, OrderFacade $orderFacade, BreadcrumbsService $breadcrumbs)
+    public function __construct(Cart $cart, OrderFacade $orderFacade, Breadcrumbs $breadcrumbs)
     {
         $this->cart = $cart;
         $this->orderFacade = $orderFacade;
