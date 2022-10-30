@@ -10,7 +10,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 /**
- * Konzolový příkaz, který aktualizuje oprávnění v db podle PermissionVoter::PERMISSIONS a zobrazí informace o počtu
+ * Konzolový příkaz, který aktualizuje oprávnění v db podle "app_permissions" (services.yaml) a zobrazí informace o počtu
  * vytvořených a aktualizovaných oprávnění v db.
  *
  * @package App\Command
@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 class RefreshPermissionsCommand extends Command
 {
     protected static $defaultName = 'app:refresh-permissions';
-    protected static $defaultDescription = 'Updates the "permission" table in the database so that it matches PermissionVoter::PERMISSIONS.';
+    protected static $defaultDescription = 'Updates the "permission" table in the database so that it matches "app_permissions" in services.yaml.';
 
     private EntityManagerInterface $entityManager;
     private ParameterBagInterface $parameterBag;

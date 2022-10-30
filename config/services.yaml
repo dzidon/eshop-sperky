@@ -44,6 +44,7 @@ parameters:
     app_permission_category.product_options: 'Produktové volby'
     app_permission_category.product_info: 'Skupiny produktových informací'
     app_permission_category.delivery_payment_methods: 'Doručovací a platební metody'
+    app_permission_category.text_content: 'Textový obsah'
 
     # admin oprávnění (po editaci je nutné vyvolat "php bin/console app:refresh-permissions" pro aktualizaci v DB)
     app_permissions:
@@ -118,6 +119,10 @@ parameters:
         order_delete_custom:
             name: 'Mazání objednávek na míru'
             category: '%app_permission_category.orders%'
+
+        text_content_edit:
+            name: 'Editace textového obsahu'
+            category: '%app_permission_category.text_content%'
 
     # sekce v administraci
     app_admin_routes_required_permissions:
