@@ -33,7 +33,7 @@ class MainController extends AbstractAdminController
             $orders = $this->getDoctrine()->getManager()->getRepository(Order::class)->findAllForAdminDashboard();
         }
 
-        $this->breadcrumbs->setPageTitleByRoute('admin_dashboard');
+        $this->breadcrumbs->setCurrentTitleByRoute('admin_dashboard');
 
         return $this->render('admin/admin_dashboard.html.twig', [
             'permissionsGrouped' => $this->getUser()->getPermissionsGrouped(),

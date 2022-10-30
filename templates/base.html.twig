@@ -16,8 +16,8 @@
         <meta name="theme-color" content="#ffffff">
 
         <title>
-            {% if breadcrumbs_service is defined and breadcrumbs_service.pageTitle|length > 0 and app.request.attributes.get('_route') is not same as('home') %}
-                {{ breadcrumbs_service.pageTitle }} -
+            {% if breadcrumbs_service is defined and breadcrumbs_service.currentTitle|length > 0 and app.request.attributes.get('_route') is not same as('home') %}
+                {{ breadcrumbs_service.currentTitle }} -
             {% endif %}
             {{ site_name }}
         </title>

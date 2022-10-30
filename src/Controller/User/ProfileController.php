@@ -66,13 +66,14 @@ class ProfileController extends AbstractController
             {
                 $this->addFlash('warning', 'Vaše recenze se nebude zobrazovat, dokud nebudete mít nastavené křestní jméno a příjmení zároveň.');
             }
+
             $this->addFlash('success', 'Osobní údaje uloženy!');
             $this->logger->info(sprintf("User %s (ID: %s) has changed their personal information.", $user->getUserIdentifier(), $user->getId()));
 
             return $this->redirectToRoute('profile');
         }
 
-        $this->breadcrumbs->setPageTitleByRoute('profile');
+        $this->breadcrumbs->setCurrentTitleByRoute('profile');
 
         return $this->render('profile/profile_overview.html.twig', [
             'personalDataForm' => $form->createView(),

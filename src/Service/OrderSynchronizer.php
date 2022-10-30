@@ -13,19 +13,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 class OrderSynchronizer
 {
-    /**
-     * Před vyvoláním těchto cest dojde k úplnému načtení a synchronizaci košíku.
-     * Na jiných cestách stačí načítat počet produktů pro zobrazení v navbaru.
-     */
-    public const SYNCHRONIZATION_ROUTES = [
-        'cart_insert' => true,
-        'cart_update' => true,
-        'cart_remove' => true,
-        'order_cart' => true,
-        'order_methods' => true,
-        'order_addresses' => true,
-    ];
-
     private RequestStack $requestStack;
 
     public function __construct(RequestStack $requestStack)

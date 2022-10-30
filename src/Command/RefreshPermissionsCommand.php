@@ -3,11 +3,11 @@
 namespace App\Command;
 
 use App\Entity\Permission;
-use App\Security\Voter\PermissionVoter;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 /**
  * Konzolový příkaz, který aktualizuje oprávnění v db podle PermissionVoter::PERMISSIONS a zobrazí informace o počtu
@@ -21,10 +21,12 @@ class RefreshPermissionsCommand extends Command
     protected static $defaultDescription = 'Updates the "permission" table in the database so that it matches PermissionVoter::PERMISSIONS.';
 
     private EntityManagerInterface $entityManager;
+    private ParameterBagInterface $parameterBag;
 
-    public function __construct(EntityManagerInterface $entityManager)
+    public function __construct(EntityManagerInterface $entityManager, ParameterBagInterface $parameterBag)
     {
         $this->entityManager = $entityManager;
+        $this->parameterBag = $parameterBag;
 
         parent::__construct();
     }
@@ -39,13 +41,21 @@ class RefreshPermissionsCommand extends Command
             'updated' => array(),
         ];
 
-        foreach(PermissionVoter::PERMISSIONS as $attribute => $data)
+        if (!$this->parameterBag->has('app_permissions'))
+        {
+            $output->writeln('Parameter app_permissions not found in services.yaml!');
+            return Command::FAILURE;
+        }
+
+        $permissions = $this->parameterBag->get('app_permissions');
+
+        foreach ($permissions as $attribute => $data)
         {
             $permissionInDb = $this->entityManager->getRepository(Permission::class)->findOneBy(['code' => $attribute]);
             $permissionHere = new Permission();
             $permissionHere->setCode($attribute)
-                           ->setName(PermissionVoter::PERMISSIONS[$attribute]['name'])
-                           ->setCategory(PermissionVoter::PERMISSIONS[$attribute]['category']);
+                           ->setName($data['name'])
+                           ->setCategory($data['category']);
 
             if($permissionInDb === null) // neexistuje opravneni s hledanym kodem
             {
@@ -62,6 +72,7 @@ class RefreshPermissionsCommand extends Command
                 $stats['updated'][] = $permissionInDb->getCode();
             }
         }
+
         $this->entityManager->flush();
 
         $numberOfCreated = count($stats['created']);

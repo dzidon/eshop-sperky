@@ -8,6 +8,7 @@ use App\Entity\Product;
 use App\Entity\ProductOption;
 use App\Exception\CartException;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Uid\Uuid;
@@ -45,13 +46,15 @@ class Cart
     private EntityManagerInterface $entityManager;
     private OrderSynchronizer $synchronizer;
     private OrphanRemoval $orphanRemoval;
+    private ParameterBagInterface $parameterBag;
 
-    public function __construct(EntityManagerInterface $entityManager, RequestStack $requestStack, OrderSynchronizer $synchronizer, OrphanRemoval $orphanRemoval)
+    public function __construct(EntityManagerInterface $entityManager, RequestStack $requestStack, OrderSynchronizer $synchronizer, OrphanRemoval $orphanRemoval, ParameterBagInterface $parameterBag)
     {
         $this->entityManager = $entityManager;
         $this->requestStack = $requestStack;
         $this->synchronizer = $synchronizer;
         $this->orphanRemoval = $orphanRemoval;
+        $this->parameterBag = $parameterBag;
     }
 
     /**
@@ -104,7 +107,7 @@ class Cart
         $tokenIsValid = UUid::isValid($tokenInCookie);
 
         $currentRoute = $request->attributes->get('_route');
-        $loadFully = isset(OrderSynchronizer::SYNCHRONIZATION_ROUTES[$currentRoute]);
+        $loadFully = in_array($currentRoute, $this->parameterBag->get('app_cart')['synchronize_at']);
 
         if ($loadFully)
         {

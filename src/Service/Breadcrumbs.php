@@ -34,15 +34,9 @@ class Breadcrumbs
      */
     public function addRoute(string $route, array $parameters = [], string $title = '', string $variation = '', string $titleAppend = ''): self
     {
-        if (mb_strlen($title, 'utf-8') === 0)
+        if ($title === '')
         {
-            $title = $this->parameterBag->get('app_page_title.' . $route);
-            if (is_array($title))
-            {
-                $title = $title[$variation];
-            }
-
-            $title = (string) $title;
+            $title = $this->getPageTitleForRoute($route, $variation);
         }
 
         if (mb_strlen($titleAppend, 'utf-8') > 0)
@@ -56,12 +50,22 @@ class Breadcrumbs
         return $this;
     }
 
+    /**
+     * Vrátí data pro vykreslení drobečkové navigace.
+     *
+     * @return array
+     */
     public function getBreadcrumbsData(): array
     {
         return $this->breadcrumbsData;
     }
 
-    public function getPageTitle(): string
+    /**
+     * Vrátí aktuální název cesty.
+     *
+     * @return string
+     */
+    public function getCurrentTitle(): string
     {
         return $this->currentTitle;
     }
@@ -73,15 +77,9 @@ class Breadcrumbs
      * @param string $variation
      * @return $this
      */
-    public function setPageTitleByRoute(string $route, string $variation = ''): self
+    public function setCurrentTitleByRoute(string $route, string $variation = ''): self
     {
-        $title = $this->parameterBag->get('app_page_title.' . $route);
-        if (is_array($title))
-        {
-            $title = $title[$variation];
-        }
-
-        $this->currentTitle = (string) $title;
+        $this->currentTitle = $this->getPageTitleForRoute($route, $variation);
 
         return $this;
     }
@@ -90,10 +88,9 @@ class Breadcrumbs
      * Manuálně nastaví aktuální title na zadaný string.
      *
      * @param string $currentTitle
-     *
      * @return $this
      */
-    public function setPageTitle(string $currentTitle): self
+    public function setCurrentTitle(string $currentTitle): self
     {
         $this->currentTitle = $currentTitle;
 
@@ -104,12 +101,43 @@ class Breadcrumbs
      * Přidá string k aktuálnímu title.
      *
      * @param string $string
-     * @return Breadcrumbs
+     * @return $this
      */
-    public function appendToPageTitle(string $string): self
+    public function appendToCurrentTitle(string $string): self
     {
         $this->currentTitle .= $string;
 
         return $this;
+    }
+
+    /**
+     * Pro danou cestu vrátí její název. Také jde zadat variace.
+     *
+     * @param string $route
+     * @param string $variation
+     * @return string
+     */
+    private function getPageTitleForRoute(string $route, string $variation = ''): string
+    {
+        $key = 'app_page_title.' . $route;
+        if (!$this->parameterBag->has($key))
+        {
+            return '';
+        }
+
+        $title = $this->parameterBag->get($key);
+        if (is_array($title))
+        {
+            if (array_key_exists($variation, $title))
+            {
+                $title = $title[$variation];
+            }
+            else
+            {
+                return '';
+            }
+        }
+
+        return (string) $title;
     }
 }

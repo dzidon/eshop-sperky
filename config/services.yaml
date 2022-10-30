@@ -19,16 +19,118 @@ parameters:
         clientId: '%env(GOPAY_CLIENT_ID)%'
         clientSecret: '%env(GOPAY_CLIENT_SECRET)%'
         gatewayUrl: '%env(GOPAY_GATEWAY_URL)%'
-        # optional config
         scope: payment-all
         language: CS
         timeout: 30
 
+    # synchronizátor košíku
+    app_cart:
+        synchronize_at: ['cart_insert', 'cart_update', 'cart_remove', 'order_cart', 'order_methods', 'order_addresses']
+
+    # textový obsah
     app_text_content:
         default_text: 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Mauris metus. Nunc tincidunt ante vitae massa. In enim a arcu imperdiet malesuada. Curabitur vitae diam non enim vestibulum interdum. Nunc dapibus tortor vel mi dapibus sollicitudin.'
         routes:
             _all: ['footer_about']
             home: ['home_what_we_do', 'home_follow_us']
+
+    # skupiny admin oprávnění
+    app_permission_category.reviews: 'Recenze'
+    app_permission_category.users: 'Uživatelé'
+    app_permission_category.orders: 'Objednávky'
+    app_permission_category.products: 'Produkty'
+    app_permission_category.product_sections: 'Produktové sekce'
+    app_permission_category.product_categories: 'Produktové kategorie'
+    app_permission_category.product_options: 'Produktové volby'
+    app_permission_category.product_info: 'Skupiny produktových informací'
+    app_permission_category.delivery_payment_methods: 'Doručovací a platební metody'
+
+    # admin oprávnění (po editaci je nutné vyvolat "php bin/console app:refresh-permissions" pro aktualizaci v DB)
+    app_permissions:
+        review_edit:
+            name: 'Editace recenzí'
+            category: '%app_permission_category.reviews%'
+        review_delete:
+            name: 'Mazání recenzí'
+            category: '%app_permission_category.reviews%'
+
+        user_edit_credentials:
+            name: 'Editace osobních údajů uživatelů'
+            category: '%app_permission_category.users%'
+        user_block_reviews:
+            name: 'Zablokování možnosti napsání recenze uživatelů'
+            category: '%app_permission_category.users%'
+        user_set_permissions:
+            name: 'Nastavení oprávnění uživatelů'
+            category: '%app_permission_category.users%'
+
+        product_section_edit:
+            name: 'Tvorba a editace produktových sekcí'
+            category: '%app_permission_category.product_sections%'
+        product_section_delete:
+            name: 'Mazání produktových sekcí'
+            category: '%app_permission_category.product_sections%'
+
+        product_category_edit:
+            name: 'Tvorba a editace produktových kategorií'
+            category: '%app_permission_category.product_categories%'
+        product_category_delete:
+            name: 'Mazání produktových kategorií'
+            category: '%app_permission_category.product_categories%'
+
+        product_option_edit:
+            name: 'Tvorba a editace produktových voleb'
+            category: '%app_permission_category.product_options%'
+        product_option_delete:
+            name: 'Mazání produktových voleb'
+            category: '%app_permission_category.product_options%'
+
+        product_info_edit:
+            name: 'Tvorba a editace skupin produktových informací'
+            category: '%app_permission_category.product_info%'
+        product_info_delete:
+            name: 'Mazání skupin produktových informací'
+            category: '%app_permission_category.product_info%'
+
+        product_edit:
+            name: 'Tvorba a editace produktů'
+            category: '%app_permission_category.products%'
+        product_delete:
+            name: 'Mazání produktů'
+            category: '%app_permission_category.products%'
+
+        delivery_method_edit:
+            name: 'Editace doručovacích metod'
+            category: '%app_permission_category.delivery_payment_methods%'
+        payment_method_edit:
+            name: 'Editace platebních metod'
+            category: '%app_permission_category.delivery_payment_methods%'
+
+        order_edit:
+            name: 'Editace objednávek'
+            category: '%app_permission_category.orders%'
+        order_cancel:
+            name: 'Rušení objednávek'
+            category: '%app_permission_category.orders%'
+        order_edit_custom:
+            name: 'Tvorba a editace objednávek na míru'
+            category: '%app_permission_category.orders%'
+        order_delete_custom:
+            name: 'Mazání objednávek na míru'
+            category: '%app_permission_category.orders%'
+
+    # sekce v administraci
+    app_admin_routes_required_permissions:
+        admin_dashboard: '_any'
+        admin_user_management: ['user_edit_credentials', 'user_block_reviews', 'user_set_permissions']
+        admin_orders: ['order_edit', 'order_cancel', 'order_edit_custom', 'order_delete_custom']
+        admin_products: ['product_edit', 'product_delete']
+        admin_product_sections: ['product_section_edit', 'product_section_delete']
+        admin_product_categories: ['product_category_edit', 'product_category_delete']
+        admin_product_options: ['product_option_edit', 'product_option_delete']
+        admin_product_info: ['product_info_edit', 'product_info_delete']
+        admin_delivery_methods: ['delivery_method_edit']
+        admin_payment_methods: ['payment_method_edit']
 
     # názvy cest
     app_page_title.home: 'Domů'
