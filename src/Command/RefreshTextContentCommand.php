@@ -68,29 +68,21 @@ class RefreshTextContentCommand extends Command
 
         $existingTextContents = $this->entityManager->getRepository(TextContent::class)->findAll();
         $newTextContents = [];
-        $configTextContentNames = [];
 
         foreach ($configData['defaults']['entities'] as $textContentName => $defaultTextName)
-        {
-            $configTextContentNames[$textContentName] = $textContentName;
-        }
-
-        foreach ($configTextContentNames as $configTextContentName)
         {
             /** @var TextContent $existingTextContent */
             foreach ($existingTextContents as $existingTextContent)
             {
-                if ($existingTextContent->getName() === $configTextContentName)
+                if ($existingTextContent->getName() === $textContentName)
                 {
                     continue 2;
                 }
             }
 
             $newTextContent = new TextContent();
-            $newTextContent->setName($configTextContentName);
-
-            $defaultTextKey = $configData['defaults']['entities'][$configTextContentName];
-            $newTextContent->setText($configData['defaults']['texts'][$defaultTextKey]);
+            $newTextContent->setName($textContentName);
+            $newTextContent->setText($configData['defaults']['texts'][$defaultTextName]);
 
             $newTextContents[] = $newTextContent;
             $this->entityManager->persist($newTextContent);
