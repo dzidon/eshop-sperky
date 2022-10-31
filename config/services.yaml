@@ -27,7 +27,7 @@ parameters:
     app_cart:
         synchronize_at: ['cart_insert', 'cart_update', 'cart_remove', 'order_cart', 'order_methods', 'order_addresses']
 
-    # textový obsah
+    # textový obsah (po editace je nutné vyvolat "php bin/console app:refresh-text-content")
     app_text_content:
         default_text: 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Mauris metus. Nunc tincidunt ante vitae massa. In enim a arcu imperdiet malesuada. Curabitur vitae diam non enim vestibulum interdum. Nunc dapibus tortor vel mi dapibus sollicitudin.'
         routes:

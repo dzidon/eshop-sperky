@@ -15,18 +15,21 @@ use Doctrine\ORM\Mapping\ClassMetadataInfo;
  */
 class DoctrineTrackingPolicySubscriber implements EventSubscriber
 {
-    public function getSubscribedEvents()
-    {
-        return [
-            Events::loadClassMetadata
-        ];
-    }
-
     public function loadClassMetadata(LoadClassMetadataEventArgs $args)
     {
         $classMetadata = $args->getClassMetadata();
         $classMetadata->setChangeTrackingPolicy(
             ClassMetadataInfo::CHANGETRACKING_DEFERRED_EXPLICIT
         );
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getSubscribedEvents()
+    {
+        return [
+            Events::loadClassMetadata
+        ];
     }
 }

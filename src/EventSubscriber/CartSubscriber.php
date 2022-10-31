@@ -38,6 +38,9 @@ class CartSubscriber implements EventSubscriberInterface
         }
     }
 
+    /**
+     * @inheritDoc
+     */
     public static function getSubscribedEvents()
     {
         return [
