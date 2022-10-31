@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\TextContentRepository;
+use DateTime;
+use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -31,6 +33,22 @@ class TextContent
      */
     private $text;
 
+    /**
+     * @ORM\Column(type="datetime")
+     */
+    private $created;
+
+    /**
+     * @ORM\Column(type="datetime")
+     */
+    private $updated;
+
+    public function __construct()
+    {
+        $this->created = new DateTime('now');
+        $this->updated = $this->created;
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -58,5 +76,37 @@ class TextContent
         $this->text = $text;
 
         return $this;
+    }
+
+    public function getCreated(): ?DateTimeInterface
+    {
+        return $this->created;
+    }
+
+    public function setCreated(DateTimeInterface $created): self
+    {
+        $this->created = $created;
+
+        return $this;
+    }
+
+    public function getUpdated(): ?DateTimeInterface
+    {
+        return $this->updated;
+    }
+
+    public function setUpdated(DateTimeInterface $updated): self
+    {
+        $this->updated = $updated;
+
+        return $this;
+    }
+
+    /**
+     * @ORM\PreUpdate
+     */
+    public function setUpdatedNow(): void
+    {
+        $this->updated = new DateTime('now');
     }
 }

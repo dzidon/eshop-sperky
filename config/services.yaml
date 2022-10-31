@@ -29,8 +29,15 @@ parameters:
 
     # textový obsah (po editace je nutné vyvolat "php bin/console app:refresh-text-content")
     app_text_content:
-        default_text: 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Mauris metus. Nunc tincidunt ante vitae massa. In enim a arcu imperdiet malesuada. Curabitur vitae diam non enim vestibulum interdum. Nunc dapibus tortor vel mi dapibus sollicitudin.'
-        routes:
+        defaults:
+            texts:
+                short: 'Lorem ipsum'
+                long: 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Mauris metus. Nunc tincidunt ante vitae massa. In enim a arcu imperdiet malesuada. Curabitur vitae diam non enim vestibulum interdum. Nunc dapibus tortor vel mi dapibus sollicitudin.'
+            entities:
+                footer_about: 'short'
+                home_what_we_do: 'long'
+                home_follow_us: 'long'
+        route_preloading:
             _all: ['footer_about']
             home: ['home_what_we_do', 'home_follow_us']
 

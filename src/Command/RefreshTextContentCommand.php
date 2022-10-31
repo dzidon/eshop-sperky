@@ -42,21 +42,27 @@ class RefreshTextContentCommand extends Command
         }
 
         $configData = $this->parameterBag->get('app_text_content');
-        if (!array_key_exists('default_text', $configData) || !array_key_exists('routes', $configData))
+        if (!array_key_exists('defaults', $configData))
         {
-            $output->writeln('Parameter app_text_content must contain the following keys: default_text, routes');
+            $output->writeln('Parameter app_text_content must contain the following key: defaults');
             return Command::FAILURE;
         }
 
-        if (!is_string($configData['default_text']))
+        if (!array_key_exists('texts', $configData['defaults']) || !array_key_exists('entities', $configData['defaults']))
         {
-            $output->writeln('Parameter default_text in app_text_content must be a string!');
+            $output->writeln('Parameter app_text_content.defaults must contain the following keys: texts, entities');
             return Command::FAILURE;
         }
 
-        if (!is_array($configData['routes']))
+        if (!is_array($configData['defaults']['texts']))
         {
-            $output->writeln('Parameter routes in app_text_content must be an array!');
+            $output->writeln('Parameter app_text_content.defaults.texts must be an array!');
+            return Command::FAILURE;
+        }
+
+        if (!is_array($configData['defaults']['entities']))
+        {
+            $output->writeln('Parameter app_text_content.defaults.entities must be an array!');
             return Command::FAILURE;
         }
 
@@ -64,12 +70,9 @@ class RefreshTextContentCommand extends Command
         $newTextContents = [];
         $configTextContentNames = [];
 
-        foreach ($configData['routes'] as $textContentForRoute)
+        foreach ($configData['defaults']['entities'] as $textContentName => $defaultTextName)
         {
-            foreach ($textContentForRoute as $textContentName)
-            {
-                $configTextContentNames[$textContentName] = $textContentName;
-            }
+            $configTextContentNames[$textContentName] = $textContentName;
         }
 
         foreach ($configTextContentNames as $configTextContentName)
@@ -85,7 +88,9 @@ class RefreshTextContentCommand extends Command
 
             $newTextContent = new TextContent();
             $newTextContent->setName($configTextContentName);
-            $newTextContent->setText($configData['default_text']);
+
+            $defaultTextKey = $configData['defaults']['entities'][$configTextContentName];
+            $newTextContent->setText($configData['defaults']['texts'][$defaultTextKey]);
 
             $newTextContents[] = $newTextContent;
             $this->entityManager->persist($newTextContent);

@@ -40,24 +40,24 @@ class TextContentSubscriber implements EventSubscriberInterface
         }
 
         $configData = $this->parameterBag->get('app_text_content');
-        if (!array_key_exists('routes', $configData) || !is_array($configData['routes']))
+        if (!array_key_exists('route_preloading', $configData) || !is_array($configData['route_preloading']))
         {
             return;
         }
 
         $namesToLoad = [];
-        if (array_key_exists('_all', $configData['routes']) && is_array($configData['routes']['_all']))
+        if (array_key_exists('_all', $configData['route_preloading']) && is_array($configData['route_preloading']['_all']))
         {
-            foreach ($configData['routes']['_all'] as $textContentName)
+            foreach ($configData['route_preloading']['_all'] as $textContentName)
             {
                 $namesToLoad[$textContentName] = $textContentName;
             }
         }
 
         $route = $currentRequest->attributes->get('_route');
-        if (array_key_exists($route, $configData['routes']) && is_array($configData['routes'][$route]))
+        if (array_key_exists($route, $configData['route_preloading']) && is_array($configData['route_preloading'][$route]))
         {
-            foreach ($configData['routes'][$route] as $textContentName)
+            foreach ($configData['route_preloading'][$route] as $textContentName)
             {
                 $namesToLoad[$textContentName] = $textContentName;
             }
