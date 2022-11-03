@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service;
+namespace App\TextContent;
 
 use App\Entity\TextContent;
 use Doctrine\ORM\EntityManagerInterface;
@@ -9,7 +9,7 @@ use LogicException;
 /**
  * Třída pro načítání editovatelného textového obsahu.
  *
- * @package App\Service
+ * @package App\TextContent
  */
 class TextContentLoader
 {

@@ -2,7 +2,7 @@
 
 namespace App\Twig;
 
-use App\Service\TextContentLoader;
+use App\TextContent\TextContentLoader;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 

@@ -5,6 +5,7 @@ namespace App\Controller\Admin;
 use App\Entity\TextContent;
 use App\Form\FormType\Admin\TextContentFormType;
 use App\Service\Breadcrumbs;
+use App\TextContent\TextContentEditor;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -35,7 +36,7 @@ class TextContentController extends AbstractController
      *
      * @IsGranted("text_content_edit")
      */
-    public function textContent(Request $request, $id): Response
+    public function textContent(Request $request, TextContentEditor $textContentEditor, $id): Response
     {
         $user = $this->getUser();
 
@@ -61,7 +62,8 @@ class TextContentController extends AbstractController
             $this->addFlash('success', 'Textový obsah uložen!');
             $this->logger->info(sprintf("Admin %s (ID: %s) has saved a text content entity %s (ID: %s).", $user->getUserIdentifier(), $user->getId(), $textContent->getName(), $textContent->getId()));
 
-            return $this->redirectToRoute('home');
+            $redirectRoute = $textContentEditor->getTextContentRoute($textContent);
+            return $this->redirectToRoute($redirectRoute);
         }
 
         return $this->render('admin/text_content/admin_text_content_edit.html.twig', [

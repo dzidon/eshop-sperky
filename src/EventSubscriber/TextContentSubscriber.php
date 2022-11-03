@@ -2,7 +2,7 @@
 
 namespace App\EventSubscriber;
 
-use App\Service\TextContentLoader;
+use App\TextContent\TextContentLoader;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
