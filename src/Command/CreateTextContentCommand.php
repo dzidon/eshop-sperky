@@ -14,9 +14,9 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
  *
  * @package App\Command
  */
-class RefreshTextContentCommand extends Command
+class CreateTextContentCommand extends Command
 {
-    protected static $defaultName = 'app:refresh-text-content';
+    protected static $defaultName = 'app:create-text-content';
     protected static $defaultDescription = 'Creates non-existent TextContent entities in the database.';
 
     private EntityManagerInterface $entityManager;
@@ -84,13 +84,19 @@ class RefreshTextContentCommand extends Command
             $newTextContent->setName($textContentName);
             $newTextContent->setText($configData['defaults']['texts'][$defaultTextName]);
 
+            $newTextContent->setIsHtmlAllowed(false);
+            if (array_key_exists('allow_html', $configData) && in_array($textContentName, $configData['allow_html']))
+            {
+                $newTextContent->setIsHtmlAllowed(true);
+            }
+
             $newTextContents[] = $newTextContent;
             $this->entityManager->persist($newTextContent);
         }
 
         if (empty($newTextContents))
         {
-            $output->writeln('All TextContent entities are up-to-date!');
+            $output->writeln('No new TextContent entities were created!');
         }
         else
         {

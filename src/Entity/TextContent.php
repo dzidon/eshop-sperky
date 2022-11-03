@@ -10,6 +10,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=TextContentRepository::class)
+ * @ORM\HasLifecycleCallbacks()
  */
 class TextContent
 {
@@ -32,6 +33,11 @@ class TextContent
      * @Assert\NotBlank()
      */
     private $text;
+
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $isHtmlAllowed;
 
     /**
      * @ORM\Column(type="datetime")
@@ -74,6 +80,18 @@ class TextContent
     public function setText(?string $text): self
     {
         $this->text = $text;
+
+        return $this;
+    }
+
+    public function isHtmlAllowed(): bool
+    {
+        return $this->isHtmlAllowed;
+    }
+
+    public function setIsHtmlAllowed(?bool $isHtmlAllowed): self
+    {
+        $this->isHtmlAllowed = $isHtmlAllowed;
 
         return $this;
     }

@@ -1,0 +1,28 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+
+    {# Breadcrumbs #}
+    {{ include('fragments/_breadcrumbs.html.twig') }}
+
+    <div class="container container-narrow">
+        {# h1 #}
+        {{ include('fragments/_h1.html.twig') }}
+
+        {# Flash zprávy #}
+        {{ include('fragments/_flash_messages.html.twig') }}
+
+        <div class="section">
+            {# Časy vytvoření a aktualizace #}
+            {{ include('fragments/_instance_created_updated.html.twig', {instance: textContentInstance}) }}
+
+            {{ form(textContentForm) }}
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {{ encore_entry_script_tags('tinymceEditor') }}
+{% endblock %}

@@ -1,0 +1,17 @@
+{% set text_content_entity = get_text_content(text_content_name) %}
+
+<div class="text-content-container">
+    <div class="text-content">
+        {% if text_content_entity.isHtmlAllowed %}
+            {{ text_content_entity.text|raw }}
+        {% else %}
+            {{ text_content_entity.text }}
+        {% endif %}
+    </div>
+
+    {% if can_edit_text_content %}
+        <a href="{{ path('admin_text_content_edit', {id: text_content_entity.id}) }}" class="btn-floating btn-small waves-effect waves-light blue text-content-edit-button tooltipped" data-position="bottom" data-tooltip="Upravit">
+            <i class="material-icons">mode_edit</i>
+        </a>
+    {% endif %}
+</div>

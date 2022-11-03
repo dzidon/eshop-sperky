@@ -331,7 +331,28 @@ a.secondary-content {
 }
 
 /*
-    ======== RATING ========
+    ======== Text content ========
+*/
+
+.text-content-edit-button {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: -16px;
+}
+
+.text-content-edit-button:hover,
+.text-content:hover + .text-content-edit-button
+{
+    display: inline;
+}
+
+.text-content-container {
+    position: relative;
+}
+
+/*
+    ======== Rating ========
 */
 
 .rating {

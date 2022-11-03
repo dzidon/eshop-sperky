@@ -41,6 +41,7 @@
                     {% set path_order_cart = path('order_cart') %}
                     {% set is_authenticated_remembered = is_granted('IS_AUTHENTICATED_REMEMBERED') %}
                     {% set can_enter_admin = is_granted('admin_dashboard') %}
+                    {% set can_edit_text_content = is_granted('text_content_edit') %}
                     {% set navbar_sections = navbar_service.getVisibleSections() %}
                     {% set navbar_sections_count = navbar_sections|length %}
 
@@ -191,8 +192,8 @@
                 <div class="col s12">
                     <div class="row">
                         <div class="col l6 s12">
-                            <h5 class="white-text">O nás</h5>
-                            <p class="grey-text">Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Mauris metus. Nunc tincidunt ante vitae massa. In enim a arcu imperdiet malesuada. Curabitur vitae diam non enim vestibulum interdum. Nunc dapibus tortor vel mi dapibus sollicitudin.</p>
+                            <h5 class="white-text">{{ include('fragments/_text_content.html.twig', {text_content_name: 'footer_heading1'}) }}</h5>
+                            {{ include('fragments/_text_content.html.twig', {text_content_name: 'footer_paragraph1'}) }}
                         </div>
 
                         <div class="col l3 s12">

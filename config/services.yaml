@@ -27,19 +27,32 @@ parameters:
     app_cart:
         synchronize_at: ['cart_insert', 'cart_update', 'cart_remove', 'order_cart', 'order_methods', 'order_addresses']
 
-    # textový obsah (po editace je nutné vyvolat "php bin/console app:refresh-text-content")
+    # textový obsah (po editace je nutné vyvolat "php bin/console app:create-text-content")
     app_text_content:
         defaults:
             texts:
+                icon: 'local_florist'
                 short: 'Lorem ipsum'
                 long: 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Mauris metus. Nunc tincidunt ante vitae massa. In enim a arcu imperdiet malesuada. Curabitur vitae diam non enim vestibulum interdum. Nunc dapibus tortor vel mi dapibus sollicitudin.'
+                long_html: '<p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Mauris metus. Nunc tincidunt ante vitae massa. In enim a arcu imperdiet malesuada. Curabitur vitae diam non enim vestibulum interdum. Nunc dapibus tortor vel mi dapibus sollicitudin.</p>'
+                long_html_light: '<p class="light">Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Mauris metus. Nunc tincidunt ante vitae massa. In enim a arcu imperdiet malesuada. Curabitur vitae diam non enim vestibulum interdum. Nunc dapibus tortor vel mi dapibus sollicitudin.</p>'
+                long_html_grey: '<p class="grey-text">Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Mauris metus. Nunc tincidunt ante vitae massa. In enim a arcu imperdiet malesuada. Curabitur vitae diam non enim vestibulum interdum. Nunc dapibus tortor vel mi dapibus sollicitudin.</p>'
             entities:
-                footer_about: 'short'
-                home_what_we_do: 'long'
-                home_follow_us: 'long'
+                home_icon1: 'icon'
+                home_icon2: 'icon'
+                home_icon3: 'icon'
+                home_heading1: 'short'
+                home_heading2: 'short'
+                home_heading3: 'short'
+                home_paragraph1: 'long_html_light'
+                home_paragraph2: 'long_html_light'
+                home_paragraph3: 'long_html_light'
+                footer_heading1: 'short'
+                footer_paragraph1: 'long_html_grey'
+        allow_html: ['home_paragraph1', 'home_paragraph2', 'home_paragraph3', 'footer_paragraph1']
         route_preloading:
-            _all: ['footer_about']
-            home: ['home_what_we_do', 'home_follow_us']
+            _all: ['footer_heading1', 'footer_paragraph1']
+            home: ['home_icon1', 'home_icon2', 'home_icon3', 'home_heading1', 'home_heading2', 'home_heading3', 'home_paragraph1', 'home_paragraph2', 'home_paragraph3']
 
     # skupiny admin oprávnění
     app_permission_category.reviews: 'Recenze'
@@ -214,6 +227,7 @@ parameters:
     app_page_title.admin_order_custom_edit:
         new: 'Nová objednávka na míru'
         edit: 'Upravit objednávku na míru'
+    app_page_title.admin_text_content_edit: 'Upravit textový obsah'
 
 services:
     _defaults:

@@ -23,12 +23,7 @@ class TextContentExtension extends AbstractExtension
     public function getFunctions(): array
     {
         return [
-            new TwigFunction('get_text_content', [$this, 'getTextContentText']),
+            new TwigFunction('get_text_content', [$this->textContentLoader, 'getTextContent']),
         ];
-    }
-
-    public function getTextContentText(string $name, bool $forceReload = false): string
-    {
-        return (string) $this->textContentLoader->getTextContent($name, $forceReload)->getText();
     }
 }
