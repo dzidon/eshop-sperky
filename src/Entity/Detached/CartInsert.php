@@ -6,6 +6,11 @@ use App\Entity\Product;
 use App\Validation\Compound as AssertCompound;
 use Symfony\Component\Validator\Constraints as Assert;
 
+/**
+ * Třída představující akci vložení produktu do košíku.
+ *
+ * @package App\Entity\Detached
+ */
 class CartInsert
 {
     /**

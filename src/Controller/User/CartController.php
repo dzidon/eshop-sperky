@@ -2,12 +2,15 @@
 
 namespace App\Controller\User;
 
-use App\Entity\Detached\CartInsert;
 use App\Exception\CartException;
+use App\Exception\RequestTransformerException;
 use App\Form\FormType\User\CartFormType;
+use App\Request\Transformer\RequestToCartInsertTransformer;
+use App\Request\Transformer\RequestToCartRemoveTransformer;
 use App\Response\Json;
 use App\Service\Cart;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -24,27 +27,32 @@ class CartController extends AbstractController
         $this->cart = $cart;
     }
 
-    private function getCartOccurenceIdFromRequest(Request $request): ?int
-    {
-        $cartOccurenceId = $request->request->get('cartOccurenceId');
-        if($cartOccurenceId !== null)
-        {
-            return (int) $cartOccurenceId;
-        }
-
-        return null;
-    }
-
     /**
      * @Route("/vlozit", name="cart_insert")
      */
-    public function insert(CartInsert $cartInsertRequest): Response
+    public function insert(Request $request, ValidatorInterface $validator, RequestToCartInsertTransformer $requestToCartInsertTransformer): Response
     {
         $jsonResponse = new Json();
 
+        // prevod requestu a validace
         try
         {
-            $this->cart->insertProduct($cartInsertRequest->getProduct(), $cartInsertRequest->getQuantity(), $cartInsertRequest->getOptionGroups());
+            $cartInsertRequest = $requestToCartInsertTransformer->createCartInsert($request);
+            $errors = $validator->validate($cartInsertRequest);
+            if (count($errors) > 0)
+            {
+                return $jsonResponse->addResponseValidatorErrors($errors)->create();
+            }
+        }
+        catch (RequestTransformerException $exception)
+        {
+            return $jsonResponse->addResponseError($exception->getMessage())->create();
+        }
+
+        // vlozeni do kosiku
+        try
+        {
+            $this->cart->insertProduct($cartInsertRequest);
             $jsonResponse
                 ->setResponseHtml(
                     $this->renderView('fragments/_cart_insert_modal_content.html.twig', [
@@ -97,18 +105,36 @@ class CartController extends AbstractController
     /**
      * @Route("/smazat", name="cart_remove")
      */
-    public function remove(Request $request): Response
+    public function remove(Request $request, ValidatorInterface $validator, RequestToCartRemoveTransformer $requestToCartRemoveTransformer): Response
     {
         $jsonResponse = new Json();
-        $cartOccurenceId = $this->getCartOccurenceIdFromRequest($request);
 
+        // prevod requestu a validace
         try
         {
-            $this->cart->removeCartOccurence($cartOccurenceId);
+            $cartRemoveRequest = $requestToCartRemoveTransformer->createCartRemove($request);
+            $errors = $validator->validate($cartRemoveRequest);
+            if (count($errors) > 0)
+            {
+                $jsonResponse->addResponseValidatorErrors($errors);
+            }
         }
-        catch (CartException $exception)
+        catch (RequestTransformerException $exception)
         {
             $jsonResponse->addResponseError($exception->getMessage());
+        }
+
+        // odstraneni produktu z kosiku
+        if (!$jsonResponse->hasErrors())
+        {
+            try
+            {
+                $this->cart->removeCartOccurence($cartRemoveRequest);
+            }
+            catch (CartException $exception)
+            {
+                $jsonResponse->addResponseError($exception->getMessage());
+            }
         }
 
         $order = $this->cart->getOrder();

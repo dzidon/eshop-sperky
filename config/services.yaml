@@ -251,10 +251,6 @@ services:
         tags:
             - { name: doctrine.event_subscriber, connection: default }
 
-    App\ArgumentResolver\CartInsertResolver:
-        tags:
-            - { name: controller.argument_value_resolver, priority: 100 }
-
     gopay.payments:
         class: GoPay\Payments
         factory: ['GoPay\Api', payments]

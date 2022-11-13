@@ -5,7 +5,7 @@
 {% else %}
     <div class="row">
         {{ form_start(cartForm) }}
-            <div class="collection z-depth-1" id="cart-wrapper" data-cart-remove-url="{{ path('cart_remove') }}">
+            <div class="collection z-depth-1" id="cart-wrapper" data-cart-remove-url="{{ path('cart_remove') }}" data-cart-remove-csrf-token="{{ csrf_token('form_cart_remove') }}">
                 <div class="collection-item hide-on-med-and-down">
                     <div class="row no-mar-bot">
                         <div class="col s4">

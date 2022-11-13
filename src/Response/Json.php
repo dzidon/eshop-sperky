@@ -38,6 +38,11 @@ class Json
         return $this;
     }
 
+    public function hasErrors(): bool
+    {
+        return !empty($this->responseData['errors']);
+    }
+
     public function addResponseError(string $text): self
     {
         $this->responseStatus = Response::HTTP_UNPROCESSABLE_ENTITY;

@@ -3,7 +3,6 @@
 namespace App\Exception;
 
 use Exception;
-use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 /**
  * Výjimka pro chyby související s převodem požadavku na jiný objekt.
@@ -12,17 +11,8 @@ use Symfony\Component\Validator\ConstraintViolationListInterface;
  */
 class RequestTransformerException extends Exception
 {
-    private ?ConstraintViolationListInterface $validatorErrors;
-
-    public function __construct($message, ConstraintViolationListInterface $validatorErrors = null)
+    public function __construct($message)
     {
         parent::__construct($message);
-
-        $this->validatorErrors = $validatorErrors;
-    }
-
-    public function getValidatorErrors(): ?ConstraintViolationListInterface
-    {
-        return $this->validatorErrors;
     }
 }

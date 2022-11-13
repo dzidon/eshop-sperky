@@ -3,8 +3,9 @@
 namespace App\Service;
 
 use App\Entity\CartOccurence;
+use App\Entity\Detached\CartInsert;
+use App\Entity\Detached\CartRemove;
 use App\Entity\Order;
-use App\Entity\Product;
 use App\Entity\ProductOption;
 use App\Exception\CartException;
 use Doctrine\ORM\EntityManagerInterface;
@@ -154,15 +155,16 @@ class Cart
     /**
      * Vloží produkt do košíku s požadovaným množstvím a volbami.
      *
-     * @param Product $submittedProduct
-     * @param int $submittedQuantity
-     * @param array $submittedOptions
-     * @throws CartException
-     *
+     * @param CartInsert $cartInsert
      * @return $this
+     * @throws CartException
      */
-    public function insertProduct(Product $submittedProduct, int $submittedQuantity, array $submittedOptions): self
+    public function insertProduct(CartInsert $cartInsert): self
     {
+        $submittedProduct = $cartInsert->getProduct();
+        $submittedQuantity = $cartInsert->getQuantity();
+        $submittedOptions = $cartInsert->getOptionGroups();
+
         $inventory = $submittedProduct->getInventory();
         $requiredQuantity = $submittedQuantity;
         $targetCartOccurence = null;
@@ -259,21 +261,15 @@ class Cart
     /**
      * Odstraní CartOccurence z košíku.
      *
-     * @param int|null $cartOccurenceId
-     * @throws CartException
-     *
+     * @param CartRemove $cartRemove
      * @return $this
+     * @throws CartException
      */
-    public function removeCartOccurence(?int $cartOccurenceId): self
+    public function removeCartOccurence(CartRemove $cartRemove): self
     {
-        if ($cartOccurenceId === null)
-        {
-            throw new CartException('Byl zadán neplatný produkt.');
-        }
-
         foreach ($this->order->getCartOccurences() as $cartOccurence)
         {
-            if ($cartOccurence->getId() === $cartOccurenceId)
+            if ($cartOccurence->getId() === $cartRemove->getCartOccurenceId())
             {
                 $this->order->removeCartOccurence($cartOccurence);
                 $this->entityManager->remove($cartOccurence);
@@ -288,7 +284,7 @@ class Cart
     }
 
     /**
-     * Vrátí novou cookie s tokenem aktivní objednávky, pokud je objednávka nová, nebo se blíží k expiraci.
+     * Vytvoří novou cookie s tokenem aktivní objednávky, pokud je objednávka nová, nebo se blíží k expiraci.
      */
     private function obtainNewOrderCookie(): void
     {

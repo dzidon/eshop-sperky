@@ -28,9 +28,15 @@ function initialize()
     // tlačítka pro odstranění
     $('.button-cart-remove').click(function()
     {
-        const url = $('#cart-wrapper').data('cart-remove-url');
+        const cartWrapper = $('#cart-wrapper');
+        const url = cartWrapper.data('cart-remove-url');
+        const csrfToken = cartWrapper.data('cart-remove-csrf-token');
+
         const data = {
-            'cartOccurenceId': $(this).data('cart-occurence-id'),
+            'cart_remove_form': {
+                'cartOccurenceId': $(this).data('cart-occurence-id'),
+                '_token': csrfToken,
+            }
         };
 
         ajaxUpdateCart(url, data);
