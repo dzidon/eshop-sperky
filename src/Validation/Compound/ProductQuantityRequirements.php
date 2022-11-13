@@ -19,7 +19,7 @@ class ProductQuantityRequirements extends Compound
                 'message' => 'Do počtu kusů musíte zadat celé číslo.',
             ]),
             new NotBlank([
-                'message' => 'Počet kusů nesmí být prázdný.',
+                'message' => 'Počet kusů nesmí být nulový.',
             ]),
         ];
     }

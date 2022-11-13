@@ -9,27 +9,31 @@ use Symfony\Component\Validator\Constraints as Assert;
 class CartInsert
 {
     /**
+     * @Assert\NotNull(message="Produkt je neplatný.")
+     */
+    private $product;
+
+    /**
      * @AssertCompound\ProductQuantityRequirements
-     * @Assert\GreaterThanOrEqual(1)
+     * @Assert\GreaterThanOrEqual(value=1, message="Počet kusů musí být alespoň 1.")
      */
     private $quantity = 1;
 
     /**
-     * @Assert\NotBlank(message="Bylo odesláno neplatné ID produktu. Zkuste aktualizovat stránku a opakovat akci.")
-     */
-    private $productId;
-
-    /**
-     * @Assert\NotNull(message="Některá z produktových voleb byla vybrána chybně. Zkuste aktualizovat stránku a opakovat akci.")
+     * @Assert\NotNull(message="Některá z produktových voleb byla vybrána chybně.")
      */
     private $optionGroups;
 
-    private $product;
+    public function getProduct(): ?Product
+    {
+        return $this->product;
+    }
 
-    public function __construct(Product $product)
+    public function setProduct(?Product $product): self
     {
         $this->product = $product;
-        $this->productId = $product->getId();
+
+        return $this;
     }
 
     public function getQuantity(): ?int
@@ -40,23 +44,6 @@ class CartInsert
     public function setQuantity(?int $quantity): self
     {
         $this->quantity = $quantity;
-
-        return $this;
-    }
-
-    public function getProduct(): Product
-    {
-        return $this->product;
-    }
-
-    public function getProductId(): ?int
-    {
-        return $this->productId;
-    }
-
-    public function setProductId(?int $productId): self
-    {
-        $this->productId = $productId;
 
         return $this;
     }

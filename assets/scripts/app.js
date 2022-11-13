@@ -41,7 +41,7 @@ $(document).ready(function() {
 
     // scroll prvniho erroru na obrazovku
     const firstError = document.getElementsByClassName('form-error')[0];
-    if(firstError)
+    if (firstError)
     {
         firstError.scrollIntoView({
             behavior: 'auto',
@@ -76,7 +76,7 @@ const addFormToCollection = (e) =>
 
     // Možná chceme reloadnout dropdown (kvůli tomu jak funguje Materialize)
     const reloadSelect = collectionHolder.dataset.reloadSelect;
-    if(reloadSelect)
+    if (reloadSelect)
     {
         const element = collectionHolder.lastElementChild.querySelectorAll('select');
         M.FormSelect.init(element);
@@ -84,7 +84,7 @@ const addFormToCollection = (e) =>
 
     // Možná chceme reloadnout dropdown (kvůli tomu jak funguje Materialize)
     const reloadAutocomplete = collectionHolder.dataset.reloadAutocomplete;
-    if(reloadAutocomplete)
+    if (reloadAutocomplete)
     {
         const element = collectionHolder.lastElementChild.querySelectorAll('input.autocomplete');
 
@@ -142,8 +142,8 @@ export function ajaxAddProductToCart(url, data)
 
 export function initializeAddToCartLinks()
 {
-    const productImageLarge = $('.cart-insert-link');
-    productImageLarge.click(function()
+    const cartInsertLink = $('.cart-insert-link');
+    cartInsertLink.click(function()
     {
         const wrapper = $(this).closest('.insertable-products-wrapper');
         const csrfToken = wrapper.data('cart-insert-csrf-token');

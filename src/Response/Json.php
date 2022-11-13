@@ -3,12 +3,13 @@
 namespace App\Response;
 
 use LogicException;
-use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Validator\ConstraintViolationInterface;
+use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 /**
- * Třída řešící JSON odpověď.
+ * Třída pro sestavení JSON odpovědi.
  *
  * @package App\Response
  */
@@ -45,11 +46,12 @@ class Json
         return $this;
     }
 
-    public function addResponseFormErrors(FormInterface $form): self
+    public function addResponseValidatorErrors(ConstraintViolationListInterface $violationList): self
     {
-        foreach ($form->getErrors() as $formError)
+        /** @var ConstraintViolationInterface $error */
+        foreach ($violationList as $error)
         {
-            $this->addResponseError($formError->getMessage());
+            $this->addResponseError($error->getMessage());
         }
 
         return $this;

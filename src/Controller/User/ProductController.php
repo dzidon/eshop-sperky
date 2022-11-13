@@ -111,7 +111,8 @@ class ProductController extends AbstractController
             throw new NotFoundHttpException('Produkt nenalezen.');
         }
 
-        $cartInsertRequest = new CartInsert($product);
+        $cartInsertRequest = new CartInsert();
+        $cartInsertRequest->setProduct($product);
         $form = $this->createForm(CartInsertFormType::class, $cartInsertRequest);
 
         $relatedProducts = null;

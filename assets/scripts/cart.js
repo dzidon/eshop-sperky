@@ -11,7 +11,7 @@ function initialize()
 {
     // formulář celého košíku
     const formCartUpdate = $('#form-cart-update');
-    if(formCartUpdate)
+    if (formCartUpdate)
     {
         formCartUpdate.on('change', function()
         {
@@ -39,7 +39,7 @@ function initialize()
 
 function ajaxUpdateCart(url, data)
 {
-    if(requestInProgress)
+    if (requestInProgress)
     {
         return;
     }

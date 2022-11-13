@@ -3,6 +3,7 @@
 namespace App\Form\FormType\User;
 
 use App\Entity\Detached\CartInsert;
+use App\Entity\Product;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
@@ -21,17 +22,30 @@ class CartInsertFormType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        /** @var CartInsert $cartInsert */
+        $cartInsert = $builder->getForm()->getData();
+
+        /** @var Product|null $product */
+        $product = $cartInsert->getProduct();
+
+        $productId = null;
+        if ($product !== null)
+        {
+            $productId = $product->getId();
+        }
+
         $builder
+            ->add('productId', HiddenType::class, [
+                'mapped' => false,
+                'data' => $productId,
+                'error_bubbling' => true,
+            ])
             ->add('quantity', IntegerType::class, [
                 'attr' => [
                     'min' => 1
                 ],
-                'invalid_message' => 'Do počtu kusů musíte zadat celé číslo.',
                 'error_bubbling' => true,
                 'label' => 'Ks',
-            ])
-            ->add('productId', HiddenType::class, [
-                'error_bubbling' => true,
             ])
             ->add('optionGroups', CartInsertOptionGroupsFormType::class, [
                 'empty_data' => [],
