@@ -67,10 +67,9 @@ class Order implements EntityOrphanRemovalInterface
     private $expireAt;
 
     /**
-     * @ORM\OneToMany(targetEntity=CartOccurence::class, mappedBy="order_", cascade={"persist"})
+     * @ORM\OneToMany(targetEntity=CartOccurence::class, mappedBy="order_", cascade={"persist"}, indexBy="id")
      *
-     * @AssertCustom\CartOccurenceQuantity(groups={"cart"})
-     * @Assert\Valid(groups={"cart", "onDemandCreation"})
+     * @Assert\Valid(groups={"onDemandCreation"})
      * @Assert\Count(min=1, groups={"addresses", "onDemandCreation"}, minMessage="Objednávka musí mít alespoň 1 produkt.")
      */
     private $cartOccurences;
@@ -446,13 +445,6 @@ class Order implements EntityOrphanRemovalInterface
                 $cartOccurence->setOrder(null);
             }
         }
-
-        return $this;
-    }
-
-    public function reindexCartOccurences(): self
-    {
-        $this->cartOccurences = new ArrayCollection($this->cartOccurences->getValues());
 
         return $this;
     }

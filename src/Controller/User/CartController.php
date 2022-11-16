@@ -7,6 +7,7 @@ use App\Exception\RequestTransformerException;
 use App\Form\FormType\User\CartFormType;
 use App\Request\Transformer\RequestToCartInsertTransformer;
 use App\Request\Transformer\RequestToCartRemoveTransformer;
+use App\Request\Transformer\RequestToCartUpdateTransformer;
 use App\Response\Json;
 use App\Service\Cart;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -75,27 +76,36 @@ class CartController extends AbstractController
     /**
      * @Route("/aktualizovat", name="cart_update")
      */
-    public function update(Request $request): Response
+    public function update(Request $request, ValidatorInterface $validator, RequestToCartUpdateTransformer $requestToCartUpdateTransformer): Response
     {
         $jsonResponse = new Json();
         $order = $this->cart->getOrder();
 
-        $form = $this->createForm(CartFormType::class, $order);
-        $jsonResponse->setResponseHtml($this->renderView('fragments/forms_unique/_form_cart_update.html.twig', ['cartForm' => $form->createView(), 'order' => $order]));
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid())
+        // prevod requestu a validace
+        try
         {
-            $this->cart->updateQuantities();
-            $form = $this->createForm(CartFormType::class, $order);
-            $jsonResponse->setResponseHtml($this->renderView('fragments/forms_unique/_form_cart_update.html.twig', ['cartForm' => $form->createView(), 'order' => $order]));
+            $cartUpdateRequest = $requestToCartUpdateTransformer->createCartUpdate($request, $order);
+            $errors = $validator->validate($cartUpdateRequest);
+            if (count($errors) > 0)
+            {
+                $jsonResponse->addResponseValidatorErrors($errors);
+            }
         }
-        /*else if ($form->isSubmitted() && !$form->isValid())
+        catch (RequestTransformerException $exception)
         {
-            $jsonResponse->addResponseFormErrors($form);
-        }*/
+            $jsonResponse->addResponseError($exception->getMessage());
+        }
+
+        // aktualizace košíku
+        if (!$jsonResponse->hasErrors())
+        {
+            $this->cart->updateQuantities($cartUpdateRequest);
+        }
+
+        $form = $this->createForm(CartFormType::class, $order);
 
         return $jsonResponse
+            ->setResponseHtml($this->renderView('fragments/forms_unique/_form_cart_update.html.twig', ['cartForm' => $form->createView(), 'order' => $order]))
             ->setResponseData('flashHtml', $this->renderView('fragments/_flash_messages.html.twig'))
             ->setResponseData('totalProducts', $order->getTotalQuantity())
             ->create()
@@ -108,11 +118,12 @@ class CartController extends AbstractController
     public function remove(Request $request, ValidatorInterface $validator, RequestToCartRemoveTransformer $requestToCartRemoveTransformer): Response
     {
         $jsonResponse = new Json();
+        $order = $this->cart->getOrder();
 
         // prevod requestu a validace
         try
         {
-            $cartRemoveRequest = $requestToCartRemoveTransformer->createCartRemove($request);
+            $cartRemoveRequest = $requestToCartRemoveTransformer->createCartRemove($request, $order);
             $errors = $validator->validate($cartRemoveRequest);
             if (count($errors) > 0)
             {

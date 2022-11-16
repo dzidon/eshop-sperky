@@ -2,6 +2,7 @@
 
 namespace App\Entity\Detached;
 
+use App\Entity\CartOccurence;
 use App\Validation\Compound as AssertCompound;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -15,16 +16,16 @@ class CartRemove
     /**
      * @Assert\NotNull(message="Produkt je neplatný.")
      */
-    private $cartOccurenceId;
+    private $cartOccurence;
 
-    public function getCartOccurenceId(): ?int
+    public function getCartOccurence(): ?CartOccurence
     {
-        return $this->cartOccurenceId;
+        return $this->cartOccurence;
     }
 
-    public function setCartOccurenceId(?int $cartOccurenceId): self
+    public function setCartOccurence(?CartOccurence $cartOccurence): self
     {
-        $this->cartOccurenceId = $cartOccurenceId;
+        $this->cartOccurence = $cartOccurence;
 
         return $this;
     }

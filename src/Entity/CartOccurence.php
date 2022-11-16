@@ -43,7 +43,7 @@ class CartOccurence
      * @ORM\Column(type="integer")
      *
      * @AssertCompound\ProductQuantityRequirements(groups={"Default", "onDemandCreation"})
-     * @Assert\GreaterThanOrEqual(value=0, groups={"Default"})
+     * @Assert\GreaterThanOrEqual(value=0, groups={"Default"}, message="Počet kusů musí být větší nebo roven 0.")
      * @Assert\GreaterThanOrEqual(value=1, groups={"onDemandCreation"})
      */
     private $quantity;

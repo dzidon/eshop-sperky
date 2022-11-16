@@ -5,6 +5,7 @@ namespace App\Service;
 use App\Entity\CartOccurence;
 use App\Entity\Detached\CartInsert;
 use App\Entity\Detached\CartRemove;
+use App\Entity\Detached\CartUpdate;
 use App\Entity\Order;
 use App\Entity\ProductOption;
 use App\Exception\CartException;
@@ -155,15 +156,15 @@ class Cart
     /**
      * Vloží produkt do košíku s požadovaným množstvím a volbami.
      *
-     * @param CartInsert $cartInsert
+     * @param CartInsert $cartInsertAction
      * @return $this
      * @throws CartException
      */
-    public function insertProduct(CartInsert $cartInsert): self
+    public function insertProduct(CartInsert $cartInsertAction): self
     {
-        $submittedProduct = $cartInsert->getProduct();
-        $submittedQuantity = $cartInsert->getQuantity();
-        $submittedOptions = $cartInsert->getOptionGroups();
+        $submittedProduct = $cartInsertAction->getProduct();
+        $submittedQuantity = $cartInsertAction->getQuantity();
+        $submittedOptions = $cartInsertAction->getOptionGroups();
 
         $inventory = $submittedProduct->getInventory();
         $requiredQuantity = $submittedQuantity;
@@ -197,7 +198,7 @@ class Cart
 
         if($requiredQuantity > $inventory)
         {
-            throw new CartException('Tolik kusů už na skladě bohužel nemáme.');
+            throw new CartException('Do košíku už si nemůžete vložit více kusů tohoto produktu.');
         }
 
         if($targetCartOccurence === null)
@@ -235,25 +236,36 @@ class Cart
      * Aktualizuje počty produktů v košíku. Pokud je nějaký počet menší nebo roven 0, CartOccurence se odstraní. Pokud je
      * počet větší než 0, CartOccurence se uloží.
      *
+     * @param CartUpdate $cartUpdateAction
      * @return $this
      */
-    public function updateQuantities(): self
+    public function updateQuantities(CartUpdate $cartUpdateAction): self
     {
-        foreach ($this->order->getCartOccurences() as $cartOccurence)
+        $cartOccurences = $this->order->getCartOccurences();
+
+        foreach ($cartUpdateAction->getCartOccurences() as $inputCartOccurence)
         {
-            if($cartOccurence->getQuantity() <= 0)
+            $inputCartOccurenceId = $inputCartOccurence->getId();
+            $inputQuantity = $inputCartOccurence->getQuantity();
+
+            if ($cartOccurences->containsKey($inputCartOccurenceId))
             {
-                $this->order->removeCartOccurence($cartOccurence);
-                $this->entityManager->remove($cartOccurence);
-            }
-            else
-            {
-                $this->entityManager->persist($cartOccurence);
+                $cartOccurence = $cartOccurences->get($inputCartOccurenceId);
+                $cartOccurence->setQuantity($inputQuantity);
+
+                if($cartOccurence->getQuantity() <= 0)
+                {
+                    $this->order->removeCartOccurence($cartOccurence);
+                    $this->entityManager->remove($cartOccurence);
+                }
+                else
+                {
+                    $this->entityManager->persist($cartOccurence);
+                }
             }
         }
 
         $this->entityManager->flush();
-        $this->order->reindexCartOccurences();
 
         return $this;
     }
@@ -261,22 +273,26 @@ class Cart
     /**
      * Odstraní CartOccurence z košíku.
      *
-     * @param CartRemove $cartRemove
+     * @param CartRemove $cartRemoveAction
      * @return $this
      * @throws CartException
      */
-    public function removeCartOccurence(CartRemove $cartRemove): self
+    public function removeCartOccurence(CartRemove $cartRemoveAction): self
     {
-        foreach ($this->order->getCartOccurences() as $cartOccurence)
-        {
-            if ($cartOccurence->getId() === $cartRemove->getCartOccurenceId())
-            {
-                $this->order->removeCartOccurence($cartOccurence);
-                $this->entityManager->remove($cartOccurence);
-                $this->entityManager->flush();
-                $this->order->reindexCartOccurences();
+        $targetCartOccurence = $cartRemoveAction->getCartOccurence();
 
-                return $this;
+        if ($targetCartOccurence !== null)
+        {
+            foreach ($this->order->getCartOccurences() as $cartOccurence)
+            {
+                if ($cartOccurence->getId() === $targetCartOccurence->getId())
+                {
+                    $this->order->removeCartOccurence($cartOccurence);
+                    $this->entityManager->remove($cartOccurence);
+                    $this->entityManager->flush();
+
+                    return $this;
+                }
             }
         }
 
